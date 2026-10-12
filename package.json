@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "build": "echo 'Static site - no build needed'",
+    "pages:deploy": "wrangler pages deploy . --project-name=personal-website",
     "install-deps": "npm install",
     "test": "echo \"No tests yet\" && exit 0"
   },
