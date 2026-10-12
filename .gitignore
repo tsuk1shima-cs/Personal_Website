@@ -13,7 +13,7 @@ yarn-error.log*
 .env.example
 
 # API Configuration files (CHỨA KEYS - KHÔNG BAO GIỜ COMMIT)
-config.js
+# config.js -- da doi thanh file public, khong chua keys
 config.json
 config.ini
 *.key
