@@ -440,16 +440,18 @@
 
             let items = [], source = '';
 
-            // 1. Thu backend truoc
-            try {
-                const res = await fetch(`${API_BASE}/news/rss`,
-                    { signal: AbortSignal.timeout(4000) });
-                const data = await res.json();
-                if (data.success && data.items?.length) {
-                    items  = data.items;
-                    source = data.cached ? ' (cache)' : '';
-                }
-            } catch { /* fallback */ }
+            // 1. Thu backend truoc (chi khi co API_BASE)
+            if (API_BASE) {
+                try {
+                    const res = await fetch(`${API_BASE}/news/rss`,
+                        { signal: AbortSignal.timeout(4000) });
+                    const data = await res.json();
+                    if (data.success && data.items?.length) {
+                        items  = data.items;
+                        source = data.cached ? ' (cache)' : '';
+                    }
+                } catch { /* fallback */ }
+            }
 
             // 2. Fallback: goi truc tiep qua rss2json
             if (!items.length) {
@@ -457,7 +459,7 @@
                     items  = await fetchRSSDirect();
                     source = ' (trực tiếp)';
                 } catch (err) {
-                    showEmpty('Không tải được tin tức. Vui lòng thử lại.');
+                    showEmpty('Không tải được tin tức. Vui lòng thử lại sau.');
                     btn.disabled = false;
                     btn.textContent = 'Làm mới';
                     return;
@@ -526,6 +528,15 @@
             const indicator = document.getElementById('aiGenerating');
             const section   = document.getElementById('aiSection');
             const content   = document.getElementById('aiContent');
+
+            if (!API_BASE) {
+                content.innerHTML = `<div class="error-box">
+                    Tính năng tổng hợp AI cần backend server (Render).<br>
+                    Xem hướng dẫn deploy trong <strong>README.md</strong>.
+                </div>`;
+                section.style.display = 'block';
+                return;
+            }
 
             btn.disabled = true;
             btn.textContent = 'Đang tổng hợp...';

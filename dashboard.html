@@ -336,6 +336,23 @@
         }
 
         async function checkHealth() {
+            if (!API_BASE) {
+                setBadge('statusServer', false, 'Không có backend');
+                setBadge('statusAI',     false, 'Cần Render');
+                setBadge('statusTCBS',   false, 'Cần Render');
+                document.getElementById('systemGrid').innerHTML = [
+                    ['Backend',      '✗ Chưa deploy (xem README)'],
+                    ['OpenRouter AI', '✗ Cần backend'],
+                    ['TCBS iFlash',   '✗ Cần backend'],
+                    ['Market data',   '✓ TradingView (không cần backend)'],
+                    ['RSS tin tức',   '✓ Trực tiếp qua rss2json'],
+                ].map(([k, v]) => `
+                    <div class="config-label">${k}</div>
+                    <div class="config-value ${v.startsWith('✗') ? 'empty' : ''}">${v}</div>
+                `).join('');
+                return;
+            }
+
             try {
                 const res = await fetch(`${API_BASE}/health`);
                 const data = await res.json();
