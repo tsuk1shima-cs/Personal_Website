@@ -1,0 +1,300 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="posts.js"></script>
+    <style>
+        .blog-container {
+            background: #f8f8f8;
+            min-height: calc(100vh - 70px);
+            padding: 45px 0 70px;
+        }
+        
+        .blog-header {
+            margin-bottom: 42px;
+            padding-left: 8px;
+        }
+        
+        .blog-header h1 {
+            margin-bottom: 8px;
+            font-size: 28px;
+            letter-spacing: -0.01em;
+        }
+        
+        .blog-header p {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+        
+        .posts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .post-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 26px 28px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        
+        .post-card:hover {
+            border-color: #999;
+        }
+        
+        .post-card:nth-child(3n+1) {
+            margin-left: 20px;
+        }
+        
+        .post-card:nth-child(3n+2) {
+            margin-right: 20px;
+        }
+        
+        .post-meta {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #888;
+            font-weight: 400;
+        }
+        
+        .post-meta span {
+            position: relative;
+        }
+        
+        .post-title {
+            font-size: 21px;
+            font-weight: 700;
+            margin: 0 0 11px 0;
+            color: #222;
+            line-height: 1.35;
+            letter-spacing: -0.01em;
+        }
+        
+        .post-excerpt {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.65;
+            margin-bottom: 14px;
+        }
+        
+        .post-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+        
+        .tag {
+            padding: 5px 11px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .empty-state p {
+            color: #999;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .post-card:nth-child(3n+1),
+            .post-card:nth-child(3n+2) {
+                margin-left: 0;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="wrap">
+            <a href="index.html" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="market-data.html">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html">TCBS Realtime</a>
+                    </div>
+                </div>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
+                        <a href="dao-tao.html">Đào tạo</a>
+                    </div>
+                </div>
+
+                <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+                <a href="chatbot.html" class="nav-link">Chatbot</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel">
+            <a href="index.html">Trang chủ</a>
+            <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html">Bộ lọc FA</a>
+            <a href="market-data.html">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html">Mở tài khoản</a>
+            <a href="dao-tao.html">Đào tạo</a>
+            <a href="tin-tuc.html">Tin tức</a>
+            <a href="chatbot.html">Chatbot</a>
+            <a href="blog.html">Blog</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="index.html#contact">Liên hệ</a>
+        </div>
+    </nav>
+
+    <!-- BLOG CONTAINER -->
+    <section class="blog-container">
+        <div class="wrap">
+            <div class="blog-header">
+                <h1>Blog & Phân tích</h1>
+                <p>Chia sẻ kiến thức, phân tích thị trường và chiến lược đầu tư</p>
+            </div>
+
+            <div class="posts-list" id="postsGrid">
+                <!-- Posts will be loaded from posts.js -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="wrap">
+            <p><strong>Đặng Cao Hoàng Phúc</strong>  · Chức vụ...., Công ty....</p>
+            <p>&copy; 2026 Bản tin và khuyến nghị mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
+            <p>
+                <a href="#">Chính sách bảo mật</a> · 
+                <a href="#">Điều khoản sử dụng</a> · 
+                Email: <a href="mailto:contact@example.com">contact@example.com</a> · 
+                Điện thoại: <a href="tel:0982059995">0982 059 995</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Click-to-open dropdown navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navGroups = document.querySelectorAll('.nav-grp');
+            
+            navGroups.forEach(group => {
+                const btn = group.querySelector('.nav-grp__btn');
+                
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Close other open menus
+                    navGroups.forEach(g => {
+                        if (g !== group) g.classList.remove('open');
+                    });
+                    
+                    // Toggle current menu
+                    group.classList.toggle('open');
+                });
+            });
+            
+            // Close menus when clicking outside
+    <script src="nav-script.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPosts();
+        });
+
+        function loadPosts() {
+            const grid = document.getElementById('postsGrid');
+            
+            if (typeof blogPosts === 'undefined' || blogPosts.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Chưa có bài viết</h3>
+                        <p>Thêm bài viết vào file posts.js để hiển thị ở đây</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = blogPosts.map(post => `
+                <article class="post-card" onclick="window.location.href='${post.url || '#'}'">
+                    <div class="post-meta">
+                        <span>${post.date}</span>
+                        <span>•</span>
+                        <span>${post.author || 'Đặng Cao Hoàng Phúc'}</span>
+                    </div>
+                    <h2 class="post-title">${post.title}</h2>
+                    <p class="post-excerpt">${post.excerpt}</p>
+                    ${post.tags ? `
+                        <div class="post-tags">
+                            ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </article>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

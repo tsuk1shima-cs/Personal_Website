@@ -1,0 +1,341 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyên Gia Tư Vấn Tài Chính - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="wrap">
+            <a href="#" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="market-data.html">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html">TCBS Realtime</a>
+                    </div>
+                </div>
+
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
+                        <a href="dao-tao.html">Đào tạo</a>
+                    </div>
+                </div>
+
+                <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+                <a href="chatbot.html" class="nav-link">Chatbot</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel">
+            <a href="index.html">Trang chủ</a>
+            <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html">Bộ lọc FA</a>
+            <a href="market-data.html">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html">Mở tài khoản</a>
+            <a href="dao-tao.html">Đào tạo</a>
+            <a href="tin-tuc.html">Tin tức</a>
+            <a href="chatbot.html">Chatbot</a>
+            <a href="blog.html">Blog</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="#contact">Liên hệ</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero__panel">
+            <div class="hero__eyebrow">CHUYÊN GIA ĐẦU TƯ CHỨNG KHOÁN</div>
+            <h1>Đặng Cao Hoàng Phúc</h1>
+            <p>Đoạn này bổ sung sau</p>
+            <div class="hero__actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">
+                    Đăng ký tư vấn tại đây
+                </button>
+                <button class="btn btn--outline">Xem danh mục chiến lược</button>
+            </div>
+        </div>
+        <div class="hero__media">
+            <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=600&fit=crop" alt="Chuyên gia tài chính">
+            <div class="hero__cap">
+                Chức vụ....
+                <strong>Công ty....</strong>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY SECTION -->
+    <section class="why" id="about">
+        <div class="wrap">
+            <h2>Vì sao....</h2>
+            <div class="why__rule"></div>
+            
+            <svg class="signature-line" viewBox="0 0 400 60" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 30 Q 100 10, 200 30 T 390 30" stroke="white" stroke-width="2" fill="none" opacity="0.3"/>
+            </svg>
+
+            <div class="why-grid">
+                <div class="why-item">
+                    <h3>Lí do 1</h3>
+                    <p>....</p>
+                </div>
+                <div class="why-item">
+                    <h3>Lí do 2</h3>
+                    <p>....</p>
+                </div>
+                <div class="why-item">
+                    <h3>Lí do 3</h3>
+                    <p>....</p>
+                </div>
+                <div class="why-item">
+                    <h3>Lí do 4</h3>
+                    <p>....</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEES SECTION -->
+    <section class="fees">
+        <div class="wrap">
+            <div class="fees__head">
+                <h2>Chi phí minh bạch</h2>
+            </div>
+
+            <div class="fee-grid">
+                <div class="fee-card" style="background-image: url('https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&h=400&fit=crop');">
+                    <div class="fee-val">0%</div>
+                    <div class="fee-lbl">Phí tư vấn</div>
+                </div>
+                <div class="fee-card" style="background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop');">
+                    <div class="fee-val">0.1% – 0.15%</div>
+                    <div class="fee-lbl">Phí giao dịch</div>
+                </div>
+                <div class="fee-card" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop');">
+                    <div class="fee-val">~ 10%</div>
+                    <div class="fee-lbl">Lãi margin</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- REGISTRATION BAR -->
+    <section class="reg-bar">
+        <div class="wrap">
+            <h2>Đăng ký tham gia tư vấn miễn phí</h2>
+            <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký ngay</button>
+        </div>
+    </section>
+
+    <!-- CONSULT FORM -->
+    <section class="consult" id="contact">
+        <div class="wrap">
+            <form id="consultForm">
+                <div class="field-row">
+                    <div class="field">
+                        <label for="name">Họ và tên</label>
+                        <input type="text" id="name" name="from_name" placeholder="Nguyễn Văn A" required>
+                    </div>
+                    <div class="field">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="tel" id="phone" name="phone" placeholder="0982 059 995" required>
+                    </div>
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="reply_to" placeholder="example@email.com">
+                    </div>
+                </div>
+
+                <div class="group-label">Dịch vụ cần tư vấn</div>
+                <div class="services">
+                    <label>
+                        <input type="checkbox" name="service" value="Tư vấn đầu tư">
+                        <span>Tư vấn đầu tư</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="service" value="Quản lý danh mục">
+                        <span>Quản lý danh mục</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="service" value="Mở tài khoản">
+                        <span>Mở tài khoản</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" name="service" value="Đào tạo đầu tư">
+                        <span>Đào tạo đầu tư</span>
+                    </label>
+                </div>
+
+                <div class="message-wrap">
+                    <textarea id="userMessage" name="message" placeholder="Lời nhắn của bạn..."></textarea>
+                    <button type="submit" class="btn btn--solid" id="submitBtn">Gửi thông tin</button>
+                </div>
+
+                <div class="consult-msg" id="consultMsg"></div>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="wrap">
+            <p><strong>Đặng Cao Hoàng Phúc</strong> — Đặng Cao Hoàng Phúc - Chức vụ...., Công ty....</p>
+            <p>&copy; 2026 Bản tin và khuyến nghị mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
+            <p>
+                <a href="#">Chính sách bảo mật</a> · 
+                <a href="#">Điều khoản sử dụng</a> · 
+                Email: <a href="mailto:contact@example.com">contact@example.com</a> · 
+                Điện thoại: <a href="tel:0982059995">01234567890</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="nav-script.js"></script>
+    <script>
+        // ============================================================
+        // EMAILJS CONFIG — Dien thong tin cua ban vao day
+        // Dang ky mien phi tai: https://www.emailjs.com
+        // ============================================================
+        const EMAILJS_CONFIG = {
+            publicKey:  'vT62BsMsNqsgYeQBf',    // Account -> API Keys
+            serviceId:  'service_u5fkowq',    // Email Services -> Service ID
+            templateId: 'template_vviryqe',   // Email Templates -> Template ID
+        };
+        // ============================================================
+
+        // Khoi tao EmailJS
+        if (EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
+            emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+        }
+
+        document.getElementById('consultForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const msgDiv   = document.getElementById('consultMsg');
+            const submitBtn = document.getElementById('submitBtn');
+            const form     = this;
+
+            // Thu thap du lieu
+            const name    = document.getElementById('name').value.trim();
+            const phone   = document.getElementById('phone').value.trim();
+            const email   = document.getElementById('email').value.trim();
+            const message = document.getElementById('userMessage').value.trim();
+            const services = [...document.querySelectorAll('input[name="service"]:checked')]
+                .map(cb => cb.value).join(', ') || 'Chưa chọn';
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang gửi...';
+            msgDiv.className = 'consult-msg';
+            msgDiv.textContent = '';
+
+            // --- Gui qua EmailJS (neu da cau hinh) ---
+            if (EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
+                try {
+                    await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+                        from_name: name,
+                        phone:     phone,
+                        reply_to:  email,
+                        services:  services,
+                        message:   message || '(Không có lời nhắn)',
+                        time:      new Date().toLocaleString('vi-VN'),
+                    });
+
+                    msgDiv.className = 'consult-msg ok';
+                    msgDiv.textContent = 'Cảm ơn bạn đã đăng ký! Chúng tôi sẽ liên hệ tư vấn miễn phí trong thời gian sớm nhất.';
+                    form.reset();
+                } catch (err) {
+                    console.error('EmailJS error:', err);
+                    msgDiv.className = 'consult-msg';
+                    msgDiv.style.color = '#dc2626';
+                    msgDiv.textContent = 'Gửi thất bại, vui lòng thử lại hoặc liên hệ trực tiếp.';
+                }
+            } else {
+                // --- Fallback: gui qua backend server ---
+                try {
+                    const res = await fetch('/api/contact', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, phone, email, services, message })
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        msgDiv.className = 'consult-msg ok';
+                        msgDiv.textContent = 'Cảm ơn bạn đã đăng ký! Chúng tôi sẽ liên hệ tư vấn miễn phí trong thời gian sớm nhất.';
+                        form.reset();
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } catch (err) {
+                    msgDiv.className = 'consult-msg';
+                    msgDiv.style.color = '#dc2626';
+                    msgDiv.textContent = 'Gửi thất bại. Vui lòng liên hệ trực tiếp qua số điện thoại.';
+                }
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Gửi thông tin';
+            setTimeout(() => { msgDiv.textContent = ''; msgDiv.style.color = ''; }, 6000);
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#' && href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+    </script>

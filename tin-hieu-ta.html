@@ -1,0 +1,574 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tín hiệu TA - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #fafafa; }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .tab-nav .wrap {
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+        }
+        
+        .tab-link {
+            padding: 16px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #737373;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        
+        .tab-link:hover {
+            color: #171717;
+            background: #fafafa;
+        }
+        
+        .tab-link.active {
+            color: #171717;
+            border-bottom-color: #171717;
+        }
+        
+        /* Header Stats */
+        .signal-header {
+            background: white;
+            padding: 32px 40px;
+            margin-bottom: 24px;
+        }
+        
+        .signal-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+        }
+        
+        .signal-header p {
+            margin: 0 0 24px 0;
+            color: #737373;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #171717;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .stat-value.positive { color: #16a34a; }
+        .stat-value.negative { color: #dc2626; }
+        
+        /* Filters */
+        .filters-section {
+            background: white;
+            padding: 20px 32px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #525252;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #404040;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .filter-btn:hover {
+            background: #fafafa;
+            border-color: #a3a3a3;
+        }
+        
+        .filter-btn.active {
+            background: #171717;
+            color: white;
+            border-color: #171717;
+        }
+        
+        /* Signals Table */
+        .signals-section {
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            border: 1px solid #e5e5e5;
+            overflow: hidden;
+        }
+        
+        .section-header {
+            padding: 20px 32px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .signals-count {
+            font-size: 13px;
+            color: #737373;
+        }
+        
+        .signals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .signals-table thead {
+            background: #fafafa;
+        }
+        
+        .signals-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .signals-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 14px;
+        }
+        
+        .signals-table tbody tr:hover {
+            background: #fafafa;
+        }
+        
+        .symbol {
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge.buy {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge.sell {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge.holding {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 2px 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 500;
+            margin-right: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            .signals-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="wrap">
+            <a href="index.html" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="market-data.html">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html">TCBS Realtime</a>
+                    </div>
+                </div>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
+                        <a href="dao-tao.html">Đào tạo</a>
+                    </div>
+                </div>
+
+                <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+                <a href="chatbot.html" class="nav-link">Chatbot</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel">
+            <a href="index.html">Trang chủ</a>
+            <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html">Bộ lọc FA</a>
+            <a href="market-data.html">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html">Mở tài khoản</a>
+            <a href="dao-tao.html">Đào tạo</a>
+            <a href="tin-tuc.html">Tin tức</a>
+            <a href="chatbot.html">Chatbot</a>
+            <a href="blog.html">Blog</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="index.html#contact">Liên hệ</a>
+        </div>
+    </nav>
+
+    <!-- TAB NAVIGATION -->
+    <div class="tab-nav">
+        <div class="wrap">
+            <a href="?screen=all" class="tab-link active">Tất cả</a>
+            <a href="?screen=sideway_breakout" class="tab-link">Sideway Breakout</a>
+            <a href="?screen=volume_breakout" class="tab-link">Volume Breakout</a>
+            <a href="?screen=oversold" class="tab-link">Oversold</a>
+            <a href="?screen=golden_cross" class="tab-link">Golden Cross</a>
+            <a href="?screen=pattern" class="tab-link">Candlestick Pattern</a>
+        </div>
+    </div>
+
+    <!-- SIGNAL HEADER -->
+    <div class="signal-header">
+        <h1>Tín hiệu mới & đang nắm giữ</h1>
+        <p>Giá cập nhật tự động từ thị trường — <span id="updateBadge" style="color:#16a34a;font-weight:500">Đang tải...</span></p>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-label">Đang nắm giữ</div>
+                <div class="stat-value" id="statHolding">8</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Tỷ lệ thắng</div>
+                <div class="stat-value" id="statWinRate">—</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">% Lãi/Lỗ TB</div>
+                <div class="stat-value" id="statAvgPnl">—</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Số phiên TB</div>
+                <div class="stat-value" id="statAvgDays">—</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="wrap" style="padding-bottom: 60px;">
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <span class="filter-label">Bộ lọc FA:</span>
+                <button class="filter-btn active" onclick="toggleFilter(this, 'all')">Tất cả</button>
+                <button class="filter-btn" onclick="toggleFilter(this, 'gia_tri')">Giá trị</button>
+                <button class="filter-btn" onclick="toggleFilter(this, 'tang_truong')">Tăng trưởng</button>
+                <button class="filter-btn" onclick="toggleFilter(this, 'co_tuc_cao')">Cổ tức cao</button>
+            </div>
+        </div>
+
+        <!-- Signals Table -->
+        <div class="signals-section">
+            <div class="section-header">
+                <h2 class="section-title">Lịch sử tín hiệu</h2>
+                <span class="signals-count">8 tín hiệu</span>
+            </div>
+
+            <table class="signals-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Mã CK</th>
+                        <th>Sàn</th>
+                        <th>FA Filter</th>
+                        <th>Lệnh</th>
+                        <th>Ngày vào</th>
+                        <th>Giá vào</th>
+                        <th>Giá hiện tại</th>
+                        <th>% Ngày</th>
+                        <th>% Lãi/Lỗ</th>
+                        <th>Phiên</th>
+                        <th>Pattern</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="signalsTable">
+                    <!-- Data will be loaded by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="wrap">
+            <p><strong>Đặng Cao Hoàng Phúc</strong></p>
+            <p>&copy; 2026 Tín hiệu mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
+        </div>
+    </footer>
+
+    <script src="nav-script.js"></script>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+
+        // Danh sach tin hieu — gia vao va thong tin static
+        const signals = [
+            { id: 1, symbol: 'FRT', exchange: 'HOSE', faFilter: 'gia_tri',           action: 'buy', dateIn: '07/10/2026', priceIn: 150.5, pattern: 'Tweezer Bottom' },
+            { id: 2, symbol: 'MSB', exchange: 'HOSE', faFilter: '',                   action: 'buy', dateIn: '07/10/2026', priceIn: 14.65, pattern: '' },
+            { id: 3, symbol: 'MSN', exchange: 'HOSE', faFilter: '',                   action: 'buy', dateIn: '07/10/2026', priceIn: 75.2,  pattern: '' },
+            { id: 4, symbol: 'NAB', exchange: 'HOSE', faFilter: '',                   action: 'buy', dateIn: '06/10/2026', priceIn: 12.9,  pattern: '' },
+            { id: 5, symbol: 'DGW', exchange: 'HOSE', faFilter: 'tang_truong',        action: 'buy', dateIn: '05/10/2026', priceIn: 47.4,  pattern: '' },
+            { id: 6, symbol: 'PVT', exchange: 'HOSE', faFilter: 'tang_truong',        action: 'buy', dateIn: '29/09/2026', priceIn: 24.95, pattern: '' },
+            { id: 7, symbol: 'BVH', exchange: 'HOSE', faFilter: '',                   action: 'buy', dateIn: '28/09/2026', priceIn: 73.6,  pattern: '' },
+            { id: 8, symbol: 'VGC', exchange: 'HOSE', faFilter: 'co_tuc_cao,gia_tri', action: 'buy', dateIn: '24/09/2026', priceIn: 42.4,  pattern: '' }
+        ];
+
+        // Cache gia hien tai
+        const livePrices = {};
+        let lastPriceUpdate = null;
+        let currentFilter = 'all';
+        let refreshInterval = null;
+
+        // Tinh so phien giao dich tu ngay vao
+        function calcDays(dateStr) {
+            const [d, m, y] = dateStr.split('/').map(Number);
+            const entry = new Date(y, m - 1, d);
+            const now = new Date();
+            let days = 0;
+            const cur = new Date(entry);
+            while (cur < now) {
+                const dow = cur.getDay();
+                if (dow !== 0 && dow !== 6) days++;
+                cur.setDate(cur.getDate() + 1);
+            }
+            return Math.max(0, days - 1);
+        }
+
+        // Lay gia tu server (TradingView)
+        async function fetchPrices() {
+            const symbols = signals.map(s => s.symbol);
+            try {
+                const res = await fetch(`${API_BASE}/market/prices`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ symbols })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    Object.assign(livePrices, data.prices);
+                    lastPriceUpdate = new Date();
+                    updateSummaryStats();
+                    renderSignals(currentFilter);
+                    document.getElementById('updateBadge').textContent =
+                        'Cập nhật: ' + lastPriceUpdate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+            } catch (err) {
+                console.error('Price fetch error:', err);
+            }
+        }
+
+        function updateSummaryStats() {
+            const holding = signals.length;
+            let wins = 0, totalPnl = 0, count = 0;
+            signals.forEach(s => {
+                const lp = livePrices[s.symbol];
+                if (lp && lp.price) {
+                    const pnl = (lp.price - s.priceIn) / s.priceIn * 100;
+                    totalPnl += pnl;
+                    count++;
+                    if (pnl > 0) wins++;
+                }
+            });
+
+            const winRate = count ? ((wins / count) * 100).toFixed(1) + '%' : '—';
+            const avgPnl  = count ? (totalPnl / count).toFixed(2) + '%' : '—';
+            const avgDays = (signals.reduce((sum, s) => sum + calcDays(s.dateIn), 0) / signals.length).toFixed(1);
+
+            const el = id => document.getElementById(id);
+            if (el('statHolding'))  el('statHolding').textContent  = holding;
+            if (el('statWinRate'))  el('statWinRate').textContent  = winRate;
+            if (el('statAvgPnl')) {
+                el('statAvgPnl').textContent = avgPnl;
+                el('statAvgPnl').className = 'stat-value ' + (parseFloat(totalPnl / count) >= 0 ? 'positive' : 'negative');
+            }
+            if (el('statAvgDays')) el('statAvgDays').textContent = avgDays;
+        }
+
+        function renderSignals(filter = 'all') {
+            currentFilter = filter;
+            const tbody = document.getElementById('signalsTable');
+
+            let list = filter === 'all' ? signals : signals.filter(s => s.faFilter.includes(filter));
+
+            tbody.innerHTML = list.map(s => {
+                const lp = livePrices[s.symbol];
+                const priceCurrent = lp ? lp.price : null;
+                const profitPct = (priceCurrent && s.priceIn)
+                    ? ((priceCurrent - s.priceIn) / s.priceIn * 100)
+                    : null;
+                const days = calcDays(s.dateIn);
+
+                const priceDisplay  = priceCurrent ? priceCurrent.toLocaleString('vi-VN') : '...';
+                const pnlClass  = profitPct === null ? '' : profitPct > 0 ? 'positive' : profitPct < 0 ? 'negative' : '';
+                const pnlSign   = profitPct !== null && profitPct > 0 ? '+' : '';
+                const pnlDisplay = profitPct !== null ? `${pnlSign}${profitPct.toFixed(2)}%` : '...';
+                const dayChange = lp?.change !== null && lp?.change !== undefined ? (lp.change >= 0 ? '+' : '') + lp.change.toFixed(2) + '%' : '—';
+                const dayClass  = lp?.change > 0 ? 'positive' : lp?.change < 0 ? 'negative' : '';
+
+                return `<tr id="row-${s.symbol}">
+                    <td>${s.id}</td>
+                    <td><span class="symbol">${s.symbol}</span></td>
+                    <td style="font-size:12px">${s.exchange}</td>
+                    <td>${s.faFilter ? s.faFilter.split(',').map(f => `<span class="tag">${f}</span>`).join('') : '—'}</td>
+                    <td><span class="badge buy">Mua</span></td>
+                    <td>${s.dateIn}</td>
+                    <td style="font-family:monospace">${s.priceIn.toLocaleString('vi-VN')}</td>
+                    <td style="font-family:monospace;font-weight:600" id="price-${s.symbol}">${priceDisplay}</td>
+                    <td class="${dayClass}" style="font-family:monospace;font-size:12px">${dayChange}</td>
+                    <td class="${pnlClass}" style="font-weight:600;font-family:monospace" id="pnl-${s.symbol}">${pnlDisplay}</td>
+                    <td>${days}</td>
+                    <td style="font-size:12px">${s.pattern || '—'}</td>
+                    <td><span class="badge holding">Đang nắm</span></td>
+                </tr>`;
+            }).join('');
+
+            document.querySelector('.signals-count').textContent = `${list.length} tín hiệu`;
+        }
+
+        function toggleFilter(btn, filter) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderSignals(filter);
+        }
+
+        // Handle tab navigation
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                document.querySelectorAll('.tab-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSignals('all');     // Hien thi ngay voi "..." cho gia
+            updateSummaryStats();
+            fetchPrices();            // Lay gia lan dau
+            // Tu dong cap nhat moi 30 giay
+            refreshInterval = setInterval(fetchPrices, 30000);
+        });
+    </script>
+</body>
+</html>

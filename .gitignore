@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables (CHỨA API KEYS - KHÔNG BAO GIỜ COMMIT)
+.env
+.env.local
+.env.production
+.env.test
+.env.example
+
+# API Configuration files (CHỨA KEYS - KHÔNG BAO GIỜ COMMIT)
+config.js
+config.json
+config.ini
+*.key
+*.pem
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build outputs
+dist/
+build/
+.cache/
+
+# Backup files
+*.bak
+*-old.html
+*-backup.*
+dashboard-old.html

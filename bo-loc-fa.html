@@ -1,0 +1,568 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bộ lọc FA - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #fafafa; }
+        
+        .page-header {
+            background: white;
+            padding: 32px 40px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 32px;
+        }
+        
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+        }
+        
+        .page-header p {
+            margin: 0;
+            color: #737373;
+            font-size: 14px;
+        }
+        
+        .filter-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            border: 1px solid #e5e5e5;
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .filter-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #525252;
+        }
+        
+        .filter-input {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input[type="number"],
+        select {
+            padding: 8px 12px;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 120px;
+        }
+        
+        select {
+            width: auto;
+            min-width: 150px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .checkbox-label:hover {
+            background: #fafafa;
+            border-color: #a3a3a3;
+        }
+        
+        .checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin: 0;
+        }
+        
+        .checkbox-label.checked {
+            background: #171717;
+            color: white;
+            border-color: #171717;
+        }
+        
+        .btn-apply {
+            padding: 10px 24px;
+            background: #171717;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .btn-apply:hover {
+            background: #404040;
+        }
+        
+        .btn-reset {
+            padding: 10px 24px;
+            background: white;
+            color: #404040;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-left: 12px;
+        }
+        
+        .btn-reset:hover {
+            background: #fafafa;
+            border-color: #a3a3a3;
+        }
+        
+        .results-section {
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            border: 1px solid #e5e5e5;
+            overflow: hidden;
+        }
+        
+        .results-header {
+            padding: 20px 28px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .results-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .results-count {
+            font-size: 13px;
+            color: #737373;
+        }
+        
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .results-table thead {
+            background: #fafafa;
+        }
+        
+        .results-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .results-table td {
+            padding: 16px;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 14px;
+        }
+        
+        .results-table tbody tr:hover {
+            background: #fafafa;
+        }
+        
+        .symbol {
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            font-size: 15px;
+        }
+        
+        @media (max-width: 768px) {
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="wrap">
+            <a href="index.html" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="market-data.html">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html">TCBS Realtime</a>
+                    </div>
+                </div>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
+                        <a href="dao-tao.html">Đào tạo</a>
+                    </div>
+                </div>
+
+                <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+                <a href="chatbot.html" class="nav-link">Chatbot</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel">
+            <a href="index.html">Trang chủ</a>
+            <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html">Bộ lọc FA</a>
+            <a href="market-data.html">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html">Mở tài khoản</a>
+            <a href="dao-tao.html">Đào tạo</a>
+            <a href="tin-tuc.html">Tin tức</a>
+            <a href="chatbot.html">Chatbot</a>
+            <a href="blog.html">Blog</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="index.html#contact">Liên hệ</a>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1>Bộ lọc cơ bản (Fundamental Analysis)</h1>
+        <p>Lọc cổ phiếu theo các chỉ số tài chính và định giá</p>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="wrap" style="padding-bottom: 60px; max-width: 1200px;">
+        <!-- Filters -->
+        <div class="filter-panel">
+            <div class="filter-row">
+                <div class="filter-label">P/E Ratio</div>
+                <div class="filter-input">
+                    <div class="input-group">
+                        <span>Từ</span>
+                        <input type="number" id="peMin" placeholder="0" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <span>Đến</span>
+                        <input type="number" id="peMax" placeholder="50" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-label">P/B Ratio</div>
+                <div class="filter-input">
+                    <div class="input-group">
+                        <span>Từ</span>
+                        <input type="number" id="pbMin" placeholder="0" step="0.1">
+                    </div>
+                    <div class="input-group">
+                        <span>Đến</span>
+                        <input type="number" id="pbMax" placeholder="5" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-label">ROE (%)</div>
+                <div class="filter-input">
+                    <div class="input-group">
+                        <span>Tối thiểu</span>
+                        <input type="number" id="roeMin" placeholder="15" step="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-label">Vốn hóa (tỷ VNĐ)</div>
+                <div class="filter-input">
+                    <select id="marketCap">
+                        <option value="all">Tất cả</option>
+                        <option value="large">Lớn (>10,000 tỷ)</option>
+                        <option value="mid">Trung bình (1,000–10,000 tỷ)</option>
+                        <option value="small">Nhỏ (<1,000 tỷ)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-label">Sàn</div>
+                <div class="filter-input">
+                    <select id="exchangeFilter">
+                        <option value="all">Tất cả</option>
+                        <option value="HOSE">HOSE</option>
+                        <option value="HNX">HNX</option>
+                        <option value="UPCOM">UPCOM</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-row">
+                <div class="filter-label">Ngành</div>
+                <div class="filter-input sectors" style="flex-wrap:wrap; gap:8px;">
+                    <span style="color:#999;font-size:13px">Đang tải ngành...</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <button class="btn-apply" onclick="applyFilters()">Áp dụng bộ lọc</button>
+                <button class="btn-reset" onclick="resetFilters()">Đặt lại</button>
+                <span id="dataStatus" style="font-size:12px;color:#999;margin-left:4px;"></span>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-section">
+            <div class="results-header">
+                <h2 class="results-title">Kết quả lọc</h2>
+                <span class="results-count" id="resultsCount">— kết quả</span>
+            </div>
+
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Mã CK</th>
+                        <th>Sàn</th>
+                        <th>Ngành</th>
+                        <th>Giá (đ)</th>
+                        <th>% Ngày</th>
+                        <th>P/E</th>
+                        <th>P/B</th>
+                        <th>ROE (%)</th>
+                        <th>Vốn hóa (tỷ)</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTable">
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #737373;">
+                            Đang tải dữ liệu thị trường...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="wrap">
+            <p><strong>Đặng Cao Hoàng Phúc</strong> </p>
+            <p>&copy; 2026 Dữ liệu mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
+        </div>
+    </footer>
+
+    <script src="nav-script.js"></script>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+
+        // Tap hop du lieu tu server
+        let allStocks = [];
+        let isLoading = false;
+
+        // Map sector TV -> tieng Viet
+        const SECTOR_MAP = {
+            'Finance': 'Tài chính', 'Technology Services': 'Công nghệ',
+            'Consumer Non-Durables': 'Hàng tiêu dùng', 'Consumer Durables': 'Hàng lâu bền',
+            'Consumer Services': 'Dịch vụ tiêu dùng', 'Retail Trade': 'Bán lẻ',
+            'Health Technology': 'Y tế', 'Utilities': 'Tiện ích',
+            'Non-Energy Minerals': 'Khoáng sản', 'Energy Minerals': 'Dầu khí',
+            'Industrial Services': 'Dịch vụ CN', 'Commercial Services': 'Dịch vụ TM',
+            'Process Industries': 'Công nghiệp', 'Electronic Technology': 'Điện tử',
+            'Transportation': 'Vận tải', 'Communications': 'Viễn thông',
+            'Distribution Services': 'Phân phối', 'Miscellaneous': 'Khác'
+        };
+
+        function sectorVi(s) { return SECTOR_MAP[s] || s || 'Khác'; }
+
+        // Load du lieu FA tu server
+        async function loadScreenerData() {
+            const tbody = document.getElementById('resultsTable');
+            const countEl = document.getElementById('resultsCount');
+            const statusEl = document.getElementById('dataStatus');
+            isLoading = true;
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#737373">Đang tải dữ liệu thị trường...</td></tr>`;
+            countEl.textContent = 'Đang tải...';
+            statusEl.textContent = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/market/screener?size=500`);
+                const data = await res.json();
+                if (data.success) {
+                    allStocks = data.data;
+                    const now = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
+                    statusEl.textContent = `Cập nhật: ${now} — ${data.count} / ${data.total} mã`;
+                    countEl.textContent = `${data.count} cổ phiếu đã tải`;
+                    populateSectors();
+                    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#737373">Chọn điều kiện lọc và nhấn "Áp dụng bộ lọc"</td></tr>`;
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626">Không thể tải dữ liệu: ${err.message}</td></tr>`;
+                statusEl.textContent = 'Lỗi tải dữ liệu';
+            }
+            isLoading = false;
+        }
+
+        function populateSectors() {
+            const sectors = [...new Set(allStocks.map(s => s.sector).filter(Boolean))].sort();
+            const container = document.querySelector('.filter-input.sectors');
+            if (!container) return;
+            container.innerHTML = sectors.map(s => `
+                <label class="checkbox-label">
+                    <input type="checkbox" value="${s}">
+                    <span>${sectorVi(s)}</span>
+                </label>`).join('');
+            // Re-attach checkbox styling
+            container.querySelectorAll('input').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    this.closest('.checkbox-label').classList.toggle('checked', this.checked);
+                });
+            });
+        }
+
+        function applyFilters() {
+            if (!allStocks.length) { loadScreenerData(); return; }
+
+            const peMin     = parseFloat(document.getElementById('peMin').value)  || 0;
+            const peMax     = parseFloat(document.getElementById('peMax').value)  || 9999;
+            const pbMin     = parseFloat(document.getElementById('pbMin').value)  || 0;
+            const pbMax     = parseFloat(document.getElementById('pbMax').value)  || 9999;
+            const roeMin    = parseFloat(document.getElementById('roeMin').value) || -9999;
+            const capTier   = document.getElementById('marketCap').value;
+            const exchange  = document.getElementById('exchangeFilter').value;
+            const selectedSectors = [...document.querySelectorAll('.checkbox-label input:checked')].map(cb => cb.value);
+
+            const filtered = allStocks.filter(s => {
+                if (exchange !== 'all' && s.exchange !== exchange) return false;
+                if (s.pe !== null && (s.pe < peMin || s.pe > peMax)) return false;
+                if (s.pb !== null && (s.pb < pbMin || s.pb > pbMax)) return false;
+                if (s.roe !== null && s.roe < roeMin) return false;
+                if (capTier === 'large'  && (s.marketCap === null || s.marketCap <= 10000)) return false;
+                if (capTier === 'mid'    && (s.marketCap === null || s.marketCap < 1000 || s.marketCap > 10000)) return false;
+                if (capTier === 'small'  && (s.marketCap === null || s.marketCap >= 1000)) return false;
+                if (selectedSectors.length && !selectedSectors.includes(s.sector)) return false;
+                return true;
+            });
+
+            renderResults(filtered);
+        }
+
+        function renderResults(results) {
+            const tbody = document.getElementById('resultsTable');
+            const countEl = document.getElementById('resultsCount');
+            countEl.textContent = `${results.length} kết quả`;
+
+            if (!results.length) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#737373">Không tìm thấy cổ phiếu phù hợp</td></tr>`;
+                return;
+            }
+
+            // Sort by market cap desc
+            results.sort((a, b) => (b.marketCap || 0) - (a.marketCap || 0));
+
+            tbody.innerHTML = results.slice(0, 200).map(s => {
+                const chgClass = s.change > 0 ? 'positive' : s.change < 0 ? 'negative' : '';
+                const chgSign  = s.change > 0 ? '+' : '';
+                const mcap = s.marketCap ? (s.marketCap >= 100000 ? (s.marketCap / 1000).toFixed(0) + 'K' : s.marketCap.toLocaleString()) : '—';
+                return `<tr>
+                    <td><span class="symbol">${s.symbol}</span></td>
+                    <td style="font-size:12px;color:#555">${s.exchange}</td>
+                    <td style="font-size:12px">${sectorVi(s.sector)}</td>
+                    <td style="font-family:monospace;font-weight:600">${s.price ? s.price.toLocaleString('vi-VN') : '—'}</td>
+                    <td class="${chgClass}" style="font-family:monospace">${s.change !== null ? chgSign + s.change.toFixed(2) + '%' : '—'}</td>
+                    <td>${s.pe !== null ? s.pe.toFixed(1) : '—'}</td>
+                    <td>${s.pb !== null ? s.pb.toFixed(2) : '—'}</td>
+                    <td>${s.roe !== null ? s.roe.toFixed(1) + '%' : '—'}</td>
+                    <td style="font-size:12px">${mcap}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function resetFilters() {
+            ['peMin','peMax','pbMin','pbMax','roeMin'].forEach(id => { document.getElementById(id).value = ''; });
+            document.getElementById('marketCap').value = 'all';
+            document.getElementById('exchangeFilter').value = 'all';
+            document.querySelectorAll('.checkbox-label input').forEach(cb => { cb.checked = false; });
+            document.querySelectorAll('.checkbox-label').forEach(el => el.classList.remove('checked'));
+            document.getElementById('resultsTable').innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#737373">Chọn điều kiện lọc và nhấn "Áp dụng bộ lọc"</td></tr>`;
+            document.getElementById('resultsCount').textContent = `${allStocks.length} cổ phiếu đã tải`;
+        }
+
+        // Load khi trang mo
+        document.addEventListener('DOMContentLoaded', loadScreenerData);
+    </script>
+</body>
+</html>

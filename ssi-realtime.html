@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCBS Realtime - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #0a0a0a; color: #e0e0e0; }
+
+        .realtime-header {
+            background: #1a1a1a;
+            padding: 20px 40px;
+            border-bottom: 1px solid #333;
+        }
+
+        .realtime-header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+            color: #fff;
+        }
+
+        .realtime-header p {
+            margin: 0;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 40px;
+            background: #151515;
+            border-bottom: 1px solid #333;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+            flex-shrink: 0;
+        }
+
+        .status-dot.connected { background: #22c55e; animation: pulse 2s infinite; }
+        .status-dot.connecting { background: #eab308; animation: pulse 0.8s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .auth-panel {
+            background: #1e1e1e;
+            border: 1px solid #333;
+            padding: 20px 24px;
+            margin: 20px 40px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .auth-panel.hidden { display: none; }
+
+        .auth-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .auth-field label {
+            font-size: 12px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .auth-field input {
+            background: #111;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            width: 160px;
+        }
+
+        .auth-field input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .btn-auth {
+            padding: 8px 20px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-auth:hover { background: #2563eb; }
+        .btn-auth:disabled { background: #555; cursor: not-allowed; }
+
+        .auth-note {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            height: calc(100vh - 220px);
+            gap: 1px;
+            background: #333;
+        }
+
+        .panel {
+            background: #1a1a1a;
+            overflow-y: auto;
+            padding: 14px;
+        }
+
+        .panel-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 0 14px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        /* Watchlist */
+        .watchlist-item {
+            padding: 10px 12px;
+            margin-bottom: 3px;
+            background: #222;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .watchlist-item:hover { background: #2a2a2a; border-color: #3a3a3a; }
+
+        .watchlist-item.selected {
+            background: #1e2a3a;
+            border-color: #3b82f6;
+        }
+
+        .sym-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .sym-name {
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .sym-price {
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Center: Price board */
+        .price-board { display: flex; flex-direction: column; gap: 14px; }
+
+        .board-block {
+            background: #222;
+            border: 1px solid #2a2a2a;
+            padding: 14px 16px;
+        }
+
+        .block-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .price-large {
+            font-size: 36px;
+            font-weight: 700;
+            text-align: center;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            margin: 12px 0 6px;
+        }
+
+        .price-change {
+            text-align: center;
+            font-size: 15px;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 4px;
+        }
+
+        .price-table { width: 100%; font-family: 'Courier New', monospace; font-size: 13px; }
+        .price-table td { padding: 5px 8px; }
+        .price-table td:last-child { text-align: right; }
+
+        .up    { color: #22c55e; }
+        .down  { color: #ef4444; }
+        .ref   { color: #eab308; }
+        .ceil  { color: #a855f7; }
+        .floor { color: #06b6d4; }
+
+        /* Orderbook */
+        .ob-row {
+            display: grid;
+            grid-template-columns: 1fr 80px 60px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            border-bottom: 1px solid #1e1e1e;
+        }
+
+        .ob-row:hover { background: #222; }
+        .ob-header { font-weight: 600; color: #777; border-bottom: 2px solid #333; }
+
+        .no-data-msg {
+            color: #555;
+            font-size: 13px;
+            text-align: center;
+            padding: 30px 0;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 1100px) {
+            .main-grid { grid-template-columns: 1fr; height: auto; }
+            .panel { max-height: 450px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav" style="background: #1a1a1a; border-bottom-color: #333;">
+        <div class="wrap">
+            <a href="index.html" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt" style="color: #fff;">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link" style="color: #e0e0e0;">Trang chủ</a>
+
+                <div class="nav-grp">
+                    <button class="nav-grp__btn" style="color: #e0e0e0;">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="nav-grp__menu" style="background: #1a1a1a; border-color: #333;">
+                        <a href="tin-hieu-ta.html" style="color: #e0e0e0;">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html" style="color: #e0e0e0;">Bộ lọc FA</a>
+                        <a href="market-data.html" style="color: #e0e0e0;">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html" style="color: #e0e0e0;">TCBS Realtime</a>
+                    </div>
+                </div>
+
+                <div class="nav-grp">
+                    <button class="nav-grp__btn" style="color: #e0e0e0;">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="nav-grp__menu" style="background: #1a1a1a; border-color: #333;">
+                        <a href="tu-van-dau-tu.html" style="color: #e0e0e0;">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html" style="color: #e0e0e0;">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html" style="color: #e0e0e0;">Mở tài khoản</a>
+                        <a href="dao-tao.html" style="color: #e0e0e0;">Đào tạo</a>
+                    </div>
+                </div>
+
+                <a href="tin-tuc.html" class="nav-link" style="color: #e0e0e0;">Tin tức</a>
+                <a href="chatbot.html" class="nav-link" style="color: #e0e0e0;">Chatbot</a>
+                <a href="blog.html" class="nav-link" style="color: #e0e0e0;">Blog</a>
+                <a href="dashboard.html" class="nav-link" style="color: #e0e0e0;">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel" style="background: #1a1a1a;">
+            <a href="index.html" style="color: #e0e0e0;">Trang chủ</a>
+            <a href="tin-hieu-ta.html" style="color: #e0e0e0;">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html" style="color: #e0e0e0;">Bộ lọc FA</a>
+            <a href="market-data.html" style="color: #e0e0e0;">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html" style="color: #e0e0e0;">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html" style="color: #e0e0e0;">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html" style="color: #e0e0e0;">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html" style="color: #e0e0e0;">Mở tài khoản</a>
+            <a href="dao-tao.html" style="color: #e0e0e0;">Đào tạo</a>
+            <a href="tin-tuc.html" style="color: #e0e0e0;">Tin tức</a>
+            <a href="chatbot.html" style="color: #e0e0e0;">Chatbot</a>
+            <a href="blog.html" style="color: #e0e0e0;">Blog</a>
+            <a href="dashboard.html" style="color: #e0e0e0;">Dashboard</a>
+            <a href="index.html#contact" style="color: #e0e0e0;">Liên hệ</a>
+        </div>
+    </nav>
+
+    <!-- HEADER -->
+    <div class="realtime-header">
+        <h1>TCBS Realtime Market Data</h1>
+        <p>Dữ liệu thị trường realtime qua TCBS iFlash OpenAPI — <a href="https://tcinvest.tcbs.com.vn/iflash-open-api" target="_blank" style="color: #3b82f6;">Đăng ký iFlash</a></p>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="status-bar">
+        <div class="connection-status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Chưa kết nối</span>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <span id="updateTime" style="font-size: 12px; color: #555;">--</span>
+            <button id="btnConnect" onclick="connectRealtime()" style="padding: 6px 16px; background: #3b82f6; color: white; border: none; font-size: 13px; cursor: pointer;">
+                Kết nối
+            </button>
+            <button id="btnDisconnect" onclick="disconnectRealtime()" style="padding: 6px 16px; background: #ef4444; color: white; border: none; font-size: 13px; cursor: pointer; display: none;">
+                Ngắt kết nối
+            </button>
+        </div>
+    </div>
+
+    <!-- AUTH PANEL (hien thi khi chua co token) -->
+    <div class="auth-panel" id="authPanel">
+        <div>
+            <div style="font-size: 14px; color: #ccc; margin-bottom: 10px; font-weight: 600;">Xác thực TCBS iFlash OpenAPI</div>
+            <div style="font-size: 12px; color: #666; margin-bottom: 14px; line-height: 1.6;">
+                Cần đăng ký <a href="https://tcinvest.tcbs.com.vn/iflash-open-api" target="_blank" style="color: #3b82f6;">iFlash OpenAPI</a> và điền <strong style="color: #aaa;">TCBS_API_KEY</strong> vào file <code style="color: #aaa; background: #111; padding: 1px 5px;">.env</code>.
+                Sau đó nhập OTP từ app TCInvest để lấy JWT token.
+            </div>
+        </div>
+        <div class="auth-field">
+            <label>Smart OTP (từ app TCInvest)</label>
+            <input type="text" id="otpInput" placeholder="6 số OTP" maxlength="8" style="width: 130px;">
+        </div>
+        <button class="btn-auth" id="btnGetToken" onclick="getToken()">Lấy Token</button>
+        <div class="auth-note" id="authNote"></div>
+    </div>
+
+    <!-- MAIN GRID -->
+    <div class="main-grid">
+        <!-- Left: Watchlist -->
+        <div class="panel">
+            <h3 class="panel-title">Danh sách theo dõi</h3>
+            <div id="watchlist"></div>
+        </div>
+
+        <!-- Center: Price board -->
+        <div class="panel">
+            <div class="price-board">
+                <div class="board-block">
+                    <div class="block-title">Giá hiện tại</div>
+                    <div id="currentSymbol" style="font-size: 20px; font-weight: 700; color: #fff;">--</div>
+                    <div class="price-large" id="currentPrice">--</div>
+                    <div class="price-change" id="priceChange">--</div>
+                </div>
+
+                <div class="board-block">
+                    <div class="block-title">Bảng giá</div>
+                    <table class="price-table">
+                        <tr><td>Trần:</td><td class="ceil" id="ceilPrice">--</td></tr>
+                        <tr><td>Sàn:</td><td class="floor" id="floorPrice">--</td></tr>
+                        <tr><td>TC:</td><td class="ref" id="refPrice">--</td></tr>
+                        <tr><td>Mua tốt nhất:</td><td class="up" id="bidPrice">--</td></tr>
+                        <tr><td>Bán tốt nhất:</td><td class="down" id="askPrice">--</td></tr>
+                        <tr><td>Khối lượng:</td><td id="volume">--</td></tr>
+                        <tr><td>Giá trị:</td><td id="totalValue">--</td></tr>
+                        <tr><td>Cao nhất:</td><td id="highPrice">--</td></tr>
+                        <tr><td>Thấp nhất:</td><td id="lowPrice">--</td></tr>
+                    </table>
+                </div>
+
+                <!-- Index bar -->
+                <div class="board-block">
+                    <div class="block-title">Chỉ số thị trường</div>
+                    <div id="indexBoard">
+                        <div class="no-data-msg">Kết nối để xem chỉ số realtime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Order book -->
+        <div class="panel">
+            <h3 class="panel-title">Sổ lệnh</h3>
+            <div id="orderbook">
+                <div class="ob-row ob-header">
+                    <div>Giá</div>
+                    <div style="text-align: right;">Khối lượng</div>
+                    <div style="text-align: right;">Bên</div>
+                </div>
+                <div class="no-data-msg" style="padding: 20px 0;">Chưa có dữ liệu</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MCP PANEL -->
+    <div style="background:#111; border-top: 1px solid #333; padding: 16px 40px 24px;">
+        <div style="max-width:1200px; margin:0 auto;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                <div>
+                    <span style="font-size:13px; font-weight:700; color:#999; text-transform:uppercase; letter-spacing:0.5px;">TCBS MCP Tools</span>
+                    <span style="font-size:11px; color:#555; margin-left:10px;">Model Context Protocol</span>
+                </div>
+                <button id="btnLoadTools" onclick="loadMCPTools()" style="padding:5px 14px; background:#1e2a3a; border:1px solid #3b82f6; color:#3b82f6; font-size:12px; cursor:pointer;">
+                    Tải danh sách tools
+                </button>
+            </div>
+
+            <div id="mcpToolList" style="display:none; margin-bottom:16px;">
+                <div id="mcpTools" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+            </div>
+
+            <div id="mcpCallPanel" style="display:none; background:#1a1a1a; border:1px solid #333; padding:14px 16px; margin-bottom:12px;">
+                <div style="font-size:12px; color:#aaa; margin-bottom:8px;">
+                    Gọi tool: <strong id="mcpToolName" style="color:#3b82f6;"></strong>
+                </div>
+                <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+                    <div style="flex:1; min-width:200px;">
+                        <div style="font-size:11px; color:#666; margin-bottom:4px;">Tham số (JSON)</div>
+                        <textarea id="mcpParams" rows="2" style="width:100%; background:#111; border:1px solid #444; color:#e0e0e0; padding:8px; font-family:monospace; font-size:12px; resize:vertical;">{}</textarea>
+                    </div>
+                    <button onclick="callMCPTool()" style="padding:8px 18px; background:#3b82f6; color:white; border:none; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;">
+                        Gọi
+                    </button>
+                    <button onclick="closeMCPCall()" style="padding:8px 14px; background:transparent; border:1px solid #444; color:#999; font-size:13px; cursor:pointer;">
+                        Đóng
+                    </button>
+                </div>
+            </div>
+
+            <div id="mcpResult" style="display:none; background:#0d0d0d; border:1px solid #222; padding:12px 14px; max-height:200px; overflow-y:auto;">
+                <div style="font-size:11px; color:#555; margin-bottom:6px;">Kết quả:</div>
+                <pre id="mcpResultContent" style="font-size:12px; color:#86efac; font-family:monospace; margin:0; white-space:pre-wrap; word-break:break-all;"></pre>
+            </div>
+
+            <div id="mcpStatus" style="font-size:12px; color:#666; margin-top:8px;"></div>
+        </div>
+    </div>
+
+    <script src="nav-script.js"></script>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/api'
+            : '/api';
+        const WS_BASE = window.location.hostname === 'localhost'
+            ? 'ws://localhost:3000'
+            : `ws://${window.location.host}`;
+
+        let ws = null;
+        let selectedSymbol = null;
+
+        // Du lieu tich luy cho tung ma
+        const stockData = {};
+
+        const WATCHLIST = ['VNM', 'VIC', 'VHM', 'HPG', 'VCB', 'TCB', 'MWG', 'FPT', 'SSI', 'MSN', 'VPB', 'ACB'];
+
+        const INDEX_NAMES = { 1: 'VN-INDEX', 2: 'VN30', 3: 'HNX', 4: 'HNX30', 5: 'UPCOM' };
+
+        // Khoi tao watchlist
+        function initWatchlist() {
+            const container = document.getElementById('watchlist');
+            container.innerHTML = '';
+            WATCHLIST.forEach((sym, i) => {
+                stockData[sym] = stockData[sym] || {};
+                const item = document.createElement('div');
+                item.className = 'watchlist-item' + (i === 0 ? ' selected' : '');
+                item.id = 'wl-' + sym;
+                item.onclick = () => selectSymbol(sym);
+                item.innerHTML = `
+                    <div class="sym-row">
+                        <span class="sym-name">${sym}</span>
+                        <span class="change" id="wl-chg-${sym}">--</span>
+                    </div>
+                    <div class="sym-price">
+                        <span id="wl-price-${sym}">--</span>
+                        <span id="wl-vol-${sym}" style="color: #555;">--</span>
+                    </div>`;
+                container.appendChild(item);
+            });
+            selectSymbol(WATCHLIST[0]);
+        }
+
+        function selectSymbol(sym) {
+            selectedSymbol = sym;
+            document.querySelectorAll('.watchlist-item').forEach(el => el.classList.remove('selected'));
+            const el = document.getElementById('wl-' + sym);
+            if (el) el.classList.add('selected');
+            document.getElementById('currentSymbol').textContent = sym;
+            updatePriceBoard(sym);
+        }
+
+        function updatePriceBoard(sym) {
+            const d = stockData[sym] || {};
+            const price = d.matchPrice || '--';
+            const ref = d.refPrice;
+            const change = d.change;
+            const changePct = d.changePercent;
+
+            document.getElementById('currentPrice').textContent =
+                price !== '--' ? Number(price).toLocaleString('vi-VN') : '--';
+
+            if (change !== undefined && changePct !== undefined) {
+                const dir = change >= 0 ? 'up' : 'down';
+                const sign = change >= 0 ? '+' : '';
+                document.getElementById('priceChange').innerHTML =
+                    `<span class="${dir}">${sign}${Number(change).toLocaleString('vi-VN')} (${sign}${Number(changePct).toFixed(2)}%)</span>`;
+            } else {
+                document.getElementById('priceChange').textContent = '--';
+            }
+
+            document.getElementById('refPrice').textContent = ref ? Number(ref).toLocaleString('vi-VN') : '--';
+            document.getElementById('ceilPrice').textContent = d.ceilPrice ? Number(d.ceilPrice).toLocaleString('vi-VN') : '--';
+            document.getElementById('floorPrice').textContent = d.floorPrice ? Number(d.floorPrice).toLocaleString('vi-VN') : '--';
+            document.getElementById('bidPrice').textContent = d.bidPrice01 ? Number(d.bidPrice01).toLocaleString('vi-VN') : '--';
+            document.getElementById('askPrice').textContent = d.offerPrice01 ? Number(d.offerPrice01).toLocaleString('vi-VN') : '--';
+            document.getElementById('volume').textContent = d.totalVolume ? Number(d.totalVolume).toLocaleString('vi-VN') : '--';
+            document.getElementById('highPrice').textContent = d.high ? Number(d.high).toLocaleString('vi-VN') : '--';
+            document.getElementById('lowPrice').textContent = d.low ? Number(d.low).toLocaleString('vi-VN') : '--';
+
+            // Gia tri giao dich
+            if (d.totalValue) {
+                const val = Number(d.totalValue);
+                const formatted = val >= 1e9
+                    ? (val / 1e9).toFixed(1) + ' tỷ'
+                    : (val / 1e6).toFixed(0) + ' triệu';
+                document.getElementById('totalValue').textContent = formatted;
+            } else {
+                document.getElementById('totalValue').textContent = '--';
+            }
+
+            // Cap nhat orderbook
+            updateOrderBook(sym);
+        }
+
+        function updateOrderBook(sym) {
+            const d = stockData[sym] || {};
+            const container = document.getElementById('orderbook');
+
+            const rows = [
+                { price: d.offerPrice03, vol: d.offerQtty03, side: 'Bán', cls: 'down' },
+                { price: d.offerPrice02, vol: d.offerQtty02, side: 'Bán', cls: 'down' },
+                { price: d.offerPrice01, vol: d.offerQtty01, side: 'Bán', cls: 'down' },
+                { price: d.matchPrice, vol: d.matchQtty, side: 'Khớp', cls: 'ref' },
+                { price: d.bidPrice01, vol: d.bidQtty01, side: 'Mua', cls: 'up' },
+                { price: d.bidPrice02, vol: d.bidQtty02, side: 'Mua', cls: 'up' },
+                { price: d.bidPrice03, vol: d.bidQtty03, side: 'Mua', cls: 'up' },
+            ].filter(r => r.price);
+
+            if (rows.length === 0) {
+                container.innerHTML = `<div class="ob-row ob-header">
+                    <div>Giá</div><div style="text-align:right">Khối lượng</div><div style="text-align:right">Bên</div>
+                </div><div class="no-data-msg" style="padding:20px 0">Chưa có dữ liệu</div>`;
+                return;
+            }
+
+            container.innerHTML = `<div class="ob-row ob-header">
+                <div>Giá</div><div style="text-align:right">Khối lượng</div><div style="text-align:right">Bên</div>
+            </div>` + rows.map(r => `
+                <div class="ob-row">
+                    <div class="${r.cls}">${Number(r.price).toLocaleString('vi-VN')}</div>
+                    <div style="text-align:right">${Number(r.vol || 0).toLocaleString('vi-VN')}</div>
+                    <div style="text-align:right; color: #666; font-size: 11px">${r.side}</div>
+                </div>`).join('');
+        }
+
+        // Xu ly du lieu tu WebSocket
+        function handleWSData(msg) {
+            if (msg.type !== 'data') return;
+
+            const { channel, data } = msg;
+            const sym = data.symbol || data.indexNumber;
+
+            if (channel === 'match' && data.symbol) {
+                if (!stockData[data.symbol]) stockData[data.symbol] = {};
+                Object.assign(stockData[data.symbol], {
+                    matchPrice: data.matchPrice,
+                    matchQtty: data.matchQtty,
+                    change: data.change,
+                    changePercent: data.changePercent,
+                    totalVolume: data.totalVolume,
+                    totalValue: data.totalValue
+                });
+                // Cap nhat watchlist item
+                updateWatchlistItem(data.symbol);
+            }
+
+            if (channel === 'bid' && data.symbol) {
+                if (!stockData[data.symbol]) stockData[data.symbol] = {};
+                Object.assign(stockData[data.symbol], {
+                    bidPrice01: data.bidPrice01, bidQtty01: data.bidQtty01,
+                    bidPrice02: data.bidPrice02, bidQtty02: data.bidQtty02,
+                    bidPrice03: data.bidPrice03, bidQtty03: data.bidQtty03
+                });
+            }
+
+            if (channel === 'offer' && data.symbol) {
+                if (!stockData[data.symbol]) stockData[data.symbol] = {};
+                Object.assign(stockData[data.symbol], {
+                    offerPrice01: data.offerPrice01, offerQtty01: data.offerQtty01,
+                    offerPrice02: data.offerPrice02, offerQtty02: data.offerQtty02,
+                    offerPrice03: data.offerPrice03, offerQtty03: data.offerQtty03
+                });
+            }
+
+            if (channel === 'base' && data.symbol) {
+                if (!stockData[data.symbol]) stockData[data.symbol] = {};
+                Object.assign(stockData[data.symbol], {
+                    ceilPrice: data.ceilPrice,
+                    floorPrice: data.floorPrice,
+                    refPrice: data.refPrice
+                });
+            }
+
+            if (channel === 'session' && data.symbol) {
+                if (!stockData[data.symbol]) stockData[data.symbol] = {};
+                Object.assign(stockData[data.symbol], {
+                    high: data.high,
+                    low: data.low,
+                    open: data.open,
+                    avg: data.avg
+                });
+            }
+
+            if (channel === 'index') {
+                updateIndexBoard(data);
+            }
+
+            // Neu dang xem ma nay, cap nhat price board
+            if (data.symbol === selectedSymbol) {
+                updatePriceBoard(selectedSymbol);
+            }
+
+            // Cap nhat thoi gian
+            document.getElementById('updateTime').textContent =
+                new Date().toLocaleTimeString('vi-VN');
+        }
+
+        function updateWatchlistItem(sym) {
+            const d = stockData[sym] || {};
+            const priceEl = document.getElementById('wl-price-' + sym);
+            const chgEl = document.getElementById('wl-chg-' + sym);
+            const volEl = document.getElementById('wl-vol-' + sym);
+
+            if (priceEl && d.matchPrice) {
+                priceEl.textContent = Number(d.matchPrice).toLocaleString('vi-VN');
+            }
+            if (chgEl && d.changePercent !== undefined) {
+                const pct = Number(d.changePercent);
+                const sign = pct >= 0 ? '+' : '';
+                chgEl.textContent = `${sign}${pct.toFixed(2)}%`;
+                chgEl.className = 'change ' + (pct >= 0 ? 'up' : 'down');
+            }
+            if (volEl && d.totalVolume) {
+                const vol = Number(d.totalVolume);
+                volEl.textContent = vol >= 1e6 ? (vol / 1e6).toFixed(1) + 'M' : vol.toLocaleString('vi-VN');
+            }
+        }
+
+        function updateIndexBoard(data) {
+            const name = INDEX_NAMES[data.indexNumber];
+            if (!name) return;
+
+            const board = document.getElementById('indexBoard');
+            let row = document.getElementById('idx-' + data.indexNumber);
+
+            if (!row) {
+                // Tao row lan dau
+                if (board.querySelector('.no-data-msg')) board.innerHTML = '';
+                row = document.createElement('div');
+                row.id = 'idx-' + data.indexNumber;
+                row.style.cssText = 'display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid #222;font-size:13px;font-family:Courier New,monospace';
+                board.appendChild(row);
+            }
+
+            const dir = data.change >= 0 ? 'up' : 'down';
+            const sign = data.change >= 0 ? '+' : '';
+            row.innerHTML = `
+                <span style="color:#aaa;font-weight:600">${name}</span>
+                <span>${data.index ? data.index.toFixed(2) : '--'}</span>
+                <span class="${dir}">${sign}${data.changePercent ? data.changePercent.toFixed(2) : '0'}%</span>
+                <span style="color:#555;font-size:11px">T:${data.increase || 0} G:${data.decrease || 0}</span>`;
+        }
+
+        // Xac thuc TCBS
+        async function getToken() {
+            const otp = document.getElementById('otpInput').value.trim();
+            const noteEl = document.getElementById('authNote');
+            const btn = document.getElementById('btnGetToken');
+
+            if (!otp) {
+                noteEl.textContent = 'Vui long nhap OTP';
+                noteEl.style.color = '#ef4444';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Dang xu ly...';
+            noteEl.textContent = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/tcbs/token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ otp })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    noteEl.textContent = 'Xac thuc thanh cong! Co the ket noi.';
+                    noteEl.style.color = '#22c55e';
+                    document.getElementById('authPanel').classList.add('hidden');
+                } else {
+                    noteEl.textContent = data.error || 'Xac thuc that bai';
+                    noteEl.style.color = '#ef4444';
+                }
+            } catch (err) {
+                noteEl.textContent = 'Loi ket noi server: ' + err.message;
+                noteEl.style.color = '#ef4444';
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Lay Token';
+        }
+
+        // Ket noi WebSocket qua proxy server
+        function connectRealtime() {
+            if (ws && ws.readyState === WebSocket.OPEN) return;
+
+            setStatus('connecting', 'Dang ket noi...');
+
+            ws = new WebSocket(WS_BASE);
+
+            ws.onopen = () => {
+                // Yeu cau ket noi toi TCBS
+                ws.send(JSON.stringify({ action: 'connect' }));
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+
+                    if (msg.type === 'status') {
+                        if (msg.connected) {
+                            setStatus('connected', 'Da ket noi TCBS Realtime');
+                            document.getElementById('btnConnect').style.display = 'none';
+                            document.getElementById('btnDisconnect').style.display = '';
+                            // Subscribe toan bo watchlist
+                            ws.send(JSON.stringify({ action: 'subscribe', symbols: WATCHLIST }));
+                            // Subscribe chi so
+                            ws.send(JSON.stringify({ action: 'subscribe_index' }));
+                        } else {
+                            setStatus('disconnected', msg.message || 'Mat ket noi');
+                        }
+                    }
+
+                    if (msg.type === 'error') {
+                        if (msg.message && msg.message.includes('token')) {
+                            // Token het han, hien auth panel
+                            document.getElementById('authPanel').classList.remove('hidden');
+                            document.getElementById('authNote').textContent = msg.message;
+                            document.getElementById('authNote').style.color = '#ef4444';
+                        }
+                        setStatus('disconnected', msg.message);
+                    }
+
+                    if (msg.type === 'data') {
+                        handleWSData(msg);
+                    }
+
+                } catch (e) { /* ignore */ }
+            };
+
+            ws.onclose = () => {
+                setStatus('disconnected', 'Mat ket noi');
+                document.getElementById('btnConnect').style.display = '';
+                document.getElementById('btnDisconnect').style.display = 'none';
+            };
+
+            ws.onerror = () => {
+                setStatus('disconnected', 'Loi WebSocket');
+            };
+        }
+
+        function disconnectRealtime() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+            setStatus('disconnected', 'Da ngat ket noi');
+            document.getElementById('btnConnect').style.display = '';
+            document.getElementById('btnDisconnect').style.display = 'none';
+        }
+
+        function setStatus(state, text) {
+            const dot = document.getElementById('statusDot');
+            dot.className = 'status-dot ' + state;
+            document.getElementById('statusText').textContent = text;
+        }
+
+        // Kiem tra trang thai server khi load
+        async function checkServerStatus() {
+            try {
+                const res = await fetch(`${API_BASE}/tcbs/status`);
+                const data = await res.json();
+
+                if (!data.apiKeyConfigured) {
+                    document.getElementById('authNote').textContent =
+                        'TCBS_API_KEY chua duoc dien vao file .env';
+                    document.getElementById('authNote').style.color = '#eab308';
+                }
+
+                if (data.hasToken) {
+                    // Da co token, an auth panel
+                    document.getElementById('authPanel').classList.add('hidden');
+                }
+            } catch (e) { /* server chua chay */ }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            initWatchlist();
+            checkServerStatus();
+        });
+
+        // ==================== MCP TOOLS ====================
+
+        let currentMCPTool = null;
+
+        async function loadMCPTools() {
+            const btn = document.getElementById('btnLoadTools');
+            const statusEl = document.getElementById('mcpStatus');
+            btn.textContent = 'Đang tải...';
+            btn.disabled = true;
+            statusEl.textContent = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/tcbs/mcp/tools`);
+                const data = await res.json();
+
+                if (data.success && data.data) {
+                    const tools = data.data.result?.tools || data.data.tools || [];
+                    renderMCPTools(tools);
+                    document.getElementById('mcpToolList').style.display = 'block';
+                    statusEl.textContent = `${tools.length} tools khả dụng`;
+                    statusEl.style.color = '#22c55e';
+                } else {
+                    statusEl.textContent = data.error || 'Không thể tải tools. Cần xác thực TCBS trước.';
+                    statusEl.style.color = '#ef4444';
+                }
+            } catch (err) {
+                statusEl.textContent = 'Lỗi kết nối server: ' + err.message;
+                statusEl.style.color = '#ef4444';
+            }
+
+            btn.textContent = 'Tải danh sách tools';
+            btn.disabled = false;
+        }
+
+        function renderMCPTools(tools) {
+            const container = document.getElementById('mcpTools');
+            if (!tools.length) {
+                container.innerHTML = '<span style="color:#555;font-size:12px">Không có tool nào</span>';
+                return;
+            }
+            container.innerHTML = tools.map(t => `
+                <button onclick="selectMCPTool('${t.name}', ${JSON.stringify(JSON.stringify(t.inputSchema || {}))})"
+                    title="${t.description || ''}"
+                    style="padding:5px 12px; background:#1e2a3a; border:1px solid #334; color:#93c5fd; font-size:12px; cursor:pointer; transition:all 0.1s;"
+                    onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#334'">
+                    ${t.name}
+                </button>`).join('');
+        }
+
+        function selectMCPTool(name, schemaStr) {
+            currentMCPTool = name;
+            document.getElementById('mcpToolName').textContent = name;
+            // Tao tham so mau tu input schema
+            try {
+                const schema = JSON.parse(schemaStr);
+                const props = schema.properties || {};
+                const sample = {};
+                Object.keys(props).forEach(k => {
+                    const t = props[k].type;
+                    sample[k] = t === 'string' ? '' : t === 'number' ? 0 : t === 'boolean' ? false : null;
+                });
+                document.getElementById('mcpParams').value = JSON.stringify(sample, null, 2);
+            } catch (e) {
+                document.getElementById('mcpParams').value = '{}';
+            }
+            document.getElementById('mcpCallPanel').style.display = 'block';
+            document.getElementById('mcpResult').style.display = 'none';
+        }
+
+        function closeMCPCall() {
+            currentMCPTool = null;
+            document.getElementById('mcpCallPanel').style.display = 'none';
+            document.getElementById('mcpResult').style.display = 'none';
+        }
+
+        async function callMCPTool() {
+            if (!currentMCPTool) return;
+
+            let params = {};
+            try {
+                params = JSON.parse(document.getElementById('mcpParams').value || '{}');
+            } catch (e) {
+                document.getElementById('mcpStatus').textContent = 'Tham số JSON không hợp lệ';
+                document.getElementById('mcpStatus').style.color = '#ef4444';
+                return;
+            }
+
+            document.getElementById('mcpStatus').textContent = 'Đang gọi ' + currentMCPTool + '...';
+            document.getElementById('mcpStatus').style.color = '#3b82f6';
+
+            try {
+                const res = await fetch(`${API_BASE}/tcbs/mcp/call`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tool: currentMCPTool, params })
+                });
+                const data = await res.json();
+
+                const resultEl = document.getElementById('mcpResultContent');
+                const resultBox = document.getElementById('mcpResult');
+
+                if (data.success) {
+                    const content = data.data?.result?.content;
+                    let display = '';
+                    if (Array.isArray(content)) {
+                        display = content.map(c => c.text || JSON.stringify(c)).join('\n');
+                    } else {
+                        display = JSON.stringify(data.data, null, 2);
+                    }
+                    resultEl.textContent = display;
+                    resultEl.style.color = '#86efac';
+                    resultBox.style.display = 'block';
+                    document.getElementById('mcpStatus').textContent = 'Thành công';
+                    document.getElementById('mcpStatus').style.color = '#22c55e';
+                } else {
+                    resultEl.textContent = data.error || 'Lỗi không xác định';
+                    resultEl.style.color = '#fca5a5';
+                    resultBox.style.display = 'block';
+                    document.getElementById('mcpStatus').textContent = data.tokenExpired ? 'Token hết hạn — cần xác thực lại' : 'Lỗi';
+                    document.getElementById('mcpStatus').style.color = '#ef4444';
+                    if (data.tokenExpired) document.getElementById('authPanel').classList.remove('hidden');
+                }
+            } catch (err) {
+                document.getElementById('mcpStatus').textContent = 'Lỗi: ' + err.message;
+                document.getElementById('mcpStatus').style.color = '#ef4444';
+            }
+        }
+    </script>
+</body>
+</html>

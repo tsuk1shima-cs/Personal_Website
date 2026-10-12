@@ -1,0 +1,443 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #fafafa; }
+        
+        .dashboard-header {
+            background: white;
+            padding: 32px 40px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            color: #1a1a1a;
+        }
+        
+        .dashboard-header p {
+            margin: 0;
+            color: #737373;
+            font-size: 14px;
+        }
+        
+        .dashboard-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        
+        .btn-refresh {
+            padding: 8px 16px;
+            border: 1px solid #d4d4d4;
+            border-radius: 6px;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            color: #404040;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .btn-refresh:hover {
+            background: #fafafa;
+            border-color: #a3a3a3;
+        }
+        
+        .config-section {
+            background: white;
+            border-radius: 8px;
+            padding: 28px 32px;
+            margin-bottom: 16px;
+            border: 1px solid #e5e5e5;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #737373;
+            margin: 0 0 20px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 16px 24px;
+            align-items: center;
+        }
+        
+        .config-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #525252;
+        }
+        
+        .config-value {
+            font-size: 14px;
+            color: #171717;
+            font-family: 'Courier New', monospace;
+            background: #f9f9f9;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #e5e5e5;
+            word-break: break-all;
+        }
+        
+        .config-value.empty {
+            color: #a3a3a3;
+            font-style: italic;
+        }
+        
+        .config-value.secret {
+            color: #dc2626;
+            letter-spacing: 2px;
+        }
+
+        .btn-tab-dash {
+            padding: 6px 14px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #555;
+            border-radius: 4px;
+        }
+        .btn-tab-dash:hover  { background: #f5f5f5; }
+        .btn-tab-dash.active { background: #171717; color: white; border-color: #171717; }
+        
+        @media (max-width: 768px) {
+            .config-grid {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .config-label {
+                font-size: 12px;
+                color: #737373;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="wrap">
+            <a href="index.html" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="market-data.html">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html">TCBS Realtime</a>
+                    </div>
+                </div>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
+                        <a href="dao-tao.html">Đào tạo</a>
+                    </div>
+                </div>
+
+                <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+                <a href="chatbot.html" class="nav-link">Chatbot</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel">
+            <a href="index.html">Trang chủ</a>
+            <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html">Bộ lọc FA</a>
+            <a href="market-data.html">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html">Mở tài khoản</a>
+            <a href="dao-tao.html">Đào tạo</a>
+            <a href="tin-tuc.html">Tin tức</a>
+            <a href="chatbot.html">Chatbot</a>
+            <a href="blog.html">Blog</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="index.html#contact">Liên hệ</a>
+        </div>
+    </nav>
+        </div>
+    </nav>
+
+    <!-- DASHBOARD HEADER -->
+    <div class="dashboard-header">
+        <h1>Dashboard</h1>
+        <p id="dashHeaderSub">Đang tải...</p>
+    </div>
+
+    <!-- DASHBOARD CONTENT -->
+    <div class="dashboard-content">
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                <span class="status-badge" id="statusServer">
+                    <span class="status-dot"></span> Server
+                </span>
+                <span class="status-badge" id="statusAI">
+                    <span class="status-dot"></span> AI
+                </span>
+                <span class="status-badge" id="statusTCBS">
+                    <span class="status-dot"></span> TCBS
+                </span>
+                <span class="status-badge" id="statusMarket">
+                    <span class="status-dot"></span> Market
+                </span>
+            </div>
+            <button class="btn-refresh" onclick="loadDashboard()">Làm mới</button>
+        </div>
+
+        <!-- Market Overview Cards -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px;" id="indexCards">
+            <div class="config-section" style="padding:20px; text-align:center">
+                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px;">VN-INDEX</div>
+                <div style="font-size:28px;font-weight:700;font-family:monospace" id="idx-vni">—</div>
+                <div id="idx-vni-chg" style="font-size:14px;margin-top:4px">—</div>
+            </div>
+            <div class="config-section" style="padding:20px; text-align:center">
+                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px;">HNX-INDEX</div>
+                <div style="font-size:28px;font-weight:700;font-family:monospace" id="idx-hnx">—</div>
+                <div id="idx-hnx-chg" style="font-size:14px;margin-top:4px">—</div>
+            </div>
+            <div class="config-section" style="padding:20px; text-align:center">
+                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px;">Top Tăng</div>
+                <div style="font-size:14px;font-family:monospace" id="topGainer">—</div>
+            </div>
+            <div class="config-section" style="padding:20px; text-align:center">
+                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px;">Top Giảm</div>
+                <div style="font-size:14px;font-family:monospace" id="topLoser">—</div>
+            </div>
+        </div>
+
+        <!-- Top Movers table -->
+        <div class="config-section" style="margin-bottom:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <h3 class="section-title" style="margin:0">Biến động trong ngày</h3>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn-tab-dash active" onclick="switchMovers('gain',this)">Tăng mạnh</button>
+                    <button class="btn-tab-dash" onclick="switchMovers('loss',this)">Giảm mạnh</button>
+                    <button class="btn-tab-dash" onclick="switchMovers('vol',this)">Khối lượng</button>
+                </div>
+            </div>
+            <div id="moversTable">Đang tải...</div>
+        </div>
+
+        <!-- API Status -->
+        <div class="config-section">
+            <h3 class="section-title">Trạng thái hệ thống</h3>
+            <div class="config-grid" id="systemGrid">Đang kiểm tra...</div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="wrap">
+            <p><strong>Đặng Cao Hoàng Phúc</strong></p>
+            <p>&copy; 2026 Bản tin mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
+        </div>
+    </footer>
+
+    <script src="nav-script.js"></script>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        let _movers = {};
+
+        async function loadDashboard() {
+            document.getElementById('dashHeaderSub').textContent = 'Đang tải...';
+            await Promise.all([checkHealth(), loadMarketData()]);
+            const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('dashHeaderSub').textContent = `Cập nhật: ${now}`;
+        }
+
+        async function checkHealth() {
+            try {
+                const res = await fetch(`${API_BASE}/health`);
+                const data = await res.json();
+                setBadge('statusServer', true, 'Server OK');
+                setBadge('statusAI',     data.apis.openrouter, data.apis.openrouter ? 'OpenRouter' : 'Chưa cấu hình AI');
+                setBadge('statusTCBS',   data.apis.tcbs_authenticated, data.apis.tcbs_authenticated ? 'TCBS Live' : (data.apis.tcbs_configured ? 'TCBS (chưa xác thực)' : 'TCBS chưa cấu hình'));
+
+                document.getElementById('systemGrid').innerHTML = [
+                    ['OpenRouter API',   data.apis.openrouter          ? '✓ Đã cấu hình'     : '✗ Chưa có key'],
+                    ['TCBS iFlash key',  data.apis.tcbs_configured      ? '✓ Đã cấu hình'     : '✗ Chưa có key'],
+                    ['TCBS JWT token',   data.apis.tcbs_authenticated   ? '✓ Đang kết nối'    : '✗ Chưa xác thực'],
+                    ['Market data',      '✓ TradingView (không cần key)'],
+                    ['RSS tin tức',      '✓ VnExpress / CafeF / VnEconomy'],
+                    ['Server port',      '3000'],
+                ].map(([k, v]) => `
+                    <div class="config-label">${k}</div>
+                    <div class="config-value ${v.startsWith('✗') ? 'empty' : ''}">${v}</div>
+                `).join('');
+            } catch (e) {
+                setBadge('statusServer', false, 'Server offline');
+            }
+        }
+
+        async function loadMarketData() {
+            try {
+                const res = await fetch(`${API_BASE}/market/screener?size=100`);
+                const data = await res.json();
+                if (!data.success) throw new Error();
+
+                setBadge('statusMarket', true, `${data.count} mã`);
+
+                const stocks = data.data.filter(s => s.change !== null);
+                _movers.gain = [...stocks].sort((a,b) => b.change - a.change).slice(0,10);
+                _movers.loss = [...stocks].sort((a,b) => a.change - b.change).slice(0,10);
+                _movers.vol  = [...data.data].filter(s => s.volume).sort((a,b) => b.volume - a.volume).slice(0,10);
+
+                // Index cards
+                const top5 = _movers.gain.slice(0,5);
+                const bot5 = _movers.loss.slice(0,5);
+                document.getElementById('topGainer').innerHTML = top5.map(s =>
+                    `<div style="color:#16a34a">${s.symbol} <strong>+${s.change.toFixed(2)}%</strong></div>`).join('');
+                document.getElementById('topLoser').innerHTML = bot5.map(s =>
+                    `<div style="color:#dc2626">${s.symbol} <strong>${s.change.toFixed(2)}%</strong></div>`).join('');
+
+                // VNI, HNX index tham khao tu top market cap
+                const vni = data.data.find(s => s.symbol === 'VNI' || s.symbol === 'VNINDEX');
+                if (vni) {
+                    document.getElementById('idx-vni').textContent = vni.price?.toLocaleString('vi-VN') || '—';
+                    const chgEl = document.getElementById('idx-vni-chg');
+                    chgEl.textContent = vni.change !== null ? (vni.change >= 0 ? '+' : '') + vni.change.toFixed(2) + '%' : '—';
+                    chgEl.style.color = vni.change >= 0 ? '#16a34a' : '#dc2626';
+                }
+
+                renderMovers('gain');
+            } catch (e) {
+                setBadge('statusMarket', false, 'Lỗi');
+            }
+        }
+
+        function switchMovers(tab, btn) {
+            document.querySelectorAll('.btn-tab-dash').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMovers(tab);
+        }
+
+        function renderMovers(tab) {
+            const list = _movers[tab] || [];
+            if (!list.length) { document.getElementById('moversTable').textContent = 'Đang tải...'; return; }
+            document.getElementById('moversTable').innerHTML = `
+                <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                    <thead>
+                        <tr style="background:#fafafa">
+                            <th style="padding:10px;text-align:left;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">Mã</th>
+                            <th style="padding:10px;text-align:left;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">Sàn</th>
+                            <th style="padding:10px;text-align:right;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">Giá (đ)</th>
+                            <th style="padding:10px;text-align:right;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">% Ngày</th>
+                            <th style="padding:10px;text-align:right;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">Vốn hóa (tỷ)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${list.map(s => {
+                            const cls  = s.change > 0 ? '#16a34a' : s.change < 0 ? '#dc2626' : '#666';
+                            const sign = s.change > 0 ? '+' : '';
+                            const mc   = s.marketCap ? (s.marketCap >= 100000 ? (s.marketCap/1000).toFixed(0)+'K' : s.marketCap.toLocaleString()) : '—';
+                            return `<tr style="border-bottom:1px solid #f5f5f5">
+                                <td style="padding:12px 10px;font-weight:700;font-family:monospace">${s.symbol}</td>
+                                <td style="padding:12px 10px;font-size:12px;color:#888">${s.exchange}</td>
+                                <td style="padding:12px 10px;text-align:right;font-family:monospace;font-weight:600">${s.price?.toLocaleString('vi-VN') || '—'}</td>
+                                <td style="padding:12px 10px;text-align:right;font-weight:600;color:${cls}">${s.change !== null ? sign+s.change.toFixed(2)+'%' : '—'}</td>
+                                <td style="padding:12px 10px;text-align:right;font-size:12px">${mc}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+        }
+
+        function setBadge(id, ok, label) {
+            const el = document.getElementById(id);
+            el.innerHTML = `<span class="status-dot"></span> ${label}`;
+            el.style.background = ok ? '#dcfce7' : '#fee2e2';
+            el.style.color      = ok ? '#166534' : '#991b1b';
+        }
+
+        window.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>

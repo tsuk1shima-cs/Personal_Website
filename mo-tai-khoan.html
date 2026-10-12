@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mở tài khoản giao dịch - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="wrap">
+            <a href="index.html" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="market-data.html">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html">TCBS Realtime</a>
+                    </div>
+                </div>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
+                        <a href="dao-tao.html">Đào tạo</a>
+                    </div>
+                </div>
+
+                <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+                <a href="chatbot.html" class="nav-link">Chatbot</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel">
+            <a href="index.html">Trang chủ</a>
+            <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html">Bộ lọc FA</a>
+            <a href="market-data.html">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html">Mở tài khoản</a>
+            <a href="dao-tao.html">Đào tạo</a>
+            <a href="tin-tuc.html">Tin tức</a>
+            <a href="chatbot.html">Chatbot</a>
+            <a href="blog.html">Blog</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="index.html#contact">Liên hệ</a>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <section class="hero" style="min-height: 400px;">
+        <div class="hero__panel" style="grid-column: 1 / -1; text-align: center; max-width: 800px; margin: 0 auto;">
+            <div class="hero__eyebrow">BẮT ĐẦU ĐẦU TƯ</div>
+            <h1>Mở tài khoản giao dịch chứng khoán</h1>
+            <p>Mở tài khoản online nhanh chóng, miễn phí và nhận nhiều ưu đãi hấp dẫn. Bắt đầu hành trình đầu tư của bạn ngay hôm nay.</p>
+        </div>
+    </section>
+
+    <!-- CONTENT SECTION -->
+    <section style="padding: 80px 0;">
+        <div class="wrap">
+            <div style="max-width: 900px; margin: 0 auto;">
+                <h2 style="margin-bottom: 30px;">3 bước mở tài khoản</h2>
+                
+                <div class="why-grid" style="grid-template-columns: repeat(3, 1fr); gap: 30px; margin-bottom: 60px;">
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 15px;">Buoc 1: Dang ky online</h3>
+                        <p style="color: var(--color-gray-text);">Dien thong tin ca nhan va tai len giay to can thiet</p>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 15px;">Buoc 2: Xac thuc eKYC</h3>
+                        <p style="color: var(--color-gray-text);">Xac minh danh tinh qua video call voi nhan vien</p>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <h3 style="margin-bottom: 15px;">Buoc 3: Nhan tai khoan</h3>
+                        <p style="color: var(--color-gray-text);">Nhan thong tin tai khoan va bat dau giao dich</p>
+                    </div>
+                </div>
+
+                <h2 style="margin-bottom: 30px;">Hồ sơ cần chuẩn bị</h2>
+                <ul style="line-height: 2.2; color: var(--color-gray-text); margin-bottom: 50px; font-size: 15px;">
+                    <li>📄 CMND/CCCD (bản gốc hoặc bản sao)</li>
+                    <li>📱 Số điện thoại đang sử dụng</li>
+                    <li>✉️ Địa chỉ email</li>
+                    <li>🏦 Tài khoản ngân hàng liên kết</li>
+                    <li>⏱️ Thời gian: Chỉ 15-20 phút</li>
+                </ul>
+
+                <div style="background: var(--color-green-bg); padding: 30px; border-radius: var(--radius); margin-bottom: 40px;">
+                    <h3 style="color: var(--color-green-text); margin-bottom: 15px;">Uu dai dac biet cho khach hang moi</h3>
+                    <ul style="line-height: 2; color: var(--color-green-text);">
+                        <li>Mien phi mo tai khoan</li>
+                        <li>Giam 50% phi giao dich 6 thang dau</li>
+                        <li>Tang 500.000 VND phi giao dich</li>
+                        <li>Tu van mien phi tu chuyen gia</li>
+                    </ul>
+                </div>
+
+                <div style="text-align: center; padding: 30px 0;">
+                    <button class="btn btn--solid" style="margin-right: 15px;" onclick="window.location.href='index.html#contact'">Mở tài khoản ngay</button>
+                    <button class="btn btn--outline" onclick="alert('Tính năng đang phát triển!')">Tải app giao dịch</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="wrap">
+            <p><strong>Đặng Cao Hoàng Phúc</strong> · Giám đốc Trung tâm Kinh doanh, Công ty Chứng khoán ABC</p>
+            <p>&copy; 2026 Bản tin và khuyến nghị mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
+            <p>
+                <a href="#">Chính sách bảo mật</a> · 
+                <a href="#">Điều khoản sử dụng</a> · 
+                Email: <a href="mailto:contact@example.com">contact@example.com</a> · 
+                Điện thoại: <a href="tel:0982059995">0982 059 995</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="nav-script.js"></script>
+</body>
+</html>

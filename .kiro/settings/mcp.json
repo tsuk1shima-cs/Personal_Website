@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "tcbs-tcinvest": {
+      "type": "http",
+      "url": "https://mcp.tcbs.com.vn/mcp/tcinvest/",
+      "headers": {
+        "Authorization": "Bearer YOUR_TCBS_JWT_TOKEN_HERE"
+      },
+      "disabled": true,
+      "autoApprove": [],
+      "notes": "Dien JWT token TCBS vao Authorization header. Lay token bang cach goi POST http://localhost:3000/api/tcbs/token voi otp tu app TCInvest. Token het han sau 8h can lay lai."
+    }
+  }
+}

@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đào tạo đầu tư - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="wrap">
+            <a href="index.html" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="market-data.html">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html">TCBS Realtime</a>
+                    </div>
+                </div>
+                
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M7 10l5 5 5-5z"/>
+                        </svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
+                        <a href="dao-tao.html">Đào tạo</a>
+                    </div>
+                </div>
+
+                <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+                <a href="chatbot.html" class="nav-link">Chatbot</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel">
+            <a href="index.html">Trang chủ</a>
+            <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html">Bộ lọc FA</a>
+            <a href="market-data.html">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html">Mở tài khoản</a>
+            <a href="dao-tao.html">Đào tạo</a>
+            <a href="tin-tuc.html">Tin tức</a>
+            <a href="chatbot.html">Chatbot</a>
+            <a href="blog.html">Blog</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="index.html#contact">Liên hệ</a>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <section class="hero" style="min-height: 400px;">
+        <div class="hero__panel" style="grid-column: 1 / -1; text-align: center; max-width: 800px; margin: 0 auto;">
+            <div class="hero__eyebrow">HỌC TẬP & PHÁT TRIỂN</div>
+            <h1>Đào tạo đầu tư chứng khoán</h1>
+            <p>Khóa học từ cơ bản đến nâng cao, giúp bạn tự tin đầu tư và quản lý tài chính hiệu quả. Học từ chuyên gia có hơn 15 năm kinh nghiệm thực chiến.</p>
+        </div>
+    </section>
+
+    <!-- CONTENT SECTION -->
+    <section style="padding: 80px 0;">
+        <div class="wrap">
+            <h2 style="text-align: center; margin-bottom: 50px;">Các khóa học</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px;">
+                <div style="border: 2px solid var(--color-border); border-radius: var(--radius); padding: 30px; transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <h3 style="margin-bottom: 15px;">Co ban chung khoan</h3>
+                    <p style="color: var(--color-gray-text); margin-bottom: 20px; line-height: 1.7;">Dành cho người mới bắt đầu. Tìm hiểu thị trường, cách đọc biểu đồ và chiến lược đầu tư cơ bản.</p>
+                    <div style="font-weight: 700; font-size: 24px; color: var(--color-black); margin-bottom: 20px;">2.500.000đ</div>
+                    <ul style="color: var(--color-gray-text); line-height: 2; font-size: 14px; margin-bottom: 25px;">
+                        <li>✓ 8 buổi học (16 giờ)</li>
+                        <li>✓ Tài liệu học tập</li>
+                        <li>✓ Group hỗ trợ</li>
+                        <li>✓ Chứng chỉ hoàn thành</li>
+                    </ul>
+                    <button class="btn btn--outline btn--block" onclick="window.location.href='index.html#contact'">Đăng ký ngay</button>
+                </div>
+
+                <div style="border: 2px solid var(--color-border); border-radius: var(--radius); padding: 30px; transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <h3 style="margin-bottom: 15px;">Phan tich ky thuat</h3>
+                    <p style="color: var(--color-gray-text); margin-bottom: 20px; line-height: 1.7;">Học cách phân tích biểu đồ, nhận diện mô hình giá và đưa ra quyết định giao dịch chính xác.</p>
+                    <div style="font-weight: 700; font-size: 24px; color: var(--color-black); margin-bottom: 20px;">4.500.000đ</div>
+                    <ul style="color: var(--color-gray-text); line-height: 2; font-size: 14px; margin-bottom: 25px;">
+                        <li>✓ 12 buổi học (24 giờ)</li>
+                        <li>✓ Công cụ phân tích</li>
+                        <li>✓ Thực hành thực tế</li>
+                        <li>✓ Hỗ trợ 1-1</li>
+                    </ul>
+                    <button class="btn btn--outline btn--block" onclick="window.location.href='index.html#contact'">Đăng ký ngay</button>
+                </div>
+
+                <div style="border: 2px solid var(--color-black); border-radius: var(--radius); padding: 30px; background: var(--color-gray-bg); position: relative; transition: transform 0.2s; cursor: pointer;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    <div style="position: absolute; top: -15px; right: 20px; background: var(--color-black); color: white; padding: 5px 15px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 700;">PHO BIEN</div>
+                    <h3 style="margin-bottom: 15px;">Master Trader</h3>
+                    <p style="color: var(--color-gray-text); margin-bottom: 20px; line-height: 1.7;">Khóa học toàn diện từ cơ bản đến nâng cao, đào tạo trader chuyên nghiệp.</p>
+                    <div style="font-weight: 700; font-size: 24px; color: var(--color-black); margin-bottom: 20px;">12.000.000đ</div>
+                    <ul style="color: var(--color-gray-text); line-height: 2; font-size: 14px; margin-bottom: 25px;">
+                        <li>✓ 24 buổi học (48 giờ)</li>
+                        <li>✓ Mentor 1-1</li>
+                        <li>✓ Trading room riêng</li>
+                        <li>✓ Hỗ trợ trọn đời</li>
+                    </ul>
+                    <button class="btn btn--solid btn--block" onclick="window.location.href='index.html#contact'">Đăng ký ngay</button>
+                </div>
+            </div>
+
+            <div style="max-width: 900px; margin: 60px auto 0;">
+                <h2 style="margin-bottom: 30px;">Lợi ích khi tham gia</h2>
+                
+                <div style="display: grid; gap: 20px;">
+                    <div style="display: flex; gap: 20px; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--color-black); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">👨‍🏫</div>
+                        <div>
+                            <h3 style="margin-bottom: 10px;">Học từ chuyên gia thực chiến</h3>
+                            <p style="color: var(--color-gray-text);">Giảng viên có hơn 15 năm kinh nghiệm, từng quản lý hàng trăm tỷ đồng.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px; align-items: start;">
+                        <div>
+                            <h3 style="margin-bottom: 10px;">Thuc hanh voi tai khoan that</h3>
+                            <p style="color: var(--color-gray-text);">Không chỉ lý thuyết, bạn sẽ được thực hành giao dịch thực tế.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--color-black); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">👥</div>
+                        <div>
+                            <h3 style="margin-bottom: 10px;">Cộng đồng học viên</h3>
+                            <p style="color: var(--color-gray-text);">Tham gia cộng đồng, chia sẻ kinh nghiệm và cùng phát triển.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 20px; align-items: start;">
+                        <div style="width: 50px; height: 50px; background: var(--color-black); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;">🎯</div>
+                        <div>
+                            <h3 style="margin-bottom: 10px;">Cam kết kết quả</h3>
+                            <p style="color: var(--color-gray-text);">Hoàn tiền 100% nếu không hài lòng sau 2 buổi học đầu tiên.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="wrap">
+            <p><strong>Đặng Cao Hoàng Phúc</strong> · Chức vụ...., Công ty....</p>
+            <p>&copy; 2026 Bản tin và khuyến nghị mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
+            <p>
+                <a href="#">Chính sách bảo mật</a> · 
+                <a href="#">Điều khoản sử dụng</a> · 
+                Email: <a href="mailto:contact@example.com">contact@example.com</a> · 
+                Điện thoại: <a href="tel:0982059995">0982 059 995</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="nav-script.js"></script>
+</body>
+</html>

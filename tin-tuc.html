@@ -1,0 +1,540 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tin tức thị trường - Đặng Cao Hoàng Phúc</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { background: #f8f8f8; }
+
+        .news-header {
+            background: white;
+            padding: 28px 40px 20px;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 28px;
+        }
+
+        .news-header h1 { font-size: 24px; font-weight: 700; margin: 0 0 4px; }
+        .news-header p  { margin: 0 0 18px; color: #666; font-size: 14px; }
+
+        .header-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .update-time { font-size: 13px; color: #888; flex: 1; }
+
+        .btn-refresh {
+            padding: 7px 16px;
+            border: 1px solid #d4d4d4;
+            background: white;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-refresh:hover    { background: #f5f5f5; }
+        .btn-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-ai {
+            padding: 7px 18px;
+            border: none;
+            background: #171717;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-ai:hover    { background: #404040; }
+        .btn-ai:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Filter tabs */
+        .filter-bar {
+            display: flex;
+            gap: 6px;
+            padding: 0 40px 16px;
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 6px 16px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #555;
+        }
+
+        .filter-tab:hover  { border-color: #999; }
+        .filter-tab.active { background: #171717; color: white; border-color: #171717; }
+
+        /* News grid */
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .news-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.15s, border-color 0.15s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .news-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-color: #ccc;
+        }
+
+        .card-body { padding: 18px 20px; flex: 1; }
+
+        .card-cat {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #666;
+            background: #f5f5f5;
+            padding: 2px 8px;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.45;
+            margin: 0 0 10px;
+            color: #111;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-summary {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+            margin: 0 0 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            padding: 10px 20px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .card-source { font-weight: 500; color: #555; }
+
+        /* AI summary section */
+        .ai-section {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 28px 32px;
+            margin-bottom: 24px;
+        }
+
+        .ai-section-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #222;
+        }
+
+        .ai-content { line-height: 1.75; font-size: 14px; color: #333; }
+        .ai-content h3 { font-size: 15px; font-weight: 700; margin: 18px 0 8px; color: #111; }
+        .ai-content p  { margin-bottom: 10px; }
+        .ai-content ul { margin: 8px 0 12px 20px; }
+        .ai-content li { margin-bottom: 6px; }
+
+        .ai-generating {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 14px 18px;
+            color: #0369a1;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .error-box {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 14px 18px;
+            color: #b91c1c;
+            font-size: 14px;
+        }
+
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+            border-radius: 2px;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .skeleton-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 18px 20px;
+        }
+        .sk-line { height: 14px; margin-bottom: 8px; }
+        .sk-line.wide  { width: 100%; }
+        .sk-line.mid   { width: 75%; }
+        .sk-line.short { width: 45%; }
+
+        .empty-state { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+
+        @media (max-width: 700px) {
+            .news-header { padding: 20px; }
+            .filter-bar  { padding: 0 20px 14px; }
+            .news-grid   { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav class="nav">
+        <div class="wrap">
+            <a href="index.html" class="logo">
+                <span class="mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                    </svg>
+                </span>
+                <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
+            </a>
+
+            <div class="nav-menu">
+                <a href="index.html" class="nav-link">Trang chủ</a>
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Phân tích
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="market-data.html">Dữ liệu thị trường</a>
+                        <a href="ssi-realtime.html">TCBS Realtime</a>
+                    </div>
+                </div>
+                <div class="nav-grp">
+                    <button class="nav-grp__btn">
+                        Dịch vụ
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="nav-grp__menu">
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
+                        <a href="dao-tao.html">Đào tạo</a>
+                    </div>
+                </div>
+                <a href="tin-tuc.html" class="nav-link">Tin tức</a>
+                <a href="chatbot.html" class="nav-link">Chatbot</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            </div>
+
+            <button class="hamburger" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+
+        <div class="mobile-panel" id="mobilePanel">
+            <a href="index.html">Trang chủ</a>
+            <a href="tin-hieu-ta.html">Tín hiệu TA</a>
+            <a href="bo-loc-fa.html">Bộ lọc FA</a>
+            <a href="market-data.html">Dữ liệu thị trường</a>
+            <a href="ssi-realtime.html">TCBS Realtime</a>
+            <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+            <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
+            <a href="mo-tai-khoan.html">Mở tài khoản</a>
+            <a href="dao-tao.html">Đào tạo</a>
+            <a href="tin-tuc.html">Tin tức</a>
+            <a href="chatbot.html">Chatbot</a>
+            <a href="blog.html">Blog</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="index.html#contact">Liên hệ</a>
+        </div>
+    </nav>
+
+    <!-- HEADER -->
+    <div class="news-header">
+        <h1>Tin tức thị trường</h1>
+        <p id="headerDate">Tin tức tổng hợp từ các báo tài chính uy tín</p>
+        <div class="header-bar">
+            <span class="update-time" id="lastUpdate">Đang tải...</span>
+            <button class="btn-refresh" id="btnRefresh" onclick="loadRSS()">Làm mới</button>
+            <button class="btn-ai" id="btnAI" onclick="generateAI()">Tổng hợp AI</button>
+        </div>
+    </div>
+
+    <!-- FILTER TABS -->
+    <div class="filter-bar">
+        <button class="filter-tab active" onclick="filterNews('all', this)">Tất cả</button>
+        <button class="filter-tab" onclick="filterNews('Kinh doanh', this)">Kinh doanh</button>
+        <button class="filter-tab" onclick="filterNews('Chứng khoán', this)">Chứng khoán</button>
+        <button class="filter-tab" onclick="filterNews('Tài chính', this)">Tài chính</button>
+        <button class="filter-tab" onclick="filterNews('Thị trường', this)">Thị trường</button>
+    </div>
+
+    <div class="wrap" style="padding-bottom: 60px; max-width: 1100px;">
+
+        <!-- AI generating bar -->
+        <div class="ai-generating" id="aiGenerating">
+            Đang tổng hợp phân tích AI, vui lòng đợi...
+        </div>
+
+        <!-- AI summary section (hidden by default) -->
+        <div class="ai-section" id="aiSection" style="display:none;">
+            <div class="ai-section-title">Phân tích AI</div>
+            <div class="ai-content" id="aiContent"></div>
+        </div>
+
+        <!-- News grid -->
+        <div class="news-grid" id="newsGrid">
+            <!-- Skeleton loading -->
+            <div class="skeleton-card">
+                <div class="skeleton sk-line short" style="margin-bottom:12px"></div>
+                <div class="skeleton sk-line wide"></div>
+                <div class="skeleton sk-line wide"></div>
+                <div class="skeleton sk-line mid"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton sk-line short" style="margin-bottom:12px"></div>
+                <div class="skeleton sk-line wide"></div>
+                <div class="skeleton sk-line wide"></div>
+                <div class="skeleton sk-line mid"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton sk-line short" style="margin-bottom:12px"></div>
+                <div class="skeleton sk-line wide"></div>
+                <div class="skeleton sk-line wide"></div>
+                <div class="skeleton sk-line mid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="wrap">
+            <p><strong>Đặng Cao Hoàng Phúc</strong></p>
+            <p>&copy; 2026 Tin tức tổng hợp từ nguồn công khai, mang tính chất tham khảo.</p>
+        </div>
+    </footer>
+
+    <script src="nav-script.js"></script>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:3000/api'
+            : '/api';
+
+        let allArticles = [];
+
+        // Mau badge theo category
+        const CAT_COLORS = {
+            'Chứng khoán': '#dbeafe:#1d4ed8',   // xanh duong
+            'Tài chính':   '#dcfce7:#166534',   // xanh la
+            'Kinh doanh':  '#fef3c7:#92400e',   // vang
+            'Thị trường':  '#f3e8ff:#6b21a8',   // tim
+        };
+
+        function catStyle(cat) {
+            const pair = CAT_COLORS[cat];
+            if (!pair) return '';
+            const [bg, color] = pair.split(':');
+            return `background:${bg};color:${color};`;
+        }
+
+        // Nguon bao -> mau nhan
+        const SOURCE_COLORS = {
+            'VnExpress':  '#e53e3e',
+            'CafeF':      '#2b6cb0',
+            'VnEconomy':  '#276749',
+            'Dân trí':    '#dd6b20',
+        };
+
+        function sourceColor(src) {
+            return SOURCE_COLORS[src] || '#555';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const now = new Date();
+            document.getElementById('headerDate').textContent =
+                'Tin tức từ VnExpress, CafeF, VnEconomy, Dân trí — ' +
+                now.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+            loadRSS();
+        });
+
+        async function loadRSS() {
+            const btn = document.getElementById('btnRefresh');
+            btn.disabled = true;
+            btn.textContent = 'Đang tải...';
+            showSkeletons();
+
+            try {
+                const res = await fetch(`${API_BASE}/news/rss`);
+                const data = await res.json();
+
+                if (data.success && data.items && data.items.length > 0) {
+                    allArticles = data.items;
+                    renderArticles(allArticles);
+                    const fetchTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                    const cacheNote = data.cached ? ' (cache)' : '';
+                    document.getElementById('lastUpdate').textContent =
+                        `Cập nhật: ${fetchTime}${cacheNote} — ${data.total} bài`;
+                } else {
+                    showEmpty('Không tải được tin tức. Vui lòng kiểm tra server đang chạy.');
+                }
+            } catch (err) {
+                showEmpty('Không thể kết nối server. Vui lòng chạy <code>npm start</code>.');
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Làm mới';
+        }
+
+        function renderArticles(articles) {
+            const grid = document.getElementById('newsGrid');
+
+            if (!articles || articles.length === 0) {
+                grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">Không có bài viết nào trong danh mục này.</div>';
+                return;
+            }
+
+            grid.innerHTML = articles.map(a => {
+                const safeLink    = encodeURI(a.link || '#');
+                const safeTitle   = escHtml(a.title);
+                const safeSummary = escHtml(a.summary);
+                const safeSource  = escHtml(a.source);
+                const safeCat     = escHtml(a.category);
+                const safeTime    = escHtml(a.time);
+                const srcColor    = sourceColor(a.source);
+
+                return `
+                <a class="news-card" href="${safeLink}" target="_blank" rel="noopener noreferrer">
+                    <div class="card-body">
+                        <span class="card-cat" style="${catStyle(a.category)}">${safeCat}</span>
+                        <h3 class="card-title">${safeTitle}</h3>
+                        ${safeSummary ? `<p class="card-summary">${safeSummary}</p>` : ''}
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-source" style="color:${srcColor}">${safeSource}</span>
+                        <span>${safeTime}</span>
+                    </div>
+                </a>`;
+            }).join('');
+        }
+
+        function filterNews(cat, tabBtn) {
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            tabBtn.classList.add('active');
+
+            const filtered = cat === 'all'
+                ? allArticles
+                : allArticles.filter(a => a.category === cat);
+
+            renderArticles(filtered);
+        }
+
+        async function generateAI() {
+            const btn       = document.getElementById('btnAI');
+            const indicator = document.getElementById('aiGenerating');
+            const section   = document.getElementById('aiSection');
+            const content   = document.getElementById('aiContent');
+
+            btn.disabled = true;
+            btn.textContent = 'Đang tổng hợp...';
+            indicator.style.display = 'block';
+            section.style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_BASE}/news/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ section: 'full_summary' })
+                });
+                const data = await res.json();
+
+                if (data.success && data.content) {
+                    const liveBadge = data.hasLiveData
+                        ? `<span style="display:inline-block;padding:2px 8px;background:#dcfce7;color:#166534;font-size:11px;font-weight:600;margin-left:8px;vertical-align:middle">Dữ liệu thực</span>`
+                        : '';
+                    const dateLabel = data.date || new Date().toLocaleDateString('vi-VN');
+                    content.innerHTML = data.content +
+                        `<p style="margin-top:16px;padding-top:12px;border-top:1px solid #f0f0f0;font-size:12px;color:#999">
+                            Tổng hợp bởi AI — ${dateLabel}${liveBadge} — Mang tính chất tham khảo
+                        </p>`;
+                    section.style.display = 'block';
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    content.innerHTML = `<div class="error-box"><strong>Lỗi:</strong> ${escHtml(data.error || 'Không thể tổng hợp')}</div>`;
+                    section.style.display = 'block';
+                }
+            } catch (err) {
+                content.innerHTML = `<div class="error-box">Không thể kết nối server backend. Vui lòng chạy <code>npm start</code>.</div>`;
+                section.style.display = 'block';
+            }
+
+            indicator.style.display = 'none';
+            btn.disabled = false;
+            btn.textContent = 'Tổng hợp AI';
+        }
+
+        function showSkeletons() {
+            document.getElementById('newsGrid').innerHTML = Array(6).fill(`
+                <div class="skeleton-card">
+                    <div class="skeleton sk-line short" style="margin-bottom:12px"></div>
+                    <div class="skeleton sk-line wide"></div>
+                    <div class="skeleton sk-line wide"></div>
+                    <div class="skeleton sk-line mid"></div>
+                </div>`).join('');
+        }
+
+        function showEmpty(msg) {
+            document.getElementById('newsGrid').innerHTML =
+                `<div class="empty-state" style="grid-column:1/-1">${msg}</div>`;
+            document.getElementById('lastUpdate').textContent = 'Không tải được dữ liệu';
+        }
+
+        // Escape HTML cho text content (khong dung cho href)
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+    </script>
+</body>
+</html>
