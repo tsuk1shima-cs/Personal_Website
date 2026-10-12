@@ -13,19 +13,19 @@ function getAPIBase() {
         return 'http://localhost:3000/api';
     }
 
-    // Dang chay tren Render (cung domain voi backend)
-    if (host.includes('onrender.com')) {
+    // Dang chay tren Cloudflare Pages hoac Render (co /api/rss endpoint)
+    // Cloudflare Pages Functions tu dong tao /api/rss, /api/news
+    if (host.includes('pages.dev') || host.includes('onrender.com') || RENDER_URL) {
         return '/api';
     }
 
-    // Dang chay tren GitHub Pages hoac domain khac
-    // Neu co Render URL thi dung, con khong thi fallback ve truc tiep
-    if (RENDER_URL) {
-        return RENDER_URL + '/api';
+    // Dang chay tren GitHub Pages — Cloudflare Pages Functions khong hoat dong
+    // Tra ve null de dung fallback truc tiep
+    if (host.includes('github.io')) {
+        return RENDER_URL ? RENDER_URL + '/api' : null;
     }
 
-    // Khong co backend — cac tinh nang AI se khong hoat dong
-    return null;
+    return '/api';
 }
 
 const APP_CONFIG = {
