@@ -599,8 +599,10 @@
                     content: 'Bạn là trợ lý AI chuyên về tài chính và đầu tư chứng khoán tại Việt Nam. Trả lời ngắn gọn, chính xác và chuyên nghiệp bằng tiếng Việt.'
                 });
 
-                // Tat ca model deu goi qua /api/chat (OpenRouter)
-                const response = await fetch(`${API_BASE_URL}/chat`, {
+                // Tat ca model deu goi qua /api/chat (Cloudflare Pages Function hoac backend)
+                const endpoint = `${API_BASE_URL}/chat`;
+
+                const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ messages: chatMessages, model: currentModel })
