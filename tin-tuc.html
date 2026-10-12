@@ -360,14 +360,14 @@
 
         let allArticles = [];
 
-        // RSS feeds voi category tuong ung
+        // RSS feeds
         const RSS_FEEDS_DIRECT = [
             { url: 'https://vnexpress.net/rss/kinh-doanh.rss',      name: 'VnExpress',  category: 'Kinh doanh'  },
             { url: 'https://vnexpress.net/rss/thi-truong.rss',       name: 'VnExpress',  category: 'Thị trường'  },
             { url: 'https://dantri.com.vn/rss/kinh-doanh.rss',       name: 'Dân trí',    category: 'Kinh doanh'  },
         ];
 
-        // Parse XML RSS bang DOMParser (native browser)
+        // Parse XML RSS bang DOMParser
         function parseRSSXML(xml, sourceName, category) {
             try {
                 const parser = new DOMParser();
@@ -381,41 +381,54 @@
                                  || item.querySelector('guid')?.textContent?.trim() || '';
                     const desc    = item.querySelector('description')?.textContent || '';
                     const pubDate = item.querySelector('pubDate')?.textContent || '';
-
                     if (!title || !link || !link.startsWith('http')) return;
-
                     const summary = desc.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
                     const time = pubDate ? new Date(pubDate).toLocaleString('vi-VN', {
                         day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
                     }) : '';
-
                     result.push({ title, link, summary, source: sourceName, category, time });
                 });
                 return result;
             } catch (e) { return []; }
         }
 
-        // Lay RSS truc tiep tu browser (fetch voi no-cors fallback)
+        // Fallback cuoi: tin tuong doi moi tu cac bao (co link that de click)
+        function getStaticFallback() {
+            const today = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+            return [
+                { title: 'Xem tin tức chứng khoán mới nhất', link: 'https://cafef.vn/thi-truong-chung-khoan.html', summary: 'Truy cập CafeF để xem tin tức thị trường chứng khoán cập nhật mới nhất.', source: 'CafeF', category: 'Chứng khoán', time: today },
+                { title: 'Tin tức kinh doanh - VnExpress', link: 'https://vnexpress.net/kinh-doanh', summary: 'Cập nhật tin tức kinh tế, tài chính, doanh nghiệp từ VnExpress.', source: 'VnExpress', category: 'Kinh doanh', time: today },
+                { title: 'Thị trường chứng khoán - VnEconomy', link: 'https://vneconomy.vn/chung-khoan.htm', summary: 'Phân tích và nhận định thị trường chứng khoán từ VnEconomy.', source: 'VnEconomy', category: 'Chứng khoán', time: today },
+                { title: 'Tin tức tài chính - Dân trí', link: 'https://dantri.com.vn/kinh-doanh.htm', summary: 'Tin tức kinh doanh, tài chính từ báo Dân trí.', source: 'Dân trí', category: 'Kinh doanh', time: today },
+                { title: 'Dữ liệu thị trường realtime', link: 'market-data.html', summary: 'Xem bảng giá cổ phiếu và chỉ số thị trường realtime ngay trên website này.', source: 'Website', category: 'Thị trường', time: today },
+                { title: 'Bộ lọc cổ phiếu FA', link: 'bo-loc-fa.html', summary: 'Lọc 500+ cổ phiếu theo P/E, P/B, ROE với dữ liệu thực từ thị trường.', source: 'Website', category: 'Chứng khoán', time: today },
+            ];
+        }
+
         async function fetchRSSDirect() {
+            // Thu 1: Cloudflare Worker neu co
+            if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.workerUrl) {
+                try {
+                    const res = await fetch(APP_CONFIG.workerUrl, { signal: AbortSignal.timeout(6000) });
+                    const data = await res.json();
+                    if (data.success && data.items?.length) return data.items;
+                } catch { /* fallback */ }
+            }
+
+            // Thu 2: fetch truc tiep (chi hoat dong neu server cho phep CORS)
             const results = await Promise.allSettled(
                 RSS_FEEDS_DIRECT.map(feed =>
-                    fetch(feed.url, {
-                        signal: AbortSignal.timeout(6000),
-                        headers: { 'Accept': 'application/rss+xml, application/xml, text/xml, */*' }
-                    })
-                    .then(r => r.text())
-                    .then(xml => parseRSSXML(xml, feed.name, feed.category))
-                    .catch(() => [])
+                    fetch(feed.url, { signal: AbortSignal.timeout(4000) })
+                        .then(r => r.text())
+                        .then(xml => parseRSSXML(xml, feed.name, feed.category))
+                        .catch(() => [])
                 )
             );
-
             const items = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+            if (items.length > 0) return items;
 
-            // Fallback thu 2: dantri neu vnexpress bi block
-            if (!items.length) {
-                throw new Error('Không thể tải RSS trực tiếp từ browser');
-            }
-            return items;
+            // Thu 3: fallback tinh (luon co ket qua, co link that)
+            return getStaticFallback();
         }
 
         // Mau badge theo category
@@ -474,16 +487,14 @@
                 } catch { /* fallback */ }
             }
 
-            // 2. Fallback: goi truc tiep qua rss2json
+            // 2. Fallback: goi truc tiep (Worker / fetch / static)
             if (!items.length) {
                 try {
                     items  = await fetchRSSDirect();
-                    source = ' (trực tiếp)';
+                    source = items.some(i => i.source !== 'Website') ? ' (trực tiếp)' : ' (tĩnh)';
                 } catch (err) {
-                    showEmpty('Không tải được tin tức. Vui lòng thử lại sau.');
-                    btn.disabled = false;
-                    btn.textContent = 'Làm mới';
-                    return;
+                    items  = getStaticFallback();
+                    source = ' (tĩnh)';
                 }
             }
 
