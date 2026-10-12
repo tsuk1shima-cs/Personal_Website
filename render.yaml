@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: chuyen-gia-tai-chinh
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: TCBS_API_KEY
+        sync: false
+      - key: TCBS_API_BASE
+        value: https://openapi.tcbs.com.vn
+      - key: TCBS_WS_URL
+        value: wss://openapi.tcbs.com.vn/ws/thesis/v1/stream/normal

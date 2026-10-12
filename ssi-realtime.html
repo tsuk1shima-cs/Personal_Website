@@ -473,13 +473,12 @@
     </div>
 
     <script src="nav-script.js"></script>
+    <script src="config.js"></script>
     <script>
-        const API_BASE = window.location.hostname === 'localhost'
-            ? 'http://localhost:3000/api'
-            : '/api';
-        const WS_BASE = window.location.hostname === 'localhost'
-            ? 'ws://localhost:3000'
-            : `ws://${window.location.host}`;
+        const API_BASE = APP_CONFIG.apiBase;
+        const WS_BASE = APP_CONFIG.renderUrl
+            ? APP_CONFIG.renderUrl.replace('https://', 'wss://').replace('http://', 'ws://')
+            : (window.location.hostname === 'localhost' ? 'ws://localhost:3000' : `wss://${window.location.host}`);
 
         let ws = null;
         let selectedSymbol = null;

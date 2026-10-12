@@ -483,8 +483,9 @@
     </div>
 
     <script src="nav-script.js"></script>
+    <script src="config.js"></script>
     <script>
-        let currentModel = 'gpt-3.5-turbo';
+        let currentModel = 'openai/gpt-4o-mini';
         let messages = [];
         let isTyping = false;
 
@@ -580,9 +581,11 @@
         }
 
         async function callAI(message) {
-            const API_BASE_URL = window.location.hostname === 'localhost' 
-                ? 'http://localhost:3000/api'
-                : '/api';
+            if (!APP_CONFIG.hasBackend) {
+                return 'Chatbot AI cần backend server. Vui lòng chạy <code>npm start</code> hoặc deploy backend lên Render. Xem hướng dẫn trong README.md.';
+            }
+
+            const API_BASE_URL = APP_CONFIG.apiBase;
 
             try {
                 const chatMessages = messages.map(m => ({

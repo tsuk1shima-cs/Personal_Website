@@ -424,8 +424,10 @@
     </footer>
 
     <script src="nav-script.js"></script>
+    <script src="config.js"></script>
+    <script src="tv-api.js"></script>
     <script>
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        const API_BASE = APP_CONFIG.apiBase;
 
         // Tap hop du lieu tu server
         let allStocks = [];
@@ -457,18 +459,14 @@
             statusEl.textContent = '';
 
             try {
-                const res = await fetch(`${API_BASE}/market/screener?size=500`);
-                const data = await res.json();
-                if (data.success) {
-                    allStocks = data.data;
-                    const now = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
-                    statusEl.textContent = `Cập nhật: ${now} — ${data.count} / ${data.total} mã`;
-                    countEl.textContent = `${data.count} cổ phiếu đã tải`;
-                    populateSectors();
-                    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#737373">Chọn điều kiện lọc và nhấn "Áp dụng bộ lọc"</td></tr>`;
-                } else {
-                    throw new Error(data.error);
-                }
+                const { data, source } = await getScreenerData(500);
+                allStocks = data;
+                const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                const src = source === 'direct' ? 'TradingView trực tiếp' : 'Server';
+                statusEl.textContent = `Cập nhật: ${now} — ${allStocks.length} mã (${src})`;
+                countEl.textContent = `${allStocks.length} cổ phiếu đã tải`;
+                populateSectors();
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#737373">Chọn điều kiện lọc và nhấn "Áp dụng bộ lọc"</td></tr>`;
             } catch (err) {
                 tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626">Không thể tải dữ liệu: ${err.message}</td></tr>`;
                 statusEl.textContent = 'Lỗi tải dữ liệu';

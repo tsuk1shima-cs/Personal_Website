@@ -354,12 +354,48 @@
     </footer>
 
     <script src="nav-script.js"></script>
+    <script src="config.js"></script>
     <script>
-        const API_BASE = window.location.hostname === 'localhost'
-            ? 'http://localhost:3000/api'
-            : '/api';
+        const API_BASE = APP_CONFIG.apiBase;
 
         let allArticles = [];
+
+        // RSS feeds voi category tuong ung
+        const RSS_FEEDS_DIRECT = [
+            { url: 'https://vnexpress.net/rss/kinh-doanh.rss',      name: 'VnExpress',  category: 'Kinh doanh'  },
+            { url: 'https://vnexpress.net/rss/thi-truong.rss',       name: 'VnExpress',  category: 'Thị trường'  },
+            { url: 'https://cafef.vn/thi-truong-chung-khoan.rss',    name: 'CafeF',      category: 'Chứng khoán' },
+            { url: 'https://vneconomy.vn/chung-khoan.rss',           name: 'VnEconomy',  category: 'Chứng khoán' },
+            { url: 'https://vneconomy.vn/tai-chinh.rss',             name: 'VnEconomy',  category: 'Tài chính'   },
+            { url: 'https://dantri.com.vn/rss/kinh-doanh.rss',       name: 'Dân trí',    category: 'Kinh doanh'  },
+        ];
+
+        // Lay RSS truc tiep tu browser qua rss2json.com (public, khong can key)
+        async function fetchRSSDirect() {
+            const R2J = 'https://api.rss2json.com/v1/api.json?rss_url=';
+            const results = await Promise.allSettled(
+                RSS_FEEDS_DIRECT.map(feed =>
+                    fetch(R2J + encodeURIComponent(feed.url), { signal: AbortSignal.timeout(8000) })
+                        .then(r => r.json())
+                        .then(json => {
+                            if (json.status !== 'ok') return [];
+                            return (json.items || []).slice(0, 6).map(item => ({
+                                title:    item.title,
+                                link:     item.link,
+                                summary:  item.description?.replace(/<[^>]+>/g, '').slice(0, 200) || '',
+                                source:   feed.name,
+                                category: feed.category,
+                                time:     item.pubDate
+                                    ? new Date(item.pubDate).toLocaleString('vi-VN',
+                                        { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                                    : ''
+                            }));
+                        })
+                        .catch(() => [])
+                )
+            );
+            return results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+        }
 
         // Mau badge theo category
         const CAT_COLORS = {
@@ -402,22 +438,40 @@
             btn.textContent = 'Đang tải...';
             showSkeletons();
 
-            try {
-                const res = await fetch(`${API_BASE}/news/rss`);
-                const data = await res.json();
+            let items = [], source = '';
 
-                if (data.success && data.items && data.items.length > 0) {
-                    allArticles = data.items;
-                    renderArticles(allArticles);
-                    const fetchTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-                    const cacheNote = data.cached ? ' (cache)' : '';
-                    document.getElementById('lastUpdate').textContent =
-                        `Cập nhật: ${fetchTime}${cacheNote} — ${data.total} bài`;
-                } else {
-                    showEmpty('Không tải được tin tức. Vui lòng kiểm tra server đang chạy.');
+            // 1. Thu backend truoc
+            try {
+                const res = await fetch(`${API_BASE}/news/rss`,
+                    { signal: AbortSignal.timeout(4000) });
+                const data = await res.json();
+                if (data.success && data.items?.length) {
+                    items  = data.items;
+                    source = data.cached ? ' (cache)' : '';
                 }
-            } catch (err) {
-                showEmpty('Không thể kết nối server. Vui lòng chạy <code>npm start</code>.');
+            } catch { /* fallback */ }
+
+            // 2. Fallback: goi truc tiep qua rss2json
+            if (!items.length) {
+                try {
+                    items  = await fetchRSSDirect();
+                    source = ' (trực tiếp)';
+                } catch (err) {
+                    showEmpty('Không tải được tin tức. Vui lòng thử lại.');
+                    btn.disabled = false;
+                    btn.textContent = 'Làm mới';
+                    return;
+                }
+            }
+
+            if (items.length) {
+                allArticles = items;
+                renderArticles(allArticles);
+                const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('lastUpdate').textContent =
+                    `Cập nhật: ${now}${source} — ${items.length} bài`;
+            } else {
+                showEmpty('Không có bài viết nào được tải.');
             }
 
             btn.disabled = false;

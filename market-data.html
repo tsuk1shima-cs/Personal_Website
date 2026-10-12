@@ -315,8 +315,10 @@
     </footer>
 
     <script src="nav-script.js"></script>
+    <script src="config.js"></script>
+    <script src="tv-api.js"></script>
     <script>
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        const API_BASE = APP_CONFIG.apiBase;
 
         // Map chi so TradingView -> ten hien thi
         const INDEX_SYMBOLS = ['HOSE:VNI', 'HNX:HNX', 'UPCOM:UPCOM'];
@@ -334,15 +336,7 @@
 
         async function loadIndices() {
             try {
-                const res = await fetch(`${API_BASE}/market/prices`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ symbols: ['VNI', 'HNX', 'UPCOM'] })
-                });
-                const data = await res.json();
-                if (!data.success) throw new Error(data.error);
-
-                // Fallback: lay tu screener neu /prices khong tra chi so
+                const { prices } = await getPricesData(['VNI', 'HNX', 'UPCOM']);
                 const grid = document.getElementById('indicesGrid');
                 const indices = [
                     { name: 'VN-INDEX',    key: 'VNI'   },
@@ -351,13 +345,12 @@
                 ];
 
                 grid.innerHTML = indices.map(idx => {
-                    const d = data.prices?.[idx.key];
-                    const val     = d?.price;
-                    const chg     = d?.change;
-                    const cls     = chg > 0 ? 'positive' : chg < 0 ? 'negative' : '';
-                    const arrow   = chg > 0 ? '▲' : chg < 0 ? '▼' : '—';
-                    const sign    = chg > 0 ? '+' : '';
-
+                    const d   = prices?.[idx.key];
+                    const val = d?.price;
+                    const chg = d?.change;
+                    const cls   = chg > 0 ? 'positive' : chg < 0 ? 'negative' : '';
+                    const arrow = chg > 0 ? '▲' : chg < 0 ? '▼' : '—';
+                    const sign  = chg > 0 ? '+' : '';
                     return `<div class="index-card">
                         <div class="index-name">${idx.name}</div>
                         <div class="index-value">${val ? val.toLocaleString('vi-VN') : '—'}</div>
@@ -366,10 +359,7 @@
                         </div>
                     </div>`;
                 }).join('');
-
-            } catch (e) {
-                console.error('Indices error:', e);
-            }
+            } catch (e) { console.error('Indices error:', e); }
         }
 
         async function loadTopStocks() {
@@ -377,11 +367,12 @@
             container.innerHTML = '<div class="loading">Đang tải...</div>';
 
             try {
-                const res = await fetch(`${API_BASE}/market/screener?size=100`);
-                const data = await res.json();
-                if (!data.success) throw new Error(data.error);
-
-                displayStocks(data.data);
+                const { data, source } = await getScreenerData(100);
+                if (source === 'direct') {
+                    document.getElementById('marketHeaderSub').textContent +=
+                        ' — Dữ liệu trực tiếp từ TradingView';
+                }
+                displayStocks(data);
             } catch (e) {
                 container.innerHTML = `<div style="padding:20px;color:#dc2626">Không thể tải dữ liệu: ${e.message}</div>`;
             }

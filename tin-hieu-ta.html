@@ -419,8 +419,10 @@
     </footer>
 
     <script src="nav-script.js"></script>
+    <script src="config.js"></script>
+    <script src="tv-api.js"></script>
     <script>
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        const API_BASE = APP_CONFIG.apiBase;
 
         // Danh sach tin hieu — gia vao va thong tin static
         const signals = [
@@ -455,26 +457,23 @@
             return Math.max(0, days - 1);
         }
 
-        // Lay gia tu server (TradingView)
+        // Lay gia tu server (TradingView) — fallback truc tiep neu khong co backend
         async function fetchPrices() {
             const symbols = signals.map(s => s.symbol);
             try {
-                const res = await fetch(`${API_BASE}/market/prices`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ symbols })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    Object.assign(livePrices, data.prices);
-                    lastPriceUpdate = new Date();
-                    updateSummaryStats();
-                    renderSignals(currentFilter);
-                    document.getElementById('updateBadge').textContent =
-                        'Cập nhật: ' + lastPriceUpdate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                }
+                const { prices, source } = await getPricesData(symbols);
+                Object.assign(livePrices, prices);
+                lastPriceUpdate = new Date();
+                const srcNote = source === 'direct' ? ' (TradingView)' : '';
+                updateSummaryStats();
+                renderSignals(currentFilter);
+                document.getElementById('updateBadge').textContent =
+                    'Cập nhật: ' + lastPriceUpdate.toLocaleTimeString('vi-VN',
+                        { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + srcNote;
             } catch (err) {
                 console.error('Price fetch error:', err);
+                document.getElementById('updateBadge').textContent = 'Lỗi tải giá';
+                document.getElementById('updateBadge').style.color = '#dc2626';
             }
         }
 

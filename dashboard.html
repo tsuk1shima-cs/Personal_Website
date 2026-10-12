@@ -322,8 +322,10 @@
     </footer>
 
     <script src="nav-script.js"></script>
+    <script src="config.js"></script>
+    <script src="tv-api.js"></script>
     <script>
-        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
+        const API_BASE = APP_CONFIG.apiBase;
         let _movers = {};
 
         async function loadDashboard() {
@@ -359,33 +361,19 @@
 
         async function loadMarketData() {
             try {
-                const res = await fetch(`${API_BASE}/market/screener?size=100`);
-                const data = await res.json();
-                if (!data.success) throw new Error();
+                const { data, source } = await getScreenerData(100);
+                setBadge('statusMarket', true, `${data.length} mã${source === 'direct' ? ' (TV)' : ''}`);
 
-                setBadge('statusMarket', true, `${data.count} mã`);
-
-                const stocks = data.data.filter(s => s.change !== null);
+                const stocks = data.filter(s => s.change !== null);
                 _movers.gain = [...stocks].sort((a,b) => b.change - a.change).slice(0,10);
                 _movers.loss = [...stocks].sort((a,b) => a.change - b.change).slice(0,10);
-                _movers.vol  = [...data.data].filter(s => s.volume).sort((a,b) => b.volume - a.volume).slice(0,10);
+                _movers.vol  = [...data].filter(s => s.volume).sort((a,b) => b.volume - a.volume).slice(0,10);
 
-                // Index cards
-                const top5 = _movers.gain.slice(0,5);
-                const bot5 = _movers.loss.slice(0,5);
-                document.getElementById('topGainer').innerHTML = top5.map(s =>
+                // Top gainers/losers cards
+                document.getElementById('topGainer').innerHTML = _movers.gain.slice(0,5).map(s =>
                     `<div style="color:#16a34a">${s.symbol} <strong>+${s.change.toFixed(2)}%</strong></div>`).join('');
-                document.getElementById('topLoser').innerHTML = bot5.map(s =>
+                document.getElementById('topLoser').innerHTML = _movers.loss.slice(0,5).map(s =>
                     `<div style="color:#dc2626">${s.symbol} <strong>${s.change.toFixed(2)}%</strong></div>`).join('');
-
-                // VNI, HNX index tham khao tu top market cap
-                const vni = data.data.find(s => s.symbol === 'VNI' || s.symbol === 'VNINDEX');
-                if (vni) {
-                    document.getElementById('idx-vni').textContent = vni.price?.toLocaleString('vi-VN') || '—';
-                    const chgEl = document.getElementById('idx-vni-chg');
-                    chgEl.textContent = vni.change !== null ? (vni.change >= 0 ? '+' : '') + vni.change.toFixed(2) + '%' : '—';
-                    chgEl.style.color = vni.change >= 0 ? '#16a34a' : '#dc2626';
-                }
 
                 renderMovers('gain');
             } catch (e) {
