@@ -364,37 +364,58 @@
         const RSS_FEEDS_DIRECT = [
             { url: 'https://vnexpress.net/rss/kinh-doanh.rss',      name: 'VnExpress',  category: 'Kinh doanh'  },
             { url: 'https://vnexpress.net/rss/thi-truong.rss',       name: 'VnExpress',  category: 'Thị trường'  },
-            { url: 'https://cafef.vn/thi-truong-chung-khoan.rss',    name: 'CafeF',      category: 'Chứng khoán' },
-            { url: 'https://vneconomy.vn/chung-khoan.rss',           name: 'VnEconomy',  category: 'Chứng khoán' },
-            { url: 'https://vneconomy.vn/tai-chinh.rss',             name: 'VnEconomy',  category: 'Tài chính'   },
             { url: 'https://dantri.com.vn/rss/kinh-doanh.rss',       name: 'Dân trí',    category: 'Kinh doanh'  },
         ];
 
-        // Lay RSS truc tiep tu browser qua rss2json.com (public, khong can key)
+        // Parse XML RSS bang DOMParser (native browser)
+        function parseRSSXML(xml, sourceName, category) {
+            try {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(xml, 'text/xml');
+                const items = doc.querySelectorAll('item');
+                const result = [];
+                items.forEach((item, i) => {
+                    if (i >= 8) return;
+                    const title   = item.querySelector('title')?.textContent?.trim() || '';
+                    const link    = item.querySelector('link')?.textContent?.trim()
+                                 || item.querySelector('guid')?.textContent?.trim() || '';
+                    const desc    = item.querySelector('description')?.textContent || '';
+                    const pubDate = item.querySelector('pubDate')?.textContent || '';
+
+                    if (!title || !link || !link.startsWith('http')) return;
+
+                    const summary = desc.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 200);
+                    const time = pubDate ? new Date(pubDate).toLocaleString('vi-VN', {
+                        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                    }) : '';
+
+                    result.push({ title, link, summary, source: sourceName, category, time });
+                });
+                return result;
+            } catch (e) { return []; }
+        }
+
+        // Lay RSS truc tiep tu browser (fetch voi no-cors fallback)
         async function fetchRSSDirect() {
-            const R2J = 'https://api.rss2json.com/v1/api.json?rss_url=';
             const results = await Promise.allSettled(
                 RSS_FEEDS_DIRECT.map(feed =>
-                    fetch(R2J + encodeURIComponent(feed.url), { signal: AbortSignal.timeout(8000) })
-                        .then(r => r.json())
-                        .then(json => {
-                            if (json.status !== 'ok') return [];
-                            return (json.items || []).slice(0, 6).map(item => ({
-                                title:    item.title,
-                                link:     item.link,
-                                summary:  item.description?.replace(/<[^>]+>/g, '').slice(0, 200) || '',
-                                source:   feed.name,
-                                category: feed.category,
-                                time:     item.pubDate
-                                    ? new Date(item.pubDate).toLocaleString('vi-VN',
-                                        { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-                                    : ''
-                            }));
-                        })
-                        .catch(() => [])
+                    fetch(feed.url, {
+                        signal: AbortSignal.timeout(6000),
+                        headers: { 'Accept': 'application/rss+xml, application/xml, text/xml, */*' }
+                    })
+                    .then(r => r.text())
+                    .then(xml => parseRSSXML(xml, feed.name, feed.category))
+                    .catch(() => [])
                 )
             );
-            return results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+
+            const items = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+
+            // Fallback thu 2: dantri neu vnexpress bi block
+            if (!items.length) {
+                throw new Error('Không thể tải RSS trực tiếp từ browser');
+            }
+            return items;
         }
 
         // Mau badge theo category
