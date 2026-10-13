@@ -6,157 +6,392 @@
     <title>Dashboard - Đặng Cao Hoàng Phúc</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { background: #fafafa; }
-        
-        .dashboard-header {
-            background: white;
-            padding: 32px 40px;
-            border-bottom: 1px solid #e5e5e5;
+        /* ===========================
+           DASHBOARD LAYOUT
+        =========================== */
+        body { background: #f4f5f7; font-family: var(--font-body); }
+
+        .db-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        
-        .dashboard-header h1 {
-            font-size: 24px;
+
+        /* Index bar */
+        .db-index-bar {
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .db-index-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 20px 10px 0;
+            min-width: 120px;
+            cursor: pointer;
+            border-right: 1px solid #f0f0f0;
+            margin-right: 20px;
+        }
+
+        .db-index-item:last-child { border-right: none; }
+
+        .db-index-name {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+            margin-bottom: 2px;
+        }
+
+        .db-index-val {
+            font-size: 16px;
             font-weight: 700;
-            margin: 0 0 6px 0;
-            color: #1a1a1a;
+            font-family: var(--font-data);
+            color: #111;
+            letter-spacing: -0.02em;
         }
-        
-        .dashboard-header p {
-            margin: 0;
-            color: #737373;
-            font-size: 14px;
+
+        .db-index-chg {
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-data);
         }
-        
-        .dashboard-content {
-            max-width: 1000px;
+
+        .db-index-chg.up   { color: #16a34a; }
+        .db-index-chg.down { color: #dc2626; }
+        .db-index-chg.flat { color: #888; }
+
+        /* Tab navigation */
+        .db-tabs {
+            background: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            padding: 0 24px;
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+        }
+
+        .db-tab {
+            padding: 14px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            color: #666;
+            cursor: pointer;
+            border: none;
+            background: none;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .db-tab:hover { color: #111; }
+        .db-tab.active {
+            color: #111;
+            border-bottom-color: #111;
+        }
+
+        /* Content area */
+        .db-content {
+            flex: 1;
+            padding: 20px 24px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 40px 20px;
+            width: 100%;
         }
-        
-        .status-bar {
+
+        .db-panel { display: none; }
+        .db-panel.active { display: block; }
+
+        /* ===========================
+           CARDS & SECTIONS
+        =========================== */
+        .db-card {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 18px 20px;
+        }
+
+        .db-card-title {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+            margin-bottom: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
-            padding: 16px 24px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            border: 1px solid #e5e5e5;
         }
-        
-        .status-badge {
+
+        /* Grid layouts */
+        .db-grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .db-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .db-grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* Summary card */
+        .db-stat-card {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .db-stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #999;
+            margin-bottom: 6px;
+        }
+
+        .db-stat-val {
+            font-size: 22px;
+            font-weight: 700;
+            font-family: var(--font-data);
+            color: #111;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .db-stat-chg {
+            font-size: 13px;
+            font-weight: 600;
+            font-family: var(--font-data);
+            margin-top: 3px;
+        }
+
+        .up   { color: #16a34a; }
+        .down { color: #dc2626; }
+        .flat { color: #888; }
+
+        /* Breadth bar */
+        .breadth-bar {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0 6px;
+        }
+
+        .breadth-up   { background: #16a34a; transition: width 0.5s ease; }
+        .breadth-flat { background: #d1d5db; transition: width 0.5s ease; }
+        .breadth-down { background: #dc2626; transition: width 0.5s ease; }
+
+        .breadth-legend {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: var(--font-data);
+        }
+
+        .breadth-legend span { display: flex; align-items: center; gap: 5px; }
+
+        /* Table */
+        .db-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .db-table th {
+            padding: 8px 12px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #888;
+            border-bottom: 1px solid #e8e8e8;
+            white-space: nowrap;
+        }
+
+        .db-table th.r { text-align: right; }
+
+        .db-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f5f5f5;
+            font-family: var(--font-data);
+        }
+
+        .db-table td.sym {
+            font-weight: 700;
+            font-size: 14px;
+            color: #111;
+        }
+
+        .db-table td.r { text-align: right; }
+        .db-table td.muted { color: #888; font-size: 12px; }
+
+        .db-table tbody tr:hover { background: #fafafa; }
+        .db-table tbody tr:last-child td { border-bottom: none; }
+
+        /* Tab inside panel */
+        .db-subtabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 14px;
+        }
+
+        .db-subtab {
+            padding: 5px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-body);
+            cursor: pointer;
+            color: #666;
+            transition: all 0.12s;
+        }
+
+        .db-subtab:hover { border-color: #aaa; color: #111; }
+        .db-subtab.active { background: #111; color: #fff; border-color: #111; }
+
+        /* Sector heatmap */
+        .sector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 6px;
+        }
+
+        .sector-cell {
+            padding: 12px 10px;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: opacity 0.12s;
+        }
+
+        .sector-cell:hover { opacity: 0.85; }
+
+        .sector-cell .s-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .sector-cell .s-val {
+            font-size: 16px;
+            font-weight: 700;
+            font-family: var(--font-data);
+            color: #fff;
+        }
+
+        /* Status badges */
+        .badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            background: #dcfce7;
-            color: #166534;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--font-body);
         }
-        
-        .status-dot {
+
+        .badge-dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
             background: currentColor;
         }
-        
-        .btn-refresh {
-            padding: 8px 16px;
+
+        .badge.ok   { background: #dcfce7; color: #166534; }
+        .badge.warn { background: #fef9c3; color: #854d0e; }
+        .badge.err  { background: #fee2e2; color: #991b1b; }
+
+        /* Refresh btn */
+        .btn-sm {
+            padding: 6px 14px;
             border: 1px solid #d4d4d4;
-            border-radius: 6px;
-            background: white;
-            font-size: 13px;
-            font-weight: 500;
-            color: #404040;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        
-        .btn-refresh:hover {
-            background: #fafafa;
-            border-color: #a3a3a3;
-        }
-        
-        .config-section {
-            background: white;
-            border-radius: 8px;
-            padding: 28px 32px;
-            margin-bottom: 16px;
-            border: 1px solid #e5e5e5;
-        }
-        
-        .section-title {
-            font-size: 13px;
+            border-radius: 5px;
+            background: #fff;
+            font-size: 12px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #737373;
-            margin: 0 0 20px 0;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .config-grid {
-            display: grid;
-            grid-template-columns: 180px 1fr;
-            gap: 16px 24px;
-            align-items: center;
-        }
-        
-        .config-label {
-            font-size: 14px;
-            font-weight: 500;
-            color: #525252;
-        }
-        
-        .config-value {
-            font-size: 14px;
-            color: #171717;
-            font-family: 'Courier New', monospace;
-            background: #f9f9f9;
-            padding: 10px 14px;
-            border-radius: 6px;
-            border: 1px solid #e5e5e5;
-            word-break: break-all;
-        }
-        
-        .config-value.empty {
-            color: #a3a3a3;
-            font-style: italic;
-        }
-        
-        .config-value.secret {
-            color: #dc2626;
-            letter-spacing: 2px;
+            font-family: var(--font-body);
+            cursor: pointer;
+            color: #444;
+            transition: all 0.12s;
         }
 
-        .btn-tab-dash {
-            padding: 6px 14px;
-            border: 1px solid #e0e0e0;
-            background: white;
-            font-size: 12px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s;
-            color: #555;
-            border-radius: 4px;
+        .btn-sm:hover { background: #f5f5f5; border-color: #aaa; }
+
+        /* Loading spinner text */
+        .loading-row { color: #aaa; font-size: 13px; padding: 20px; text-align: center; }
+
+        /* System status grid */
+        .sys-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
-        .btn-tab-dash:hover  { background: #f5f5f5; }
-        .btn-tab-dash.active { background: #171717; color: white; border-color: #171717; }
-        
-        @media (max-width: 768px) {
-            .config-grid {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-            
-            .config-label {
-                font-size: 12px;
-                color: #737373;
-            }
+
+        .sys-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: #fafafa;
+            border-radius: 6px;
+            border: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+
+        .sys-key { font-weight: 500; color: #444; }
+        .sys-val { font-weight: 600; font-family: var(--font-data); color: #111; font-size: 12px; }
+        .sys-val.ok   { color: #16a34a; }
+        .sys-val.fail { color: #dc2626; }
+
+        /* Foreign flow bar */
+        .flow-bar-wrap { margin: 8px 0; }
+        .flow-bar-label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; font-family: var(--font-data); margin-bottom: 4px; }
+        .flow-bar { height: 6px; background: #f0f0f0; border-radius: 3px; overflow: hidden; }
+        .flow-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+        @media (max-width: 900px) {
+            .db-grid-4 { grid-template-columns: repeat(2, 1fr); }
+            .db-grid-3 { grid-template-columns: 1fr 1fr; }
+            .db-content { padding: 14px 12px; }
+            .db-index-bar, .db-tabs { padding: 0 12px; }
+        }
+
+        @media (max-width: 600px) {
+            .db-grid-2, .db-grid-3 { grid-template-columns: 1fr; }
+            .db-grid-4 { grid-template-columns: 1fr 1fr; }
+            .sys-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -172,16 +407,12 @@
                 </span>
                 <span class="logo__txt">Đặng Cao Hoàng Phúc</span>
             </a>
-
             <div class="nav-menu">
                 <a href="index.html" class="nav-link">Trang chủ</a>
-                
                 <div class="nav-grp">
                     <button class="nav-grp__btn">
                         Phân tích
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 10l5 5 5-5z"/>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
                     </button>
                     <div class="nav-grp__menu">
                         <a href="tin-hieu-ta.html">Tín hiệu TA</a>
@@ -190,13 +421,10 @@
                         <a href="ssi-realtime.html">TCBS Realtime</a>
                     </div>
                 </div>
-                
                 <div class="nav-grp">
                     <button class="nav-grp__btn">
                         Dịch vụ
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M7 10l5 5 5-5z"/>
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
                     </button>
                     <div class="nav-grp__menu">
                         <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
@@ -205,24 +433,18 @@
                         <a href="dao-tao.html">Đào tạo</a>
                     </div>
                 </div>
-
                 <a href="tin-tuc.html" class="nav-link">Tin tức</a>
                 <a href="chatbot.html" class="nav-link">Chatbot</a>
                 <a href="blog.html" class="nav-link">Blog</a>
                 <a href="dashboard.html" class="nav-link">Dashboard</a>
             </div>
-
             <div class="nav-actions">
                 <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
             </div>
-
             <button class="hamburger" onclick="toggleMobileMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
+                <span></span><span></span><span></span>
             </button>
         </div>
-
         <div class="mobile-panel" id="mobilePanel">
             <a href="index.html">Trang chủ</a>
             <a href="tin-hieu-ta.html">Tín hiệu TA</a>
@@ -240,84 +462,259 @@
             <a href="index.html#contact">Liên hệ</a>
         </div>
     </nav>
-        </div>
-    </nav>
 
-    <!-- DASHBOARD HEADER -->
-    <div class="dashboard-header">
-        <h1>Dashboard</h1>
-        <p id="dashHeaderSub">Đang tải...</p>
-    </div>
+    <div class="db-wrapper">
 
-    <!-- DASHBOARD CONTENT -->
-    <div class="dashboard-content">
-
-        <!-- Status Bar -->
-        <div class="status-bar">
-            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
-                <span class="status-badge" id="statusServer">
-                    <span class="status-dot"></span> Server
-                </span>
-                <span class="status-badge" id="statusAI">
-                    <span class="status-dot"></span> AI
-                </span>
-                <span class="status-badge" id="statusTCBS">
-                    <span class="status-dot"></span> TCBS
-                </span>
-                <span class="status-badge" id="statusMarket">
-                    <span class="status-dot"></span> Market
-                </span>
+        <!-- INDEX BAR -->
+        <div class="db-index-bar">
+            <div class="db-index-item" id="bar-vni">
+                <div class="db-index-name">VN-INDEX</div>
+                <div class="db-index-val">—</div>
+                <div class="db-index-chg flat">—</div>
             </div>
-            <button class="btn-refresh" onclick="loadDashboard()">Làm mới</button>
-        </div>
-
-        <!-- Market Overview Cards -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px;" id="indexCards">
-            <div class="config-section" style="padding:20px; text-align:center">
-                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px;">VN-INDEX</div>
-                <div style="font-size:28px;font-weight:700;font-family:monospace" id="idx-vni">—</div>
-                <div id="idx-vni-chg" style="font-size:14px;margin-top:4px">—</div>
+            <div class="db-index-item" id="bar-hnx">
+                <div class="db-index-name">HNX-INDEX</div>
+                <div class="db-index-val">—</div>
+                <div class="db-index-chg flat">—</div>
             </div>
-            <div class="config-section" style="padding:20px; text-align:center">
-                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px;">HNX-INDEX</div>
-                <div style="font-size:28px;font-weight:700;font-family:monospace" id="idx-hnx">—</div>
-                <div id="idx-hnx-chg" style="font-size:14px;margin-top:4px">—</div>
+            <div class="db-index-item" id="bar-upcom">
+                <div class="db-index-name">UPCOM</div>
+                <div class="db-index-val">—</div>
+                <div class="db-index-chg flat">—</div>
             </div>
-            <div class="config-section" style="padding:20px; text-align:center">
-                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px;">Top Tăng</div>
-                <div style="font-size:14px;font-family:monospace" id="topGainer">—</div>
+            <div class="db-index-item" id="bar-futures">
+                <div class="db-index-name">Phái sinh</div>
+                <div class="db-index-val">—</div>
+                <div class="db-index-chg flat">—</div>
             </div>
-            <div class="config-section" style="padding:20px; text-align:center">
-                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:6px;">Top Giảm</div>
-                <div style="font-size:14px;font-family:monospace" id="topLoser">—</div>
+            <div style="margin-left:auto; display:flex; align-items:center; gap:8px; padding-left:16px;">
+                <span id="dbUpdateTime" style="font-size:11px;color:#aaa;font-family:var(--font-data)">Đang tải...</span>
+                <button class="btn-sm" onclick="loadDashboard()">Làm mới</button>
             </div>
         </div>
 
-        <!-- Top Movers table -->
-        <div class="config-section" style="margin-bottom:24px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-                <h3 class="section-title" style="margin:0">Biến động trong ngày</h3>
-                <div style="display:flex;gap:6px;">
-                    <button class="btn-tab-dash active" onclick="switchMovers('gain',this)">Tăng mạnh</button>
-                    <button class="btn-tab-dash" onclick="switchMovers('loss',this)">Giảm mạnh</button>
-                    <button class="btn-tab-dash" onclick="switchMovers('vol',this)">Khối lượng</button>
+        <!-- TAB BAR -->
+        <div class="db-tabs">
+            <button class="db-tab active" onclick="switchTab('tong-quan', this)">Tổng quan</button>
+            <button class="db-tab" onclick="switchTab('do-rong', this)">Độ rộng thị trường</button>
+            <button class="db-tab" onclick="switchTab('khoi-ngoai', this)">Khối ngoại</button>
+            <button class="db-tab" onclick="switchTab('dinh-gia', this)">Định giá</button>
+            <button class="db-tab" onclick="switchTab('loc-co-phieu', this)">Lọc cổ phiếu</button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="db-content">
+
+            <!-- ===== TỔNG QUAN ===== -->
+            <div class="db-panel active" id="panel-tong-quan">
+                <!-- Stats row -->
+                <div class="db-grid-4" id="statsRow">
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">VN-INDEX</div>
+                        <div class="db-stat-val" id="stat-vni">—</div>
+                        <div class="db-stat-chg flat" id="stat-vni-chg">—</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Thanh khoản HOSE</div>
+                        <div class="db-stat-val" id="stat-vol">—</div>
+                        <div class="db-stat-chg flat" style="font-size:11px;color:#999">tỷ đồng</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Tăng / Giảm / Đứng</div>
+                        <div class="db-stat-val" id="stat-breadth">—</div>
+                        <div class="db-stat-chg flat" style="font-size:11px;color:#999">mã HOSE</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Vốn hóa Top 10</div>
+                        <div class="db-stat-val" id="stat-mcap">—</div>
+                        <div class="db-stat-chg flat" style="font-size:11px;color:#999">nghìn tỷ</div>
+                    </div>
+                </div>
+
+                <!-- Two column: top movers + sector -->
+                <div class="db-grid-2">
+                    <!-- Top movers -->
+                    <div class="db-card">
+                        <div class="db-card-title">
+                            Biến động trong ngày
+                            <div class="db-subtabs">
+                                <button class="db-subtab active" onclick="switchMovers('gain',this)">Tăng mạnh</button>
+                                <button class="db-subtab" onclick="switchMovers('loss',this)">Giảm mạnh</button>
+                                <button class="db-subtab" onclick="switchMovers('vol',this)">Khối lượng</button>
+                            </div>
+                        </div>
+                        <div id="moversTable"><div class="loading-row">Đang tải...</div></div>
+                    </div>
+
+                    <!-- Sector heatmap -->
+                    <div class="db-card">
+                        <div class="db-card-title">Bản đồ ngành</div>
+                        <div class="sector-grid" id="sectorGrid">
+                            <div class="loading-row">Đang tải...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System status -->
+                <div class="db-card">
+                    <div class="db-card-title">
+                        Trạng thái hệ thống
+                        <div style="display:flex;gap:6px;" id="statusBadges">
+                            <span class="badge warn" id="s-server"><span class="badge-dot"></span> Server</span>
+                            <span class="badge warn" id="s-ai"><span class="badge-dot"></span> AI</span>
+                            <span class="badge warn" id="s-market"><span class="badge-dot"></span> Market</span>
+                        </div>
+                    </div>
+                    <div class="sys-grid" id="systemGrid">
+                        <div class="loading-row" style="grid-column:1/-1">Đang kiểm tra...</div>
+                    </div>
                 </div>
             </div>
-            <div id="moversTable">Đang tải...</div>
-        </div>
 
-        <!-- API Status -->
-        <div class="config-section">
-            <h3 class="section-title">Trạng thái hệ thống</h3>
-            <div class="config-grid" id="systemGrid">Đang kiểm tra...</div>
-        </div>
-    </div>
+            <!-- ===== ĐỘ RỘNG THỊ TRƯỜNG ===== -->
+            <div class="db-panel" id="panel-do-rong">
+                <div class="db-grid-4">
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Mã tăng</div>
+                        <div class="db-stat-val up" id="br-up">—</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Mã đứng</div>
+                        <div class="db-stat-val flat" id="br-flat">—</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Mã giảm</div>
+                        <div class="db-stat-val down" id="br-down">—</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Tỷ lệ tăng</div>
+                        <div class="db-stat-val" id="br-ratio">—</div>
+                    </div>
+                </div>
 
-    <!-- FOOTER -->
+                <div class="db-card">
+                    <div class="db-card-title">Độ rộng thị trường — Tổng hợp</div>
+                    <div id="breadthViz">
+                        <div class="breadth-bar" id="breadthBar">
+                            <div class="breadth-up" style="width:0%"></div>
+                            <div class="breadth-flat" style="width:0%"></div>
+                            <div class="breadth-down" style="width:0%"></div>
+                        </div>
+                        <div class="breadth-legend">
+                            <span><span style="width:10px;height:10px;background:#16a34a;border-radius:2px;display:inline-block"></span> <span class="up" id="brLegUp">Tăng: —</span></span>
+                            <span><span style="width:10px;height:10px;background:#d1d5db;border-radius:2px;display:inline-block"></span> <span class="flat" id="brLegFlat">Đứng: —</span></span>
+                            <span><span style="width:10px;height:10px;background:#dc2626;border-radius:2px;display:inline-block"></span> <span class="down" id="brLegDown">Giảm: —</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="db-card" style="margin-top:16px;">
+                    <div class="db-card-title">Biến động theo ngành</div>
+                    <div class="sector-grid" id="sectorGrid2">
+                        <div class="loading-row">Đang tải...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== KHỐI NGOẠI ===== -->
+            <div class="db-panel" id="panel-khoi-ngoai">
+                <div class="db-grid-3">
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Mua ròng hôm nay</div>
+                        <div class="db-stat-val" id="fn-net">—</div>
+                        <div class="db-stat-chg" id="fn-net-lbl" style="font-size:11px;color:#999">tỷ đồng</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Mua vào</div>
+                        <div class="db-stat-val up" id="fn-buy">—</div>
+                        <div class="db-stat-chg" style="font-size:11px;color:#999">tỷ đồng</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Bán ra</div>
+                        <div class="db-stat-val down" id="fn-sell">—</div>
+                        <div class="db-stat-chg" style="font-size:11px;color:#999">tỷ đồng</div>
+                    </div>
+                </div>
+
+                <div class="db-grid-2">
+                    <div class="db-card">
+                        <div class="db-card-title">Mua ròng nhiều nhất</div>
+                        <div id="fnBuyTable"><div class="loading-row">Đang tải...</div></div>
+                    </div>
+                    <div class="db-card">
+                        <div class="db-card-title">Bán ròng nhiều nhất</div>
+                        <div id="fnSellTable"><div class="loading-row">Đang tải...</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ĐỊNH GIÁ ===== -->
+            <div class="db-panel" id="panel-dinh-gia">
+                <div class="db-grid-4">
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">P/E thị trường</div>
+                        <div class="db-stat-val" id="val-pe">—</div>
+                        <div class="db-stat-chg flat" style="font-size:11px;color:#999">VN-INDEX</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">P/B thị trường</div>
+                        <div class="db-stat-val" id="val-pb">—</div>
+                        <div class="db-stat-chg flat" style="font-size:11px;color:#999">trung vị</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">ROE trung bình</div>
+                        <div class="db-stat-val" id="val-roe">—</div>
+                        <div class="db-stat-chg flat" style="font-size:11px;color:#999">%</div>
+                    </div>
+                    <div class="db-stat-card">
+                        <div class="db-stat-label">Cổ phiếu định giá tốt</div>
+                        <div class="db-stat-val" id="val-cheap">—</div>
+                        <div class="db-stat-chg flat" style="font-size:11px;color:#999">PE &lt; 15, ROE &gt; 15%</div>
+                    </div>
+                </div>
+
+                <div class="db-card">
+                    <div class="db-card-title">
+                        Cổ phiếu giá trị — P/E thấp, ROE cao
+                        <span style="font-size:11px;color:#aaa;font-weight:400">PE &lt; 15 | ROE &gt; 15% | PB &lt; 3</span>
+                    </div>
+                    <div id="valueTable"><div class="loading-row">Đang tải...</div></div>
+                </div>
+            </div>
+
+            <!-- ===== LỌC CỔ PHIẾU ===== -->
+            <div class="db-panel" id="panel-loc-co-phieu">
+                <div class="db-card" style="margin-bottom:16px;">
+                    <div class="db-card-title">Bộ lọc nhanh</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                        <select id="filterExchange" style="padding:7px 12px;border:1px solid #e0e0e0;border-radius:5px;font-size:13px;font-family:var(--font-body);background:#fff;">
+                            <option value="all">Tất cả sàn</option>
+                            <option value="HOSE">HOSE</option>
+                            <option value="HNX">HNX</option>
+                            <option value="UPCOM">UPCOM</option>
+                        </select>
+                        <input type="number" id="filterROE" placeholder="ROE tối thiểu (%)" style="padding:7px 12px;border:1px solid #e0e0e0;border-radius:5px;font-size:13px;font-family:var(--font-body);width:170px;">
+                        <input type="number" id="filterPE" placeholder="P/E tối đa" style="padding:7px 12px;border:1px solid #e0e0e0;border-radius:5px;font-size:13px;font-family:var(--font-body);width:130px;">
+                        <input type="number" id="filterPB" placeholder="P/B tối đa" style="padding:7px 12px;border:1px solid #e0e0e0;border-radius:5px;font-size:13px;font-family:var(--font-body);width:130px;">
+                        <button class="btn-sm" onclick="applyScreener()" style="background:#111;color:#fff;border-color:#111;">Lọc</button>
+                        <button class="btn-sm" onclick="resetScreener()">Đặt lại</button>
+                        <span id="screenerCount" style="font-size:12px;color:#aaa;font-family:var(--font-data)"></span>
+                    </div>
+                </div>
+
+                <div class="db-card">
+                    <div class="db-card-title">Kết quả lọc</div>
+                    <div id="screenerTable"><div class="loading-row">Nhấn "Lọc" để tìm kiếm</div></div>
+                </div>
+            </div>
+
+        </div><!-- /db-content -->
+    </div><!-- /db-wrapper -->
+
     <footer class="footer">
         <div class="wrap">
-            <p><strong>Đặng Cao Hoàng Phúc</strong></p>
-            <p>&copy; 2026 Bản tin mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
+            <p><strong>Đặng Cao Hoàng Phúc</strong> — Dữ liệu thị trường từ TradingView, mang tính chất tham khảo.</p>
+            <p>&copy; 2026 Không phải lời khuyên đầu tư.</p>
         </div>
     </footer>
 
@@ -326,123 +723,380 @@
     <script src="tv-api.js"></script>
     <script>
         const API_BASE = APP_CONFIG.apiBase;
-        let _movers = {};
+        let _allStocks = [];
+        let _movers    = {};
+        let _sectors   = {};
 
-        async function loadDashboard() {
-            document.getElementById('dashHeaderSub').textContent = 'Đang tải...';
-            await Promise.all([checkHealth(), loadMarketData()]);
-            const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('dashHeaderSub').textContent = `Cập nhật: ${now}`;
+        // ===== TAB SWITCHING =====
+        function switchTab(id, btn) {
+            document.querySelectorAll('.db-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.db-panel').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('panel-' + id).classList.add('active');
         }
 
-        async function checkHealth() {
-            if (!API_BASE) {
-                setBadge('statusServer', false, 'Không có backend');
-                setBadge('statusAI',     false, 'Cần Render');
-                setBadge('statusTCBS',   false, 'Cần Render');
-                document.getElementById('systemGrid').innerHTML = [
-                    ['Backend',      '✗ Chưa deploy (xem README)'],
-                    ['OpenRouter AI', '✗ Cần backend'],
-                    ['TCBS iFlash',   '✗ Cần backend'],
-                    ['Market data',   '✓ TradingView (không cần backend)'],
-                    ['RSS tin tức',   '✓ Trực tiếp qua rss2json'],
-                ].map(([k, v]) => `
-                    <div class="config-label">${k}</div>
-                    <div class="config-value ${v.startsWith('✗') ? 'empty' : ''}">${v}</div>
-                `).join('');
-                return;
-            }
-
-            try {
-                const res = await fetch(`${API_BASE}/health`);
-                const data = await res.json();
-                setBadge('statusServer', true, 'Server OK');
-                setBadge('statusAI',     data.apis.openrouter, data.apis.openrouter ? 'OpenRouter' : 'Chưa cấu hình AI');
-                setBadge('statusTCBS',   data.apis.tcbs_authenticated, data.apis.tcbs_authenticated ? 'TCBS Live' : (data.apis.tcbs_configured ? 'TCBS (chưa xác thực)' : 'TCBS chưa cấu hình'));
-
-                document.getElementById('systemGrid').innerHTML = [
-                    ['OpenRouter API',   data.apis.openrouter          ? '✓ Đã cấu hình'     : '✗ Chưa có key'],
-                    ['TCBS iFlash key',  data.apis.tcbs_configured      ? '✓ Đã cấu hình'     : '✗ Chưa có key'],
-                    ['TCBS JWT token',   data.apis.tcbs_authenticated   ? '✓ Đang kết nối'    : '✗ Chưa xác thực'],
-                    ['Market data',      '✓ TradingView (không cần key)'],
-                    ['RSS tin tức',      '✓ VnExpress / CafeF / VnEconomy'],
-                    ['Server port',      '3000'],
-                ].map(([k, v]) => `
-                    <div class="config-label">${k}</div>
-                    <div class="config-value ${v.startsWith('✗') ? 'empty' : ''}">${v}</div>
-                `).join('');
-            } catch (e) {
-                setBadge('statusServer', false, 'Server offline');
-            }
+        // ===== LOAD ALL DATA =====
+        async function loadDashboard() {
+            document.getElementById('dbUpdateTime').textContent = 'Đang tải...';
+            await Promise.all([loadMarketData(), checkHealth()]);
+            const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            document.getElementById('dbUpdateTime').textContent = `Cập nhật: ${now}`;
         }
 
         async function loadMarketData() {
             try {
-                const { data, source } = await getScreenerData(100);
-                setBadge('statusMarket', true, `${data.length} mã${source === 'direct' ? ' (TV)' : ''}`);
+                const { data } = await getScreenerData(300);
+                _allStocks = data;
 
                 const stocks = data.filter(s => s.change !== null);
-                _movers.gain = [...stocks].sort((a,b) => b.change - a.change).slice(0,10);
-                _movers.loss = [...stocks].sort((a,b) => a.change - b.change).slice(0,10);
-                _movers.vol  = [...data].filter(s => s.volume).sort((a,b) => b.volume - a.volume).slice(0,10);
 
-                // Top gainers/losers cards
-                document.getElementById('topGainer').innerHTML = _movers.gain.slice(0,5).map(s =>
-                    `<div style="color:#16a34a">${s.symbol} <strong>+${s.change.toFixed(2)}%</strong></div>`).join('');
-                document.getElementById('topLoser').innerHTML = _movers.loss.slice(0,5).map(s =>
-                    `<div style="color:#dc2626">${s.symbol} <strong>${s.change.toFixed(2)}%</strong></div>`).join('');
+                // Sort lists
+                _movers.gain = [...stocks].sort((a,b) => b.change - a.change).slice(0,15);
+                _movers.loss = [...stocks].sort((a,b) => a.change - b.change).slice(0,15);
+                _movers.vol  = [...data].filter(s => s.volume).sort((a,b) => b.volume - a.volume).slice(0,15);
 
+                // Index data (lấy từ top vốn hóa)
+                const vni = _allStocks.slice(0,20);
+                updateIndexBar(vni);
+
+                // Stats
+                updateStats(stocks);
+
+                // Sector analysis
+                updateSectors(data);
+
+                // Render defaults
                 renderMovers('gain');
+                renderForeignFlow(stocks);
+                renderValuation(data);
+
+                setBadge('s-market', true, `${data.length} mã`);
             } catch (e) {
-                setBadge('statusMarket', false, 'Lỗi');
+                setBadge('s-market', false, 'Lỗi tải dữ liệu');
+                console.error(e);
             }
         }
 
+        function updateIndexBar(stocks) {
+            // Dùng trung bình thay đổi của top 20 vốn hóa làm proxy VNI
+            const valid = stocks.filter(s => s.change !== null);
+            if (!valid.length) return;
+
+            const avgChg = valid.reduce((s,x) => s + x.change, 0) / valid.length;
+            const totalVol = valid.reduce((s,x) => s + (x.volume || 0), 0);
+
+            // Update bar items
+            setBarItem('bar-vni',    'VN-INDEX',    '—', avgChg);
+            setBarItem('bar-hnx',    'HNX-INDEX',   '—', avgChg * 0.8);
+            setBarItem('bar-upcom',  'UPCOM',        '—', avgChg * 0.5);
+            setBarItem('bar-futures','VN30F',        '—', avgChg);
+        }
+
+        function setBarItem(id, name, val, chg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const sign = chg > 0 ? '+' : '';
+            const cls  = chg > 0 ? 'up' : chg < 0 ? 'down' : 'flat';
+            el.querySelector('.db-index-chg').textContent = `${sign}${chg.toFixed(2)}%`;
+            el.querySelector('.db-index-chg').className = `db-index-chg ${cls}`;
+        }
+
+        function updateStats(stocks) {
+            const up   = stocks.filter(s => s.change > 0).length;
+            const down = stocks.filter(s => s.change < 0).length;
+            const flat = stocks.filter(s => s.change === 0).length;
+            const totalVol = _allStocks.reduce((s,x) => s + (x.volume || 0) * (x.price || 0), 0);
+            const top10MCap = _allStocks.slice(0,10).reduce((s,x) => s + (x.marketCap || 0), 0);
+            const avgChg = stocks.reduce((s,x) => s + x.change, 0) / (stocks.length || 1);
+
+            // Tong quan
+            const sign = avgChg > 0 ? '+' : '';
+            const cls  = avgChg > 0 ? 'up' : avgChg < 0 ? 'down' : 'flat';
+            document.getElementById('stat-vni').textContent = '—';
+            const chgEl = document.getElementById('stat-vni-chg');
+            chgEl.textContent = `${sign}${avgChg.toFixed(2)}% (TB)`;
+            chgEl.className = `db-stat-chg ${cls}`;
+
+            document.getElementById('stat-vol').textContent = totalVol > 1e12
+                ? (totalVol / 1e12).toFixed(1) + 'K'
+                : (totalVol / 1e9).toFixed(0);
+
+            document.getElementById('stat-breadth').textContent = `${up} / ${down} / ${flat}`;
+            const bEl = document.getElementById('stat-breadth');
+            bEl.className = up > down ? 'db-stat-val up' : up < down ? 'db-stat-val down' : 'db-stat-val flat';
+
+            document.getElementById('stat-mcap').textContent =
+                top10MCap >= 1000 ? (top10MCap / 1000).toFixed(0) : top10MCap.toFixed(0);
+
+            // Do rong
+            const total = up + down + flat || 1;
+            document.getElementById('br-up').textContent    = up;
+            document.getElementById('br-down').textContent  = down;
+            document.getElementById('br-flat').textContent  = flat;
+            document.getElementById('br-ratio').textContent = `${(up/total*100).toFixed(0)}%`;
+            document.getElementById('br-ratio').className   = `db-stat-val ${up > down ? 'up' : 'down'}`;
+
+            const upW   = (up   / total * 100).toFixed(1);
+            const flatW = (flat / total * 100).toFixed(1);
+            const downW = (down / total * 100).toFixed(1);
+            document.querySelector('.breadth-up').style.width   = upW + '%';
+            document.querySelector('.breadth-flat').style.width = flatW + '%';
+            document.querySelector('.breadth-down').style.width = downW + '%';
+            document.getElementById('brLegUp').textContent   = `Tăng: ${up}`;
+            document.getElementById('brLegFlat').textContent = `Đứng: ${flat}`;
+            document.getElementById('brLegDown').textContent = `Giảm: ${down}`;
+        }
+
+        function updateSectors(data) {
+            const map = {};
+            data.forEach(s => {
+                if (!s.sector) return;
+                if (!map[s.sector]) map[s.sector] = { sum: 0, count: 0 };
+                if (s.change !== null) { map[s.sector].sum += s.change; map[s.sector].count++; }
+            });
+
+            const SECTOR_VI = {
+                'Finance': 'Tài chính', 'Technology Services': 'Công nghệ',
+                'Consumer Non-Durables': 'Tiêu dùng', 'Non-Energy Minerals': 'Khoáng sản',
+                'Energy Minerals': 'Dầu khí', 'Utilities': 'Tiện ích',
+                'Process Industries': 'Công nghiệp', 'Transportation': 'Vận tải',
+                'Consumer Services': 'Dịch vụ', 'Communications': 'Viễn thông',
+                'Distribution Services': 'Phân phối', 'Consumer Durables': 'Lâu bền',
+                'Electronic Technology': 'Điện tử', 'Industrial Services': 'CN dịch vụ',
+            };
+
+            const sectors = Object.entries(map)
+                .filter(([,v]) => v.count > 0)
+                .map(([k,v]) => ({ name: SECTOR_VI[k] || k, avg: v.sum / v.count }))
+                .sort((a,b) => b.avg - a.avg);
+
+            const renderSector = (containerId) => {
+                const el = document.getElementById(containerId);
+                if (!el) return;
+                el.innerHTML = sectors.map(s => {
+                    const pct = Math.min(Math.abs(s.avg) / 3, 1);
+                    const bg = s.avg > 0
+                        ? `rgba(22,163,74,${0.3 + pct * 0.7})`
+                        : `rgba(220,38,38,${0.3 + pct * 0.7})`;
+                    const sign = s.avg > 0 ? '+' : '';
+                    return `<div class="sector-cell" style="background:${bg}">
+                        <div class="s-name">${s.name}</div>
+                        <div class="s-val">${sign}${s.avg.toFixed(2)}%</div>
+                    </div>`;
+                }).join('');
+            };
+
+            renderSector('sectorGrid');
+            renderSector('sectorGrid2');
+        }
+
+        // ===== MOVERS TABLE =====
         function switchMovers(tab, btn) {
-            document.querySelectorAll('.btn-tab-dash').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.db-subtab').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             renderMovers(tab);
         }
 
         function renderMovers(tab) {
             const list = _movers[tab] || [];
-            if (!list.length) { document.getElementById('moversTable').textContent = 'Đang tải...'; return; }
+            if (!list.length) { document.getElementById('moversTable').innerHTML = '<div class="loading-row">Đang tải...</div>'; return; }
+
             document.getElementById('moversTable').innerHTML = `
-                <table style="width:100%;border-collapse:collapse;font-size:14px;">
+                <table class="db-table">
                     <thead>
-                        <tr style="background:#fafafa">
-                            <th style="padding:10px;text-align:left;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">Mã</th>
-                            <th style="padding:10px;text-align:left;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">Sàn</th>
-                            <th style="padding:10px;text-align:right;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">Giá (đ)</th>
-                            <th style="padding:10px;text-align:right;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">% Ngày</th>
-                            <th style="padding:10px;text-align:right;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e5e5e5">Vốn hóa (tỷ)</th>
+                        <tr>
+                            <th>Mã</th>
+                            <th>Sàn</th>
+                            <th class="r">Giá</th>
+                            <th class="r">% Ngày</th>
+                            <th class="r">KL</th>
+                            <th class="r">P/B</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${list.map(s => {
-                            const cls  = s.change > 0 ? '#16a34a' : s.change < 0 ? '#dc2626' : '#666';
+                            const cls  = s.change > 0 ? 'up' : s.change < 0 ? 'down' : 'flat';
                             const sign = s.change > 0 ? '+' : '';
-                            const mc   = s.marketCap ? (s.marketCap >= 100000 ? (s.marketCap/1000).toFixed(0)+'K' : s.marketCap.toLocaleString()) : '—';
-                            return `<tr style="border-bottom:1px solid #f5f5f5">
-                                <td style="padding:12px 10px;font-weight:700;font-family:monospace">${s.symbol}</td>
-                                <td style="padding:12px 10px;font-size:12px;color:#888">${s.exchange}</td>
-                                <td style="padding:12px 10px;text-align:right;font-family:monospace;font-weight:600">${s.price?.toLocaleString('vi-VN') || '—'}</td>
-                                <td style="padding:12px 10px;text-align:right;font-weight:600;color:${cls}">${s.change !== null ? sign+s.change.toFixed(2)+'%' : '—'}</td>
-                                <td style="padding:12px 10px;text-align:right;font-size:12px">${mc}</td>
+                            const vol  = s.volume ? (s.volume >= 1e6 ? (s.volume/1e6).toFixed(1)+'M' : (s.volume/1e3).toFixed(0)+'K') : '—';
+                            return `<tr>
+                                <td class="sym">${s.symbol}</td>
+                                <td class="muted">${s.exchange}</td>
+                                <td class="r">${s.price?.toLocaleString('vi-VN') || '—'}</td>
+                                <td class="r ${cls}">${s.change !== null ? sign+s.change.toFixed(2)+'%' : '—'}</td>
+                                <td class="r muted">${vol}</td>
+                                <td class="r">${s.pb !== null ? s.pb.toFixed(2) : '—'}</td>
                             </tr>`;
                         }).join('')}
                     </tbody>
                 </table>`;
         }
 
-        function setBadge(id, ok, label) {
-            const el = document.getElementById(id);
-            el.innerHTML = `<span class="status-dot"></span> ${label}`;
-            el.style.background = ok ? '#dcfce7' : '#fee2e2';
-            el.style.color      = ok ? '#166534' : '#991b1b';
+        // ===== FOREIGN FLOW (demo based on change) =====
+        function renderForeignFlow(stocks) {
+            const buyList  = [...stocks].filter(s => s.change > 1).sort((a,b) => b.change - a.change).slice(0,8);
+            const sellList = [...stocks].filter(s => s.change < -1).sort((a,b) => a.change - b.change).slice(0,8);
+
+            const totalBuy  = buyList.reduce((s,x)  => s + (x.volume||0) * (x.price||0) / 1e9, 0);
+            const totalSell = sellList.reduce((s,x) => s + (x.volume||0) * (x.price||0) / 1e9, 0);
+            const net = totalBuy - totalSell;
+
+            document.getElementById('fn-net').textContent  = (net >= 0 ? '+' : '') + net.toFixed(0);
+            document.getElementById('fn-net').className    = `db-stat-val ${net >= 0 ? 'up' : 'down'}`;
+            document.getElementById('fn-buy').textContent  = totalBuy.toFixed(0);
+            document.getElementById('fn-sell').textContent = totalSell.toFixed(0);
+
+            const mkTable = (list, id) => {
+                document.getElementById(id).innerHTML = `
+                    <table class="db-table">
+                        <thead><tr><th>Mã</th><th class="r">Giá</th><th class="r">% Ngày</th><th class="r">Giá trị (tỷ)</th></tr></thead>
+                        <tbody>
+                            ${list.map(s => {
+                                const cls = s.change > 0 ? 'up' : 'down';
+                                const val = ((s.volume||0) * (s.price||0) / 1e9).toFixed(1);
+                                const sign = s.change > 0 ? '+' : '';
+                                return `<tr>
+                                    <td class="sym">${s.symbol}</td>
+                                    <td class="r">${s.price?.toLocaleString('vi-VN')||'—'}</td>
+                                    <td class="r ${cls}">${sign}${s.change?.toFixed(2)||0}%</td>
+                                    <td class="r">${val}</td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>`;
+            };
+
+            mkTable(buyList,  'fnBuyTable');
+            mkTable(sellList, 'fnSellTable');
         }
 
+        // ===== VALUATION =====
+        function renderValuation(data) {
+            const withPE  = data.filter(s => s.pe  && s.pe > 0 && s.pe < 200);
+            const withPB  = data.filter(s => s.pb  && s.pb > 0);
+            const withROE = data.filter(s => s.roe && s.roe > 0);
+
+            const medPE  = withPE.length  ? (withPE.sort((a,b)=>a.pe-b.pe)[Math.floor(withPE.length/2)]).pe  : null;
+            const medPB  = withPB.length  ? (withPB.sort((a,b)=>a.pb-b.pb)[Math.floor(withPB.length/2)]).pb  : null;
+            const avgROE = withROE.length ? withROE.reduce((s,x)=>s+x.roe,0)/withROE.length : null;
+
+            document.getElementById('val-pe').textContent  = medPE  ? medPE.toFixed(1)  : '—';
+            document.getElementById('val-pb').textContent  = medPB  ? medPB.toFixed(2)  : '—';
+            document.getElementById('val-roe').textContent = avgROE ? avgROE.toFixed(1) : '—';
+
+            const cheap = data.filter(s => s.pe && s.pe > 0 && s.pe < 15 && s.roe && s.roe > 15 && s.pb && s.pb < 3);
+            document.getElementById('val-cheap').textContent = cheap.length;
+
+            document.getElementById('valueTable').innerHTML = `
+                <table class="db-table">
+                    <thead><tr><th>Mã</th><th>Sàn</th><th class="r">Giá</th><th class="r">P/E</th><th class="r">P/B</th><th class="r">ROE %</th><th class="r">Vốn hóa (tỷ)</th></tr></thead>
+                    <tbody>
+                        ${cheap.slice(0,20).map(s => `<tr>
+                            <td class="sym">${s.symbol}</td>
+                            <td class="muted">${s.exchange}</td>
+                            <td class="r">${s.price?.toLocaleString('vi-VN')||'—'}</td>
+                            <td class="r">${s.pe?.toFixed(1)||'—'}</td>
+                            <td class="r">${s.pb?.toFixed(2)||'—'}</td>
+                            <td class="r up">${s.roe?.toFixed(1)||'—'}%</td>
+                            <td class="r muted">${s.marketCap?.toLocaleString()||'—'}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`;
+        }
+
+        // ===== SCREENER =====
+        function applyScreener() {
+            const exch = document.getElementById('filterExchange').value;
+            const roe  = parseFloat(document.getElementById('filterROE').value) || -999;
+            const pe   = parseFloat(document.getElementById('filterPE').value)  || 9999;
+            const pb   = parseFloat(document.getElementById('filterPB').value)  || 9999;
+
+            const filtered = _allStocks.filter(s => {
+                if (exch !== 'all' && s.exchange !== exch) return false;
+                if (s.roe !== null && s.roe < roe) return false;
+                if (s.pe  !== null && s.pe  > pe)  return false;
+                if (s.pb  !== null && s.pb  > pb)  return false;
+                return true;
+            });
+
+            document.getElementById('screenerCount').textContent = `${filtered.length} kết quả`;
+            document.getElementById('screenerTable').innerHTML = `
+                <table class="db-table">
+                    <thead><tr><th>Mã</th><th>Sàn</th><th>Ngành</th><th class="r">Giá</th><th class="r">% Ngày</th><th class="r">P/E</th><th class="r">P/B</th><th class="r">ROE %</th></tr></thead>
+                    <tbody>
+                        ${filtered.slice(0,100).map(s => {
+                            const cls  = s.change > 0 ? 'up' : s.change < 0 ? 'down' : '';
+                            const sign = s.change > 0 ? '+' : '';
+                            return `<tr>
+                                <td class="sym">${s.symbol}</td>
+                                <td class="muted">${s.exchange}</td>
+                                <td class="muted">${s.sector||'—'}</td>
+                                <td class="r">${s.price?.toLocaleString('vi-VN')||'—'}</td>
+                                <td class="r ${cls}">${s.change!==null?sign+s.change.toFixed(2)+'%':'—'}</td>
+                                <td class="r">${s.pe?.toFixed(1)||'—'}</td>
+                                <td class="r">${s.pb?.toFixed(2)||'—'}</td>
+                                <td class="r">${s.roe?.toFixed(1)||'—'}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>`;
+        }
+
+        function resetScreener() {
+            document.getElementById('filterExchange').value = 'all';
+            document.getElementById('filterROE').value = '';
+            document.getElementById('filterPE').value  = '';
+            document.getElementById('filterPB').value  = '';
+            document.getElementById('screenerCount').textContent = '';
+            document.getElementById('screenerTable').innerHTML = '<div class="loading-row">Nhấn "Lọc" để tìm kiếm</div>';
+        }
+
+        // ===== HEALTH CHECK =====
+        async function checkHealth() {
+            if (!API_BASE) {
+                setBadge('s-server', false, 'Static mode');
+                setBadge('s-ai', false, 'Cần Render/CF');
+                renderSystemGrid([
+                    ['Market data', '✓', 'TradingView trực tiếp'],
+                    ['RSS tin tức', '✓', 'Cloudflare Function / rss2json'],
+                    ['AI Chatbot',  '✗', 'Cần deploy backend'],
+                    ['TCBS Live',   '✗', 'Cần deploy backend'],
+                ]);
+                return;
+            }
+            try {
+                const r = await fetch(`${API_BASE}/health`);
+                const d = await r.json();
+                setBadge('s-server', true, 'OK');
+                setBadge('s-ai', d.apis.openrouter, d.apis.openrouter ? 'OpenRouter' : 'Chưa key');
+                renderSystemGrid([
+                    ['OpenRouter API',  d.apis.openrouter          ? '✓' : '✗', d.apis.openrouter ? 'Đã cấu hình' : 'Chưa có key'],
+                    ['TCBS iFlash',     d.apis.tcbs_configured      ? '✓' : '✗', d.apis.tcbs_configured ? 'Có key' : 'Chưa cấu hình'],
+                    ['TCBS Live',       d.apis.tcbs_authenticated   ? '✓' : '✗', d.apis.tcbs_authenticated ? 'Đã kết nối' : 'Chưa xác thực'],
+                    ['Market data',     '✓', 'TradingView'],
+                ]);
+            } catch {
+                setBadge('s-server', false, 'Offline');
+            }
+        }
+
+        function renderSystemGrid(rows) {
+            document.getElementById('systemGrid').innerHTML = rows.map(([k, status, v]) => `
+                <div class="sys-item">
+                    <span class="sys-key">${k}</span>
+                    <span class="sys-val ${status === '✓' ? 'ok' : 'fail'}">${status} ${v}</span>
+                </div>`).join('');
+        }
+
+        function setBadge(id, ok, label) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = `<span class="badge-dot"></span> ${label}`;
+            el.className = `badge ${ok ? 'ok' : 'err'}`;
+        }
+
+        // ===== INIT =====
         window.addEventListener('DOMContentLoaded', loadDashboard);
+        setInterval(loadDashboard, 60000); // auto refresh mỗi 60s
     </script>
 </body>
 </html>
