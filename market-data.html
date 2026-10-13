@@ -58,14 +58,14 @@
         .index-value {
             font-size: 32px;
             font-weight: 700;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-data);
             margin-bottom: 8px;
         }
         
         .index-change {
             font-size: 14px;
             font-weight: 600;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-data);
         }
         
         .index-change.positive { color: #16a34a; }
@@ -137,17 +137,17 @@
         
         .stock-symbol {
             font-weight: 700;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-data);
         }
         
         .stock-price {
             font-weight: 600;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-data);
         }
         
         .stock-change {
             font-weight: 600;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-data);
         }
         
         .loading {
@@ -429,7 +429,7 @@
                             return `<tr>
                                 <td><span class="stock-symbol">${s.symbol}</span></td>
                                 <td style="font-size:11px;color:#888">${s.exchange}</td>
-                                <td style="text-align:right;font-family:monospace;font-weight:600">${s.price ? s.price.toLocaleString('vi-VN') : '—'}</td>
+                                <td style="text-align:right;font-family:var(--font-data);font-weight:600">${s.price ? s.price.toLocaleString('vi-VN') : '—'}</td>
                                 <td style="text-align:right" class="stock-change ${cls}">${s.change !== null ? sign+s.change.toFixed(2)+'%' : '—'}</td>
                                 <td style="text-align:right">${s.pb !== null ? s.pb.toFixed(2) : '—'}</td>
                                 <td style="text-align:right">${s.roe !== null ? s.roe.toFixed(1)+'%' : '—'}</td>

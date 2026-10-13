@@ -86,7 +86,7 @@
             font-size: 24px;
             font-weight: 700;
             color: #171717;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-data);
         }
         
         .stat-value.positive { color: #16a34a; }
@@ -197,7 +197,7 @@
         
         .symbol {
             font-weight: 700;
-            font-family: 'Courier New', monospace;
+            font-family: var(--font-data);
             font-size: 15px;
         }
         
@@ -532,10 +532,10 @@
                     <td>${s.faFilter ? s.faFilter.split(',').map(f => `<span class="tag">${f}</span>`).join('') : '—'}</td>
                     <td><span class="badge buy">Mua</span></td>
                     <td>${s.dateIn}</td>
-                    <td style="font-family:monospace">${s.priceIn.toLocaleString('vi-VN')}</td>
-                    <td style="font-family:monospace;font-weight:600" id="price-${s.symbol}">${priceDisplay}</td>
-                    <td class="${dayClass}" style="font-family:monospace;font-size:12px">${dayChange}</td>
-                    <td class="${pnlClass}" style="font-weight:600;font-family:monospace" id="pnl-${s.symbol}">${pnlDisplay}</td>
+                    <td style="font-family:var(--font-data)">${s.priceIn.toLocaleString('vi-VN')}</td>
+                    <td style="font-family:var(--font-data);font-weight:600" id="price-${s.symbol}">${priceDisplay}</td>
+                    <td class="${dayClass}" style="font-family:var(--font-data);font-size:12px">${dayChange}</td>
+                    <td class="${pnlClass}" style="font-weight:600;font-family:var(--font-data)" id="pnl-${s.symbol}">${pnlDisplay}</td>
                     <td>${days}</td>
                     <td style="font-size:12px">${s.pattern || '—'}</td>
                     <td><span class="badge holding">Đang nắm</span></td>
