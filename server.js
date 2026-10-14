@@ -26,6 +26,10 @@ const GEMINI_KEY     = process.env.GEMINI_API_KEY;
 const TCBS_API_KEY   = process.env.TCBS_API_KEY;
 const TCBS_API_BASE  = process.env.TCBS_API_BASE || 'https://openapi.tcbs.com.vn';
 const TCBS_WS_URL    = process.env.TCBS_WS_URL   || 'wss://openapi.tcbs.com.vn/ws/thesis/v1/stream/normal';
+const DNSE_API_KEY      = process.env.DNSE_API_KEY;
+const DNSE_API_BASE     = process.env.DNSE_API_BASE || 'https://api.dnse.com.vn';
+const DNSE_ENTRADE_BASE = process.env.DNSE_ENTRADE_BASE || 'https://services.entrade.com.vn';
+const DNSE_WS_URL       = process.env.DNSE_WS_URL || 'wss://datafeed-lts.dnse.com.vn/wss';
 
 // Map ten model thân thiện -> model ID cua OpenRouter
 const MODEL_MAP = {
@@ -773,6 +777,127 @@ app.post('/api/market/prices', async (req, res) => {
         console.error('Prices error:', error.message);
         res.status(500).json({ success: false, error: 'Khong the lay gia co phieu' });
     }
+});
+
+// ==================== DNSE OPEN API / ENTRADE REALTIME ====================
+const dnseCache = { indices: null, indicesTime: 0, TTL: 6000 };
+
+// Lay thong tin chi so thi truong realtime tu DNSE Entrade
+app.get('/api/dnse/indices', async (req, res) => {
+    const now = Date.now();
+    if (dnseCache.indices && (now - dnseCache.indicesTime) < dnseCache.TTL) {
+        return res.json({ success: true, data: dnseCache.indices, cached: true });
+    }
+
+    try {
+        const from = Math.floor(now / 1000 - 86400);
+        const to = Math.floor(now / 1000);
+        const indexList = ['VNINDEX', 'VN30', 'HNX', 'UPCOM'];
+
+        const results = await Promise.allSettled(indexList.map(async (sym) => {
+            const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${sym}&resolution=1&from=${from}&to=${to}`;
+            const r = await axios.get(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    ...(DNSE_API_KEY ? { 'Authorization': `Bearer ${DNSE_API_KEY}` } : {})
+                },
+                timeout: 5000
+            });
+            const d = r.data;
+            if (d.t && d.t.length) {
+                const i = d.t.length - 1;
+                return {
+                    symbol: sym,
+                    price: d.c[i],
+                    high: d.h[i],
+                    low: d.l[i],
+                    open: d.o[0],
+                    volume: d.v ? d.v[i] : null,
+                    time: d.t[i]
+                };
+            }
+            return null;
+        }));
+
+        const indices = {};
+        results.forEach((r, idx) => {
+            const sym = indexList[idx];
+            if (r.status === 'fulfilled' && r.value) {
+                indices[sym] = r.value;
+            }
+        });
+
+        if (Object.keys(indices).length > 0) {
+            dnseCache.indices = indices;
+            dnseCache.indicesTime = now;
+            return res.json({ success: true, data: indices, cached: false, provider: 'DNSE Entrade API' });
+        }
+
+        res.status(502).json({ success: false, error: 'DNSE indices khong co du lieu' });
+    } catch (err) {
+        console.error('DNSE indices proxy error:', err.message);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Lay chart OHLC index tu DNSE Entrade (ho tro resolution: 1, 5, 15, 30, 1D)
+app.get('/api/dnse/chart/index/:symbol', async (req, res) => {
+    const { symbol } = req.params;
+    const { resolution = '1', from, to } = req.query;
+    const now = Math.floor(Date.now() / 1000);
+    const fromTime = from || (now - 2 * 86400);
+    const toTime = to || now;
+
+    try {
+        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${encodeURIComponent(symbol.toUpperCase())}&resolution=${resolution}&from=${fromTime}&to=${toTime}`;
+        const response = await axios.get(url, {
+            headers: {
+                'Accept': 'application/json',
+                ...(DNSE_API_KEY ? { 'Authorization': `Bearer ${DNSE_API_KEY}` } : {})
+            },
+            timeout: 6000
+        });
+        res.json({ success: true, data: response.data, provider: 'DNSE' });
+    } catch (err) {
+        console.error(`DNSE chart index error (${symbol}):`, err.message);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Lay chart OHLC co phieu tu DNSE Entrade
+app.get('/api/dnse/chart/stock/:symbol', async (req, res) => {
+    const { symbol } = req.params;
+    const { resolution = '1', from, to } = req.query;
+    const now = Math.floor(Date.now() / 1000);
+    const fromTime = from || (now - 2 * 86400);
+    const toTime = to || now;
+
+    try {
+        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/stock?symbol=${encodeURIComponent(symbol.toUpperCase())}&resolution=${resolution}&from=${fromTime}&to=${toTime}`;
+        const response = await axios.get(url, {
+            headers: {
+                'Accept': 'application/json',
+                ...(DNSE_API_KEY ? { 'Authorization': `Bearer ${DNSE_API_KEY}` } : {})
+            },
+            timeout: 6000
+        });
+        res.json({ success: true, data: response.data, provider: 'DNSE' });
+    } catch (err) {
+        console.error(`DNSE chart stock error (${symbol}):`, err.message);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Kiem tra trang thai ket noi DNSE API
+app.get('/api/dnse/status', (req, res) => {
+    res.json({
+        success: true,
+        configured: Boolean(DNSE_API_KEY),
+        apiBase: DNSE_API_BASE,
+        entradeBase: DNSE_ENTRADE_BASE,
+        wsUrl: DNSE_WS_URL,
+        provider: 'DNSE Open API (Entrade X)'
+    });
 });
 
 // ==================== CONTACT FORM ====================
