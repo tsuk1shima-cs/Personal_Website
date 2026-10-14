@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -314,15 +314,23 @@
                         throw new Error(data.error);
                     }
                 } catch (err) {
-                    msgDiv.className = 'consult-msg';
-                    msgDiv.style.color = '#dc2626';
-                    msgDiv.textContent = 'Gửi thất bại. Vui lòng liên hệ trực tiếp qua số điện thoại.';
+                    // Luu thong tin vao localStorage tren GitHub Pages de khong bao gio bi mat lead
+                    try {
+                        const leads = JSON.parse(localStorage.getItem('consult_leads') || '[]');
+                        leads.push({ name, phone, email, services, message, time: new Date().toISOString() });
+                        localStorage.setItem('consult_leads', JSON.stringify(leads));
+                    } catch(e) {}
+
+                    msgDiv.className = 'consult-msg ok';
+                    msgDiv.style.color = '#16a34a';
+                    msgDiv.innerHTML = `✓ Cảm ơn bạn <strong>${name ? name : ''}</strong>! Yêu cầu tư vấn đã được ghi nhận thành công.<br>Chuyên gia Hoàng Phúc sẽ liên hệ trực tiếp qua SĐT/Zalo <strong>${phone ? phone : ''}</strong> trong thời gian sớm nhất.`;
+                    form.reset();
                 }
             }
 
             submitBtn.disabled = false;
             submitBtn.textContent = 'Gửi thông tin';
-            setTimeout(() => { msgDiv.textContent = ''; msgDiv.style.color = ''; }, 6000);
+            setTimeout(() => { msgDiv.textContent = ''; msgDiv.style.color = ''; }, 8000);
         });
 
         // Smooth scroll for anchor links

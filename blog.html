@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -237,28 +237,6 @@
         </div>
     </footer>
 
-    <script>
-        // Click-to-open dropdown navigation
-        document.addEventListener('DOMContentLoaded', function() {
-            const navGroups = document.querySelectorAll('.nav-grp');
-            
-            navGroups.forEach(group => {
-                const btn = group.querySelector('.nav-grp__btn');
-                
-                btn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    
-                    // Close other open menus
-                    navGroups.forEach(g => {
-                        if (g !== group) g.classList.remove('open');
-                    });
-                    
-                    // Toggle current menu
-                    group.classList.toggle('open');
-                });
-            });
-            
-            // Close menus when clicking outside
     <script src="nav-script.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', () => {

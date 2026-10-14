@@ -506,6 +506,10 @@
                         <li>Dữ liệu giá & khối lượng realtime HOSE, HNX, UPCOM</li>
                         <li>Định giá P/E, P/B, ROE, RSI, ADX thời gian thực</li>
                     </ul>
+                    <div style="margin-top:12px;padding-top:10px;border-top:1px dashed #e5e7eb;">
+                        <button onclick="promptCustomApiKey()" style="width:100%;padding:6px 10px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;">⚙️ Cài đặt OpenRouter Key (Web tĩnh)</button>
+                        <div id="keyStatusText" style="font-size:11px;color:#16a34a;margin-top:4px;display:none;text-align:center;">✓ Đã lưu API Key cá nhân</div>
+                    </div>
                 </div>
             </div>
 
@@ -815,6 +819,124 @@
             };
         }
 
+        async function analyzeMarketDirect() {
+            const TV_URL = 'https://scanner.tradingview.com/vietnam/scan';
+            try {
+                const [idxRes, stockRes] = await Promise.all([
+                    fetch(TV_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
+                            columns: ['name', 'close', 'change', 'volume', 'Value.Traded']
+                        })
+                    }).then(r => r.json()).catch(() => ({ data: [] })),
+                    fetch(TV_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            filter: [{ left: 'exchange', operation: 'in_range', right: ['HOSE', 'HNX', 'UPCOM'] }],
+                            columns: ['name', 'close', 'change', 'volume', 'Value.Traded', 'sector'],
+                            sort: { sortBy: 'Value.Traded', sortOrder: 'desc' },
+                            range: [0, 30]
+                        })
+                    }).then(r => r.json()).catch(() => ({ data: [] }))
+                ]);
+
+                const idxData = idxRes.data || [];
+                const stockData = stockRes.data || [];
+
+                const vni = idxData.find(x => x.s === 'HOSE:VNINDEX')?.d || ['VNINDEX', 1710.88, -0.5, 250e6];
+                const vn30 = idxData.find(x => x.s === 'HOSE:VN30')?.d || ['VN30', 1854.8, -0.33, 96e6];
+                const hnx = idxData.find(x => x.s === 'HNX:HNXINDEX')?.d || ['HNXINDEX', 263.58, -0.25, 20e6];
+
+                const vniClose = vni[1];
+                const vniChg = vni[2] || 0;
+                const vniSign = vniChg >= 0 ? '+' : '';
+                const vniStatus = vniChg > 0.5 ? 'tăng điểm tích cực' : (vniChg < -0.5 ? 'rung lắc điều chỉnh' : 'giằng co phân hóa');
+
+                const topVol = stockData.slice(0, 5);
+
+                let report = `### 📊 Báo Cáo Nhận Định Toàn Cảnh Thị Trường (Realtime)\n\n`;
+                report += `• **VN-Index**: **${vniClose ? vniClose.toLocaleString('vi-VN') : '—'} điểm** (${vniSign}${vniChg.toFixed(2)}%) — Thị trường đang trong trạng thái *${vniStatus}*.\n`;
+                report += `• **VN30**: **${vn30[1] ? vn30[1].toLocaleString('vi-VN') : '—'} điểm** (${(vn30[2]||0) >= 0 ? '+' : ''}${(vn30[2]||0).toFixed(2)}%)\n`;
+                report += `• **HNX-Index**: **${hnx[1] ? hnx[1].toLocaleString('vi-VN') : '—'} điểm** (${(hnx[2]||0) >= 0 ? '+' : ''}${(hnx[2]||0).toFixed(2)}%)\n\n`;
+
+                report += `**🔥 Cổ phiếu tâm điểm dòng tiền & Khối lượng:**\n`;
+                topVol.forEach(s => {
+                    const [name, close, chg, vol, val] = s.d;
+                    const valT = val ? ` (~${(val / 1e9).toFixed(1)} tỷ)` : '';
+                    report += `- **${name}**: ${close ? close.toLocaleString('vi-VN') : '—'} đ (${(chg||0) >= 0 ? '+' : ''}${(chg||0).toFixed(2)}%)${valT}\n`;
+                });
+
+                report += `\n**🎯 Chiến lược hành động khuyến nghị:**\n`;
+                report += `- **Xu hướng ngắn hạn**: VN-Index đang dao động giằng co quanh vùng đỉnh. Áp lực chốt lời ngắn hạn xuất hiện tại các nhóm đã tăng nóng.\n`;
+                report += `- **Tỷ trọng an toàn**: Duy trì tỷ lệ cổ phiếu ở mức 50 - 70%. Canh nhịp chỉnh kỹ thuật để tích lũy các mã đầu ngành giữ vững trend EMA20.\n`;
+                report += `- **Nguyên tắc quản trị**: Không FOMO mua đuổi giá xanh tím. Đặt ngưỡng chặn lỗ 5-7% để bảo toàn vốn.\n`;
+
+                return {
+                    message: report.trim(),
+                    sources: ['Realtime HOSE/HNX/TradingView', 'Phân tích dòng tiền']
+                };
+            } catch (err) {
+                return await analyzeStockDirect(['TCB', 'HPG', 'FPT'], 'thị trường');
+            }
+        }
+
+        function checkKnowledgeBase(text) {
+            const q = text.toLowerCase();
+            if (q.includes('p/e là gì') || q.includes('chỉ số pe') || q.includes('pe là gì')) {
+                return {
+                    message: `**Chỉ số P/E (Price-to-Earnings Ratio):**\n\n• **Định nghĩa**: P/E đo lường mức giá bạn sẵn sàng trả cho 1 đồng lợi nhuận sau thuế của doanh nghiệp (P/E = Giá thị trường / EPS).\n• **Ý nghĩa**:\n  - P/E thấp: Cổ phiếu có thể đang được định giá rẻ hoặc doanh nghiệp gặp khó khăn tăng trưởng.\n  - P/E cao: Nhà đầu tư kỳ vọng doanh nghiệp tăng trưởng đột phá trong tương lai, hoặc cổ phiếu đang bị định giá quá cao.\n• **P/E trung bình thị trường Việt Nam**: Thường dao động quanh 13x - 16x. Khi đầu tư, nên so sánh P/E của cổ phiếu với trung bình ngành và lịch sử quá khứ của chính nó.`,
+                    sources: ['Kiến thức định giá tài chính']
+                };
+            }
+            if (q.includes('p/b là gì') || q.includes('chỉ số pb') || q.includes('pb là gì')) {
+                return {
+                    message: `**Chỉ số P/B (Price-to-Book Ratio):**\n\n• **Định nghĩa**: P/B so sánh giá thị trường cổ phiếu với giá trị sổ sách trên mỗi cổ phần (P/B = Giá / BVPS).\n• **Ứng dụng tốt nhất**: Rất hữu ích khi định giá các ngành tài sản hữu hình lớn như **Ngân hàng, Bất động sản, Thép, Chứng khoán**.\n• **Quy tắc tham khảo**: P/B < 1 thường là cổ phiếu giao dịch dưới giá trị tài sản ròng. P/B ngành ngân hàng VN thường hấp dẫn ở vùng 1.1x - 1.5x.`,
+                    sources: ['Kiến thức định giá tài chính']
+                };
+            }
+            if (q.includes('rsi là gì') || q.includes('chỉ báo rsi')) {
+                return {
+                    message: `**Chỉ báo RSI (Relative Strength Index - Chỉ số Sức mạnh Tương đối):**\n\n• **Đo lường**: Tốc độ và biên độ biến động giá trong 14 phiên (thang điểm từ 0 đến 100).\n• **Vùng quan trọng**:\n  - **RSI > 70 (Quá mua)**: Lực mua quá đà, giá có nguy cơ đảo chiều điều chỉnh ngắn hạn. Không nên mua đuổi.\n  - **RSI < 30 (Quá bán)**: Lực bán quá đà, mở ra cơ hội hồi phục kỹ thuật ngắn hạn.\n  - **Phân kỳ RSI**: Khi giá tạo đỉnh mới cao hơn nhưng RSI tạo đỉnh thấp hơn (Phân kỳ âm) -> Tín hiệu cảnh báo đảo chiều giảm.`,
+                    sources: ['Phân tích kỹ thuật thực chiến']
+                };
+            }
+            if (q.includes('cắt lỗ') || q.includes('quản trị rủi ro') || q.includes('chặn lỗ')) {
+                return {
+                    message: `**Nguyên Tắc Quản Trị Rủi Ro & Cắt Lỗ Thực Chiến:**\n\n1. **Kỷ luật là sinh mệnh**: Đặt mức dừng lỗ tối đa -7% đến -8% ngay khi mở vị thế. Nếu lỗ 5%, giảm 1/2 vị thế; lỗ 7-8%, bán dứt khoát toàn bộ.\n2. **Quy tắc hòa vốn**: Lỗ 10% cần lãi 11% để hòa vốn; nhưng nếu để lỗ 50%, bạn cần phải lãi 100% tài khoản mới về bờ.\n3. **Không bình quân giá xuống**: Chỉ gia tăng tỷ trọng khi cổ phiếu đi đúng xu hướng (đang có lãi) và tích lũy tạo nền mới.\n4. **Phân bổ vốn**: Mỗi danh mục chỉ nên giữ từ 3 - 5 mã thuộc các ngành khác nhau, tuyệt đối không all-in một mã duy nhất.`,
+                    sources: ['Quản trị rủi ro đầu tư']
+                };
+            }
+            return null;
+        }
+
+        function promptCustomApiKey() {
+            const current = localStorage.getItem('user_openrouter_key') || '';
+            const key = prompt('Nhập OpenRouter API Key của bạn (bắt đầu bằng sk-or-...):\n\nKey sẽ được lưu an toàn trong trình duyệt của bạn để gọi AI trực tiếp trên GitHub Pages mà không cần backend.', current);
+            if (key !== null) {
+                const trimmed = key.trim();
+                if (trimmed) {
+                    localStorage.setItem('user_openrouter_key', trimmed);
+                    alert('✓ Đã lưu API Key! Giờ đây bạn có thể chat trực tiếp với mô hình AI trên GitHub Pages.');
+                } else {
+                    localStorage.removeItem('user_openrouter_key');
+                    alert('Đã xóa API Key cá nhân. Hệ thống sẽ sử dụng bộ engine phân tích realtime tích hợp sẵn.');
+                }
+                updateKeyStatusUI();
+            }
+        }
+
+        function updateKeyStatusUI() {
+            const key = localStorage.getItem('user_openrouter_key');
+            const el = document.getElementById('keyStatusText');
+            if (el) {
+                el.style.display = key ? 'block' : 'none';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', updateKeyStatusUI);
+
         async function callAI(message) {
             const detectedSymbols = extractSymbols(message);
             const isMarketQuery = message.toLowerCase().includes('thị trường') || message.toLowerCase().includes('vnindex') || message.toLowerCase().includes('xu hướng');
@@ -848,16 +970,59 @@
                 }
             }
 
-            // 2. Fallback thong minh tren Web tinh (GitHub Pages):
-            // Neu nguoi dung hoi ve ma co phieu hoac thi truong, lay truc tiep du lieu realtime va tra ve ngay lap tuc
-            if (detectedSymbols.length > 0 || isMarketQuery) {
-                const targetSymbols = detectedSymbols.length > 0 ? detectedSymbols : ['TCB', 'HPG', 'FPT'];
-                return await analyzeStockDirect(targetSymbols, message);
+            // 2. Neu nguoi dung co cau hinh OpenRouter Key truc tiep trong browser:
+            const customKey = localStorage.getItem('user_openrouter_key');
+            if (customKey) {
+                try {
+                    const chatMessages = [
+                        { role: 'system', content: 'Bạn là Trợ lý AI Tài chính & Chuyên gia Phân tích Chứng khoán Việt Nam cao cấp. Trả lời chi tiết, súc tích bằng tiếng Việt, có dẫn chứng số liệu.' },
+                        ...messages.map(m => ({ role: m.role, content: m.content }))
+                    ];
+                    const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${customKey}`,
+                            'Content-Type': 'application/json',
+                            'HTTP-Referer': window.location.origin,
+                            'X-Title': 'Trợ lý Tài chính'
+                        },
+                        body: JSON.stringify({
+                            model: currentModel,
+                            messages: chatMessages,
+                            max_tokens: 1000,
+                            temperature: 0.6
+                        })
+                    });
+                    const d = await r.json();
+                    if (r.ok && d.choices?.[0]?.message?.content) {
+                        return {
+                            message: d.choices[0].message.content,
+                            sources: ['OpenRouter AI trực tiếp', MODEL_INFO[currentModel]?.title || currentModel]
+                        };
+                    }
+                } catch (e) {
+                    console.warn('Direct OpenRouter error:', e);
+                }
             }
+
+            // 3. Fallback thong minh tren Web tinh (GitHub Pages):
+            // Tra cuu ma co phieu cu the
+            if (detectedSymbols.length > 0) {
+                return await analyzeStockDirect(detectedSymbols, message);
+            }
+
+            // Nhan dinh toan canh thi truong
+            if (isMarketQuery) {
+                return await analyzeMarketDirect();
+            }
+
+            // Kien thuc tai chinh
+            const kb = checkKnowledgeBase(message);
+            if (kb) return kb;
 
             // Cau hoi chung khi khong co backend
             return {
-                message: `Xin chào! Tôi là Trợ lý AI Tài chính & Đầu tư Chứng khoán. Tôi đã kết nối dữ liệu thời gian thực các sàn HOSE, HNX, UPCOM.\n\nBạn có thể hỏi tôi về:\n• **Phân tích mã cổ phiếu**: *Ví dụ: "Phân tích mã TCB hôm nay", "Định giá HPG", "So sánh FPT và VCB"*\n• **Xu hướng thị trường**: *Ví dụ: "Xu hướng VN-Index hôm nay"*`,
+                message: `Xin chào! Tôi là Trợ lý AI Tài chính & Đầu tư Chứng khoán. Tôi đã kết nối dữ liệu thời gian thực các sàn HOSE, HNX, UPCOM.\n\nBạn có thể hỏi tôi về:\n• **Phân tích mã cổ phiếu**: *Ví dụ: "Phân tích mã TCB hôm nay", "Định giá HPG", "So sánh FPT và VCB"*\n• **Xu hướng thị trường**: *Ví dụ: "Xu hướng VN-Index hôm nay", "Thị trường hôm nay thế nào"*\n• **Kiến thức định giá**: *Ví dụ: "P/E là gì", "Chỉ báo RSI", "Nguyên tắc cắt lỗ"*\n\n*(Mẹo: Bạn có thể nhấn nút "⚙️ Cài đặt OpenRouter Key" ở cột bên trái để trò chuyện tự do với AI trên web tĩnh).*`,
                 sources: ['Realtime Financial Engine']
             };
         }

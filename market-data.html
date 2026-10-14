@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -336,10 +336,11 @@
 
         async function loadIndices() {
             try {
-                const { prices } = await getPricesData(['VNI', 'HNX', 'UPCOM']);
+                const { prices } = await getPricesData(['VNI', 'VN30', 'HNX', 'UPCOM']);
                 const grid = document.getElementById('indicesGrid');
                 const indices = [
                     { name: 'VN-INDEX',    key: 'VNI'   },
+                    { name: 'VN30-INDEX',  key: 'VN30'  },
                     { name: 'HNX-INDEX',   key: 'HNX'   },
                     { name: 'UPCOM-INDEX', key: 'UPCOM' },
                 ];
