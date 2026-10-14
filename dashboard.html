@@ -641,47 +641,11 @@ body {
   overflow: hidden;
 }
 
-.stock-center-header {
-  height: 40px;
-  border-bottom: 1px solid var(--border-stroke);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  background: var(--bg-container);
-  flex-shrink: 0;
-}
-.main-tab-list {
-  display: flex;
-  gap: 4px;
-  height: 100%;
-}
-.main-tab-btn {
-  background: none;
-  border: none;
-  padding: 0 14px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.15s;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-.main-tab-btn:hover { color: var(--text-primary); }
-.main-tab-btn.active {
-  color: var(--primary-brand);
-  border-bottom-color: var(--primary-brand);
-  font-weight: 600;
-}
-
 /* SUB-TABS CONTAINER (TỔNG QUAN, BẢN ĐỒ, CUNG CẦU, KHỐI NGOẠI) */
 .center-tab-container {
-  height: 38px;
+  height: 40px;
   border-bottom: 1px solid var(--border-stroke);
-  background: var(--bg-subtle);
+  background: var(--bg-container);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -695,8 +659,8 @@ body {
 .center-subtab-btn {
   background: none;
   border: 1px solid transparent;
-  padding: 4px 12px;
-  font-size: 13px;
+  padding: 5px 14px;
+  font-size: 13.5px;
   font-weight: 500;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
@@ -764,6 +728,16 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 8px;
+}
+@media (max-width: 1400px) {
+  .grid-row-3col {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 1100px) {
+  .grid-row-2col {
+    grid-template-columns: 1fr;
+  }
 }
 
 .tongquan-card {
@@ -1155,29 +1129,34 @@ body {
 /* FLOATING AI ASSISTANT DRAWER & FAB */
 .floating-ai-fab {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  height: 44px;
-  padding: 0 16px;
+  bottom: 18px;
+  right: 340px;
+  height: 40px;
+  padding: 0 14px;
   background: linear-gradient(135deg, #2980B9 0%, #1c5982 100%);
   color: #fff;
   border: none;
-  border-radius: 24px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
-  box-shadow: 0 6px 20px rgba(41, 128, 185, 0.4);
+  box-shadow: 0 6px 18px rgba(41, 128, 185, 0.4);
   cursor: pointer;
   z-index: 400;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .floating-ai-fab:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(41, 128, 185, 0.5);
+  box-shadow: 0 8px 24px rgba(41, 128, 185, 0.5);
 }
 .floating-ai-fab svg { flex-shrink: 0; }
+@media (max-width: 992px) {
+  .floating-ai-fab {
+    right: 18px;
+  }
+}
 
 .ai-drawer-card {
   position: fixed;
@@ -1658,19 +1637,8 @@ body {
 
     <div class="splitter-sash"></div>
 
-    <!-- CỘT 2: PANEL GIỮA (#second - TỔNG QUAN THỊ TRƯỜNG CUNGDAUTU.VN) -->
+    <!-- CỘT 2: PANEL GIỮA (#second - TỔNG QUAN THỊ TRƯỜNG) -->
     <main id="second">
-      <!-- HEADER TABS CHÍNH: BIẾN ĐỘNG / XU HƯỚNG / ĐỊNH GIÁ / LỌC CỔ PHIẾU / BIỂU ĐỒ -->
-      <div class="stock-center-header">
-        <div class="main-tab-list">
-          <button class="main-tab-btn active" onclick="switchMainCenterTab('biendong', this)">Biến động</button>
-          <button class="main-tab-btn" onclick="switchMainCenterTab('xuhuong', this)">Xu hướng</button>
-          <button class="main-tab-btn" onclick="switchMainCenterTab('dinhgia', this)">Định giá</button>
-          <button class="main-tab-btn" onclick="window.location.href='bo-loc-fa.html'">Lọc cổ phiếu</button>
-          <button class="main-tab-btn" onclick="window.location.href='tin-hieu-ta.html'">Biểu đồ</button>
-        </div>
-      </div>
-
       <!-- SUB-TABS: TỔNG QUAN, BẢN ĐỒ, CUNG CẦU, KHỐI NGOẠI & NÚT CHU KỲ (1 PHIÊN, 5 PHIÊN, 20 PHIÊN) -->
       <div class="center-tab-container">
         <div class="center-tab-nav">
@@ -1882,9 +1850,13 @@ body {
     <!-- CỘT 3: PANEL DANH MỤC / TIN TỨC BÊN PHẢI (#third) -->
     <aside id="third">
       <div class="right-tab-header">
-        <div class="tab-container">
+        <div class="tab-container" style="display:flex; height:100%;">
           <button class="right-tab-btn active" id="tabWatchlistBtn" onclick="switchRightTab('watchlist', this)">Danh mục</button>
           <button class="right-tab-btn" id="tabNewsBtn" onclick="switchRightTab('news', this)">Tin tức</button>
+          <button class="right-tab-btn" id="tabAiBtn" onclick="switchRightTab('ai', this)" style="display:flex; align-items:center; gap:5px;">
+            <span>Trợ lý AI</span>
+            <span class="mcp-dot" style="width:6px;height:6px;background:var(--price-up);border-radius:50%;display:inline-block;"></span>
+          </button>
         </div>
         <span style="font-size:11px;color:var(--text-muted);" id="rightPanelCount">45 mã</span>
       </div>
@@ -1928,6 +1900,55 @@ body {
         </div>
       </div>
 
+      <!-- VIEW AI CHATBOT (EMBEDDED INSIDE RIGHT PANEL - CHỐNG CHỒNG CHÉO) -->
+      <div id="rightViewAi" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+        <div class="ai-embedded-head" style="padding:8px 10px; background:var(--bg-subtle); border-bottom:1px solid var(--border-stroke); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div class="ai-avatar-badge" style="width:24px; height:24px; font-size:12px;">⚡</div>
+            <div>
+              <div style="font-size:12px; font-weight:700;">AI Realtime (DNSE MCP)</div>
+              <div style="font-size:10px; color:var(--price-up); display:flex; align-items:center; gap:3px;">
+                <span class="pulse-dot" style="width:4px;height:4px;"></span>
+                <span>Dữ liệu trực tiếp sàn HOSE/HNX</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button onclick="clearDashboardAiChat()" class="ai-head-btn" title="Xóa lịch sử" style="padding:2px 6px; font-size:11px; cursor:pointer;">🗑</button>
+            <a href="chatbot.html" target="_blank" class="ai-head-btn" title="Mở trang đầy đủ" style="padding:2px 6px; font-size:11px; text-decoration:none;">↗</a>
+          </div>
+        </div>
+
+        <div class="ai-messages-scroll" id="aiChatMessages" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px;">
+          <div class="ai-msg-item bot">
+            <div class="ai-bubble" style="font-size:12px; line-height:1.45;">
+              <p><strong>Xin chào! Tôi là Trợ lý AI kết nối trực tiếp với DNSE MCP Protocol.</strong></p>
+              <p>Dữ liệu VN-Index, độ rộng thị trường và giá các mã (FPT, TCB, HPG, SSI...) được cập nhật realtime từ sàn giao dịch.</p>
+              <p>Bạn có thể hỏi tôi:</p>
+              <ul style="padding-left:16px; margin:4px 0;">
+                <li>Xu hướng <b>VN-Index</b> hôm nay?</li>
+                <li>Phân tích chi tiết mã (<b>FPT, TCB, HPG, VCB...</b>)</li>
+                <li>Định giá P/E, P/B và điểm mua bán tối ưu</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-quick-chips-row" style="padding:6px 8px; border-top:1px solid var(--border-stroke); background:var(--bg-subtle); display:flex; gap:4px; overflow-x:auto; flex-shrink:0;">
+          <button class="ai-chip-pill" onclick="quickAiPrompt('Nhận định xu hướng VN-Index hôm nay')">📊 VN-Index</button>
+          <button class="ai-chip-pill" onclick="quickAiPrompt('Phân tích chi tiết cổ phiếu FPT')">⚡ FPT</button>
+          <button class="ai-chip-pill" onclick="quickAiPrompt('Cổ phiếu Ngân hàng nào dẫn dắt?')">🏦 Ngân hàng</button>
+          <button class="ai-chip-pill" onclick="quickAiPrompt('Top cổ phiếu có định giá hấp dẫn nhất?')">🎯 Định giá</button>
+        </div>
+
+        <form class="ai-input-form" onsubmit="handleAiFormSubmit(event)" style="padding:8px; border-top:1px solid var(--border-stroke); display:flex; gap:6px; flex-shrink:0; background:var(--bg-container);">
+          <input type="text" class="ai-input-field" id="aiChatInput" placeholder="Hỏi AI về cổ phiếu, VN-Index..." autocomplete="off" style="font-size:12px; flex:1;">
+          <button type="submit" class="ai-send-btn" id="aiSendBtn" title="Gửi" style="padding:0 12px; cursor:pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
+        </form>
+      </div>
+
     </aside>
 
   </div>
@@ -1965,68 +1986,12 @@ body {
     </div>
   </div>
 
-  <!-- NÚT FAB MỞ TRỢ LÝ AI NỔI GÓC DƯỚI PHẢI -->
+  <!-- NÚT FAB MỞ TRỢ LÝ AI (CHUYỂN NHANH VÀO TAB AI) -->
   <button class="floating-ai-fab" id="floatingAiFab" onclick="toggleDashboardAi()" title="Mở Trợ lý AI Thị trường Realtime">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
-    <span>AI Trợ lý Realtime</span>
+    <span>AI Trợ lý DNSE</span>
     <span class="pulse-dot"></span>
   </button>
-
-  <!-- CỬA SỔ CHAT TRỰC TIẾP TRÊN DASHBOARD (KẾT NỐI REALTIME DỮ LIỆU) -->
-  <div class="ai-drawer-card" id="dashboardAiDrawer">
-    <div class="ai-drawer-head">
-      <div class="ai-drawer-title-group">
-        <div class="ai-avatar-badge">⚡</div>
-        <div>
-          <div class="ai-drawer-title">Trợ lý AI Thị trường Realtime</div>
-          <div class="ai-drawer-sub">
-            <span class="pulse-dot" style="width:5px;height:5px;"></span>
-            <span id="aiMcpSubText">Kết nối DNSE MCP Protocol</span>
-          </div>
-        </div>
-      </div>
-      <div class="ai-drawer-actions">
-        <span class="ai-mcp-pill" id="aiDrawerMcpPill" title="Model Context Protocol kết nối trực tiếp với DNSE Open API">
-          <span class="mcp-dot"></span> MCP: DNSE
-        </span>
-        <a href="chatbot.html" target="_blank" class="ai-head-btn" title="Mở toàn màn hình">↗</a>
-        <button onclick="clearDashboardAiChat()" class="ai-head-btn" title="Xóa lịch sử">🗑</button>
-        <button onclick="closeDashboardAi()" class="ai-head-btn" title="Thu nhỏ">&times;</button>
-      </div>
-    </div>
-
-    <!-- KHU VỰC TIN NHẮN -->
-    <div class="ai-messages-scroll" id="aiChatMessages">
-      <div class="ai-msg-item bot">
-        <div class="ai-bubble">
-          <p><strong>Xin chào! Tôi là Trợ lý AI được liên kết trực tiếp với dữ liệu thị trường của Dashboard này.</strong></p>
-          <p>Dữ liệu giá khớp, chỉ số VN-Index, thanh khoản và độ rộng mà tôi sử dụng luôn đồng bộ theo từng giây với bảng giá bạn đang xem.</p>
-          <p>Bạn có thể hỏi tôi:</p>
-          <ul>
-            <li>Nhận định xu hướng <b>VN-Index</b> hôm nay</li>
-            <li>Phân tích chi tiết mã (<b>FPT, TCB, HPG, VCB...</b>)</li>
-            <li>Định giá P/E, P/B, RSI và điểm mua bán tối ưu</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- GỢI Ý CÂU HỎI NHANH -->
-    <div class="ai-quick-chips-row">
-      <button class="ai-chip-pill" onclick="quickAiPrompt('Nhận định xu hướng VN-Index hôm nay')">📊 VN-Index hôm nay</button>
-      <button class="ai-chip-pill" onclick="quickAiPrompt('Phân tích chi tiết cổ phiếu FPT')">⚡ Phân tích FPT</button>
-      <button class="ai-chip-pill" onclick="quickAiPrompt('Cổ phiếu Ngân hàng nào dẫn dắt thị trường?')">🏦 Nhóm Ngân hàng</button>
-      <button class="ai-chip-pill" onclick="quickAiPrompt('Tư vấn phân bổ danh mục đầu tư an toàn')">💼 Tư vấn danh mục</button>
-    </div>
-
-    <!-- KHUNG NHẬP CÂU HỎI -->
-    <form class="ai-input-form" onsubmit="handleAiFormSubmit(event)">
-      <input type="text" class="ai-input-field" id="aiChatInput" placeholder="Hỏi AI về mã cổ phiếu, VN-Index, điểm mua..." autocomplete="off">
-      <button type="submit" class="ai-send-btn" id="aiSendBtn" title="Gửi câu hỏi">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-      </button>
-    </form>
-  </div>
 
   <script src="config.js"></script>
   <script src="tv-api.js"></script>
@@ -2256,7 +2221,7 @@ body {
     }
 
     // ==========================================
-    // 4. ĐỒNG BỘ DỮ LIỆU NỀN DNSE REALTIME & TRADINGVIEW
+    // 4. ĐỒNG BỘ DỮ LIỆU NỀN 100% DNSE OPEN API REALTIME
     // ==========================================
     async function syncMarketBaseline() {
       try {
@@ -2684,14 +2649,6 @@ body {
       if (menu) menu.classList.remove('show');
     });
 
-    function switchMainCenterTab(tab, btn) {
-      document.querySelectorAll('.main-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      if (tab === 'xuhuong') switchSubTab('cungcau', document.querySelectorAll('.center-subtab-btn')[2]);
-      else if (tab === 'dinhgia') switchSubTab('bando', document.querySelectorAll('.center-subtab-btn')[1]);
-      else switchSubTab('tongquan', document.querySelectorAll('.center-subtab-btn')[0]);
-    }
-
     function switchSubTab(subtab, btn) {
       document.querySelectorAll('.center-subtab-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
@@ -2710,9 +2667,17 @@ body {
 
     function switchRightTab(tab, btn) {
       document.querySelectorAll('.right-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      if (btn) btn.classList.add('active');
       document.getElementById('rightViewWatchlist').style.display = tab === 'watchlist' ? 'flex' : 'none';
       document.getElementById('rightViewNews').style.display = tab === 'news' ? 'flex' : 'none';
+      const aiView = document.getElementById('rightViewAi');
+      if (aiView) aiView.style.display = tab === 'ai' ? 'flex' : 'none';
+      const countEl = document.getElementById('rightPanelCount');
+      if (countEl) {
+        if (tab === 'watchlist') countEl.textContent = `${stockDataList.length || 45} mã`;
+        else if (tab === 'news') countEl.textContent = '12 tin';
+        else if (tab === 'ai') countEl.textContent = 'DNSE MCP';
+      }
     }
 
     function selectChip(chip, btn) {
@@ -2785,22 +2750,20 @@ body {
     // 8. TÍCH HỢP TRỢ LÝ AI CHATBOT REALTIME TRÊN DASHBOARD
     // ==========================================
     function toggleDashboardAi(forceOpen = null) {
-      const drawer = document.getElementById('dashboardAiDrawer');
-      if (!drawer) return;
-      if (forceOpen === true) {
-        drawer.classList.add('show');
-      } else if (forceOpen === false) {
-        drawer.classList.remove('show');
-      } else {
-        drawer.classList.toggle('show');
-      }
-      if (drawer.classList.contains('show')) {
+      const tabAiBtn = document.getElementById('tabAiBtn');
+      const curAiVisible = document.getElementById('rightViewAi')?.style.display === 'flex';
+      if (forceOpen === true || (!curAiVisible && forceOpen !== false)) {
+        if (tabAiBtn) switchRightTab('ai', tabAiBtn);
         setTimeout(() => document.getElementById('aiChatInput')?.focus(), 150);
+      } else {
+        const tabWatchlistBtn = document.getElementById('tabWatchlistBtn');
+        if (tabWatchlistBtn) switchRightTab('watchlist', tabWatchlistBtn);
       }
     }
 
     function closeDashboardAi() {
-      toggleDashboardAi(false);
+      const tabWatchlistBtn = document.getElementById('tabWatchlistBtn');
+      if (tabWatchlistBtn) switchRightTab('watchlist', tabWatchlistBtn);
     }
 
     function clearDashboardAiChat() {
