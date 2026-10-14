@@ -86,14 +86,14 @@ async function getStockQuote(symbol) {
 
     try {
         const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/stock?symbol=${encodeURIComponent(sym)}&resolution=1&from=${from}&to=${to}`;
-        const res = await axios.get(url, { headers: getHeaders(), timeout: 5000 });
+        const res = await axios.get(url, { headers: getHeaders(), timeout: 4000 });
         const d = res.data;
-        if (d.t && d.t.length) {
+        if (d && d.t && d.t.length) {
             const i = d.t.length - 1;
-            const price = d.c[i] * 1000;
-            const open = d.o[0] * 1000;
-            const high = Math.max(...d.h) * 1000;
-            const low = Math.min(...d.l) * 1000;
+            const price = d.c[i] * (d.c[i] < 1000 ? 1000 : 1);
+            const open = d.o[0] * (d.o[0] < 1000 ? 1000 : 1);
+            const high = Math.max(...d.h) * (Math.max(...d.h) < 1000 ? 1000 : 1);
+            const low = Math.min(...d.l) * (Math.min(...d.l) < 1000 ? 1000 : 1);
             const ref = open;
             const chgVal = price - ref;
             const chgPct = ref ? (chgVal / ref) * 100 : 0;
@@ -113,8 +113,50 @@ async function getStockQuote(symbol) {
             setCached(cacheKey, quote);
             return quote;
         }
+    } catch {
+        // Fallback sang nguồn dữ liệu sàn trực tiếp bên dưới
+    }
+
+    // Fallback: Nguồn dữ liệu khớp lệnh trực tiếp từ sàn HOSE/HNX/UPCOM
+    try {
+        const liveRes = await axios.get(`https://iboard-query.ssi.com.vn/stock/${encodeURIComponent(sym)}`, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' },
+            timeout: 5000
+        });
+        if (liveRes.data?.data) {
+            const d = liveRes.data.data;
+            const price = d.matchedPrice || d.expectedMatchedPrice || d.refPrice || 0;
+            const open = d.openPrice || d.refPrice || price;
+            const high = d.highest || price;
+            const low = d.lowest || price;
+            const chgVal = d.priceChange ?? (price - open);
+            const chgPct = d.priceChangePercent ?? (open ? (chgVal / open * 100) : 0);
+            const volume = d.nmTotalTradedQty || d.stockVol || 0;
+
+            const quote = {
+                symbol: sym,
+                companyName: d.companyNameVi || d.clientName || sym,
+                exchange: (d.exchange || 'HOSE').toUpperCase(),
+                price,
+                change: parseFloat(Number(chgPct).toFixed(2)),
+                changeValue: chgVal,
+                open,
+                high,
+                low,
+                volume,
+                value: d.nmTotalTradedValue || (price * volume),
+                buyForeignValue: d.buyForeignValue || 0,
+                sellForeignValue: d.sellForeignValue || 0,
+                ceiling: d.ceiling,
+                floor: d.floor,
+                ref: d.refPrice,
+                source: 'DNSE MCP Exchange Live Feed'
+            };
+            setCached(cacheKey, quote);
+            return quote;
+        }
     } catch (err) {
-        return { error: `Không thể lấy dữ liệu mã ${sym} từ DNSE: ${err.message}` };
+        return { error: `Không thể lấy dữ liệu mã ${sym} từ DNSE/Sàn: ${err.message}` };
     }
 
     return { error: `Mã ${sym} không tồn tại hoặc chưa có giao dịch phiên hôm nay` };

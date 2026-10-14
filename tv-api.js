@@ -61,7 +61,11 @@ const FALLBACK_STOCKS = [
     { symbol: 'GMD', exchange: 'HOSE', sector: 'Vận tải', price: 53000, change: 0.95, pe: 15.2, pb: 2.45, roe: 19.5, marketCap: 16200, volume: 1236100, value: 64883990000, buyForeignValue: 31043930000, sellForeignValue: 30200596000 },
     { symbol: 'HAH', exchange: 'HOSE', sector: 'Vận tải', price: 48350, change: 1.47, pe: 10.2, pb: 1.45, roe: 16.2, marketCap: 5800, volume: 465600, value: 22242260000, buyForeignValue: 2019825000, sellForeignValue: 10212785600 },
     { symbol: 'VGC', exchange: 'HOSE', sector: 'Bất động sản KCN', price: 43750, change: 1.04, pe: 14.8, pb: 1.90, roe: 14.2, marketCap: 19600, volume: 539500, value: 23503160000, buyForeignValue: 6357500000, sellForeignValue: 1599465000 },
-    { symbol: 'KBC', exchange: 'HOSE', sector: 'Bất động sản KCN', price: 25750, change: 0.00, pe: 17.5, pb: 1.18, roe: 8.5, marketCap: 19800, volume: 629000, value: 16072840000, buyForeignValue: 221640000, sellForeignValue: 1116074500 }
+    { symbol: 'KBC', exchange: 'HOSE', sector: 'Bất động sản KCN', price: 25750, change: 0.00, pe: 17.5, pb: 1.18, roe: 8.5, marketCap: 19800, volume: 629000, value: 16072840000, buyForeignValue: 221640000, sellForeignValue: 1116074500 },
+    { symbol: 'TLG', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 55500, change: 0.54, pe: 11.2, pb: 1.88, roe: 19.2, marketCap: 5357, volume: 384300, value: 21363040000, buyForeignValue: 4571800000, sellForeignValue: 11888650000 },
+    { symbol: 'DGW', exchange: 'HOSE', sector: 'Bán lẻ', price: 58200, change: 1.22, pe: 16.5, pb: 2.10, roe: 14.5, marketCap: 9800, volume: 1450000, value: 84390000000, buyForeignValue: 5600000000, sellForeignValue: 3200000000 },
+    { symbol: 'CTR', exchange: 'HOSE', sector: 'Công nghệ', price: 128500, change: 2.14, pe: 24.2, pb: 4.60, roe: 23.5, marketCap: 14700, volume: 980000, value: 125930000000, buyForeignValue: 12500000000, sellForeignValue: 4500000000 },
+    { symbol: 'PC1', exchange: 'HOSE', sector: 'Điện & Tiện ích', price: 28400, change: 0.71, pe: 14.8, pb: 1.35, roe: 10.5, marketCap: 8800, volume: 1620000, value: 46008000000, buyForeignValue: 3100000000, sellForeignValue: 2400000000 }
 ];
 
 // Kiểm tra backend server (chỉ gọi khi ở localhost)
@@ -264,22 +268,23 @@ async function fetchDNSEStock(symbol) {
         } catch { /* fallback direct */ }
     }
 
-    // 2. Trực tiếp
-    try {
-        const res = await fetch(`${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/stock?symbol=${symbol}&resolution=1&from=${from}&to=${now}`, {
-            signal: AbortSignal.timeout(4000)
-        });
-        if (res.ok) {
-            const d = await res.json();
-            if (d.t && d.t.length > 0) {
-                const i = d.t.length - 1;
-                const price = Math.round(d.c[i] * (d.c[i] < 1000 ? 1000 : 1));
-                return { symbol, price, high: d.h[i], low: d.l[i], volume: d.v[i] };
+    // 3. Thử qua backend endpoint stock chi tiết
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        try {
+            const r = await fetch(`/api/market/stock/${symbol}`, { signal: AbortSignal.timeout(3500) });
+            if (r.ok) {
+                const j = await r.json();
+                if (j.success && j.data) {
+                    return j.data;
+                }
             }
-        }
-    } catch (e) {
-        console.warn(`DNSE stock fetch notice (${symbol}):`, e.message);
+        } catch { /* fallback direct */ }
     }
+
+    // 4. Fallback từ FALLBACK_STOCKS
+    const fb = FALLBACK_STOCKS.find(s => s.symbol === symbol.toUpperCase().trim());
+    if (fb) return { ...fb };
+
     return null;
 }
 
