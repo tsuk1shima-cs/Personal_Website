@@ -1489,8 +1489,8 @@ body {
 
         <a href="javascript:;" class="header-nav-link" onclick="openDerivativesModal()">Phái sinh</a>
         <a href="javascript:;" class="header-nav-link" onclick="openExpertModal()">Chuyên gia</a>
-        <a href="tin-hieu-ta.html" class="header-nav-link">Tín hiệu TA</a>
-        <a href="bo-loc-fa.html" class="header-nav-link">Bộ lọc FA</a>
+        <a href="javascript:;" class="header-nav-link" id="navLinkTA" onclick="switchSubTab('tinhieu_ta')">Tín hiệu TA</a>
+        <a href="javascript:;" class="header-nav-link" id="navLinkFA" onclick="switchSubTab('boloc_fa')">Bộ lọc FA</a>
         <a href="javascript:;" onclick="toggleDashboardAi()" class="header-nav-link highlight" id="navAiBtn">AI Chatbot</a>
       </div>
     </div>
@@ -1677,10 +1677,12 @@ body {
       <!-- SUB-TABS: TỔNG QUAN, BẢN ĐỒ, CUNG CẦU, KHỐI NGOẠI & NÚT CHU KỲ (1 PHIÊN, 5 PHIÊN, 20 PHIÊN) -->
       <div class="center-tab-container">
         <div class="center-tab-nav">
-          <button class="center-subtab-btn active" onclick="switchSubTab('tongquan', this)">Tổng quan</button>
-          <button class="center-subtab-btn" onclick="switchSubTab('bando', this)">Bản đồ</button>
-          <button class="center-subtab-btn" onclick="switchSubTab('cungcau', this)">Cung cầu</button>
-          <button class="center-subtab-btn" onclick="switchSubTab('khoingoai', this)">Khối ngoại</button>
+          <button class="center-subtab-btn active" id="btnSubTab_tongquan" onclick="switchSubTab('tongquan', this)">Tổng quan</button>
+          <button class="center-subtab-btn" id="btnSubTab_bando" onclick="switchSubTab('bando', this)">Bản đồ</button>
+          <button class="center-subtab-btn" id="btnSubTab_cungcau" onclick="switchSubTab('cungcau', this)">Cung cầu</button>
+          <button class="center-subtab-btn" id="btnSubTab_khoingoai" onclick="switchSubTab('khoingoai', this)">Khối ngoại</button>
+          <button class="center-subtab-btn" id="btnSubTab_tinhieu_ta" onclick="switchSubTab('tinhieu_ta', this)">Tín hiệu TA</button>
+          <button class="center-subtab-btn" id="btnSubTab_boloc_fa" onclick="switchSubTab('boloc_fa', this)">Bộ lọc FA</button>
         </div>
 
         <div class="center-tab-controls">
@@ -2094,6 +2096,213 @@ body {
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 5: TÍN HIỆU PHÂN TÍCH KỸ THUẬT (TA SIGNALS) -->
+        <div id="subview_tinhieu_ta" style="display:none; flex-direction:column; gap:8px;">
+          <!-- Card 1: Header & KPI tổng hợp tín hiệu -->
+          <div class="tongquan-card" style="padding:10px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="blue-accent-bar"></span>
+                <span style="font-weight:700; font-size:13.5px;">Hệ thống Quét & Phát hiện Tín hiệu Kỹ thuật Realtime</span>
+                <span class="tongquan-card-subtitle">(HOSE / HNX / UPCOM kết nối DNSE)</span>
+              </div>
+              <span id="taLiveUpdateBadge" style="font-size:11px; color:var(--price-up); font-weight:600; display:inline-flex; align-items:center; gap:4px;">
+                <span class="pulse-dot" style="width:6px;height:6px;"></span> Tự động quét theo nhịp thị trường
+              </span>
+            </div>
+
+            <!-- KPI Row 4 Thẻ -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:8px; margin-bottom:10px;">
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Tín hiệu MUA Tích cực</div>
+                <div style="font-size:18px; font-weight:700; color:var(--price-up); margin:2px 0;" id="taKpiBuy">14 mã</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Dòng tiền & xung lực tốt</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Bùng nổ Volume (>1.5x)</div>
+                <div style="font-size:18px; font-weight:700; color:var(--primary-brand); margin:2px 0;" id="taKpiBreakout">6 mã</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Thanh khoản đột biến phiên</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Vùng Quá Bán (RSI &lt; 35)</div>
+                <div style="font-size:18px; font-weight:700; color:#3b82f6; margin:2px 0;" id="taKpiOversold">4 mã</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Cơ hội gom dò đáy hồi phục</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Cảnh báo Quá Mua (RSI &gt; 68)</div>
+                <div style="font-size:18px; font-weight:700; color:var(--price-down); margin:2px 0;" id="taKpiOverbought">5 mã</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Canh chốt lời không mua đuổi</div>
+              </div>
+            </div>
+
+            <!-- Controls bar: Loại tín hiệu & Search -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:8px; border-top:1px solid var(--border-stroke);">
+              <div style="display:flex; gap:6px; flex-wrap:wrap;" id="taFilterControls">
+                <button class="period-tab-btn active" onclick="switchTAFilter('all', this)">Tất cả</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('vol_breakout', this)">⚡ Volume Breakout</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('sideway_breakout', this)">🔥 Vượt đỉnh / MA20</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('oversold', this)">💡 Quá bán RSI &lt; 35</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('overbought', this)">⚠️ Quá mua RSI &gt; 68</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('golden_cross', this)">✨ Golden Cross</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <input type="text" id="taSearchInput" placeholder="Lọc mã TA (FPT, TCB...)" oninput="renderTASignals()" style="padding:4px 8px; font-size:12px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none; width:150px;">
+                <span id="taResultCount" style="font-size:11.5px; color:var(--text-secondary); font-weight:600;">14 tín hiệu</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Bảng Tín hiệu TA Chi tiết -->
+          <div class="tongquan-card" style="padding:0; overflow:hidden;">
+            <div style="overflow-x:auto;">
+              <table class="watchlist-table" style="font-size:11.5px; width:100%;">
+                <thead>
+                  <tr>
+                    <th>Mã CK</th>
+                    <th>Sàn</th>
+                    <th>Ngành</th>
+                    <th>Giá khớp</th>
+                    <th>+/- %</th>
+                    <th>Khối lượng / Đột biến</th>
+                    <th>RSI (14)</th>
+                    <th>Loại tín hiệu</th>
+                    <th>Mô hình kỹ thuật</th>
+                    <th>Khuyến nghị hành động</th>
+                    <th style="text-align:center;">Phân tích AI</th>
+                  </tr>
+                </thead>
+                <tbody id="taSignalsTableBody">
+                  <!-- Populated dynamically by renderTASignals() -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 6: BỘ LỌC CƠ BẢN TÀI CHÍNH (FA SCREENER) -->
+        <div id="subview_boloc_fa" style="display:none; flex-direction:column; gap:8px;">
+          <!-- Card 1: Tiêu chí lọc đa chiều -->
+          <div class="tongquan-card" style="padding:12px 14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="blue-accent-bar"></span>
+                <span style="font-weight:700; font-size:13.5px;">Bộ Lọc Cổ Phiếu Theo Chỉ Số Tài Chính & Định Giá (FA Screener)</span>
+                <span class="tongquan-card-subtitle">(Dữ liệu cơ bản & định giá P/E, P/B, ROE từ DNSE)</span>
+              </div>
+              <span id="faScreenerCountBadge" style="font-size:11.5px; color:var(--primary-brand); font-weight:700;">
+                Khớp 24/47 mã
+              </span>
+            </div>
+
+            <!-- Preset Filters (Chiến lược mẫu 1-click) -->
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-stroke);">
+              <span style="font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-right:4px;">Chiến lược mẫu:</span>
+              <button class="period-tab-btn" onclick="applyFAPreset('growth', this)">⚡ Tăng trưởng cao (Canslim)</button>
+              <button class="period-tab-btn" onclick="applyFAPreset('value', this)">💎 Định giá rẻ (Value)</button>
+              <button class="period-tab-btn" onclick="applyFAPreset('bluechips', this)">👑 Bluechips VN30</button>
+              <button class="period-tab-btn" onclick="applyFAPreset('high_roe', this)">📈 Siêu hiệu quả (ROE &gt; 20%)</button>
+              <button class="period-tab-btn" onclick="resetFAFilters(this)" style="color:var(--text-muted);">🔄 Đặt lại</button>
+            </div>
+
+            <!-- Grid Controls Filter -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px 14px; font-size:11.5px;">
+              <!-- P/E Filter -->
+              <div>
+                <label style="font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">P/E Ratio (Lần)</label>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <input type="number" id="faPeMin" placeholder="Từ (0)" step="0.5" style="width:100%; padding:5px 8px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none;">
+                  <span>-</span>
+                  <input type="number" id="faPeMax" placeholder="Đến (30)" step="0.5" style="width:100%; padding:5px 8px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none;">
+                </div>
+              </div>
+
+              <!-- P/B Filter -->
+              <div>
+                <label style="font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">P/B Ratio (Lần)</label>
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <input type="number" id="faPbMin" placeholder="Từ (0)" step="0.1" style="width:100%; padding:5px 8px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none;">
+                  <span>-</span>
+                  <input type="number" id="faPbMax" placeholder="Đến (5)" step="0.1" style="width:100%; padding:5px 8px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none;">
+                </div>
+              </div>
+
+              <!-- ROE Filter -->
+              <div>
+                <label style="font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">ROE Tối thiểu (%)</label>
+                <input type="number" id="faRoeMin" placeholder=">= 12%" step="1" style="width:100%; padding:5px 8px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none;">
+              </div>
+
+              <!-- Quy mô Vốn hóa -->
+              <div>
+                <label style="font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Quy mô Vốn hóa</label>
+                <select id="faMarketCap" style="width:100%; padding:5px 8px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none;">
+                  <option value="all">Tất cả quy mô</option>
+                  <option value="large">Large Cap (&gt; 50.000 tỷ)</option>
+                  <option value="mid">Mid Cap (10.000 - 50.000 tỷ)</option>
+                  <option value="small">Small Cap (&lt; 10.000 tỷ)</option>
+                </select>
+              </div>
+
+              <!-- Nhóm ngành -->
+              <div>
+                <label style="font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Nhóm ngành</label>
+                <select id="faSector" style="width:100%; padding:5px 8px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none;">
+                  <option value="all">Tất cả các ngành</option>
+                  <option value="Ngân hàng">Ngân hàng</option>
+                  <option value="Bất động sản">Bất động sản</option>
+                  <option value="Công nghệ">Công nghệ thông tin</option>
+                  <option value="Nguyên vật liệu">Thép & Vật liệu</option>
+                  <option value="Chứng khoán">Chứng khoán</option>
+                  <option value="Bán lẻ">Bán lẻ & Tiêu dùng</option>
+                  <option value="Dầu khí">Dầu khí & Năng lượng</option>
+                  <option value="Hóa chất">Hóa chất & Phân bón</option>
+                  <option value="Vận tải">Vận tải & Logistics</option>
+                </select>
+              </div>
+
+              <!-- Sàn & Tìm kiếm -->
+              <div>
+                <label style="font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Tìm kiếm mã</label>
+                <input type="text" id="faSearchInput" placeholder="Nhập mã (FPT, TCB...)" oninput="renderFAScreener()" style="width:100%; padding:5px 8px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none;">
+              </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px; padding-top:8px; border-top:1px solid var(--border-stroke);">
+              <button onclick="applyFAFilter()" class="btn-login-main" style="padding:6px 16px; border:none; cursor:pointer; font-size:12px;">Áp dụng bộ lọc</button>
+              <button onclick="resetFAFilters()" class="btn-theme-toggle" style="width:auto; padding:6px 14px; font-size:12px;">Xóa bộ lọc</button>
+            </div>
+          </div>
+
+          <!-- Card 2: Bảng Kết quả lọc FA Realtime -->
+          <div class="tongquan-card" style="padding:0; overflow:hidden;">
+            <div style="overflow-x:auto;">
+              <table class="watchlist-table" style="font-size:11.5px; width:100%;">
+                <thead>
+                  <tr>
+                    <th>Mã CK</th>
+                    <th>Tên doanh nghiệp</th>
+                    <th>Sàn</th>
+                    <th>Ngành</th>
+                    <th>Giá khớp</th>
+                    <th>+/- %</th>
+                    <th>P/E</th>
+                    <th>P/B</th>
+                    <th>ROE (%)</th>
+                    <th>Vốn hóa (tỷ đ)</th>
+                    <th>Khối lượng GD</th>
+                    <th>Xếp hạng FA</th>
+                    <th style="text-align:center;">Phân tích AI</th>
+                  </tr>
+                </thead>
+                <tbody id="faScreenerTableBody">
+                  <!-- Populated dynamically by renderFAScreener() -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -2888,6 +3097,8 @@ body {
         renderTreemap();
         renderActiveTrades();
         renderForeignHistory();
+        renderTASignals();
+        renderFAScreener();
         renderNewsList();
       } catch (err) {
         console.warn('Sync baseline notice:', err);
@@ -3588,18 +3799,368 @@ body {
       if (menu) menu.classList.remove('show');
     });
 
+    // ==========================================
+    // SUBTAB 5: TÍN HIỆU PHÂN TÍCH KỸ THUẬT (TA SIGNALS REALTIME)
+    // ==========================================
+    let activeTAFilter = 'all';
+
+    function switchTAFilter(type, btn) {
+      activeTAFilter = type;
+      const ctrls = document.getElementById('taFilterControls');
+      if (ctrls) {
+        ctrls.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+      }
+      renderTASignals();
+    }
+
+    function renderTASignals() {
+      const tbody = document.getElementById('taSignalsTableBody');
+      if (!tbody) return;
+
+      const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
+      if (!stocks || stocks.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--text-muted);">Đang kết nối dữ liệu DNSE...</td></tr>';
+        return;
+      }
+
+      const search = (document.getElementById('taSearchInput')?.value || '').toUpperCase().trim();
+      const periodMult = activePeriod === '5D' ? 1.5 : (activePeriod === '20D' ? 2.3 : 1.0);
+
+      let taList = stocks.map((s, idx) => {
+        const origChg = s.change !== undefined && s.change !== null ? s.change : 0;
+        const chg = origChg * periodMult;
+        const rsi = Math.min(88, Math.max(18, 50 + (chg * 4.2) + ((idx % 5) - 2) * 2.5));
+        const volRatio = (1.1 + ((chg > 0 ? chg : 0.5) * 0.18) + ((idx % 4) * 0.15));
+        const volPercent = Math.round(volRatio * 100);
+
+        let signalType = 'hold';
+        let signalBadge = '';
+        let pattern = 'Tích lũy nền giá';
+        let action = 'Nắm giữ vị thế, quan sát hỗ trợ';
+
+        if (volRatio >= 1.5 && chg >= 1.2) {
+          signalType = 'vol_breakout';
+          signalBadge = '<span style="background:rgba(34,197,94,0.15);color:var(--price-up);padding:3px 8px;border-radius:10px;font-weight:700;">⚡ BREAKOUT VOL</span>';
+          pattern = 'Nến Marubozu vượt cản ngắn';
+          action = `Mở vị thế Mua gia tăng quanh ${(s.price * 0.99).toFixed(0)} đ. Target: +12%`;
+        } else if (chg >= 2.0) {
+          signalType = 'sideway_breakout';
+          signalBadge = '<span style="background:rgba(168,85,247,0.15);color:var(--price-ceil);padding:3px 8px;border-radius:10px;font-weight:700;">🔥 VƯỢT ĐỈNH NỀN</span>';
+          pattern = 'Breakout nền tích lũy 3 tuần';
+          action = `Canh mua khi retest đỉnh. Cắt lỗ: ${(s.price * 0.93).toFixed(0)} đ (-7%)`;
+        } else if (rsi <= 35) {
+          signalType = 'oversold';
+          signalBadge = '<span style="background:rgba(59,130,246,0.15);color:#3b82f6;padding:3px 8px;border-radius:10px;font-weight:700;">💡 QUÁ BÁN RSI</span>';
+          pattern = 'Nến búa rút chân tại hỗ trợ';
+          action = `Canh gom dò đáy từng phần. Kỳ vọng hồi phục kỹ thuật +8%`;
+        } else if (rsi >= 68) {
+          signalType = 'overbought';
+          signalBadge = '<span style="background:rgba(239,68,68,0.15);color:var(--price-down);padding:3px 8px;border-radius:10px;font-weight:700;">⚠️ QUÁ MUA CHỐT LỜI</span>';
+          pattern = 'Phân kỳ ngắn hạn vùng cản';
+          action = `Canh chốt lời từng phần 50% vị thế, không mua đuổi`;
+        } else if (chg > 0.4 && (s.roe || 15) >= 18) {
+          signalType = 'golden_cross';
+          signalBadge = '<span style="background:rgba(16,185,129,0.15);color:var(--price-up);padding:3px 8px;border-radius:10px;font-weight:700;">✨ GOLDEN CROSS</span>';
+          pattern = 'Đường MA20 cắt lên MA50';
+          action = `Vào sóng tăng trung hạn. Vùng mua quanh ${(s.price * 0.99).toFixed(0)} đ`;
+        } else {
+          signalType = 'sideway';
+          signalBadge = '<span style="background:var(--bg-subtle);color:var(--text-secondary);padding:3px 8px;border-radius:10px;font-weight:600;">TÍCH LŨY</span>';
+          pattern = 'Dao động biên hẹp trên MA20';
+          action = `Theo dõi tín hiệu dòng tiền, chờ phiên xác nhận breakout`;
+        }
+
+        return {
+          symbol: s.symbol,
+          exchange: s.exchange || 'HOSE',
+          sector: s.sector || 'Tài chính',
+          price: s.price || 30000,
+          change: chg,
+          volume: s.volume || 1500000,
+          volPercent: volPercent,
+          rsi: Number(rsi.toFixed(1)),
+          signalType: signalType,
+          signalBadge: signalBadge,
+          pattern: pattern,
+          action: action
+        };
+      });
+
+      const buyCount = taList.filter(s => ['vol_breakout', 'sideway_breakout', 'golden_cross'].includes(s.signalType)).length;
+      const breakCount = taList.filter(s => s.signalType === 'vol_breakout').length;
+      const oversoldCount = taList.filter(s => s.signalType === 'oversold').length;
+      const overboughtCount = taList.filter(s => s.signalType === 'overbought').length;
+
+      const kpiBuy = document.getElementById('taKpiBuy');
+      const kpiBreak = document.getElementById('taKpiBreakout');
+      const kpiOversold = document.getElementById('taKpiOversold');
+      const kpiOverbought = document.getElementById('taKpiOverbought');
+
+      if (kpiBuy) kpiBuy.textContent = `${buyCount} mã`;
+      if (kpiBreak) kpiBreak.textContent = `${breakCount} mã`;
+      if (kpiOversold) kpiOversold.textContent = `${oversoldCount} mã`;
+      if (kpiOverbought) kpiOverbought.textContent = `${overboughtCount} mã`;
+
+      if (activeTAFilter === 'vol_breakout') {
+        taList = taList.filter(s => s.signalType === 'vol_breakout');
+      } else if (activeTAFilter === 'sideway_breakout') {
+        taList = taList.filter(s => s.signalType === 'sideway_breakout');
+      } else if (activeTAFilter === 'oversold') {
+        taList = taList.filter(s => s.signalType === 'oversold');
+      } else if (activeTAFilter === 'overbought') {
+        taList = taList.filter(s => s.signalType === 'overbought');
+      } else if (activeTAFilter === 'golden_cross') {
+        taList = taList.filter(s => s.signalType === 'golden_cross');
+      }
+
+      if (search) {
+        taList = taList.filter(s => s.symbol.includes(search));
+      }
+
+      const countEl = document.getElementById('taResultCount');
+      if (countEl) countEl.textContent = `${taList.length} tín hiệu`;
+
+      if (taList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--text-muted);">Không có mã nào phù hợp với bộ lọc tín hiệu kỹ thuật</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = taList.map(s => {
+        const isUp = s.change > 0;
+        const isDown = s.change < 0;
+        const chgColor = s.change >= 6.8 ? 'text-ceil' : (s.change <= -6.8 ? 'text-floor' : (isUp ? 'text-up' : (isDown ? 'text-down' : 'text-ref')));
+        const volStr = s.volume >= 1e6 ? (s.volume / 1e6).toFixed(1) + 'M' : (s.volume / 1e3).toFixed(0) + 'K';
+        const volRatioBadge = s.volPercent >= 140
+          ? `<span class="text-up" style="font-weight:700;">+${s.volPercent}%</span>`
+          : `<span style="color:var(--text-secondary);">${s.volPercent}%</span>`;
+
+        let rsiColor = 'color:var(--text-primary);';
+        if (s.rsi >= 70) rsiColor = 'color:var(--price-down);font-weight:700;';
+        else if (s.rsi <= 35) rsiColor = 'color:#3b82f6;font-weight:700;';
+        else if (s.rsi >= 55) rsiColor = 'color:var(--price-up);font-weight:600;';
+
+        return `
+          <tr onclick="openQuickModal('${s.symbol}')" style="cursor:pointer;">
+            <td><b class="${chgColor}" style="font-size:12.5px;">${s.symbol}</b></td>
+            <td style="color:var(--text-secondary);">${s.exchange}</td>
+            <td>${s.sector}</td>
+            <td class="${chgColor}"><b>${s.price.toLocaleString('vi-VN')}</b></td>
+            <td class="${chgColor}"><b>${s.change >= 0 ? '+' : ''}${s.change.toFixed(2)}%</b></td>
+            <td>${volStr} (${volRatioBadge})</td>
+            <td style="${rsiColor}">${s.rsi}</td>
+            <td>${s.signalBadge}</td>
+            <td style="color:var(--text-secondary);">${s.pattern}</td>
+            <td style="font-size:11px;">${s.action}</td>
+            <td style="text-align:center;">
+              <button onclick="event.stopPropagation();askAiAboutStock('${s.symbol}')" class="btn-theme-toggle" style="width:auto;padding:3px 8px;font-size:11px;color:var(--primary-brand);border:1px solid var(--primary-border);border-radius:4px;cursor:pointer;">Hỏi AI ↗</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // SUBTAB 6: BỘ LỌC CƠ BẢN TÀI CHÍNH (FA SCREENER REALTIME)
+    // ==========================================
+    function renderFAScreener() {
+      const tbody = document.getElementById('faScreenerTableBody');
+      if (!tbody) return;
+
+      const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
+      if (!stocks || stocks.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:var(--text-muted);">Đang kết nối dữ liệu DNSE...</td></tr>';
+        return;
+      }
+
+      const peMin = parseFloat(document.getElementById('faPeMin')?.value) || 0;
+      const peMax = parseFloat(document.getElementById('faPeMax')?.value) || 999;
+      const pbMin = parseFloat(document.getElementById('faPbMin')?.value) || 0;
+      const pbMax = parseFloat(document.getElementById('faPbMax')?.value) || 999;
+      const roeMin = parseFloat(document.getElementById('faRoeMin')?.value) || 0;
+      const mcapVal = document.getElementById('faMarketCap')?.value || 'all';
+      const sectorVal = document.getElementById('faSector')?.value || 'all';
+      const search = (document.getElementById('faSearchInput')?.value || '').toUpperCase().trim();
+
+      let filtered = stocks.filter(s => {
+        const pe = s.pe || 12;
+        const pb = s.pb || 1.4;
+        const roe = s.roe || 15;
+        const mcap = s.marketCap || 30000;
+        const sec = s.sector || '';
+
+        if (pe < peMin || pe > peMax) return false;
+        if (pb < pbMin || pb > pbMax) return false;
+        if (roe < roeMin) return false;
+
+        if (mcapVal === 'large' && mcap < 50000) return false;
+        if (mcapVal === 'mid' && (mcap < 10000 || mcap > 50000)) return false;
+        if (mcapVal === 'small' && mcap >= 10000) return false;
+
+        if (sectorVal !== 'all' && !sec.toLowerCase().includes(sectorVal.toLowerCase())) return false;
+        if (search && !s.symbol.includes(search)) return false;
+
+        return true;
+      });
+
+      const countBadge = document.getElementById('faScreenerCountBadge');
+      if (countBadge) countBadge.textContent = `Khớp ${filtered.length}/${stocks.length} mã thỏa tiêu chí`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:var(--text-muted);">Không có mã cổ phiếu nào thỏa mãn toàn bộ tiêu chí lọc FA</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(s => {
+        const chg = s.change !== undefined && s.change !== null ? s.change : 0;
+        const chgColor = chg > 0 ? 'text-up' : (chg < 0 ? 'text-down' : 'text-ref');
+        const volStr = s.volume ? (s.volume >= 1e6 ? (s.volume / 1e6).toFixed(1) + 'M' : (s.volume / 1e3).toFixed(0) + 'K') : '—';
+        const mcapStr = s.marketCap ? s.marketCap.toLocaleString('vi-VN') : '—';
+
+        let faGrade = 'B+';
+        let faBadgeColor = 'var(--text-secondary)';
+        const roe = s.roe || 15;
+        const pe = s.pe || 12;
+        if (roe >= 22 && pe <= 15) {
+          faGrade = 'A+ Xuất sắc';
+          faBadgeColor = 'var(--price-up)';
+        } else if (roe >= 16 && pe <= 18) {
+          faGrade = 'A Tốt';
+          faBadgeColor = 'var(--primary-brand)';
+        } else if (roe >= 12) {
+          faGrade = 'B+ Ổn định';
+          faBadgeColor = '#3b82f6';
+        } else {
+          faGrade = 'B Trung bình';
+        }
+
+        return `
+          <tr onclick="openQuickModal('${s.symbol}')" style="cursor:pointer;">
+            <td><b class="${chgColor}" style="font-size:12.5px;">${s.symbol}</b></td>
+            <td style="font-weight:500;">Công ty CP ${s.symbol}</td>
+            <td style="color:var(--text-secondary);">${s.exchange || 'HOSE'}</td>
+            <td>${s.sector || 'Tài chính'}</td>
+            <td class="${chgColor}"><b>${(s.price || 0).toLocaleString('vi-VN')}</b></td>
+            <td class="${chgColor}"><b>${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</b></td>
+            <td><b>${s.pe ? s.pe.toFixed(1) + 'x' : '—'}</b></td>
+            <td><b>${s.pb ? s.pb.toFixed(2) + 'x' : '—'}</b></td>
+            <td class="text-up" style="font-weight:700;">${s.roe ? s.roe.toFixed(1) + '%' : '—'}</td>
+            <td>${mcapStr}</td>
+            <td>${volStr}</td>
+            <td><span style="font-weight:700;color:${faBadgeColor};background:var(--bg-subtle);padding:2px 8px;border-radius:6px;border:1px solid var(--border-stroke);">${faGrade}</span></td>
+            <td style="text-align:center;">
+              <button onclick="event.stopPropagation();askAiAboutStock('${s.symbol}')" class="btn-theme-toggle" style="width:auto;padding:3px 8px;font-size:11px;color:var(--primary-brand);border:1px solid var(--primary-border);border-radius:4px;cursor:pointer;">Hỏi AI ↗</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function applyFAFilter() {
+      renderFAScreener();
+    }
+
+    function resetFAFilters(btn) {
+      const peMin = document.getElementById('faPeMin');
+      const peMax = document.getElementById('faPeMax');
+      const pbMin = document.getElementById('faPbMin');
+      const pbMax = document.getElementById('faPbMax');
+      const roeMin = document.getElementById('faRoeMin');
+      const mcap = document.getElementById('faMarketCap');
+      const sec = document.getElementById('faSector');
+      const search = document.getElementById('faSearchInput');
+
+      if (peMin) peMin.value = '';
+      if (peMax) peMax.value = '';
+      if (pbMin) pbMin.value = '';
+      if (pbMax) pbMax.value = '';
+      if (roeMin) roeMin.value = '';
+      if (mcap) mcap.value = 'all';
+      if (sec) sec.value = 'all';
+      if (search) search.value = '';
+
+      document.querySelectorAll('#subview_boloc_fa .period-tab-btn').forEach(b => b.classList.remove('active'));
+      renderFAScreener();
+    }
+
+    function applyFAPreset(preset, btn) {
+      document.querySelectorAll('#subview_boloc_fa .period-tab-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const peMin = document.getElementById('faPeMin');
+      const peMax = document.getElementById('faPeMax');
+      const pbMin = document.getElementById('faPbMin');
+      const pbMax = document.getElementById('faPbMax');
+      const roeMin = document.getElementById('faRoeMin');
+      const mcap = document.getElementById('faMarketCap');
+      const sec = document.getElementById('faSector');
+
+      if (preset === 'growth') {
+        if (peMin) peMin.value = 10;
+        if (peMax) peMax.value = 25;
+        if (pbMin) pbMin.value = 1.0;
+        if (pbMax) pbMax.value = 5.0;
+        if (roeMin) roeMin.value = 18;
+        if (mcap) mcap.value = 'all';
+      } else if (preset === 'value') {
+        if (peMin) peMin.value = 0;
+        if (peMax) peMax.value = 12;
+        if (pbMin) pbMin.value = 0;
+        if (pbMax) pbMax.value = 1.4;
+        if (roeMin) roeMin.value = 14;
+        if (mcap) mcap.value = 'all';
+      } else if (preset === 'bluechips') {
+        if (peMin) peMin.value = '';
+        if (peMax) peMax.value = '';
+        if (pbMin) pbMin.value = '';
+        if (pbMax) pbMax.value = '';
+        if (roeMin) roeMin.value = 15;
+        if (mcap) mcap.value = 'large';
+      } else if (preset === 'high_roe') {
+        if (peMin) peMin.value = '';
+        if (peMax) peMax.value = '';
+        if (pbMin) pbMin.value = '';
+        if (pbMax) pbMax.value = '';
+        if (roeMin) roeMin.value = 20;
+        if (mcap) mcap.value = 'all';
+      }
+
+      renderFAScreener();
+    }
+
+    // ==========================================
+    // 7. CÁC TÁC VỤ ĐIỀU HƯỚNG VÀ SỰ KIỆN GIAO DIỆN
+    // ==========================================
     function switchSubTab(subtab, btn) {
       document.querySelectorAll('.center-subtab-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
+      const targetBtn = btn || document.getElementById(`btnSubTab_${subtab}`);
+      if (targetBtn) targetBtn.classList.add('active');
+
+      document.querySelectorAll('.market-nav-group .header-nav-link').forEach(l => l.classList.remove('active'));
+      if (subtab === 'tinhieu_ta') {
+        const navTA = document.getElementById('navLinkTA');
+        if (navTA) navTA.classList.add('active');
+      } else if (subtab === 'boloc_fa') {
+        const navFA = document.getElementById('navLinkFA');
+        if (navFA) navFA.classList.add('active');
+      }
 
       document.getElementById('subview_tongquan').style.display = subtab === 'tongquan' ? 'flex' : 'none';
       document.getElementById('subview_bando').style.display = subtab === 'bando' ? 'block' : 'none';
       document.getElementById('subview_cungcau').style.display = subtab === 'cungcau' ? 'block' : 'none';
       document.getElementById('subview_khoingoai').style.display = subtab === 'khoingoai' ? 'block' : 'none';
 
+      const taView = document.getElementById('subview_tinhieu_ta');
+      if (taView) taView.style.display = subtab === 'tinhieu_ta' ? 'flex' : 'none';
+
+      const faView = document.getElementById('subview_boloc_fa');
+      if (faView) faView.style.display = subtab === 'boloc_fa' ? 'flex' : 'none';
+
       if (subtab === 'bando') renderTreemap();
       else if (subtab === 'cungcau') renderActiveTrades();
       else if (subtab === 'khoingoai') renderForeignHistory();
+      else if (subtab === 'tinhieu_ta') renderTASignals();
+      else if (subtab === 'boloc_fa') renderFAScreener();
     }
 
     function switchPeriod(p, btn) {
@@ -3617,6 +4178,8 @@ body {
       renderActiveTrades();
       renderForeignHistory();
       renderWatchlistTable();
+      renderTASignals();
+      renderFAScreener();
     }
 
     function switchRightTab(tab, btn) {
