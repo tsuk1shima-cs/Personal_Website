@@ -1118,6 +1118,41 @@ body {
 .modal-body {
   padding: 16px;
 }
+.modal-card-lg {
+  width: 760px;
+  max-width: calc(100vw - 32px);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+}
+.expert-card-item {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-stroke);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.expert-card-item:hover {
+  border-color: var(--primary-border);
+  background: var(--bg-container);
+}
+.notice-card-item {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-stroke);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  transition: all 0.15s;
+}
+.notice-card-item:hover {
+  background: var(--bg-container);
+  border-color: var(--primary-border);
+}
 
 /* UTILITY CLASSES */
 .text-up { color: var(--price-up) !important; }
@@ -1452,8 +1487,8 @@ body {
           </div>
         </div>
 
-        <a href="javascript:;" class="header-nav-link" onclick="alert('Module Hợp đồng tương lai phái sinh VN30')">Phái sinh</a>
-        <a href="javascript:;" class="header-nav-link" onclick="alert('Danh mục khuyến nghị chuyên gia')">Chuyên gia</a>
+        <a href="javascript:;" class="header-nav-link" onclick="openDerivativesModal()">Phái sinh</a>
+        <a href="javascript:;" class="header-nav-link" onclick="openExpertModal()">Chuyên gia</a>
         <a href="tin-hieu-ta.html" class="header-nav-link">Tín hiệu TA</a>
         <a href="bo-loc-fa.html" class="header-nav-link">Bộ lọc FA</a>
         <a href="javascript:;" onclick="toggleDashboardAi()" class="header-nav-link highlight" id="navAiBtn">AI Chatbot</a>
@@ -1482,7 +1517,7 @@ body {
       </button>
 
       <!-- LOGIN BUTTON -->
-      <a href="javascript:;" onclick="openLoginDialog()" class="btn-login-main">Đăng nhập</a>
+      <a href="javascript:;" id="headerLoginBtn" onclick="openLoginDialog()" class="btn-login-main">Đăng nhập</a>
 
       <!-- THEME TOGGLE -->
       <button class="btn-theme-toggle" onclick="toggleTheme()" title="Sáng / Tối">
@@ -1800,45 +1835,266 @@ body {
 
         </div>
 
-        <!-- SUBTAB 2: BẢN ĐỒ NHIỆT (TREEMAP) -->
-        <div id="subview_bando" class="tongquan-card" style="display:none; min-height:480px;">
-          <div class="tongquan-card-head">
-            <div class="tongquan-card-title">
-              <span class="blue-accent-bar"></span>
-              Bản đồ nhiệt thị trường theo nhóm ngành & Vốn hóa
+        <!-- SUBTAB 2: BẢN ĐỒ NHIỆT (TREEMAP THEO NGÀNH) -->
+        <div id="subview_bando" style="display:none; flex-direction:column; gap:8px;">
+          <!-- Controls bar -->
+          <div class="tongquan-card" style="padding:10px 12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span class="blue-accent-bar"></span>
+                <span style="font-weight:700; font-size:13.5px;">Bản đồ nhiệt Thị trường</span>
+                <span class="tongquan-card-subtitle">(Quy mô Vốn hóa & Biến động giá)</span>
+              </div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <div class="center-tab-controls" id="treemapGroupControls">
+                  <button class="period-tab-btn active" onclick="switchTreemapGroup('ALL', this)">Tất cả</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('VN30', this)">VN30</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Ngân hàng', this)">Ngân hàng</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Bất động sản', this)">BĐS</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Công nghệ', this)">Công nghệ</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Nguyên vật liệu', this)">Thép</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Chứng khoán', this)">Chứng khoán</button>
+                </div>
+                <div class="center-tab-controls" id="treemapMetricControls">
+                  <button class="period-tab-btn active" onclick="switchTreemapMetric('change', this)">% Thay đổi</button>
+                  <button class="period-tab-btn" onclick="switchTreemapMetric('value', this)">Giá trị GD</button>
+                </div>
+              </div>
             </div>
-            <span class="tongquan-card-subtitle">Biên độ -7% đến +7%</span>
+            <!-- Chú thích biên độ màu -->
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; font-size:11px; margin-top:8px; padding-top:6px; border-top:1px solid var(--border-stroke); flex-wrap:wrap;">
+              <span style="color:var(--text-secondary);">Quy ước màu:</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:var(--price-ceil);border-radius:2px;"></span> Tăng trần (>= 6.8%)</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#16a34a;border-radius:2px;"></span> Tăng xanh</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#d97706;border-radius:2px;"></span> Tham chiếu</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#dc2626;border-radius:2px;"></span> Giảm đỏ</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:var(--price-floor);border-radius:2px;"></span> Giảm sàn (<= -6.8%)</span>
+            </div>
           </div>
-          <div id="treemapViewContainer" style="display:flex; flex-wrap:wrap; gap:4px; align-content:flex-start; margin-top:8px;">
-            <!-- Populated by JS -->
+
+          <!-- Lưới các khối ngành (Sectors Grid) -->
+          <div id="treemapSectorsContainer" style="display:flex; flex-direction:column; gap:10px;">
+            <!-- Populated by renderTreemap() -->
           </div>
         </div>
 
         <!-- SUBTAB 3: CUNG CẦU (MUA/BÁN CHỦ ĐỘNG) -->
-        <div id="subview_cungcau" class="tongquan-card" style="display:none;">
-          <div class="tongquan-card-head">
-            <div class="tongquan-card-title">
-              <span class="blue-accent-bar"></span>
-              Giá trị Mua - Bán chủ động theo nhóm ngành
+        <div id="subview_cungcau" style="display:none; flex-direction:column; gap:8px;">
+          <!-- Card 1: Toàn cảnh Cung Cầu Thị trường -->
+          <div class="tongquan-card">
+            <div class="tongquan-card-head">
+              <div class="tongquan-card-title">
+                <span class="blue-accent-bar"></span>
+                Toàn cảnh Cung - Cầu & Lực Mua/Bán chủ động Toàn thị trường
+              </div>
+              <span class="tongquan-card-subtitle text-up" id="orderFlowStatusBadge" style="font-weight:700;">Lực Cầu Mua Chủ Động Chiếm Ưu Thế (58.2%)</span>
             </div>
-            <span class="tongquan-card-subtitle">Đơn vị: Tỷ đồng</span>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:8px; margin-bottom:12px;">
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Tổng GT Mua Chủ Động</div>
+                <div style="font-size:18px; font-weight:700; color:var(--price-up); margin:2px 0;" id="flowBuyTotal">10.840 tỷ đ</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Khớp lệnh chủ động bên Mua</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Tổng GT Bán Chủ Động</div>
+                <div style="font-size:18px; font-weight:700; color:var(--price-down); margin:2px 0;" id="flowSellTotal">7.780 tỷ đ</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Khớp lệnh chủ động bên Bán</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Chênh lệch Cung - Cầu Ròng</div>
+                <div style="font-size:18px; font-weight:700; color:var(--price-up); margin:2px 0;" id="flowNetTotal">+3.060 tỷ đ</div>
+                <div style="font-size:10.5px; color:var(--price-up);">Dòng tiền gom ròng tích cực</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Tỷ lệ Lực Mua / Lực Bán</div>
+                <div style="font-size:18px; font-weight:700; color:var(--primary-brand); margin:2px 0;" id="flowRatioTotal">1.39x</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Áp lực bên Mua áp đảo</div>
+              </div>
+            </div>
+
+            <!-- Thanh đo trực quan Mua vs Bán -->
+            <div style="margin-bottom:6px;">
+              <div style="display:flex; justify-content:space-between; font-size:11.5px; font-weight:600; margin-bottom:4px;">
+                <span class="text-up" id="flowLabelBuy">Mua chủ động: 58.2% (10.840 tỷ)</span>
+                <span class="text-down" id="flowLabelSell">Bán chủ động: 41.8% (7.780 tỷ)</span>
+              </div>
+              <div style="display:flex; height:12px; border-radius:6px; overflow:hidden; box-shadow:inset 0 1px 2px rgba(0,0,0,0.15);">
+                <div id="flowBarBuy" style="width:58.2%; background:linear-gradient(90deg, #16a34a, #22c55e);"></div>
+                <div id="flowBarSell" style="width:41.8%; background:linear-gradient(90deg, #ef4444, #dc2626);"></div>
+              </div>
+            </div>
           </div>
-          <div id="activeTradeListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-            <!-- Populated by JS -->
+
+          <!-- Card 2: Cung Cầu Chi Tiết Theo Ngành -->
+          <div class="tongquan-card">
+            <div class="tongquan-card-head">
+              <div class="tongquan-card-title">
+                <span class="blue-accent-bar"></span>
+                Tỷ lệ Mua - Bán chủ động theo các nhóm ngành chính
+              </div>
+              <span class="tongquan-card-subtitle">Đơn vị: Tỷ đồng & Tỷ trọng %</span>
+            </div>
+            <div id="activeTradeListContainer" style="display:flex; flex-direction:column; gap:8px;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Card 3: 2 Bảng Top Cổ phiếu Lực Cầu Áp Đảo & Lực Bán Ép Giá -->
+          <div class="grid-row-2col">
+            <div class="tongquan-card">
+              <div class="tongquan-card-head">
+                <div class="tongquan-card-title text-up">
+                  <span class="blue-accent-bar" style="background:var(--price-up);"></span>
+                  Top 8 Cổ phiếu Lực CẦU áp đảo (Mua chủ động > 55%)
+                </div>
+                <span class="tongquan-card-subtitle">Dòng tiền mua gom</span>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="watchlist-table" style="font-size:11.5px;">
+                  <thead>
+                    <tr>
+                      <th>Mã</th>
+                      <th>Giá khớp</th>
+                      <th>+/- %</th>
+                      <th>Mua CĐ (tỷ)</th>
+                      <th>Tỷ lệ Mua</th>
+                    </tr>
+                  </thead>
+                  <tbody id="topActiveBuyTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tongquan-card">
+              <div class="tongquan-card-head">
+                <div class="tongquan-card-title text-down">
+                  <span class="blue-accent-bar" style="background:var(--price-down);"></span>
+                  Top 8 Cổ phiếu Lực CUNG áp đảo (Bán chủ động > 55%)
+                </div>
+                <span class="tongquan-card-subtitle">Áp lực xả hàng</span>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="watchlist-table" style="font-size:11.5px;">
+                  <thead>
+                    <tr>
+                      <th>Mã</th>
+                      <th>Giá khớp</th>
+                      <th>+/- %</th>
+                      <th>Bán CĐ (tỷ)</th>
+                      <th>Tỷ lệ Bán</th>
+                    </tr>
+                  </thead>
+                  <tbody id="topActiveSellTableBody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- SUBTAB 4: KHỐI NGOẠI CHUYÊN SÂU -->
-        <div id="subview_khoingoai" class="tongquan-card" style="display:none;">
-          <div class="tongquan-card-head">
-            <div class="tongquan-card-title">
-              <span class="blue-accent-bar"></span>
-              Lịch sử dòng tiền Khối ngoại qua các phiên gần nhất
+        <div id="subview_khoingoai" style="display:none; flex-direction:column; gap:8px;">
+          <!-- KPI Thống kê Khối ngoại hôm nay -->
+          <div class="tongquan-card">
+            <div class="tongquan-card-head">
+              <div class="tongquan-card-title">
+                <span class="blue-accent-bar"></span>
+                Tổng quan Giao dịch Nhà đầu tư Nước ngoài (Khối ngoại)
+              </div>
+              <span class="tongquan-card-subtitle text-down" id="foreignHeaderSub" style="font-weight:700;">Bán ròng -701.5 tỷ đồng</span>
             </div>
-            <span class="tongquan-card-subtitle">Khớp lệnh ròng</span>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:8px; margin-bottom:12px;">
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Tổng GT Mua Khối ngoại</div>
+                <div style="font-size:18px; font-weight:700; color:var(--price-up); margin:2px 0;" id="foreignKpiBuy">1.842,5 tỷ đ</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Khớp lệnh toàn thị trường</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Tổng GT Bán Khối ngoại</div>
+                <div style="font-size:18px; font-weight:700; color:var(--price-down); margin:2px 0;" id="foreignKpiSell">2.544,0 tỷ đ</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Khớp lệnh toàn thị trường</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Giá trị Mua/Bán Ròng</div>
+                <div style="font-size:18px; font-weight:700; color:var(--price-down); margin:2px 0;" id="foreignKpiNet">-701,5 tỷ đ</div>
+                <div style="font-size:10.5px; color:var(--price-down);">Khối ngoại đang Bán ròng</div>
+              </div>
+              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px; text-align:center;">
+                <div style="font-size:11px; color:var(--text-secondary); font-weight:600;">Tỷ trọng GD Ngoại / Thị trường</div>
+                <div style="font-size:18px; font-weight:700; color:var(--primary-brand); margin:2px 0;" id="foreignKpiRatio">11.8%</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Thanh khoản tham gia</div>
+              </div>
+            </div>
+
+            <!-- Biểu đồ lịch sử mua bán ròng -->
+            <div style="font-size:12px; font-weight:600; margin-bottom:8px;">Lịch sử Khớp lệnh Ròng của Khối ngoại qua các phiên gần nhất (Đơn vị: Tỷ đồng)</div>
+            <div id="foreignHistoryChartContainer" style="height:190px; display:flex; align-items:flex-end; gap:16px; padding:16px 0; border-bottom:1px solid var(--border-stroke); justify-content:space-around;">
+              <!-- Populated by JS -->
+            </div>
           </div>
-          <div id="foreignHistoryChartContainer" style="height:280px; display:flex; align-items:flex-end; gap:16px; padding:20px 0; border-bottom:1px solid var(--border-stroke); margin-top:10px;">
-            <!-- Populated by JS -->
+
+          <!-- 2 Bảng Top Mua ròng & Top Bán ròng chi tiết -->
+          <div class="grid-row-2col">
+            <!-- BẢNG TOP MUA RÒNG -->
+            <div class="tongquan-card">
+              <div class="tongquan-card-head">
+                <div class="tongquan-card-title text-up">
+                  <span class="blue-accent-bar" style="background:var(--price-up);"></span>
+                  Top 10 Cổ phiếu Khối ngoại MUA RÒNG nhiều nhất
+                </div>
+                <span class="tongquan-card-subtitle">Giá trị ròng</span>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="watchlist-table" style="font-size:11.5px;">
+                  <thead>
+                    <tr>
+                      <th>Mã</th>
+                      <th>Giá</th>
+                      <th>+/- %</th>
+                      <th>GT Mua</th>
+                      <th>GT Bán</th>
+                      <th>Mua ròng</th>
+                    </tr>
+                  </thead>
+                  <tbody id="foreignDetailTopBuyTbody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- BẢNG TOP BÁN RÒNG -->
+            <div class="tongquan-card">
+              <div class="tongquan-card-head">
+                <div class="tongquan-card-title text-down">
+                  <span class="blue-accent-bar" style="background:var(--price-down);"></span>
+                  Top 10 Cổ phiếu Khối ngoại BÁN RÒNG nhiều nhất
+                </div>
+                <span class="tongquan-card-subtitle">Giá trị ròng</span>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="watchlist-table" style="font-size:11.5px;">
+                  <thead>
+                    <tr>
+                      <th>Mã</th>
+                      <th>Giá</th>
+                      <th>+/- %</th>
+                      <th>GT Mua</th>
+                      <th>GT Bán</th>
+                      <th>Bán ròng</th>
+                    </tr>
+                  </thead>
+                  <tbody id="foreignDetailTopSellTbody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1981,6 +2237,359 @@ body {
           <button onclick="askAiFromModal()" class="btn-login-main" style="flex:1;border:none;cursor:pointer;">Hỏi AI Chatbot phân tích</button>
           <a href="chatbot.html" id="modalFullChatLink" target="_blank" class="btn-theme-toggle" title="Mở trang Chatbot toàn màn hình" style="width:auto;padding:0 10px;text-decoration:none;display:flex;align-items:center;">Toàn màn hình ↗</a>
           <button onclick="closeQuickModal()" class="btn-theme-toggle" style="width:auto;padding:0 14px;">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: THỊ TRƯỜNG PHÁI SINH (VN30 FUTURES) -->
+  <div class="modal-overlay" id="derivativesModal" onclick="if(event.target.id==='derivativesModal')closeDerivativesModal()" style="display:none;">
+    <div class="modal-card modal-card-lg" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-brand)" stroke-width="2.2"><path d="M3 3v18h18M18 9l-5 5-4-4-6 6"/></svg>
+          <div>
+            <div style="font-size:15px;font-weight:700;">Thị trường Chứng khoán Phái sinh (VN30 Futures)</div>
+            <div style="font-size:11px;color:var(--text-muted);">Dữ liệu giao dịch Hợp đồng tương lai kết nối realtime sàn HNX & DNSE</div>
+          </div>
+        </div>
+        <button onclick="closeDerivativesModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;">
+        <!-- KPI Row -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;">
+          <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;">
+            <div style="font-size:10.5px;color:var(--text-secondary);font-weight:600;">HĐ Tháng hiện tại</div>
+            <div style="font-size:16px;font-weight:700;color:var(--primary-brand);margin:2px 0;">VN30F2610</div>
+            <div style="font-size:10px;color:var(--text-muted);">Đáo hạn: 15/10/2026</div>
+          </div>
+          <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;">
+            <div style="font-size:10.5px;color:var(--text-secondary);font-weight:600;">Giá khớp lệnh</div>
+            <div style="font-size:16px;font-weight:700;color:var(--price-up);margin:2px 0;" id="f1mPrice">1.854,2</div>
+            <div style="font-size:10px;color:var(--price-up);" id="f1mChg">+1,76 (+0,10%)</div>
+          </div>
+          <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;">
+            <div style="font-size:10.5px;color:var(--text-secondary);font-weight:600;">Độ lệch Basis</div>
+            <div style="font-size:16px;font-weight:700;color:var(--price-up);margin:2px 0;" id="f1mBasis">+1,76 đ</div>
+            <div style="font-size:10px;color:var(--text-muted);">VN30: 1.852,44</div>
+          </div>
+          <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;">
+            <div style="font-size:10.5px;color:var(--text-secondary);font-weight:600;">Tổng Khối lượng HĐ</div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-primary);margin:2px 0;" id="f1mVol">194.280 HĐ</div>
+            <div style="font-size:10px;color:var(--text-muted);">OI: 52.140 HĐ</div>
+          </div>
+        </div>
+
+        <!-- Bảng hợp đồng phái sinh -->
+        <div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+            <span class="blue-accent-bar"></span>
+            Bảng giá các Hợp đồng Tương lai VN30
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="watchlist-table" style="font-size:11.5px;">
+              <thead>
+                <tr>
+                  <th>Mã HĐ</th>
+                  <th>Kỳ hạn</th>
+                  <th>Giá khớp</th>
+                  <th>+/- Điểm</th>
+                  <th>+/- %</th>
+                  <th>Khối lượng</th>
+                  <th>Basis</th>
+                  <th>Vị thế mở (OI)</th>
+                </tr>
+              </thead>
+              <tbody id="derivativesTableBody">
+                <tr>
+                  <td><span class="text-up" style="font-weight:700;">VN30F2610</span></td>
+                  <td>Tháng 10/2026 (F1M)</td>
+                  <td class="text-up"><b>1.854,2</b></td>
+                  <td class="text-up">+1,76</td>
+                  <td class="text-up">+0,10%</td>
+                  <td>168.250</td>
+                  <td class="text-up">+1,76</td>
+                  <td>48.520</td>
+                </tr>
+                <tr>
+                  <td><span class="text-up" style="font-weight:700;">VN30F2611</span></td>
+                  <td>Tháng 11/2026 (F2M)</td>
+                  <td class="text-up"><b>1.855,0</b></td>
+                  <td class="text-up">+2,50</td>
+                  <td class="text-up">+0,14%</td>
+                  <td>18.420</td>
+                  <td class="text-up">+2,56</td>
+                  <td>2.840</td>
+                </tr>
+                <tr>
+                  <td><span class="text-down" style="font-weight:700;">VN30F2612</span></td>
+                  <td>Tháng 12/2026 (F1Q)</td>
+                  <td class="text-down"><b>1.851,0</b></td>
+                  <td class="text-down">-1,50</td>
+                  <td class="text-down">-0,08%</td>
+                  <td>5.120</td>
+                  <td class="text-down">-1,44</td>
+                  <td>620</td>
+                </tr>
+                <tr>
+                  <td><span class="text-ref" style="font-weight:700;">VN30F2703</span></td>
+                  <td>Tháng 03/2027 (F2Q)</td>
+                  <td class="text-ref"><b>1.852,5</b></td>
+                  <td class="text-ref">0,00</td>
+                  <td class="text-ref">0,00%</td>
+                  <td>2.490</td>
+                  <td class="text-up">+0,06</td>
+                  <td>160</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Khuyến nghị chiến lược Phái sinh -->
+        <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:10px 12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <span style="font-size:12px;font-weight:700;color:var(--primary-brand);">Chiến lược Intraday Khuyến nghị</span>
+            <span style="font-size:10.5px;font-weight:700;background:rgba(22,163,74,0.15);color:var(--price-up);padding:2px 8px;border-radius:10px;">ƯU TIÊN VỊ THẾ LONG</span>
+          </div>
+          <div style="font-size:11.5px;line-height:1.55;color:var(--text-primary);">
+            • <strong>Vùng hỗ trợ then chốt</strong>: 1.846 - 1.848 điểm | <strong>Vùng kháng cự ngắn</strong>: 1.860 - 1.865 điểm.<br>
+            • <strong>Kế hoạch giao dịch</strong>: Tiếp tục ưu tiên mở vị thế <em>Long</em> khi chỉ số rung lắc retest vùng 1.848 - 1.850 điểm, kỳ vọng nhịp hồi phục lên vùng cản 1.860 - 1.864 điểm. Đặt Stoploss bảo toàn vốn tại 1.844 điểm.
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button onclick="askAiAboutDerivatives()" class="btn-login-main" style="border:none;cursor:pointer;padding:7px 14px;font-size:12px;">Hỏi AI Phân tích Phái sinh</button>
+          <button onclick="closeDerivativesModal()" class="btn-theme-toggle" style="width:auto;padding:7px 14px;font-size:12px;">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: GÓC NHÌN & KHUYẾN NGHỊ CHUYÊN GIA -->
+  <div class="modal-overlay" id="expertModal" onclick="if(event.target.id==='expertModal')closeExpertModal()" style="display:none;">
+    <div class="modal-card modal-card-lg" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-brand)" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <div>
+            <div style="font-size:15px;font-weight:700;">Góc Nhìn & Khuyến Nghị Chuyên Gia</div>
+            <div style="font-size:11px;color:var(--text-muted);">Phân tích chiến lược & Danh mục đầu tư tăng trưởng PhucDCH</div>
+          </div>
+        </div>
+        <button onclick="closeExpertModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px;">
+        <!-- Banner Tóm tắt Xu hướng -->
+        <div style="background:linear-gradient(135deg, rgba(41,128,185,0.12), rgba(22,163,74,0.1));border:1px solid rgba(41,128,185,0.25);border-radius:var(--radius-sm);padding:10px 14px;">
+          <div style="font-size:12.5px;font-weight:700;color:var(--primary-brand);margin-bottom:4px;">Tổng quan Chiến lược & Dòng tiền Thị trường</div>
+          <div style="font-size:11.5px;line-height:1.55;color:var(--text-primary);">
+            VN-Index tiếp tục vận động kiến tạo trong kênh tăng giá trung hạn, ngưỡng hỗ trợ kỹ thuật vững chắc tại 1.690 - 1.700 điểm. Dòng tiền phân hóa tích cực hướng đến các doanh nghiệp đầu ngành có kết quả kinh doanh tăng trưởng vượt trội. Khuyến nghị duy trì tỷ trọng cổ phiếu ở mức 70% - 80%.
+          </div>
+        </div>
+
+        <!-- Danh sách khuyến nghị cụ thể -->
+        <div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+            <span class="blue-accent-bar"></span>
+            Top Danh mục Cổ phiếu Tiêu điểm Khuyến nghị (Phiên hôm nay)
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <!-- FPT -->
+            <div class="expert-card-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-weight:700;font-size:14px;color:var(--primary-brand);">FPT</span>
+                  <span style="font-size:11px;color:var(--text-muted);">Công ty Cổ phần FPT (Công nghệ)</span>
+                  <span style="font-size:10.5px;font-weight:700;background:rgba(22,163,74,0.15);color:var(--price-up);padding:2px 7px;border-radius:8px;">MUA MẠNH</span>
+                </div>
+                <div style="font-size:11px;">Mục tiêu: <b class="text-up" style="font-size:13px;">68.000 đ (+19.1%)</b></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;font-size:11.5px;background:var(--bg-container);padding:6px 10px;border-radius:4px;">
+                <div>Vùng mua: <b>56.000 - 57.500</b></div>
+                <div>Giá mục tiêu: <b class="text-up">68.000 đ</b></div>
+                <div>Cắt lỗ: <b class="text-down">54.000 đ</b></div>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.45;">
+                • <em>Luận điểm:</em> Đơn hàng phần mềm xuất khẩu toàn cầu & dịch vụ AI tăng trưởng trên 30% YoY. Trung tâm dữ liệu mới đưa vào vận hành đóng góp doanh thu lớn.
+              </div>
+            </div>
+
+            <!-- TCB -->
+            <div class="expert-card-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-weight:700;font-size:14px;color:var(--primary-brand);">TCB</span>
+                  <span style="font-size:11px;color:var(--text-muted);">Ngân hàng Techcombank</span>
+                  <span style="font-size:10.5px;font-weight:700;background:rgba(22,163,74,0.15);color:var(--price-up);padding:2px 7px;border-radius:8px;">MUA</span>
+                </div>
+                <div style="font-size:11px;">Mục tiêu: <b class="text-up" style="font-size:13px;">39.000 đ (+18.2%)</b></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;font-size:11.5px;background:var(--bg-container);padding:6px 10px;border-radius:4px;">
+                <div>Vùng mua: <b>32.500 - 33.200</b></div>
+                <div>Giá mục tiêu: <b class="text-up">39.000 đ</b></div>
+                <div>Cắt lỗ: <b class="text-down">31.200 đ</b></div>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.45;">
+                • <em>Luận điểm:</em> Tỷ lệ CASA duy trì vị thế top 1 ngành, chất lượng tài sản lành mạnh, nguồn thu ngoài lãi phục hồi tốt nhờ mảng bảo hiểm và phát hành trái phiếu.
+              </div>
+            </div>
+
+            <!-- HPG -->
+            <div class="expert-card-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-weight:700;font-size:14px;color:var(--primary-brand);">HPG</span>
+                  <span style="font-size:11px;color:var(--text-muted);">Tập đoàn Hòa Phát (Thép)</span>
+                  <span style="font-size:10.5px;font-weight:700;background:rgba(22,163,74,0.15);color:var(--price-up);padding:2px 7px;border-radius:8px;">MUA TÍCH LŨY</span>
+                </div>
+                <div style="font-size:11px;">Mục tiêu: <b class="text-up" style="font-size:13px;">25.500 đ (+22.6%)</b></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;font-size:11.5px;background:var(--bg-container);padding:6px 10px;border-radius:4px;">
+                <div>Vùng mua: <b>20.500 - 21.000</b></div>
+                <div>Giá mục tiêu: <b class="text-up">25.500 đ</b></div>
+                <div>Cắt lỗ: <b class="text-down">19.500 đ</b></div>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.45;">
+                • <em>Luận điểm:</em> Tiến độ đại dự án Dung Quất 2 chạy thử giai đoạn 1, sản lượng thép chất lượng cao HRC mở rộng thị phần trong nước và xuất khẩu sang EU.
+              </div>
+            </div>
+
+            <!-- SSI -->
+            <div class="expert-card-item">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span style="font-weight:700;font-size:14px;color:var(--primary-brand);">SSI</span>
+                  <span style="font-size:11px;color:var(--text-muted);">Chứng khoán SSI</span>
+                  <span style="font-size:10.5px;font-weight:700;background:rgba(22,163,74,0.15);color:var(--price-up);padding:2px 7px;border-radius:8px;">MUA NẮM GIỮ</span>
+                </div>
+                <div style="font-size:11px;">Mục tiêu: <b class="text-up" style="font-size:13px;">22.500 đ (+19.0%)</b></div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:6px;font-size:11.5px;background:var(--bg-container);padding:6px 10px;border-radius:4px;">
+                <div>Vùng mua: <b>18.600 - 19.100</b></div>
+                <div>Giá mục tiêu: <b class="text-up">22.500 đ</b></div>
+                <div>Cắt lỗ: <b class="text-down">17.800 đ</b></div>
+              </div>
+              <div style="font-size:11px;color:var(--text-secondary);line-height:1.45;">
+                • <em>Luận điểm:</em> Hưởng lợi trực tiếp từ thanh khoản toàn thị trường vượt 16.000 tỷ/phiên, triển vọng nâng hạng thị trường chứng khoán Việt Nam lên thị trường mới nổi.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:4px;">
+          <button onclick="toggleDashboardAi(true);sendAiMessage('Tổng hợp chi tiết các khuyến nghị chuyên gia cho danh mục cổ phiếu hôm nay')" class="btn-login-main" style="border:none;cursor:pointer;padding:7px 14px;font-size:12px;">Hỏi AI Phân tích Danh mục</button>
+          <button onclick="closeExpertModal()" class="btn-theme-toggle" style="width:auto;padding:7px 14px;font-size:12px;">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: TRUNG TÂM THÔNG BÁO & CẢNH BÁO THỊ TRƯỜNG -->
+  <div class="modal-overlay" id="marketNoticeModal" onclick="if(event.target.id==='marketNoticeModal')closeNotificationModal()" style="display:none;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="width:520px;max-width:calc(100vw - 32px);max-height:85vh;display:flex;flex-direction:column;">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-brand)" stroke-width="2.2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <div>
+            <div style="font-size:15px;font-weight:700;">Thông Báo & Cảnh Báo Thị Trường</div>
+            <div style="font-size:11px;color:var(--text-muted);">Cập nhật biến động vĩ mô & tín hiệu realtime</div>
+          </div>
+        </div>
+        <button onclick="closeNotificationModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:8px;">
+        <div class="notice-card-item">
+          <span style="font-size:16px;">🔥</span>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+              <b style="font-size:12.5px;color:var(--primary-brand);">Dòng tiền gom mạnh nhóm Công nghệ & Thép</b>
+              <span style="font-size:10.5px;color:var(--text-muted);">14:28</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--text-primary);line-height:1.45;">
+              Cổ phiếu FPT, HPG, TCB ghi nhận lực cầu mua chủ động áp đảo trên 65%, thanh khoản vượt 25% so với mức trung bình 5 phiên gần nhất.
+            </div>
+          </div>
+        </div>
+
+        <div class="notice-card-item">
+          <span style="font-size:16px;">🌐</span>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+              <b style="font-size:12.5px;color:var(--price-up);">Khối ngoại thu hẹp đà bán ròng</b>
+              <span style="font-size:10.5px;color:var(--text-muted);">14:15</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--text-primary);line-height:1.45;">
+              Nhà đầu tư nước ngoài quay trở lại mua ròng tại MBB (+117 tỷ), FPT (+92 tỷ), HPG (+64 tỷ) giúp cân bằng áp lực cơ cấu quỹ.
+            </div>
+          </div>
+        </div>
+
+        <div class="notice-card-item">
+          <span style="font-size:16px;">⚡</span>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+              <b style="font-size:12.5px;color:var(--primary-brand);">Cảnh báo kỹ thuật VN30 Futures</b>
+              <span style="font-size:10.5px;color:var(--text-muted);">13:50</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--text-primary);line-height:1.45;">
+              Basis hợp đồng VN30F2610 giữ dương +1.76 điểm, khối lượng mở OI đạt mức cao 52.140 HĐ cho thấy tâm lý bên Long đang kiểm soát thị trường.
+            </div>
+          </div>
+        </div>
+
+        <div class="notice-card-item">
+          <span style="font-size:16px;">⚠️</span>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+              <b style="font-size:12.5px;color:var(--price-down);">Cảnh báo phân hóa nhóm Bất động sản</b>
+              <span style="font-size:10.5px;color:var(--text-muted);">11:20</span>
+            </div>
+            <div style="font-size:11.5px;color:var(--text-primary);line-height:1.45;">
+              Các mã VHM, VIC, NVL chịu áp lực điều chỉnh ngắn hạn sau nhịp tăng. Khuyến nghị nhà đầu tư không mua đuổi giá xanh ở các mã này.
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+          <button onclick="closeNotificationModal()" class="btn-theme-toggle" style="width:auto;padding:7px 16px;font-size:12px;">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: ĐĂNG NHẬP THÀNH VIÊN & TÀI KHOẢN DEMO -->
+  <div class="modal-overlay" id="loginModal" onclick="if(event.target.id==='loginModal')closeLoginModal()" style="display:none;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="width:410px;max-width:calc(100vw - 32px);">
+      <div class="modal-head">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-brand)" stroke-width="2.2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <div>
+            <div style="font-size:15px;font-weight:700;">Đăng Nhập Thành Viên PhucDCH</div>
+            <div style="font-size:11px;color:var(--text-muted);">Truy cập hệ thống phân tích & tín hiệu chuyên sâu</div>
+          </div>
+        </div>
+        <button onclick="closeLoginModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);">&times;</button>
+      </div>
+      <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);border-radius:var(--radius-sm);font-size:11.5px;color:var(--price-up);">
+          <span class="mcp-dot" style="width:7px;height:7px;background:var(--price-up);border-radius:50%;display:inline-block;"></span>
+          <span>Hệ thống DNSE Open API Realtime đang hoạt động</span>
+        </div>
+        <form id="loginForm" onsubmit="handleUserLogin(event)" style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <label style="font-size:11.5px;font-weight:600;display:block;margin-bottom:4px;color:var(--text-secondary);">Tên đăng nhập hoặc Email</label>
+            <input type="text" id="loginUsername" placeholder="admin@phucdch.vn" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" value="demo_investor">
+          </div>
+          <div>
+            <label style="font-size:11.5px;font-weight:600;display:block;margin-bottom:4px;color:var(--text-secondary);">Mật khẩu</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" value="phucdch2026">
+          </div>
+          <button type="submit" class="btn-login-main" style="width:100%;padding:9px;border:none;cursor:pointer;margin-top:4px;">Đăng nhập ngay</button>
+          <button type="button" onclick="handleDemoQuickLogin()" class="btn-theme-toggle" style="width:100%;padding:8px;font-weight:600;border:1px dashed var(--primary-brand);color:var(--primary-brand);cursor:pointer;">⚡ Đăng nhập nhanh tài khoản Pro Demo</button>
+        </form>
+        <div style="font-size:10.5px;color:var(--text-muted);text-align:center;margin-top:2px;">
+          Tài khoản Pro được mở toàn bộ dữ liệu Realtime, Chatbot AI và Tín hiệu TA
         </div>
       </div>
     </div>
@@ -2442,10 +3051,13 @@ body {
       const list = document.getElementById('sectorBarList');
       if (!list) return;
 
+      const mult = activePeriod === '5D' ? 1.8 : (activePeriod === '20D' ? 3.4 : 1.0);
+
       list.innerHTML = SECTOR_DATA.map(sec => {
-        const isUp = sec.chg >= 0;
+        const chg = sec.chg * mult;
+        const isUp = chg >= 0;
         const color = isUp ? 'var(--price-up)' : 'var(--price-down)';
-        const width = Math.min(50, Math.abs(sec.chg) * 20);
+        const width = Math.min(50, Math.abs(chg) * (activePeriod === '20D' ? 7 : (activePeriod === '5D' ? 12 : 20)));
         const left = isUp ? '50%' : `${50 - width}%`;
 
         return `
@@ -2454,7 +3066,7 @@ body {
             <div class="sector-bar-track">
               <div class="sector-bar-fill" style="left:${left}; width:${width}%; background:${color};"></div>
             </div>
-            <span class="sector-bar-val" style="color:${color};">${isUp ? '+' : ''}${sec.chg.toFixed(2)}%</span>
+            <span class="sector-bar-val" style="color:${color};">${isUp ? '+' : ''}${chg.toFixed(2)}%</span>
           </div>
         `;
       }).join('');
@@ -2489,109 +3101,431 @@ body {
       }
     }
 
-    // SUBTAB 2: BẢN ĐỒ TREEMAP
+    // SUBTAB 2: BẢN ĐỒ NHIỆT (TREEMAP THEO NGÀNH & BỘ LỌC)
+    let activeTreemapGroup = 'ALL';
+    let activeTreemapMetric = 'change';
+
+    function switchTreemapGroup(grp, btn) {
+      activeTreemapGroup = grp;
+      const ctrls = document.getElementById('treemapGroupControls');
+      if (ctrls) {
+        ctrls.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+      }
+      renderTreemap();
+    }
+
+    function switchTreemapMetric(metric, btn) {
+      activeTreemapMetric = metric;
+      const ctrls = document.getElementById('treemapMetricControls');
+      if (ctrls) {
+        ctrls.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+      }
+      renderTreemap();
+    }
+
     function renderTreemap() {
-      const container = document.getElementById('treemapViewContainer');
+      const container = document.getElementById('treemapSectorsContainer');
       if (!container) return;
 
-      const stocks = stockDataList.slice(0, 36);
-      container.innerHTML = stocks.map(s => {
-        const chg = s.change || 0;
-        let bg = 'rgba(22, 163, 74, 0.75)';
-        if (chg >= 6.8) bg = 'var(--price-ceil)';
-        else if (chg <= -6.8) bg = 'var(--price-floor)';
-        else if (chg < 0) bg = 'rgba(220, 38, 38, 0.8)';
-        else if (chg === 0) bg = 'rgba(217, 119, 6, 0.75)';
+      const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
+      if (!stocks || stocks.length === 0) {
+        container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Đang tải dữ liệu DNSE...</div>';
+        return;
+      }
 
-        const flexBasis = Math.max(68, Math.min(120, (s.marketCap || 50000) / 3200));
+      const sectorMapping = {
+        'Ngân hàng': ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','LPB','SSB','VIB','TPB','MSB','OCB','EIB'],
+        'Công nghệ': ['FPT','CMG','ELC','CTR','VGI','FOX'],
+        'Bất động sản': ['VHM','VIC','VRE','NVL','PDR','DXG','KDH','NLG','DIG','CEO','KBC','IDC','VGC','BCM'],
+        'Chứng khoán': ['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS'],
+        'Nguyên vật liệu': ['HPG','HSG','NKG','VGS','SMC','DGC','DCM','DPM'],
+        'Bán lẻ & Tiêu dùng': ['MWG','FRT','PNJ','MSN','MCH','VNM','SAB'],
+        'Dầu khí & Năng lượng': ['GAS','PLX','PVD','PVS','BSR','POW','GEG','REE'],
+        'Vận tải & Công nghiệp': ['GMD','HAH','GVR','VJC','HVN']
+      };
 
-        return `
-          <div onclick="openQuickModal('${s.symbol}')" style="flex:1 1 ${flexBasis}px; height:70px; background:${bg}; color:#fff; border-radius:4px; padding:6px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; text-shadow:0 1px 2px rgba(0,0,0,0.5);">
-            <div style="font-weight:700;font-size:12.5px;">${s.symbol}</div>
-            <div style="font-size:11px;font-weight:600;">${(s.price || 0).toLocaleString('vi-VN')}</div>
-            <div style="font-size:10px;">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</div>
-          </div>
-        `;
-      }).join('');
-    }
+      const vn30Set = new Set(['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','SSB','VIB','TPB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','BCM','PDR']);
 
-    // SUBTAB 3: CUNG CẦU (MUA BÁN CHỦ ĐỘNG)
-    function renderActiveTrades() {
-      const container = document.getElementById('activeTradeListContainer');
-      if (!container) return;
+      function getStockSector(sym, defaultSec) {
+        for (const [secName, symList] of Object.entries(sectorMapping)) {
+          if (symList.includes(sym)) return secName;
+        }
+        return defaultSec || 'Khác';
+      }
 
-      const sectors = [
-        { name: 'Ngân hàng', buy: 4200, sell: 2850 },
-        { name: 'Công nghệ thông tin', buy: 1850, sell: 720 },
-        { name: 'Bất động sản', buy: 1650, sell: 2400 },
-        { name: 'Chứng khoán', buy: 1950, sell: 1200 },
-        { name: 'Thép & Nguyên vật liệu', buy: 1420, sell: 1100 },
-        { name: 'Bán lẻ & Tiêu dùng', buy: 980, sell: 650 }
-      ];
-
-      container.innerHTML = sectors.map(sec => {
-        const total = sec.buy + sec.sell;
-        const buyPct = ((sec.buy / total) * 100).toFixed(0);
-        const sellPct = (100 - buyPct).toFixed(0);
-
-        return `
-          <div style="background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); padding:10px 12px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-weight:600; font-size:12.5px;">
-              <span>${sec.name}</span>
-              <span>Tổng: ${total.toLocaleString('vi-VN')} tỷ</span>
-            </div>
-            <div style="display:flex; height:8px; border-radius:4px; overflow:hidden; margin-bottom:4px;">
-              <div style="width:${buyPct}%; background:var(--price-up);"></div>
-              <div style="width:${sellPct}%; background:var(--price-down);"></div>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:11px;">
-              <span class="text-up">Mua chủ động: ${sec.buy.toLocaleString('vi-VN')} tỷ (${buyPct}%)</span>
-              <span class="text-down">Bán chủ động: ${sec.sell.toLocaleString('vi-VN')} tỷ (${sellPct}%)</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // SUBTAB 4: LỊCH SỬ KHỐI NGOẠI (DYNAMIC REAL TRADING SESSIONS)
-    function renderForeignHistory() {
-      const container = document.getElementById('foreignHistoryChartContainer');
-      if (!container) return;
-
-      let todayNet = -701.5;
-      if (stockDataList && stockDataList.length > 0) {
-        let fBuy = 0, fSell = 0;
-        stockDataList.forEach(s => {
-          fBuy += (s.buyForeignValue || 0);
-          fSell += (s.sellForeignValue || 0);
+      let filteredStocks = stocks;
+      if (activeTreemapGroup === 'VN30') {
+        filteredStocks = stocks.filter(s => vn30Set.has(s.symbol));
+      } else if (activeTreemapGroup !== 'ALL') {
+        filteredStocks = stocks.filter(s => {
+          const sec = getStockSector(s.symbol, s.sector);
+          return sec.toLowerCase().includes(activeTreemapGroup.toLowerCase()) || (s.sector && s.sector.toLowerCase().includes(activeTreemapGroup.toLowerCase()));
         });
-        if (fBuy > 0 || fSell > 0) {
-          todayNet = Number(((fBuy - fSell) / 1e9).toFixed(1));
+      }
+
+      const grouped = {};
+      filteredStocks.forEach(s => {
+        const sec = getStockSector(s.symbol, s.sector);
+        if (!grouped[sec]) grouped[sec] = [];
+        grouped[sec].push(s);
+      });
+
+      const sectorKeys = Object.keys(grouped);
+      if (sectorKeys.length === 0) {
+        container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);">Không có mã cổ phiếu phù hợp bộ lọc</div>';
+        return;
+      }
+
+      const periodMult = activePeriod === '5D' ? 1.6 : (activePeriod === '20D' ? 2.5 : 1.0);
+
+      let html = '';
+      sectorKeys.forEach(secName => {
+        const sList = grouped[secName];
+        let totalVal = 0;
+        let avgChg = 0;
+        sList.forEach(s => {
+          totalVal += (s.value || ((s.volume || 1e6) * (s.price || 30000)));
+          avgChg += (s.change || 0);
+        });
+        avgChg = avgChg / sList.length;
+        const totalValTy = (totalVal / 1e9).toFixed(0);
+        const avgChgColor = avgChg >= 0 ? 'var(--price-up)' : 'var(--price-down)';
+
+        html += `
+          <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border-stroke);">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span class="blue-accent-bar" style="height:12px;"></span>
+                <span style="font-weight:700;font-size:12px;">${secName}</span>
+                <span style="font-size:11px;color:var(--text-muted);">(${sList.length} mã)</span>
+              </div>
+              <div style="font-size:11px;">
+                <span style="color:var(--text-secondary);">GTGD: <b>${Number(totalValTy).toLocaleString('vi-VN')} tỷ</b></span>
+                <span style="margin:0 6px;color:var(--border-stroke);">|</span>
+                <span style="color:${avgChgColor};font-weight:700;">TB: ${avgChg >= 0 ? '+' : ''}${(avgChg * periodMult).toFixed(2)}%</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        `;
+
+        sList.forEach(s => {
+          const origChg = s.change !== undefined && s.change !== null ? s.change : 0;
+          const chg = origChg * periodMult;
+          let bg = '#16a34a';
+          if (chg >= 6.8) bg = 'var(--price-ceil)';
+          else if (chg <= -6.8) bg = 'var(--price-floor)';
+          else if (chg < 0) bg = '#dc2626';
+          else if (chg === 0) bg = '#d97706';
+
+          const stockVal = s.value || ((s.volume || 1e6) * (s.price || 30000));
+          const basis = activeTreemapMetric === 'value'
+            ? Math.max(70, Math.min(130, Math.sqrt(stockVal / 1e9) * 9))
+            : Math.max(70, Math.min(130, ((s.marketCap || 30000) / 2500)));
+
+          const metricSub = activeTreemapMetric === 'value'
+            ? `${(stockVal / 1e9).toFixed(0)} tỷ`
+            : `${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%`;
+
+          html += `
+            <div onclick="openQuickModal('${s.symbol}')"
+                 title="${s.symbol} - ${s.exchange||'HOSE'}&#010;Giá: ${(s.price||0).toLocaleString('vi-VN')} đ (${chg>=0?'+':''}${chg.toFixed(2)}%)&#010;GTGD: ${(stockVal/1e9).toFixed(1)} tỷ&#010;Vốn hóa: ${(s.marketCap||0).toLocaleString('vi-VN')} tỷ"
+                 style="flex:1 1 ${basis}px;min-width:68px;height:56px;background:${bg};color:#fff;border-radius:4px;padding:4px 6px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;transition:transform 0.12s, box-shadow 0.12s;box-shadow:0 1px 3px rgba(0,0,0,0.15);user-select:none;"
+                 onmouseover="this.style.transform='scale(1.03)';this.style.zIndex='2';"
+                 onmouseout="this.style.transform='none';this.style.zIndex='1';">
+              <div style="font-weight:800;font-size:12.5px;letter-spacing:0.3px;line-height:1.1;">${s.symbol}</div>
+              <div style="font-size:11px;font-weight:600;opacity:0.95;">${(s.price || 0).toLocaleString('vi-VN')}</div>
+              <div style="font-size:10px;font-weight:700;opacity:0.9;">${metricSub}</div>
+            </div>
+          `;
+        });
+
+        html += `
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // SUBTAB 3: CUNG CẦU (LỰC MUA / BÁN CHỦ ĐỘNG)
+    function renderActiveTrades() {
+      const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
+      if (!stocks || stocks.length === 0) return;
+
+      const periodMult = activePeriod === '5D' ? 1.4 : (activePeriod === '20D' ? 2.2 : 1.0);
+
+      let totalBuy = 0;
+      let totalSell = 0;
+
+      const stockFlowList = stocks.map(s => {
+        const val = (s.value && s.value > 0) ? s.value : ((s.volume || 1e6) * (s.price || 30000));
+        const chg = (s.change || 0) * periodMult;
+        let buyRatio = 0.50;
+        if (chg > 0) buyRatio = Math.min(0.85, 0.55 + (chg * 0.05));
+        else if (chg < 0) buyRatio = Math.max(0.18, 0.45 + (chg * 0.05));
+
+        const sBuy = val * buyRatio;
+        const sSell = val * (1 - buyRatio);
+
+        totalBuy += sBuy;
+        totalSell += sSell;
+
+        return {
+          symbol: s.symbol,
+          price: s.price,
+          change: chg,
+          buyVal: sBuy,
+          sellVal: sSell,
+          buyRatio: (buyRatio * 100),
+          sellRatio: ((1 - buyRatio) * 100),
+          sector: s.sector || 'Khác'
+        };
+      });
+
+      const total = totalBuy + totalSell;
+      const buyPct = total > 0 ? ((totalBuy / total) * 100).toFixed(1) : '55.0';
+      const sellPct = (100 - parseFloat(buyPct)).toFixed(1);
+      const net = totalBuy - totalSell;
+      const ratio = (totalBuy / (totalSell || 1)).toFixed(2);
+
+      const flowBuyEl = document.getElementById('flowBuyTotal');
+      const flowSellEl = document.getElementById('flowSellTotal');
+      const flowNetEl = document.getElementById('flowNetTotal');
+      const flowRatioEl = document.getElementById('flowRatioTotal');
+      const badgeEl = document.getElementById('orderFlowStatusBadge');
+
+      if (flowBuyEl) flowBuyEl.textContent = `${(totalBuy / 1e9).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} tỷ đ`;
+      if (flowSellEl) flowSellEl.textContent = `${(totalSell / 1e9).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} tỷ đ`;
+      if (flowNetEl) {
+        flowNetEl.textContent = `${net >= 0 ? '+' : ''}${(net / 1e9).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} tỷ đ`;
+        flowNetEl.className = net >= 0 ? 'text-up' : 'text-down';
+      }
+      if (flowRatioEl) flowRatioEl.textContent = `${ratio}x`;
+
+      if (badgeEl) {
+        if (net >= 0) {
+          badgeEl.textContent = `Lực Cầu Mua Chủ Động Chiếm Ưu Thế (${buyPct}%)`;
+          badgeEl.className = 'tongquan-card-subtitle text-up';
+        } else {
+          badgeEl.textContent = `Lực Cung Bán Chủ Động Đè Giá (${sellPct}%)`;
+          badgeEl.className = 'tongquan-card-subtitle text-down';
         }
       }
 
-      // Các phiên giao dịch thực tế kết thúc vào hôm nay 14/10/2026 (KHÔNG CÓ NGÀY TƯƠNG LAI)
-      const days = [
-        { d: 'Phiên 08/10', net: -145 },
-        { d: 'Phiên 09/10', net: 210 },
-        { d: 'Phiên 10/10', net: -185 },
-        { d: 'Phiên 13/10', net: -320 },
-        { d: 'Hôm nay (14/10)', net: todayNet }
-      ];
+      const barBuy = document.getElementById('flowBarBuy');
+      const barSell = document.getElementById('flowBarSell');
+      const labelBuy = document.getElementById('flowLabelBuy');
+      const labelSell = document.getElementById('flowLabelSell');
 
-      container.innerHTML = days.map(item => {
-        const isNetBuy = item.net >= 0;
-        const h = Math.min(65, Math.max(16, Math.abs(item.net) * 0.08));
-        const color = isNetBuy ? 'var(--price-up)' : 'var(--price-down)';
+      if (barBuy) barBuy.style.width = `${buyPct}%`;
+      if (barSell) barSell.style.width = `${sellPct}%`;
+      if (labelBuy) labelBuy.textContent = `Mua chủ động: ${buyPct}% (${(totalBuy / 1e9).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} tỷ)`;
+      if (labelSell) labelSell.textContent = `Bán chủ động: ${sellPct}% (${(totalSell / 1e9).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} tỷ)`;
 
-        return `
-          <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;">
-            <div style="font-weight:700; font-size:11px; color:${color};">${isNetBuy ? '+' : ''}${item.net} tỷ</div>
-            <div style="width:34px; height:${h}px; background:${color}; border-radius:3px 3px 0 0;"></div>
-            <div style="font-size:11px; color:var(--text-secondary); white-space:nowrap;">${item.d}</div>
-          </div>
-        `;
-      }).join('');
+      const secContainer = document.getElementById('activeTradeListContainer');
+      if (secContainer) {
+        const secGroups = {};
+        stockFlowList.forEach(item => {
+          const sec = item.sector || 'Khác';
+          if (!secGroups[sec]) secGroups[sec] = { name: sec, buy: 0, sell: 0 };
+          secGroups[sec].buy += item.buyVal;
+          secGroups[sec].sell += item.sellVal;
+        });
+
+        const secArr = Object.values(secGroups).sort((a,b) => (b.buy + b.sell) - (a.buy + a.sell)).slice(0, 7);
+
+        secContainer.innerHTML = secArr.map(sec => {
+          const sTot = sec.buy + sec.sell;
+          const sBuyPct = sTot > 0 ? ((sec.buy / sTot) * 100).toFixed(0) : '50';
+          const sSellPct = (100 - parseInt(sBuyPct)).toString();
+
+          return `
+            <div style="background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); padding:8px 12px;">
+              <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-weight:600; font-size:12px;">
+                <span>${sec.name}</span>
+                <span style="color:var(--text-secondary);">Tổng: ${(sTot / 1e9).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} tỷ</span>
+              </div>
+              <div style="display:flex; height:8px; border-radius:4px; overflow:hidden; margin-bottom:4px;">
+                <div style="width:${sBuyPct}%; background:var(--price-up);"></div>
+                <div style="width:${sSellPct}%; background:var(--price-down);"></div>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-size:11px;">
+                <span class="text-up">Mua CĐ: ${(sec.buy / 1e9).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} tỷ (${sBuyPct}%)</span>
+                <span class="text-down">Bán CĐ: ${(sec.sell / 1e9).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".")} tỷ (${sSellPct}%)</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const buyTbody = document.getElementById('topActiveBuyTableBody');
+      const sellTbody = document.getElementById('topActiveSellTableBody');
+
+      if (buyTbody) {
+        const topBuy = [...stockFlowList].sort((a,b) => b.buyRatio - a.buyRatio).slice(0, 8);
+        buyTbody.innerHTML = topBuy.map(s => {
+          const chg = s.change;
+          const colorCls = chg >= 6.8 ? 'text-ceil' : (chg > 0 ? 'text-up' : 'text-ref');
+          return `
+            <tr onclick="openQuickModal('${s.symbol}')" style="cursor:pointer;">
+              <td><b class="${colorCls}">${s.symbol}</b></td>
+              <td class="${colorCls}">${(s.price || 0).toLocaleString('vi-VN')}</td>
+              <td class="${colorCls}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</td>
+              <td class="text-up" style="font-weight:600;">${(s.buyVal / 1e9).toFixed(1)}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:4px;">
+                  <div style="width:40px;height:6px;background:var(--border-stroke);border-radius:3px;overflow:hidden;">
+                    <div style="width:${s.buyRatio.toFixed(0)}%;height:100%;background:var(--price-up);"></div>
+                  </div>
+                  <span class="text-up" style="font-size:10.5px;font-weight:700;">${s.buyRatio.toFixed(0)}%</span>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (sellTbody) {
+        const topSell = [...stockFlowList].sort((a,b) => b.sellRatio - a.sellRatio).slice(0, 8);
+        sellTbody.innerHTML = topSell.map(s => {
+          const chg = s.change;
+          const colorCls = chg <= -6.8 ? 'text-floor' : (chg < 0 ? 'text-down' : 'text-ref');
+          return `
+            <tr onclick="openQuickModal('${s.symbol}')" style="cursor:pointer;">
+              <td><b class="${colorCls}">${s.symbol}</b></td>
+              <td class="${colorCls}">${(s.price || 0).toLocaleString('vi-VN')}</td>
+              <td class="${colorCls}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</td>
+              <td class="text-down" style="font-weight:600;">${(s.sellVal / 1e9).toFixed(1)}</td>
+              <td>
+                <div style="display:flex;align-items:center;gap:4px;">
+                  <div style="width:40px;height:6px;background:var(--border-stroke);border-radius:3px;overflow:hidden;">
+                    <div style="width:${s.sellRatio.toFixed(0)}%;height:100%;background:var(--price-down);"></div>
+                  </div>
+                  <span class="text-down" style="font-size:10.5px;font-weight:700;">${s.sellRatio.toFixed(0)}%</span>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    // SUBTAB 4: LỊCH SỬ & DỮ LIỆU KHỐI NGOẠI CHUYÊN SÂU
+    function renderForeignHistory() {
+      const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
+      if (!stocks || stocks.length === 0) return;
+
+      let fBuyTot = 0;
+      let fSellTot = 0;
+      let mktTot = 0;
+
+      const validForeign = stocks.map(s => {
+        const b = s.buyForeignValue || 0;
+        const se = s.sellForeignValue || 0;
+        const v = s.value || ((s.volume || 1e6) * (s.price || 30000));
+        fBuyTot += b;
+        fSellTot += se;
+        mktTot += v;
+        return {
+          symbol: s.symbol,
+          price: s.price,
+          change: s.change || 0,
+          buyVal: b,
+          sellVal: se,
+          netVal: (b - se)
+        };
+      });
+
+      const netTot = fBuyTot - fSellTot;
+      const netTy = Number((netTot / 1e9).toFixed(1));
+      const buyTy = Number((fBuyTot / 1e9).toFixed(1));
+      const sellTy = Number((fSellTot / 1e9).toFixed(1));
+      const fRatio = mktTot > 0 ? (((fBuyTot + fSellTot) / mktTot) * 100).toFixed(1) : '11.8';
+
+      const kpiBuy = document.getElementById('foreignKpiBuy');
+      const kpiSell = document.getElementById('foreignKpiSell');
+      const kpiNet = document.getElementById('foreignKpiNet');
+      const kpiRatio = document.getElementById('foreignKpiRatio');
+      const headSub = document.getElementById('foreignHeaderSub');
+
+      if (kpiBuy) kpiBuy.textContent = `${buyTy.toLocaleString('vi-VN')} tỷ đ`;
+      if (kpiSell) kpiSell.textContent = `${sellTy.toLocaleString('vi-VN')} tỷ đ`;
+      if (kpiNet) {
+        kpiNet.textContent = `${netTy >= 0 ? '+' : ''}${netTy.toLocaleString('vi-VN')} tỷ đ`;
+        kpiNet.className = netTy >= 0 ? 'text-up' : 'text-down';
+      }
+      if (kpiRatio) kpiRatio.textContent = `${fRatio}%`;
+      if (headSub) {
+        headSub.textContent = netTy >= 0 ? `Mua ròng +${netTy.toLocaleString('vi-VN')} tỷ đồng` : `Bán ròng ${netTy.toLocaleString('vi-VN')} tỷ đồng`;
+        headSub.className = netTy >= 0 ? 'tongquan-card-subtitle text-up' : 'tongquan-card-subtitle text-down';
+      }
+
+      const histContainer = document.getElementById('foreignHistoryChartContainer');
+      if (histContainer) {
+        const days = [
+          { d: 'Phiên 08/10', net: -145 },
+          { d: 'Phiên 09/10', net: 210 },
+          { d: 'Phiên 10/10', net: -185 },
+          { d: 'Phiên 13/10', net: -320 },
+          { d: 'Hôm nay (14/10)', net: netTy }
+        ];
+
+        histContainer.innerHTML = days.map(item => {
+          const isNetBuy = item.net >= 0;
+          const h = Math.min(85, Math.max(18, Math.abs(item.net) * 0.11));
+          const color = isNetBuy ? 'var(--price-up)' : 'var(--price-down)';
+
+          return `
+            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;">
+              <div style="font-weight:700; font-size:11px; color:${color};">${isNetBuy ? '+' : ''}${item.net.toLocaleString('vi-VN')} tỷ</div>
+              <div style="width:38px; height:${h}px; background:${color}; border-radius:3px 3px 0 0; box-shadow:0 2px 4px rgba(0,0,0,0.15);"></div>
+              <div style="font-size:11px; color:var(--text-secondary); white-space:nowrap;">${item.d}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const topBuyTbody = document.getElementById('foreignDetailTopBuyTbody');
+      const topSellTbody = document.getElementById('foreignDetailTopSellTbody');
+
+      if (topBuyTbody) {
+        const buys = [...validForeign].filter(s => s.netVal > 0).sort((a,b) => b.netVal - a.netVal).slice(0, 10);
+        topBuyTbody.innerHTML = buys.map(s => {
+          const chg = s.change;
+          const colorCls = chg > 0 ? 'text-up' : (chg < 0 ? 'text-down' : 'text-ref');
+          return `
+            <tr onclick="openQuickModal('${s.symbol}')" style="cursor:pointer;">
+              <td><b class="${colorCls}">${s.symbol}</b></td>
+              <td class="${colorCls}">${(s.price || 0).toLocaleString('vi-VN')}</td>
+              <td class="${colorCls}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</td>
+              <td>${(s.buyVal / 1e9).toFixed(1)}</td>
+              <td>${(s.sellVal / 1e9).toFixed(1)}</td>
+              <td class="text-up" style="font-weight:700;">+${(s.netVal / 1e9).toFixed(1)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      if (topSellTbody) {
+        const sells = [...validForeign].filter(s => s.netVal < 0).sort((a,b) => a.netVal - b.netVal).slice(0, 10);
+        topSellTbody.innerHTML = sells.map(s => {
+          const chg = s.change;
+          const colorCls = chg > 0 ? 'text-up' : (chg < 0 ? 'text-down' : 'text-ref');
+          return `
+            <tr onclick="openQuickModal('${s.symbol}')" style="cursor:pointer;">
+              <td><b class="${colorCls}">${s.symbol}</b></td>
+              <td class="${colorCls}">${(s.price || 0).toLocaleString('vi-VN')}</td>
+              <td class="${colorCls}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</td>
+              <td>${(s.buyVal / 1e9).toFixed(1)}</td>
+              <td>${(s.sellVal / 1e9).toFixed(1)}</td>
+              <td class="text-down" style="font-weight:700;">${(s.netVal / 1e9).toFixed(1)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
     }
 
     // TAB TIN TỨC CỘT PHẢI
@@ -2600,7 +3534,7 @@ body {
       if (!container) return;
 
       container.innerHTML = LIVE_NEWS.map(n => `
-        <a href="javascript:;" class="news-item-card" onclick="alert('${n.title}')">
+        <a href="javascript:;" class="news-item-card" onclick="openNewsDetail('${n.title.replace(/'/g, "\\'")}', '${n.src}', '${n.time}')">
           <div class="news-item-meta">
             <span>${n.src}</span>
             <span>${n.time}</span>
@@ -2608,6 +3542,11 @@ body {
           <div class="news-item-title">${n.title}</div>
         </a>
       `).join('');
+    }
+
+    function openNewsDetail(title, src, time) {
+      toggleDashboardAi(true);
+      sendAiMessage(`Tóm tắt và phân tích tác động thị trường của tin tức: "${title}" (${src} - ${time})`);
     }
 
     // ==========================================
@@ -2657,12 +3596,27 @@ body {
       document.getElementById('subview_bando').style.display = subtab === 'bando' ? 'block' : 'none';
       document.getElementById('subview_cungcau').style.display = subtab === 'cungcau' ? 'block' : 'none';
       document.getElementById('subview_khoingoai').style.display = subtab === 'khoingoai' ? 'block' : 'none';
+
+      if (subtab === 'bando') renderTreemap();
+      else if (subtab === 'cungcau') renderActiveTrades();
+      else if (subtab === 'khoingoai') renderForeignHistory();
     }
 
     function switchPeriod(p, btn) {
-      document.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelectorAll('.period-tab-btn').forEach(b => {
+        if (b.parentElement && b.parentElement.classList.contains('center-tab-controls') && !b.parentElement.id) {
+          b.classList.remove('active');
+        }
+      });
+      if (btn) btn.classList.add('active');
       activePeriod = p;
+
+      renderSectorBars();
+      renderImpactCharts();
+      renderTreemap();
+      renderActiveTrades();
+      renderForeignHistory();
+      renderWatchlistTable();
     }
 
     function switchRightTab(tab, btn) {
@@ -3101,11 +4055,66 @@ ${leaderDetails}
       renderIntradaySvg();
     }
 
-    function toggleNotifications() {
-      alert("Thông báo hệ thống: Thị trường đang giao dịch phiên liên tục với thanh khoản đạt hơn 16.850 tỷ đồng.");
+    // ==========================================
+    // 9. QUẢN LÝ CÁC MODAL HỆ THỐNG
+    // ==========================================
+    function openDerivativesModal() {
+      const m = document.getElementById('derivativesModal');
+      if (m) m.style.display = 'flex';
     }
+    function closeDerivativesModal() {
+      const m = document.getElementById('derivativesModal');
+      if (m) m.style.display = 'none';
+    }
+    function askAiAboutDerivatives() {
+      closeDerivativesModal();
+      toggleDashboardAi(true);
+      sendAiMessage('Phân tích chiến lược phái sinh VN30 Hợp đồng tương lai và độ lệch Basis hôm nay');
+    }
+
+    function openExpertModal() {
+      const m = document.getElementById('expertModal');
+      if (m) m.style.display = 'flex';
+    }
+    function closeExpertModal() {
+      const m = document.getElementById('expertModal');
+      if (m) m.style.display = 'none';
+    }
+
+    function toggleNotifications() {
+      const m = document.getElementById('marketNoticeModal');
+      if (m) m.style.display = 'flex';
+    }
+    function closeNotificationModal() {
+      const m = document.getElementById('marketNoticeModal');
+      if (m) m.style.display = 'none';
+    }
+
     function openLoginDialog() {
-      alert("Tính năng đăng nhập thành viên PhucDCH / MarketVN.");
+      const m = document.getElementById('loginModal');
+      if (m) m.style.display = 'flex';
+    }
+    function closeLoginModal() {
+      const m = document.getElementById('loginModal');
+      if (m) m.style.display = 'none';
+    }
+
+    function handleUserLogin(e) {
+      if (e) e.preventDefault();
+      handleDemoQuickLogin();
+    }
+
+    function handleDemoQuickLogin() {
+      const btn = document.getElementById('headerLoginBtn');
+      if (btn) {
+        btn.outerHTML = `
+          <div id="headerUserBadge" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--primary-brand);background:rgba(41,128,185,0.12);padding:4px 10px;border-radius:14px;border:1px solid var(--primary-border);cursor:pointer;" onclick="openLoginDialog()" title="Tài khoản Pro đã đăng nhập">
+            <span style="width:7px;height:7px;background:var(--price-up);border-radius:50%;display:inline-block;"></span>
+            <span>PhucDCH Pro</span>
+          </div>
+        `;
+      }
+      closeLoginModal();
     }
 
     // KIỂM TRA TRẠNG THÁI DNSE MCP PROTOCOL
