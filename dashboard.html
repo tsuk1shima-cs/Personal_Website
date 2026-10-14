@@ -1245,6 +1245,39 @@ body {
   font-weight: 600;
 }
 
+.ai-mcp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #10b981;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ai-mcp-pill:hover {
+  background: rgba(16, 185, 129, 0.22);
+  border-color: #10b981;
+}
+.ai-mcp-pill .mcp-dot {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #10b981;
+  animation: mcpPulse 1.8s infinite;
+}
+@keyframes mcpPulse {
+  0% { transform: scale(0.9); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.8; }
+}
+
 .ai-drawer-actions {
   display: flex;
   align-items: center;
@@ -1948,11 +1981,14 @@ body {
           <div class="ai-drawer-title">Trợ lý AI Thị trường Realtime</div>
           <div class="ai-drawer-sub">
             <span class="pulse-dot" style="width:5px;height:5px;"></span>
-            <span>Kết nối Live dữ liệu HOSE/HNX</span>
+            <span id="aiMcpSubText">Kết nối DNSE MCP Protocol</span>
           </div>
         </div>
       </div>
       <div class="ai-drawer-actions">
+        <span class="ai-mcp-pill" id="aiDrawerMcpPill" title="Model Context Protocol kết nối trực tiếp với DNSE Open API">
+          <span class="mcp-dot"></span> MCP: DNSE
+        </span>
         <a href="chatbot.html" target="_blank" class="ai-head-btn" title="Mở toàn màn hình">↗</a>
         <button onclick="clearDashboardAiChat()" class="ai-head-btn" title="Xóa lịch sử">🗑</button>
         <button onclick="closeDashboardAi()" class="ai-head-btn" title="Thu nhỏ">&times;</button>
@@ -2849,13 +2885,49 @@ body {
       container.scrollTop = container.scrollHeight;
     }
 
-    // Engine tạo câu trả lời kết nối bộ nhớ thời gian thực của Dashboard
+    // Engine tạo câu trả lời kết nối bộ nhớ thời gian thực của Dashboard và DNSE MCP
     async function generateLiveAiResponse(query) {
       const q = query.trim();
       const upper = q.toUpperCase();
       const norm = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-      // Kiểm tra API Key OpenRouter người dùng (nếu có, gọi AI nâng cao với system prompt nhúng live context)
+      // 1. GỌI TRỰC TIẾP BACKEND SERVER VỚI DNSE MCP REALTIME CONTEXT (NẾU CÓ)
+      const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+        ? APP_CONFIG.apiBase
+        : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+
+      if (apiBase) {
+        try {
+          const r = await fetch(`${apiBase}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              messages: [{ role: 'user', content: q }],
+              model: 'nvidia/nemotron-3.5-lightning:free'
+            }),
+            signal: AbortSignal.timeout(10000)
+          });
+          if (r.ok) {
+            const resJson = await r.json();
+            if (resJson.success && resJson.message) {
+              const mcpTools = resJson.mcp?.toolsUsed?.length
+                ? ` [Tools: ${resJson.mcp.toolsUsed.join(', ')}]`
+                : '';
+              const mcpLabel = (resJson.dataSources && resJson.dataSources.includes('DNSE MCP Realtime Protocol'))
+                ? `DNSE MCP Realtime Protocol${mcpTools}`
+                : 'DNSE Open API & AI Assistant';
+              return {
+                message: resJson.message,
+                source: `⚡ ${mcpLabel}`
+              };
+            }
+          }
+        } catch (e) {
+          console.warn('[Dashboard AI] Backend /api/chat fallback to client engine:', e.message);
+        }
+      }
+
+      // 2. Kiểm tra API Key OpenRouter người dùng (nếu có)
       const customKey = localStorage.getItem('user_openrouter_key');
       if (customKey) {
         try {
@@ -2883,7 +2955,7 @@ body {
             const json = await r.json();
             const text = json.choices?.[0]?.message?.content;
             if (text) {
-              return { message: text, source: 'OpenRouter AI + Live Dashboard Memory' };
+              return { message: text, source: 'OpenRouter AI + Live DNSE Memory' };
             }
           }
         } catch (e) {
@@ -3073,6 +3145,25 @@ ${leaderDetails}
       alert("Tính năng đăng nhập thành viên PhucDCH / MarketVN.");
     }
 
+    // KIỂM TRA TRẠNG THÁI DNSE MCP PROTOCOL
+    async function checkDnseMcpStatus() {
+      const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+        ? APP_CONFIG.apiBase
+        : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : '/api');
+      try {
+        const r = await fetch(`${apiBase}/dnse/status`, { signal: AbortSignal.timeout(3000) });
+        if (r.ok) {
+          const d = await r.json();
+          const pill = document.getElementById('aiDrawerMcpPill');
+          const subText = document.getElementById('aiMcpSubText');
+          if (d.success && d.configured) {
+            if (pill) pill.innerHTML = `<span class="mcp-dot"></span> MCP: DNSE Online`;
+            if (subText) subText.textContent = `DNSE MCP Protocol Active (Key OK)`;
+          }
+        }
+      } catch { /* offline / static mode */ }
+    }
+
     // KHỞI ĐỘNG HỆ THỐNG
     window.addEventListener('DOMContentLoaded', async () => {
       const savedTheme = localStorage.getItem('theme');
@@ -3080,6 +3171,7 @@ ${leaderDetails}
 
       startClockEngine();
       initIntradayCurve();
+      checkDnseMcpStatus();
       await syncMarketBaseline();
       startAutoRunningTicker();
 

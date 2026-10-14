@@ -30,6 +30,7 @@ const DNSE_API_KEY      = process.env.DNSE_API_KEY;
 const DNSE_API_BASE     = process.env.DNSE_API_BASE || 'https://api.dnse.com.vn';
 const DNSE_ENTRADE_BASE = process.env.DNSE_ENTRADE_BASE || 'https://services.entrade.com.vn';
 const DNSE_WS_URL       = process.env.DNSE_WS_URL || 'wss://datafeed-lts.dnse.com.vn/wss';
+const dnseMcp           = require('./dnse-mcp-server');
 
 // Map ten model thân thiện -> model ID cua OpenRouter
 const MODEL_MAP = {
@@ -411,9 +412,9 @@ async function getLiveDashboardData() {
     return result;
 }
 
-// Ham trich xuat ma va ket noi lay du lieu thuc te tu TCBS va thi truong
+// Ham trich xuat ma va ket noi lay du lieu thuc te tu DNSE MCP va thi truong
 async function fetchStockContextForPrompt(userText) {
-    if (!userText) return { text: '', symbols: [], sources: [] };
+    if (!userText) return { text: '', symbols: [], sources: [], mcpTools: [] };
 
     // Tim ma co phieu 3 ky tu (vd: TCB, HPG, FPT, VCB, SSI...)
     const rawMatches = userText.toUpperCase().match(/\b[A-Z]{3}\b/g) || [];
@@ -422,69 +423,66 @@ async function fetchStockContextForPrompt(userText) {
     let contextParts = [];
     let sources = [];
     let validSymbols = [];
+    let mcpTools = [];
 
-    // 1. Kiem tra nhanh trong cache dashboard (0ms - sieu toc)
-    if (candidateSymbols.length > 0 && dashboardCache.data?.stocks) {
-        const foundStocks = dashboardCache.data.stocks.filter(s => candidateSymbols.includes(s.code));
-        if (foundStocks.length > 0) {
-            let cacheStr = '[DỮ LIỆU THỊ TRƯỜNG THỰC TẾ REALTIME]:\n';
-            foundStocks.forEach(s => {
-                const chgSign = (s.d1 || 0) >= 0 ? '+' : '';
-                cacheStr += `• Mã ${s.code} (${s.ex}): Giá ${s.price?.toLocaleString('vi-VN')} đ (${chgSign}${s.d1}%), GTGD: ${s.val} tỷ đ, P/E: ${s.pe || 'N/A'}, P/B: ${s.pb || 'N/A'}, ROE: ${s.roe ? s.roe + '%' : 'N/A'}, RSI(14): ${s.rsi || 'N/A'}, ADX(14): ${s.adx || 'N/A'}, Ngành: ${s.sub}\n`;
-                validSymbols.push(s.code);
-            });
-            contextParts.push(cacheStr);
-            sources.push('Realtime Stock Data');
-        }
-    }
-
-    // 2. Neu chua co trong cache, lay tu TradingView Scanner truc tiep (timeout ngan 3.5s)
-    const missingSymbols = candidateSymbols.filter(s => !validSymbols.includes(s));
-    if (missingSymbols.length > 0) {
+    // 1. Goi DNSE MCP Tools de lay gia thuc tu DNSE Open API
+    if (candidateSymbols.length > 0) {
         try {
-            const tickers = missingSymbols.flatMap(s => [`HOSE:${s}`, `HNX:${s}`, `UPCOM:${s}`]);
-            const body = {
-                symbols: { tickers, query: { types: [] } },
-                columns: ['name', 'close', 'change', 'high', 'low', 'volume', 'price_book_ratio', 'pe_ratio', 'return_on_equity', 'market_cap_basic']
-            };
-            const r = await axios.post(TV_SCANNER_URL, body, { headers: TV_HEADERS, timeout: 3500 });
-            const list = r.data?.data || [];
-            if (list.length > 0) {
-                let marketStr = '[DỮ LIỆU BỔ SUNG TỪ SÀN]:\n';
-                list.forEach(item => {
-                    const [sym, close, chg, high, low, vol, pb, pe, roe, mcap] = item.d;
-                    const mcapStr = mcap ? `${Math.round(mcap / 1e9).toLocaleString('vi-VN')} tỷ đ` : 'N/A';
-                    const peStr = pe ? pe.toFixed(2) : 'N/A';
-                    const pbStr = pb ? pb.toFixed(2) : 'N/A';
-                    const roeStr = roe ? `${roe.toFixed(1)}%` : 'N/A';
-                    const chgSign = (chg || 0) >= 0 ? '+' : '';
-                    marketStr += `• Mã ${sym}: Giá ${close?.toLocaleString('vi-VN')} đ (${chgSign}${(chg || 0).toFixed(2)}%), Cao: ${high?.toLocaleString('vi-VN')} đ, Thấp: ${low?.toLocaleString('vi-VN')} đ, Khối lượng: ${vol?.toLocaleString('vi-VN')}, P/E: ${peStr}, P/B: ${pbStr}, ROE: ${roeStr}, Vốn hoá: ${mcapStr}\n`;
-                    if (!validSymbols.includes(sym)) validSymbols.push(sym);
-                });
-                contextParts.push(marketStr);
-                sources.push('Market Scanner (HOSE/HNX)');
+            const dnseResults = await Promise.allSettled(
+                candidateSymbols.map(sym => dnseMcp.executeTool('dnse_get_stock_quote', { symbol: sym }))
+            );
+            let dnseLines = [];
+            dnseResults.forEach((r, idx) => {
+                if (r.status === 'fulfilled' && r.value && !r.value.error) {
+                    const q = r.value;
+                    const sign = q.change >= 0 ? '+' : '';
+                    dnseLines.push(`• Mã ${q.symbol}: Giá khớp ${q.price.toLocaleString('vi-VN')} đ (${sign}${q.change}%), Mở cửa: ${q.open.toLocaleString('vi-VN')} đ, Cao: ${q.high.toLocaleString('vi-VN')} đ, Thấp: ${q.low.toLocaleString('vi-VN')} đ, Khối lượng: ${q.volume.toLocaleString('vi-VN')} CP`);
+                    validSymbols.push(q.symbol);
+                }
+            });
+            if (dnseLines.length > 0) {
+                contextParts.push('[DỮ LIỆU THỰC TẾ TỪ DNSE OPEN API (MODEL CONTEXT PROTOCOL - MCP)]:\n' + dnseLines.join('\n'));
+                sources.push('DNSE MCP Realtime Protocol');
+                mcpTools.push('dnse_get_stock_quote');
             }
-        } catch (e) { /* tiep tuc neu loi */ }
+        } catch (err) {
+            console.warn('[DNSE MCP Context] Error:', err.message);
+        }
     }
 
-    // 3. Neu cau hoi ve xu huong thi truong chung hoac VN-Index
-    const lower = userText.toLowerCase();
-    if (lower.includes('thị trường') || lower.includes('thi truong') || lower.includes('vnindex') || lower.includes('vn-index') || lower.includes('xu hướng') || lower.includes('xu huong')) {
-        if (dashboardCache.data?.indices) {
-            const ixList = dashboardCache.data.indices.map(ix => {
-                const chg = ix.close - ix.ref;
-                const sign = chg >= 0 ? '+' : '';
-                return `• ${ix.name}: ${ix.close} điểm (${sign}${chg.toFixed(2)}), GTGD: ${ix.val} tỷ đ, Tăng: ${ix.adv}, Giảm: ${ix.dec}`;
-            });
-            contextParts.push('[TỔNG QUAN CHỈ SỐ THỊ TRƯỜNG REALTIME]:\n' + ixList.join('\n'));
-            sources.push('Tổng quan Chỉ số');
+    // 2. Bo sung chi so co ban (P/E, P/B, ROE, RSI) tu cache dashboard hoac TradingView
+    if (validSymbols.length > 0 && dashboardCache.data?.stocks) {
+        const found = dashboardCache.data.stocks.filter(s => validSymbols.includes(s.code));
+        if (found.length > 0) {
+            let fundLines = found.map(s => `• Mã ${s.code}: P/E: ${s.pe || 'N/A'}, P/B: ${s.pb || 'N/A'}, ROE: ${s.roe ? s.roe + '%' : 'N/A'}, RSI(14): ${s.rsi || 'N/A'}, Ngành: ${s.sub || 'Niêm yết'}`);
+            contextParts.push('[CHỈ SỐ ĐỊNH GIÁ & KỸ THUẬT BỔ SUNG]:\n' + fundLines.join('\n'));
         }
+    }
+
+    // 3. Neu cau hoi ve xu huong thi truong chung hoac VN-Index -> Goi DNSE MCP Indices
+    const lower = userText.toLowerCase();
+    if (lower.includes('thị trường') || lower.includes('thi truong') || lower.includes('vnindex') || lower.includes('vn-index') || lower.includes('xu hướng') || lower.includes('xu huong') || lower.includes('toàn cảnh')) {
+        try {
+            const idxs = await dnseMcp.executeTool('dnse_get_market_indices');
+            if (idxs && Object.keys(idxs).length > 0) {
+                let idxLines = [];
+                Object.values(idxs).forEach(ix => {
+                    const chg = ix.price && ix.open ? (ix.price - ix.open).toFixed(2) : '0.00';
+                    const sign = Number(chg) >= 0 ? '+' : '';
+                    idxLines.push(`• Chỉ số ${ix.symbol}: ${ix.price?.toLocaleString('vi-VN')} điểm (${sign}${chg}), Mở cửa: ${ix.open?.toLocaleString('vi-VN')}, Cao nhất: ${ix.high?.toLocaleString('vi-VN')}, Thấp nhất: ${ix.low?.toLocaleString('vi-VN')}`);
+                });
+                contextParts.push('[CHỈ SỐ THỊ TRƯỜNG REALTIME TỪ DNSE OPEN API (MCP)]:\n' + idxLines.join('\n'));
+                if (!sources.includes('DNSE MCP Realtime Protocol')) sources.push('DNSE MCP Realtime Protocol');
+                mcpTools.push('dnse_get_market_indices');
+            }
+        } catch { /* fallback */ }
     }
 
     return {
         text: contextParts.join('\n\n'),
         symbols: validSymbols,
-        sources
+        sources,
+        mcpTools
     };
 }
 
@@ -501,19 +499,19 @@ app.post('/api/chat', async (req, res) => {
         // Trich xuat noi dung tin nhan cuoi cung cua nguoi dung
         const lastUserMsg = [...messages].reverse().find(m => m.role === 'user')?.content || '';
 
-        // Thu thap du lieu thuc te tu TCBS MCP va San giao dich
+        // Thu thap du lieu thuc te tu DNSE MCP va San giao dich
         const stockContext = await fetchStockContextForPrompt(lastUserMsg);
 
         // Xay dung System Prompt chuyen sau ve Tai chinh & Chung khoan Viet Nam
-        const systemPrompt = `Bạn là Trợ lý AI Phân tích Tài chính & Đầu tư Chứng khoán chuyên nghiệp tại Việt Nam, tích hợp dữ liệu realtime thị trường chứng khoán (HOSE, HNX, UPCOM) và TCBS.
+        const systemPrompt = `Bạn là Trợ lý AI Phân tích Tài chính & Đầu tư Chứng khoán chuyên nghiệp tại Việt Nam, tích hợp trực tiếp qua giao thức Model Context Protocol (MCP) với DNSE Open API & Entrade X.
 Nhiệm vụ của bạn:
 1. Trả lời bằng tiếng Việt, súc tích, văn phong chuyên nghiệp và có chiều sâu phân tích tài chính.
-2. Khi người dùng hỏi về cổ phiếu hoặc thị trường, BẮT BUỘC sử dụng các số liệu thực tế được cung cấp dưới đây (giá hiện tại, % tăng giảm, P/E, P/B, ROE, vốn hoá, khối lượng, RSI, ADX). Tuyệt đối không tự suy đoán sai lệch số liệu.
+2. Khi người dùng hỏi về cổ phiếu hoặc thị trường, BẮT BUỘC sử dụng các số liệu thực tế được cung cấp dưới đây từ DNSE MCP (giá hiện tại, % tăng giảm, P/E, P/B, ROE, vốn hoá, khối lượng, RSI). Tuyệt đối không tự suy đoán sai lệch số liệu.
 3. Cung cấp góc nhìn phân tích kết hợp:
    - Cơ bản & Định giá (P/E, P/B, ROE, vị thế doanh nghiệp).
    - Kỹ thuật & Dòng tiền (vùng hỗ trợ, kháng cự, RSI, xu hướng ngắn/trung hạn).
 4. Luôn kèm khuyến nghị quản trị rủi ro (kỷ luật chốt lời/cắt lỗ).
-${stockContext.text ? `\n--- DỮ LIỆU THỰC TẾ REALTIME ---\n${stockContext.text}\n--- HẾT DỮ LIỆU THỰC TẾ ---` : ''}`;
+${stockContext.text ? `\n--- DỮ LIỆU THỰC TẾ DNSE MCP REALTIME ---\n${stockContext.text}\n--- HẾT DỮ LIỆU THỰC TẾ ---` : ''}`;
 
         // Tao danh sach messages moi voi system prompt cap nhat
         const finalMessages = messages.filter(m => m.role !== 'system');
@@ -533,10 +531,16 @@ ${stockContext.text ? `\n--- DỮ LIỆU THỰC TẾ REALTIME ---\n${stockContex
         res.json({
             success: true,
             ...result,
-            hasTCBSContext: !!stockContext.text,
+            hasDNSEContext: !!stockContext.text,
             symbolsDetected: stockContext.symbols,
             dataSources: stockContext.sources,
-            tcbsAuthenticated: !!tcbsJwtToken
+            mcp: {
+                connected: true,
+                protocol: 'Model Context Protocol (MCP)',
+                provider: 'DNSE Open API & Entrade X',
+                toolsUsed: stockContext.mcpTools,
+                keyConfigured: Boolean(DNSE_API_KEY)
+            }
         });
 
     } catch (error) {
@@ -896,8 +900,52 @@ app.get('/api/dnse/status', (req, res) => {
         apiBase: DNSE_API_BASE,
         entradeBase: DNSE_ENTRADE_BASE,
         wsUrl: DNSE_WS_URL,
-        provider: 'DNSE Open API (Entrade X)'
+        provider: 'DNSE Open API (Entrade X)',
+        mcpProtocol: 'Active',
+        tools: dnseMcp.MCP_TOOLS.map(t => t.name)
     });
+});
+
+// ==================== DNSE MCP (MODEL CONTEXT PROTOCOL) ENDPOINTS ====================
+
+// Lay danh sach tools theo chuan MCP
+app.get(['/api/mcp/tools', '/api/dnse/mcp/tools'], (req, res) => {
+    res.json({
+        success: true,
+        protocol: 'Model Context Protocol (MCP)',
+        version: '2024-11-05',
+        provider: 'DNSE Open API & Entrade X',
+        keyConfigured: Boolean(DNSE_API_KEY),
+        tools: dnseMcp.MCP_TOOLS
+    });
+});
+
+// Goi mot tool MCP cu the
+app.post(['/api/mcp/call', '/api/dnse/mcp/call'], async (req, res) => {
+    const { tool, name, params = {}, arguments: args = {} } = req.body;
+    const toolName = tool || name;
+    const toolArgs = Object.keys(args).length ? args : params;
+
+    if (!toolName) {
+        return res.status(400).json({ success: false, error: 'Thieu ten tool' });
+    }
+
+    try {
+        const result = await dnseMcp.executeTool(toolName, toolArgs);
+        res.json({ success: true, tool: toolName, data: result });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Endpoint tieu chuan JSON-RPC 2.0 cho cac Client MCP (Antigravity, Cursor, Claude...)
+app.post('/api/mcp', async (req, res) => {
+    const rpcMsg = req.body;
+    if (!rpcMsg || !rpcMsg.method) {
+        return res.status(400).json({ jsonrpc: '2.0', id: null, error: { code: -32600, message: 'Invalid Request' } });
+    }
+    const response = await dnseMcp.handleRpcMessage(rpcMsg);
+    res.json(response);
 });
 
 // ==================== CONTACT FORM ====================
