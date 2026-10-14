@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -50,42 +50,123 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
-        .model-buttons {
+
+        .model-card {
+            background: #fbfbfb;
+            border: 1px solid #e0e0e0;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
-        
-        .model-btn {
-            padding: 12px 16px;
-            border: 1px solid #d4d4d4;
-            background: white;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-align: left;
+
+        .model-card-header {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
-        .model-btn:hover {
-            background: #fafafa;
-            border-color: #a3a3a3;
-        }
-        
-        .model-btn.active {
+
+        .model-avatar-badge {
+            width: 32px;
+            height: 32px;
             background: #171717;
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .model-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #171717;
+            line-height: 1.2;
+        }
+
+        .model-card-sub {
+            font-size: 11px;
+            color: #737373;
+        }
+
+        .mcp-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            font-size: 11px;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .mcp-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #16a34a;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .model-features {
+            margin: 0;
+            padding-left: 16px;
+            font-size: 12px;
+            color: #525252;
+            line-height: 1.5;
+        }
+
+        .quick-prompts-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+
+        .prompt-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .prompt-pill {
+            padding: 8px 10px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #171717;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+
+        .prompt-pill:hover {
+            background: #f5f5f5;
             border-color: #171717;
         }
-        
-        .model-icon {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
+
+        .tcbs-badge-source {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            padding: 3px 8px;
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            font-size: 11px;
+            font-weight: 600;
         }
         
         .chat-history {
@@ -402,43 +483,39 @@
             
             <div class="model-selector">
                 <label>Chọn mô hình AI</label>
-                <div class="model-buttons">
-                    <button class="model-btn active" data-model="openai/gpt-4o-mini" onclick="selectModel('openai/gpt-4o-mini', this)">
-                        <span class="model-icon">🤖</span>
-                        <span>GPT-4o Mini (OpenAI)</span>
-                    </button>
-                    <button class="model-btn" data-model="openai/gpt-4o" onclick="selectModel('openai/gpt-4o', this)">
-                        <span class="model-icon">🧠</span>
-                        <span>GPT-4o (OpenAI)</span>
-                    </button>
-                    <button class="model-btn" data-model="anthropic/claude-3-haiku" onclick="selectModel('anthropic/claude-3-haiku', this)">
-                        <span class="model-icon">✦</span>
-                        <span>Claude 3 Haiku</span>
-                    </button>
-                    <button class="model-btn" data-model="anthropic/claude-3.5-sonnet" onclick="selectModel('anthropic/claude-3.5-sonnet', this)">
-                        <span class="model-icon">✦</span>
-                        <span>Claude 3.5 Sonnet</span>
-                    </button>
-                    <button class="model-btn" data-model="google/gemini-flash-1.5" onclick="selectModel('google/gemini-flash-1.5', this)">
-                        <span class="model-icon">◆</span>
-                        <span>Gemini 1.5 Flash</span>
-                    </button>
-                    <button class="model-btn" data-model="google/gemini-2.0-flash-001" onclick="selectModel('google/gemini-2.0-flash-001', this)">
-                        <span class="model-icon">◆</span>
-                        <span>Gemini 2.0 Flash</span>
-                    </button>
-                    <button class="model-btn" data-model="deepseek/deepseek-chat" onclick="selectModel('deepseek/deepseek-chat', this)">
-                        <span class="model-icon">◉</span>
-                        <span>DeepSeek Chat</span>
-                    </button>
-                    <button class="model-btn" data-model="meta-llama/llama-3.1-8b-instruct:free" onclick="selectModel('meta-llama/llama-3.1-8b-instruct:free', this)">
-                        <span class="model-icon">◈</span>
-                        <span>Llama 3.1 8B (Free)</span>
-                    </button>
-                    <button class="model-btn" data-model="nvidia/nemotron-3-super-120b-a12b:free" onclick="selectModel('nvidia/nemotron-3-super-120b-a12b:free', this)">
-                        <span class="model-icon">◉</span>
-                        <span>Nemotron 3 Super 120B (Free)</span>
-                    </button>
+                <select id="modelSelect" style="width:100%;padding:8px 10px;border:1px solid #d4d4d4;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;background:#fff;cursor:pointer;" onchange="changeModel(this.value)">
+                    <option value="nvidia/nemotron-3.5-lightning:free" selected>⚡ Nemotron 3.5 Lightning (Siêu nhanh 2-3s)</option>
+                    <option value="liquid/lfm-2.5-2.6b:free">🚀 Liquid LFM 2.5 (Tức thì 1s)</option>
+                    <option value="deepseek/deepseek-chat">🧠 DeepSeek V3 (Phân tích chuyên sâu)</option>
+                    <option value="nvidia/nemotron-3-super-120b-a12b:free">🔬 Nemotron 3 Super (Suy luận 120B)</option>
+                </select>
+                <div class="model-card">
+                    <div class="model-card-header">
+                        <div class="model-avatar-badge" style="background: #15803d;" id="modelBadge">⚡</div>
+                        <div>
+                            <div class="model-card-title" id="modelCardTitle">Nemotron 3.5 Lightning</div>
+                            <div class="model-card-sub" id="modelCardSub">NVIDIA AI Siêu Tốc (Miễn phí / $0)</div>
+                        </div>
+                    </div>
+                    <div class="mcp-pill">
+                        <span class="mcp-dot"></span>
+                        <span>Đã nhúng TCBS & Dữ liệu Realtime</span>
+                    </div>
+                    <ul class="model-features">
+                        <li>Tốc độ phản hồi cực nhanh (2 - 4 giây)</li>
+                        <li>Dữ liệu giá & khối lượng realtime HOSE, HNX, UPCOM</li>
+                        <li>Định giá P/E, P/B, ROE, RSI, ADX thời gian thực</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="quick-prompts-section">
+                <div class="quick-prompts-title">Gợi ý câu hỏi nhanh</div>
+                <div class="prompt-pills">
+                    <button class="prompt-pill" onclick="fillPrompt('Phân tích cổ phiếu TCB hôm nay')">⚡ Phân tích mã TCB</button>
+                    <button class="prompt-pill" onclick="fillPrompt('Định giá và xu hướng cổ phiếu HPG')">⚡ Định giá mã HPG</button>
+                    <button class="prompt-pill" onclick="fillPrompt('So sánh cổ phiếu FPT và VCB')">⚡ So sánh FPT & VCB</button>
+                    <button class="prompt-pill" onclick="fillPrompt('Nhận định xu hướng VN-Index hôm nay')">⚡ Xu hướng VN-Index</button>
                 </div>
             </div>
 
@@ -453,15 +530,14 @@
         <!-- Main chat area -->
         <div class="chat-main">
             <div class="chat-messages" id="chatMessages">
-                <div class="api-warning" id="apiWarning" style="display: none;">
-                    <strong>Backend khong ket noi duoc:</strong> Vui long chay backend server voi <code>npm start</code>
-                </div>
+                <div class="api-warning" id="apiWarning" style="display: none;"></div>
                 
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-state-icon">💬</div>
+                    <div class="empty-state-icon">⚡</div>
                     <div class="empty-state-text">
-                        <strong>Xin chào! Tôi là trợ lý AI tài chính.</strong><br>
-                        Hỏi tôi về thị trường chứng khoán, phân tích cổ phiếu, hoặc tư vấn đầu tư.
+                        <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime.</strong><br>
+                        Hệ thống đã được tích hợp dữ liệu thời gian thực từ <strong>Sàn chứng khoán Việt Nam (HOSE, HNX, UPCOM)</strong> và <strong>TCBS</strong>.<br><br>
+                        <span style="font-size: 13px; color: #737373;">Bạn có thể hỏi tôi về phân tích mã cổ phiếu (TCB, HPG, FPT, VCB...), tra cứu định giá P/E, P/B, ROE, chỉ báo RSI/ADX hoặc nhận định xu hướng thị trường hôm nay.</span>
                     </div>
                 </div>
             </div>
@@ -485,18 +561,60 @@
     <script src="nav-script.js"></script>
     <script src="config.js"></script>
     <script>
-        let currentModel = 'openai/gpt-4o-mini';
+        let currentModel = 'nvidia/nemotron-3.5-lightning:free';
         let messages = [];
         let isTyping = false;
 
+        const MODEL_INFO = {
+            'nvidia/nemotron-3.5-lightning:free': {
+                title: 'Nemotron 3.5 Lightning',
+                sub: 'NVIDIA AI Siêu Tốc (Miễn phí / $0)',
+                badge: '⚡',
+                bg: '#15803d'
+            },
+            'liquid/lfm-2.5-2.6b:free': {
+                title: 'Liquid LFM 2.5',
+                sub: 'Liquid AI Phản hồi tức thì (~1s)',
+                badge: '🚀',
+                bg: '#0284c7'
+            },
+            'deepseek/deepseek-chat': {
+                title: 'DeepSeek V3',
+                sub: 'DeepSeek AI Phân tích tài chính chuyên sâu',
+                badge: '🧠',
+                bg: '#4f46e5'
+            },
+            'nvidia/nemotron-3-super-120b-a12b:free': {
+                title: 'Nemotron 3 Super 120B',
+                sub: 'Mô hình suy luận logic 120B NVIDIA',
+                badge: '🔬',
+                bg: '#7c3aed'
+            }
+        };
+
+        function changeModel(val) {
+            currentModel = val;
+            const info = MODEL_INFO[val] || MODEL_INFO['nvidia/nemotron-3.5-lightning:free'];
+            const titleEl = document.getElementById('modelCardTitle');
+            const subEl = document.getElementById('modelCardSub');
+            const badgeEl = document.getElementById('modelBadge');
+            if (titleEl) titleEl.textContent = info.title;
+            if (subEl) subEl.textContent = info.sub;
+            if (badgeEl) {
+                badgeEl.textContent = info.badge;
+                badgeEl.style.background = info.bg;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('apiWarning').style.display = 'none';
+            const warn = document.getElementById('apiWarning');
+            if (warn) warn.style.display = 'none';
         });
 
-        function selectModel(model, btn) {
-            currentModel = model;
-            document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        function fillPrompt(text) {
+            const input = document.getElementById('chatInput');
+            input.value = text;
+            input.focus();
         }
 
         function handleKeyPress(event) {
@@ -513,7 +631,8 @@
             if (!message || isTyping) return;
 
             // Hide empty state
-            document.getElementById('emptyState').style.display = 'none';
+            const empty = document.getElementById('emptyState');
+            if (empty) empty.style.display = 'none';
 
             // Add user message
             addMessage('user', message);
@@ -525,31 +644,60 @@
             isTyping = true;
 
             try {
-                // Simulate API call - replace with actual implementation
-                const response = await callAI(message);
+                const res = await callAI(message);
                 hideTypingIndicator();
-                addMessage('assistant', response);
-                messages.push({ role: 'assistant', content: response });
+                addMessage('assistant', res.message, res.sources);
+                messages.push({ role: 'assistant', content: res.message });
             } catch (error) {
                 hideTypingIndicator();
-                addMessage('assistant', 'Xin loi, da co loi xay ra. Vui long thu lai sau.');
+                const errMsg = error.message || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
+                addMessage('assistant', errMsg);
                 console.error('Error:', error);
             }
 
             isTyping = false;
         }
 
-        function addMessage(role, content) {
+        function formatMarkdown(text) {
+            if (!text) return '';
+            let html = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            // Headers
+            html = html.replace(/^### (.*$)/gim, '<h4 style="margin:12px 0 6px;color:#111;font-size:14px;font-weight:700;">$1</h4>');
+            html = html.replace(/^## (.*$)/gim, '<h3 style="margin:14px 0 8px;color:#111;font-size:15px;font-weight:700;">$1</h3>');
+
+            // Bold **text**
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Inline code `code`
+            html = html.replace(/`([^`]+)`/g, '<code style="background:#f1f5f9;padding:2px 5px;border-radius:4px;font-family:monospace;font-size:12px;color:#0f172a;">$1</code>');
+            // Bullet list items
+            html = html.replace(/^• (.*$)/gim, '<li style="margin-left:16px;">$1</li>');
+            html = html.replace(/^- (.*$)/gim, '<li style="margin-left:16px;">$1</li>');
+            // Linebreaks
+            html = html.replace(/\n/g, '<br>');
+            return html;
+        }
+
+        function addMessage(role, content, dataSources = []) {
             const messagesDiv = document.getElementById('chatMessages');
             const messageEl = document.createElement('div');
             messageEl.className = `message ${role}`;
 
             const time = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            const formattedContent = role === 'assistant' ? formatMarkdown(content) : content;
+
+            let sourceBadge = '';
+            if (dataSources && dataSources.length > 0) {
+                sourceBadge = `<div class="tcbs-badge-source">⚡ Dữ liệu kết nối: ${dataSources.join(' • ')}</div>`;
+            }
             
             messageEl.innerHTML = `
                 <div class="message-avatar">${role === 'user' ? '👤' : '🤖'}</div>
                 <div>
-                    <div class="message-content">${content}</div>
+                    <div class="message-content">${formattedContent}${sourceBadge}</div>
                     <div class="message-time">${time}</div>
                 </div>
             `;
@@ -580,66 +728,153 @@
             if (indicator) indicator.remove();
         }
 
-        async function callAI(message) {
-            if (!APP_CONFIG.hasBackend) {
-                return 'Chatbot AI cần backend server. Vui lòng chạy <code>npm start</code> hoặc deploy backend lên Render. Xem hướng dẫn trong README.md.';
+        // Trich xuat ma co phieu 3 chu cai
+        const VIETNAMESE_STOPWORDS = new Set([
+            'CHO', 'KHI', 'NAO', 'VAY', 'CAC', 'CON', 'BAN', 'MUA', 'TOP', 'API', 'KEY', 'BOT',
+            'MCP', 'HAI', 'MOT', 'BAO', 'GIA', 'XEM', 'COI', 'LAM', 'SAO', 'LUC', 'DEN', 'QUA',
+            'DAY', 'THE', 'TIN', 'HOI', 'CHI', 'DAN', 'NAM', 'BAC', 'NHA', 'DAT', 'MAU', 'XANH',
+            'TIM', 'SAN', 'VAN', 'HAY', 'TUI', 'EMM', 'NEN', 'VOI', 'DAN', 'HOA', 'TIEN', 'DON',
+            'NAY', 'HOM', 'CAI', 'BAI', 'KIA', 'GIO', 'PHU', 'HET', 'ROI', 'DAP', 'TAP', 'LAN'
+        ]);
+
+        function extractSymbols(text) {
+            const matches = text.toUpperCase().match(/\b[A-Z]{3}\b/g) || [];
+            return [...new Set(matches)].filter(s => !VIETNAMESE_STOPWORDS.has(s)).slice(0, 3);
+        }
+
+        // Engine phan tich truc tiep tren Client (hoat dong 100% tren GitHub Pages)
+        async function analyzeStockDirect(symbols, userText) {
+            const tickers = symbols.flatMap(s => [`HOSE:${s}`, `HNX:${s}`, `UPCOM:${s}`]);
+            if (userText.toLowerCase().includes('vnindex') || userText.toLowerCase().includes('thị trường')) {
+                tickers.push('HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX');
             }
 
-            const API_BASE_URL = APP_CONFIG.apiBase;
+            const res = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symbols: { tickers, query: { types: [] } },
+                    columns: [
+                        'name', 'description', 'close', 'change', 'Perf.W', 'Perf.1M',
+                        'market_cap_basic', 'volume', 'Value.Traded', 'sector',
+                        'price_book_ratio', 'pe_ratio', 'return_on_equity',
+                        'RSI', 'ADX', 'EMA20', 'beta_1_year', 'high', 'low'
+                    ]
+                })
+            });
 
-            try {
-                const chatMessages = messages.map(m => ({
-                    role: m.role,
-                    content: m.content
-                }));
+            if (!res.ok) throw new Error('Không thể tải dữ liệu chứng khoán');
+            const json = await res.json();
+            const list = json.data || [];
 
-                // System prompt chuyen nganh tai chinh
-                chatMessages.unshift({
-                    role: 'system',
-                    content: 'Bạn là trợ lý AI chuyên về tài chính và đầu tư chứng khoán tại Việt Nam. Trả lời ngắn gọn, chính xác và chuyên nghiệp bằng tiếng Việt.'
-                });
+            if (!list.length) {
+                return {
+                    message: `Không tìm thấy số liệu trực tiếp cho các mã: **${symbols.join(', ')}**. Vui lòng kiểm tra lại mã cổ phiếu (3 ký tự).`,
+                    sources: ['Sàn giao dịch']
+                };
+            }
 
-                // Tat ca model deu goi qua /api/chat (Cloudflare Pages Function hoac backend)
-                const endpoint = `${API_BASE_URL}/chat`;
+            let report = `### BẢN TIN PHÂN TÍCH TÀI CHÍNH & KỸ THUẬT REALTIME\n\n`;
 
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: chatMessages, model: currentModel })
-                });
+            list.forEach(item => {
+                const [name, desc, close, change, w1, m1, mcap, volume, valTraded, sector, pb, pe, roe, rsi, adx, ema20, beta, high, low] = item.d;
+                const ex = item.s ? item.s.split(':')[0] : 'HOSE';
+                const sym = name || (item.s ? item.s.split(':')[1] : '');
+                const chgSign = (change || 0) >= 0 ? '+' : '';
+                const mcapT = mcap ? `${Math.round(mcap / 1e9).toLocaleString('vi-VN')} tỷ đ` : 'N/A';
+                const valT = valTraded ? `${(valTraded / 1e9).toFixed(1)} tỷ đ` : `${((volume * close) / 1e9).toFixed(1)} tỷ đ`;
 
-                const data = await response.json();
+                let rsiStatus = 'Vùng cân bằng (30 - 70)';
+                if (rsi >= 70) rsiStatus = '⚠️ Vùng Quá Mua (>70) — Cần thận trọng áp lực chốt lời ngắn hạn';
+                else if (rsi <= 30) rsiStatus = '💡 Vùng Quá Bán (<30) — Xuất hiện cơ hội hồi phục kỹ thuật';
 
-                if (data.success) {
-                    return data.message;
+                let trendStatus = 'Tích lũy ngang';
+                if (close > ema20 && (change || 0) > 0) trendStatus = 'Tăng ngắn hạn (Trên đường EMA 20)';
+                else if (close < ema20) trendStatus = 'Điều chỉnh ngắn hạn (Dưới đường EMA 20)';
+
+                report += `**Mã cổ phiếu: ${sym} (${ex})** — *${desc || ''}*\n\n`;
+                report += `• **Giá hiện tại**: **${close ? close.toLocaleString('vi-VN') : '—'} đ** (${chgSign}${(change || 0).toFixed(2)}% hôm nay)\n`;
+                report += `• **Biến động**: Biên độ ngày: ${low ? low.toLocaleString('vi-VN') : '—'} – ${high ? high.toLocaleString('vi-VN') : '—'} đ | 1 Tuần: ${(w1 || 0) >= 0 ? '+' : ''}${(w1 || 0).toFixed(2)}% | 1 Tháng: ${(m1 || 0) >= 0 ? '+' : ''}${(m1 || 0).toFixed(2)}%\n`;
+                report += `• **Thanh khoản**: Khối lượng: ${volume ? volume.toLocaleString('vi-VN') : '—'} CP (~${valT})\n`;
+                report += `• **Định giá**: P/E: **${pe ? pe.toFixed(1) + 'x' : 'N/A'}** | P/B: **${pb ? pb.toFixed(2) + 'x' : 'N/A'}** | ROE: **${roe ? roe.toFixed(1) + '%' : 'N/A'}** | Vốn hoá: ${mcapT}\n`;
+                report += `• **Kỹ thuật**: RSI(14): **${rsi ? rsi.toFixed(1) : '—'}** (${rsiStatus}) | ADX(14): **${adx ? adx.toFixed(1) : '—'}** | Xu hướng: *${trendStatus}*\n\n`;
+                report += `**Góc nhìn khuyến nghị:**\n`;
+                if ((change || 0) >= 2) {
+                    report += `- Dòng tiền tham gia tích cực. Nhà đầu tư có sẵn vị thế có thể tiếp tục nắm giữ, canh chốt lời từng phần tại các ngưỡng cản trên.\n`;
+                } else if ((change || 0) <= -2) {
+                    report += `- Cổ phiếu chịu áp lực điều chỉnh. Khuyến nghị theo dõi mốc hỗ trợ gần nhất, không vội bắt đáy khi đà giảm chưa chững lại.\n`;
                 } else {
-                    throw new Error(data.error || 'API error');
+                    report += `- Cổ phiếu đang tích lũy ổn định. Thích hợp quan sát hoặc giải ngân thăm dò theo tỷ trọng an toàn.\n`;
                 }
+                report += `- Luôn đặt kỷ luật quản trị rủi ro cắt lỗ nếu giá thủng ngưỡng hỗ trợ quan trọng.\n\n---\n\n`;
+            });
 
-            } catch (error) {
-                console.error('AI Error:', error);
+            return {
+                message: report.trim(),
+                sources: ['Realtime HOSE/HNX', 'TradingView Scanner', 'Phân tích tài chính']
+            };
+        }
 
-                // Fallback demo
-                const lowerMessage = message.toLowerCase();
-                if (lowerMessage.includes('vnindex') || lowerMessage.includes('vn-index')) {
-                    return 'Không thể kết nối AI. VN-Index hiện có thể xem trên trang Dữ liệu thị trường. Vui lòng kiểm tra OPENROUTER_API_KEY trong file .env.';
+        async function callAI(message) {
+            const detectedSymbols = extractSymbols(message);
+            const isMarketQuery = message.toLowerCase().includes('thị trường') || message.toLowerCase().includes('vnindex') || message.toLowerCase().includes('xu hướng');
+
+            // 1. Kiem tra va uu tien goi Backend API (/api/chat)
+            const base = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+                ? APP_CONFIG.apiBase
+                : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : '/api');
+
+            if (base) {
+                try {
+                    const chatMessages = messages.map(m => ({ role: m.role, content: m.content }));
+                    const response = await fetch(`${base}/chat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ messages: chatMessages, model: currentModel }),
+                        signal: AbortSignal.timeout(16000)
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.message) {
+                            return {
+                                message: data.message,
+                                sources: data.dataSources || (data.hasTCBSContext ? ['TCBS Realtime'] : ['AI Nemotron'])
+                            };
+                        }
+                    }
+                } catch(e) {
+                    console.warn('[Chatbot] Backend /api/chat không phản hồi hoặc đang chạy tĩnh:', e.message);
                 }
-                return 'Không thể kết nối AI. Vui lòng kiểm tra:\n\n1. Server đang chạy: npm start\n2. OPENROUTER_API_KEY đã điền vào file .env\n3. Đăng ký key miễn phí tại openrouter.ai';
             }
+
+            // 2. Fallback thong minh tren Web tinh (GitHub Pages):
+            // Neu nguoi dung hoi ve ma co phieu hoac thi truong, lay truc tiep du lieu realtime va tra ve ngay lap tuc
+            if (detectedSymbols.length > 0 || isMarketQuery) {
+                const targetSymbols = detectedSymbols.length > 0 ? detectedSymbols : ['TCB', 'HPG', 'FPT'];
+                return await analyzeStockDirect(targetSymbols, message);
+            }
+
+            // Cau hoi chung khi khong co backend
+            return {
+                message: `Xin chào! Tôi là Trợ lý AI Tài chính & Đầu tư Chứng khoán. Tôi đã kết nối dữ liệu thời gian thực các sàn HOSE, HNX, UPCOM.\n\nBạn có thể hỏi tôi về:\n• **Phân tích mã cổ phiếu**: *Ví dụ: "Phân tích mã TCB hôm nay", "Định giá HPG", "So sánh FPT và VCB"*\n• **Xu hướng thị trường**: *Ví dụ: "Xu hướng VN-Index hôm nay"*`,
+                sources: ['Realtime Financial Engine']
+            };
         }
 
         function newChat() {
             messages = [];
+            const info = MODEL_INFO[currentModel] || MODEL_INFO['nvidia/nemotron-3.5-lightning:free'];
             document.getElementById('chatMessages').innerHTML = `
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-state-icon">💬</div>
+                    <div class="empty-state-icon">⚡</div>
                     <div class="empty-state-text">
-                        <strong>Xin chào! Tôi là trợ lý AI tài chính.</strong><br>
-                        Hỏi tôi về thị trường chứng khoán, phân tích cổ phiếu, hoặc tư vấn đầu tư.
+                        <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime (${info.title}).</strong><br>
+                        Hệ thống đã được tích hợp dữ liệu thời gian thực từ <strong>Sàn chứng khoán Việt Nam (HOSE, HNX, UPCOM)</strong> và <strong>TCBS</strong>.<br><br>
+                        <span style="font-size: 13px; color: #737373;">Bạn có thể hỏi tôi về phân tích mã cổ phiếu (TCB, HPG, FPT, VCB...), tra cứu định giá P/E, P/B, ROE, chỉ báo RSI/ADX hoặc nhận định xu hướng thị trường hôm nay.</span>
                     </div>
                 </div>
             `;
-
         }
     </script>
 </body>

@@ -10,21 +10,32 @@ const CORS_HEADERS = {
 };
 
 const MODEL_MAP = {
-    'gpt-3.5-turbo':                        'openai/gpt-3.5-turbo',
+    'nemotron-lightning':                   'nvidia/nemotron-3.5-lightning:free',
+    'nemotron':                             'nvidia/nemotron-3.5-lightning:free',
+    'liquid':                               'liquid/lfm-2.5-2.6b:free',
+    'lfm':                                  'liquid/lfm-2.5-2.6b:free',
+    'nvidia/nemotron-3.5-lightning:free':   'nvidia/nemotron-3.5-lightning:free',
+    'liquid/lfm-2.5-2.6b:free':             'liquid/lfm-2.5-2.6b:free',
+    'nemotron-3-super-120b-a12b:free':      'nvidia/nemotron-3-super-120b-a12b:free',
+    'deepseek-chat':                        'deepseek/deepseek-chat',
     'gpt-4o-mini':                          'openai/gpt-4o-mini',
     'gpt-4o':                               'openai/gpt-4o',
     'claude-3-haiku':                       'anthropic/claude-3-haiku',
     'claude-3.5-sonnet':                    'anthropic/claude-3.5-sonnet',
     'gemini-flash-1.5':                     'google/gemini-flash-1.5',
     'gemini-2.0-flash-001':                 'google/gemini-2.0-flash-001',
-    'deepseek-chat':                        'deepseek/deepseek-chat',
-    'llama-3.1-8b-instruct:free':           'meta-llama/llama-3.1-8b-instruct:free',
-    'nemotron-3-super-120b-a12b:free':      'nvidia/nemotron-3-super-120b-a12b:free',
 };
 
 function resolveModel(model) {
     return MODEL_MAP[model] || model;
 }
+
+const FAST_FALLBACK_MODELS = [
+    'nvidia/nemotron-3.5-lightning:free',
+    'liquid/lfm-2.5-2.6b:free',
+    'deepseek/deepseek-chat',
+    'nvidia/nemotron-3-super-120b-a12b:free'
+];
 
 export async function onRequestPost(context) {
     const OPENROUTER_KEY = context.env.OPENROUTER_API_KEY;
@@ -46,7 +57,7 @@ export async function onRequestPost(context) {
         );
     }
 
-    const { messages, model = 'openai/gpt-4o-mini' } = body;
+    const { messages, model = 'nvidia/nemotron-3.5-lightning:free' } = body;
 
     if (!messages || !messages.length) {
         return new Response(
@@ -56,36 +67,42 @@ export async function onRequestPost(context) {
     }
 
     try {
-        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${OPENROUTER_KEY}`,
-                'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://tsuk1shima-cs.github.io',
-                'X-Title': 'Chuyen Gia Tai Chinh'
-            },
-            body: JSON.stringify({
-                model: resolveModel(model),
-                messages,
-                temperature: 0.7,
-                max_tokens: 1000
-            })
-        });
+        const primaryModel = resolveModel(model);
+        const candidateModels = [primaryModel, ...FAST_FALLBACK_MODELS.filter(m => m !== primaryModel)];
 
-        const data = await res.json();
+        let lastError = null;
+        for (const curModel of candidateModels) {
+            try {
+                const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${OPENROUTER_KEY}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': 'https://tsuk1shima-cs.github.io',
+                        'X-Title': 'Chuyen Gia Tai Chinh'
+                    },
+                    body: JSON.stringify({
+                        model: curModel,
+                        messages,
+                        temperature: 0.6,
+                        max_tokens: 1000
+                    })
+                });
 
-        if (!res.ok) {
-            throw new Error(data.error?.message || `OpenRouter error ${res.status}`);
+                const data = await res.json();
+                if (res.ok && data.choices?.[0]?.message?.content) {
+                    return new Response(
+                        JSON.stringify({ success: true, message: data.choices[0].message.content, usage: data.usage, modelUsed: curModel }),
+                        { status: 200, headers: CORS_HEADERS }
+                    );
+                }
+                lastError = new Error(data.error?.message || `Model ${curModel} error`);
+            } catch (err) {
+                lastError = err;
+            }
         }
 
-        const content = data.choices?.[0]?.message?.content;
-        if (!content) throw new Error('Khong nhan duoc noi dung tu AI');
-
-        return new Response(
-            JSON.stringify({ success: true, message: content, usage: data.usage }),
-            { status: 200, headers: CORS_HEADERS }
-        );
-
+        throw lastError || new Error('Khong nhan duoc noi dung tu AI');
     } catch (err) {
         return new Response(
             JSON.stringify({ success: false, error: err.message }),

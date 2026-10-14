@@ -50,3 +50,9 @@ build/
 *-old.html
 *-backup.*
 dashboard-old.html
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
