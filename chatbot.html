@@ -497,9 +497,9 @@
                             <div class="model-card-sub" id="modelCardSub">NVIDIA AI Siêu Tốc (Miễn phí / $0)</div>
                         </div>
                     </div>
-                    <div class="mcp-pill">
+                    <div class="mcp-pill" id="chatbotMcpPill">
                         <span class="mcp-dot"></span>
-                        <span>Đã nhúng TCBS & Dữ liệu Realtime</span>
+                        <span id="chatbotMcpText">DNSE MCP Protocol Realtime</span>
                     </div>
                     <ul class="model-features">
                         <li>Tốc độ phản hồi cực nhanh (2 - 4 giây)</li>
@@ -1065,9 +1065,13 @@
                     if (response.ok) {
                         const data = await response.json();
                         if (data.success && data.message) {
+                            const mcpTools = data.mcp?.toolsUsed?.length ? ` [${data.mcp.toolsUsed.join(', ')}]` : '';
+                            const mcpSource = data.dataSources && data.dataSources.length 
+                                ? data.dataSources.map(s => s + mcpTools)
+                                : ['DNSE MCP Realtime Protocol'];
                             return {
                                 message: data.message,
-                                sources: data.dataSources || (data.hasTCBSContext ? ['TCBS Realtime'] : ['AI Nemotron'])
+                                sources: mcpSource
                             };
                         }
                     }
@@ -1207,14 +1211,33 @@
                     <div class="empty-state-icon">⚡</div>
                     <div class="empty-state-text">
                         <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime (${info.title}).</strong><br>
-                        Hệ thống đã được tích hợp dữ liệu thời gian thực từ <strong>Sàn chứng khoán Việt Nam (HOSE, HNX, UPCOM)</strong> và <strong>TCBS</strong>.<br><br>
+                        Hệ thống đã được kết nối trực tiếp qua giao thức <strong>Model Context Protocol (MCP)</strong> với <strong>DNSE Open API & Entrade X</strong>.<br><br>
                         <span style="font-size: 13px; color: #737373;">Bạn có thể hỏi tôi về phân tích mã cổ phiếu (TCB, HPG, FPT, VCB...), tra cứu định giá P/E, P/B, ROE, chỉ báo RSI/ADX hoặc nhận định xu hướng thị trường hôm nay.</span>
                     </div>
                 </div>
             `;
         }
 
+        async function checkDnseMcpStatus() {
+            try {
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const base = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+                    ? APP_CONFIG.apiBase
+                    : (isLocal ? 'http://localhost:3000/api' : null);
+                if (!base) return;
+                const res = await fetch(`${base}/dnse/status`, { signal: AbortSignal.timeout(3000) });
+                if (res.ok) {
+                    const d = await res.json();
+                    const pillText = document.getElementById('chatbotMcpText');
+                    if (pillText && d.success && d.configured) {
+                        pillText.textContent = 'DNSE MCP Protocol Active (Key OK)';
+                    }
+                }
+            } catch {}
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
+            checkDnseMcpStatus();
             const params = new URLSearchParams(window.location.search);
             const query = params.get('ask') || params.get('q') || params.get('symbol');
             if (query) {
