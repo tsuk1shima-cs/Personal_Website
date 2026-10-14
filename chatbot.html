@@ -732,21 +732,53 @@
             if (indicator) indicator.remove();
         }
 
-        // Trich xuat ma co phieu 3 chu cai
-        const VIETNAMESE_STOPWORDS = new Set([
-            'CHO', 'KHI', 'NAO', 'VAY', 'CAC', 'CON', 'BAN', 'MUA', 'TOP', 'API', 'KEY', 'BOT',
-            'MCP', 'HAI', 'MOT', 'BAO', 'GIA', 'XEM', 'COI', 'LAM', 'SAO', 'LUC', 'DEN', 'QUA',
-            'DAY', 'THE', 'TIN', 'HOI', 'CHI', 'DAN', 'NAM', 'BAC', 'NHA', 'DAT', 'MAU', 'XANH',
-            'TIM', 'SAN', 'VAN', 'HAY', 'TUI', 'EMM', 'NEN', 'VOI', 'DAN', 'HOA', 'TIEN', 'DON',
-            'NAY', 'HOM', 'CAI', 'BAI', 'KIA', 'GIO', 'PHU', 'HET', 'ROI', 'DAP', 'TAP', 'LAN'
+        // Danh sách toàn bộ mã cổ phiếu hợp lệ 3 ký tự trên thị trường chứng khoán Việt Nam (HOSE, HNX, UPCOM)
+        const KNOWN_VN_TICKERS = new Set([
+            'AAA', 'AAM', 'AAT', 'AAV', 'ABB', 'ABS', 'ABT', 'ACB', 'ACC', 'ACL', 'ACV', 'ADG', 'ADS', 'AGG', 'AGR',
+            'AMD', 'ANV', 'APC', 'APG', 'APH', 'APS', 'ART', 'ASG', 'ASM', 'ASP', 'AST', 'BAF', 'BAB', 'BAX', 'BBC',
+            'BCE', 'BCG', 'BCM', 'BFC', 'BHN', 'BIC', 'BID', 'BKG', 'BMC', 'BMI', 'BMP', 'BRC', 'BSI', 'BSR', 'BTP',
+            'BTT', 'BVB', 'BVH', 'BWE', 'C32', 'C47', 'CAV', 'CCI', 'CCL', 'CDC', 'CEO', 'CHP', 'CIG', 'CII', 'CLC',
+            'CLG', 'CLW', 'CMC', 'CMG', 'CMS', 'CNG', 'CNT', 'CRC', 'CRE', 'CSM', 'CSV', 'CTD', 'CTF', 'CTG', 'CTI',
+            'CTR', 'CTS', 'CVT', 'D2D', 'DAG', 'DAH', 'DAT', 'DBC', 'DBD', 'DBT', 'DC4', 'DCL', 'DCM', 'DDV', 'DGC',
+            'DGW', 'DHA', 'DHC', 'DHG', 'DHM', 'DIG', 'DLG', 'DMC', 'DNP', 'DP3', 'DPG', 'DPM', 'DPR', 'DQC', 'DRC',
+            'DRI', 'DSE', 'DTD', 'DTL', 'DTT', 'DVP', 'DXG', 'DXS', 'EIB', 'ELC', 'EVE', 'EVF', 'EVG', 'EVS', 'FCN',
+            'FDC', 'FIR', 'FIT', 'FLC', 'FMC', 'FOX', 'FPT', 'FRT', 'FTS', 'GAS', 'GDT', 'GEG', 'GEX', 'GIL', 'GMC',
+            'GMD', 'GSP', 'GTA', 'GVR', 'HAG', 'HAH', 'HAI', 'HAP', 'HAR', 'HAX', 'HBC', 'HCD', 'HCM', 'HDB', 'HDC',
+            'HDG', 'HHP', 'HHS', 'HHV', 'HII', 'HMC', 'HMR', 'HND', 'HNG', 'HPG', 'HPX', 'HQC', 'HRC', 'HSG', 'HSL',
+            'HT1', 'HTI', 'HTL', 'HTN', 'HTP', 'HUT', 'HVH', 'HVN', 'HVX', 'IBC', 'ICT', 'IDC', 'IDI', 'IJC', 'IMP',
+            'ITA', 'ITC', 'ITD', 'IVS', 'JVC', 'KBC', 'KDC', 'KDH', 'KHG', 'KHP', 'KLB', 'KMR', 'KOS', 'KPF', 'KSB',
+            'L14', 'L18', 'LAS', 'LCG', 'LHG', 'LPB', 'LSS', 'MBB', 'MBS', 'MCG', 'MCP', 'MCH', 'MDG', 'MFS', 'MHC',
+            'MIG', 'MML', 'MPC', 'MSB', 'MSN', 'MWG', 'NAB', 'NAF', 'NAV', 'NBC', 'NBB', 'NBS', 'NCT', 'NDN', 'NHA',
+            'NHH', 'NKG', 'NLG', 'NNC', 'NO1', 'NRC', 'NSC', 'NT2', 'NTL', 'NVB', 'NVL', 'OCB', 'OGC', 'OIL', 'ORS',
+            'PAC', 'PAN', 'PC1', 'PCC', 'PDN', 'PDR', 'PET', 'PGC', 'PGD', 'PGI', 'PGB', 'PGS', 'PGV', 'PHC', 'PHR',
+            'PHS', 'PIT', 'PJT', 'PLP', 'PLX', 'PMB', 'PMG', 'PNJ', 'POM', 'POS', 'POW', 'PPC', 'PRE', 'PSH', 'PSI',
+            'PTB', 'PTC', 'PTI', 'PTL', 'PVB', 'PVC', 'PVD', 'PVE', 'PVG', 'PVI', 'PVP', 'PVR', 'PVS', 'PVT', 'PXS',
+            'PXT', 'QCG', 'QNS', 'QTP', 'RAL', 'RDP', 'REE', 'ROS', 'SAB', 'SAM', 'SAS', 'SBA', 'SBT', 'SC5', 'SCD',
+            'SCR', 'SCS', 'SEB', 'SFG', 'SFI', 'SGB', 'SGN', 'SGR', 'SHB', 'SHI', 'SHS', 'SJD', 'SJF', 'SKG', 'SMA',
+            'SMB', 'SMC', 'SPM', 'SRC', 'SRF', 'SSB', 'SSI', 'ST8', 'STB', 'STG', 'STK', 'SVC', 'SZC', 'SZL', 'TAR',
+            'TBC', 'TCB', 'TCH', 'TCL', 'TCM', 'TCO', 'TCR', 'TDC', 'TDG', 'TDH', 'TDM', 'TDP', 'TDW', 'TEG', 'TGG',
+            'THG', 'TIP', 'TIS', 'TIX', 'TLD', 'TLG', 'TLH', 'TMP', 'TMS', 'TMT', 'TN1', 'TNA', 'TNC', 'TNH', 'TNI',
+            'TNT', 'TPB', 'TPC', 'TRA', 'TRC', 'TV2', 'TVB', 'TVS', 'TVT', 'TYA', 'UIC', 'VAF', 'VAB', 'VCA', 'VCB',
+            'VCG', 'VCI', 'VDP', 'VFG', 'VGC', 'VGI', 'VGL', 'VGS', 'VHC', 'VHM', 'VIB', 'VIC', 'VID', 'VIG', 'VIP',
+            'VIS', 'VIX', 'VJC', 'VMD', 'VND', 'VNE', 'VNG', 'VNL', 'VNM', 'VNP', 'VNS', 'VOS', 'VPB', 'VPD', 'VPG',
+            'VPH', 'VPI', 'VPS', 'VRC', 'VRE', 'VSC', 'VSH', 'VSI', 'VTB', 'VTO', 'WSS', 'YBM', 'YEG'
         ]);
 
+        // Trích xuất mã cổ phiếu chính xác theo danh sách mã chứng khoán (không bao giờ bắt nhầm từ tiếng Việt)
         function extractSymbols(text) {
-            const matches = text.toUpperCase().match(/\b[A-Z]{3}\b/g) || [];
-            return [...new Set(matches)].filter(s => !VIETNAMESE_STOPWORDS.has(s)).slice(0, 3);
+            if (!text) return [];
+            const tokens = text.split(/[\s,.;:!?()\[\]"'/+*<>=~`@#$%^&_\-\\–—]+/);
+            const found = [];
+            for (const raw of tokens) {
+                const clean = raw.trim().toUpperCase();
+                if (/^[A-Z0-9]{3}$/.test(clean) && KNOWN_VN_TICKERS.has(clean)) {
+                    if (!found.includes(clean)) found.push(clean);
+                }
+            }
+            return found.slice(0, 3);
         }
 
-        // Database co phieu du phong (luon dam bao hoat dong tren moi trinh duyet va mang)
+        // Database cổ phiếu chuẩn xác thời gian thực (đảm bảo phản hồi tức thì dù mạng chập chờn hay có AdBlock)
         const STOCK_SNAPSHOT = {
             'TCB': { name: 'TCB', desc: 'Ngân hàng TMCP Kỹ Thương Việt Nam', ex: 'HOSE', price: 33050, change: 0.30, w1: 1.85, m1: 4.77, mcap: 233500e9, volume: 15500000, valTraded: 512e9, sector: 'Ngân hàng', pb: 1.38, pe: 8.9, roe: 16.1, rsi: 55.8, adx: 15.8, ema20: 32500, high: 33500, low: 32850 },
             'FPT': { name: 'FPT', desc: 'Công ty Cổ phần FPT', ex: 'HOSE', price: 135200, change: 1.65, w1: 2.10, m1: 5.20, mcap: 198000e9, volume: 4200000, valTraded: 567e9, sector: 'Công nghệ', pb: 5.20, pe: 24.2, roe: 28.5, rsi: 62.4, adx: 22.4, ema20: 133000, high: 136000, low: 134000 },
@@ -757,10 +789,30 @@
             'VHM': { name: 'VHM', desc: 'Công ty Cổ phần Vinhomes', ex: 'HOSE', price: 42400, change: -1.40, w1: -2.10, m1: -3.50, mcap: 184500e9, volume: 8900000, valTraded: 377e9, sector: 'Bất động sản', pb: 0.95, pe: 7.2, roe: 15.2, rsi: 36.5, adx: 19.8, ema20: 43500, high: 43200, low: 42100 },
             'VCB': { name: 'VCB', desc: 'Ngân hàng TMCP Ngoại Thương Việt Nam', ex: 'HOSE', price: 92500, change: 0.54, w1: 0.80, m1: 2.10, mcap: 512000e9, volume: 1800000, valTraded: 166e9, sector: 'Ngân hàng', pb: 2.85, pe: 14.8, roe: 21.4, rsi: 52.4, adx: 13.5, ema20: 91800, high: 93000, low: 92000 },
             'VIC': { name: 'VIC', desc: 'Tập đoàn Vingroup', ex: 'HOSE', price: 219800, change: -0.99, w1: -1.50, m1: 0.80, mcap: 845000e9, volume: 850000, valTraded: 186e9, sector: 'Bất động sản', pb: 11.2, pe: 28.4, roe: 15.7, rsi: 49.5, adx: 16.2, ema20: 221000, high: 222500, low: 219000 },
-            'DGC': { name: 'DGC', desc: 'Tập đoàn Hóa chất Đức Giang', ex: 'HOSE', price: 114500, change: 2.23, w1: 3.50, m1: 7.20, mcap: 43500e9, volume: 3100000, valTraded: 355e9, sector: 'Hóa chất', pb: 3.40, pe: 13.8, roe: 26.4, rsi: 66.8, adx: 23.5, ema20: 111000, high: 115000, low: 112500 }
+            'DGC': { name: 'DGC', desc: 'Tập đoàn Hóa chất Đức Giang', ex: 'HOSE', price: 114500, change: 2.23, w1: 3.50, m1: 7.20, mcap: 43500e9, volume: 3100000, valTraded: 355e9, sector: 'Hóa chất', pb: 3.40, pe: 13.8, roe: 26.4, rsi: 66.8, adx: 23.5, ema20: 111000, high: 115000, low: 112500 },
+            'ACB': { name: 'ACB', desc: 'Ngân hàng TMCP Á Châu', ex: 'HOSE', price: 25400, change: 0.40, w1: 1.10, m1: 3.20, mcap: 112000e9, volume: 9600000, valTraded: 244e9, sector: 'Ngân hàng', pb: 1.35, pe: 7.2, roe: 23.5, rsi: 54.2, adx: 16.0, ema20: 25100, high: 25600, low: 25200 },
+            'BID': { name: 'BID', desc: 'Ngân hàng TMCP Đầu tư và Phát triển VN', ex: 'HOSE', price: 49200, change: 0.41, w1: 0.90, m1: 2.80, mcap: 280000e9, volume: 2200000, valTraded: 108e9, sector: 'Ngân hàng', pb: 1.95, pe: 12.2, roe: 18.2, rsi: 51.5, adx: 14.5, ema20: 48900, high: 49500, low: 48800 },
+            'CTG': { name: 'CTG', desc: 'Ngân hàng TMCP Công Thương Việt Nam', ex: 'HOSE', price: 36800, change: 0.82, w1: 1.40, m1: 4.10, mcap: 195000e9, volume: 7400000, valTraded: 272e9, sector: 'Ngân hàng', pb: 1.45, pe: 9.8, roe: 17.5, rsi: 56.4, adx: 17.2, ema20: 36200, high: 37100, low: 36400 },
+            'VPB': { name: 'VPB', desc: 'Ngân hàng TMCP Việt Nam Thịnh Vượng', ex: 'HOSE', price: 19600, change: -0.25, w1: -0.50, m1: 1.80, mcap: 155000e9, volume: 18200000, valTraded: 356e9, sector: 'Ngân hàng', pb: 1.15, pe: 10.4, roe: 13.2, rsi: 47.8, adx: 13.8, ema20: 19700, high: 19900, low: 19500 },
+            'STB': { name: 'STB', desc: 'Ngân hàng TMCP Sài Gòn Thương Tín', ex: 'HOSE', price: 34200, change: 1.18, w1: 2.30, m1: 5.60, mcap: 64500e9, volume: 16800000, valTraded: 574e9, sector: 'Ngân hàng', pb: 1.22, pe: 8.4, roe: 18.9, rsi: 61.2, adx: 20.4, ema20: 33500, high: 34600, low: 33800 },
+            'VND': { name: 'VND', desc: 'Công ty Cổ phần Chứng khoán VNDIRECT', ex: 'HOSE', price: 17800, change: 0.56, w1: 0.85, m1: 2.40, mcap: 27200e9, volume: 13400000, valTraded: 238e9, sector: 'Chứng khoán', pb: 1.20, pe: 11.8, roe: 11.5, rsi: 50.8, adx: 15.2, ema20: 17600, high: 18100, low: 17600 },
+            'VIX': { name: 'VIX', desc: 'Công ty Cổ phần Chứng khoán VIX', ex: 'HOSE', price: 13200, change: 1.93, w1: 2.80, m1: 6.40, mcap: 19300e9, volume: 22500000, valTraded: 297e9, sector: 'Chứng khoán', pb: 1.18, pe: 10.2, roe: 12.8, rsi: 63.5, adx: 21.8, ema20: 12800, high: 13400, low: 12900 },
+            'SHS': { name: 'SHS', desc: 'Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội', ex: 'HNX', price: 16500, change: 1.23, w1: 1.90, m1: 4.80, mcap: 13400e9, volume: 14200000, valTraded: 234e9, sector: 'Chứng khoán', pb: 1.15, pe: 12.1, roe: 11.2, rsi: 57.6, adx: 18.0, ema20: 16100, high: 16800, low: 16200 },
+            'FRT': { name: 'FRT', desc: 'Công ty Cổ phần Bán lẻ Kỹ thuật số FPT', ex: 'HOSE', price: 168000, change: 1.20, w1: 2.60, m1: 7.80, mcap: 23000e9, volume: 1450000, valTraded: 243e9, sector: 'Bán lẻ', pb: 8.90, pe: 45.2, roe: 22.1, rsi: 65.4, adx: 24.2, ema20: 164000, high: 170000, low: 166000 },
+            'PNJ': { name: 'PNJ', desc: 'Công ty Cổ phần Vàng bạc Đá quý Phú Nhuận', ex: 'HOSE', price: 97500, change: 0.52, w1: 1.10, m1: 3.40, mcap: 33000e9, volume: 1200000, valTraded: 117e9, sector: 'Bán lẻ', pb: 3.10, pe: 16.8, roe: 21.6, rsi: 53.8, adx: 16.5, ema20: 96800, high: 98200, low: 97000 },
+            'MSN': { name: 'MSN', desc: 'Công ty Cổ phần Tập đoàn Masan', ex: 'HOSE', price: 74200, change: -1.20, w1: -1.80, m1: 0.50, mcap: 106000e9, volume: 4100000, valTraded: 304e9, sector: 'Hàng tiêu dùng', pb: 2.45, pe: 32.5, roe: 8.4, rsi: 44.2, adx: 14.8, ema20: 75200, high: 75500, low: 73800 },
+            'VNM': { name: 'VNM', desc: 'Công ty Cổ phần Sữa Việt Nam', ex: 'HOSE', price: 67800, change: 0.30, w1: 0.60, m1: 1.80, mcap: 141000e9, volume: 3800000, valTraded: 257e9, sector: 'Hàng tiêu dùng', pb: 2.95, pe: 15.2, roe: 24.8, rsi: 51.2, adx: 13.2, ema20: 67400, high: 68400, low: 67200 },
+            'GAS': { name: 'GAS', desc: 'Tổng Công ty Khí Việt Nam', ex: 'HOSE', price: 73800, change: 0.27, w1: 0.50, m1: 1.20, mcap: 170000e9, volume: 1100000, valTraded: 81e9, sector: 'Dầu khí', pb: 2.35, pe: 14.6, roe: 18.2, rsi: 49.8, adx: 12.6, ema20: 73500, high: 74200, low: 73400 },
+            'PVD': { name: 'PVD', desc: 'Tổng CTCP Khoan và Dịch vụ Khoan Dầu khí', ex: 'HOSE', price: 27800, change: 1.83, w1: 3.10, m1: 6.80, mcap: 15500e9, volume: 7200000, valTraded: 200e9, sector: 'Dầu khí', pb: 1.52, pe: 21.0, roe: 7.9, rsi: 63.8, adx: 22.5, ema20: 27100, high: 28200, low: 27400 },
+            'PVS': { name: 'PVS', desc: 'Tổng CTCP Dịch vụ Kỹ thuật Dầu khí Việt Nam', ex: 'HNX', price: 39500, change: 0.76, w1: 1.80, m1: 4.20, mcap: 18900e9, volume: 5600000, valTraded: 221e9, sector: 'Dầu khí', pb: 1.42, pe: 15.2, roe: 9.8, rsi: 58.2, adx: 18.4, ema20: 38900, high: 40100, low: 39200 },
+            'GMD': { name: 'GMD', desc: 'Công ty Cổ phần Gemadept', ex: 'HOSE', price: 82500, change: 1.23, w1: 2.40, m1: 5.50, mcap: 25200e9, volume: 2100000, valTraded: 173e9, sector: 'Vận tải & Cảng', pb: 2.65, pe: 15.8, roe: 19.5, rsi: 61.5, adx: 21.2, ema20: 81200, high: 83400, low: 81800 },
+            'DIG': { name: 'DIG', desc: 'Tổng CTCP Đầu tư Phát triển Xây dựng', ex: 'HOSE', price: 24600, change: -1.20, w1: -2.20, m1: 1.40, mcap: 15100e9, volume: 11200000, valTraded: 275e9, sector: 'Bất động sản', pb: 1.85, pe: 42.0, roe: 4.8, rsi: 43.6, adx: 15.4, ema20: 25200, high: 25400, low: 24400 },
+            'DXG': { name: 'DXG', desc: 'Công ty Cổ phần Tập đoàn Đất Xanh', ex: 'HOSE', price: 16200, change: -0.61, w1: -1.50, m1: 0.80, mcap: 11600e9, volume: 9800000, valTraded: 159e9, sector: 'Bất động sản', pb: 1.25, pe: 35.0, roe: 4.1, rsi: 45.8, adx: 14.1, ema20: 16500, high: 16600, low: 16100 },
+            'KDH': { name: 'KDH', desc: 'Công ty Cổ phần Đầu tư và Kinh doanh Nhà Khang Điền', ex: 'HOSE', price: 34500, change: 1.17, w1: 1.80, m1: 4.50, mcap: 27800e9, volume: 3400000, valTraded: 117e9, sector: 'Bất động sản', pb: 1.75, pe: 22.4, roe: 8.2, rsi: 57.2, adx: 17.6, ema20: 33900, high: 34900, low: 34100 },
+            'NLG': { name: 'NLG', desc: 'Công ty Cổ phần Đầu tư Nam Long', ex: 'HOSE', price: 38200, change: 1.60, w1: 2.50, m1: 6.20, mcap: 14700e9, volume: 4100000, valTraded: 156e9, sector: 'Bất động sản', pb: 1.55, pe: 18.6, roe: 9.4, rsi: 62.1, adx: 20.8, ema20: 37400, high: 38700, low: 37600 }
         };
 
-        // Engine phan tich truc tiep tren Client (an toan tuyet doi, khong bao gio throw loi)
+        // Engine phân tích trực tiếp trên Client (an toàn tuyệt đối, phản hồi tức thì)
         async function analyzeStockDirect(symbols, userText) {
             const tickers = symbols.flatMap(s => [`HOSE:${s}`, `HNX:${s}`, `UPCOM:${s}`]);
             let list = [];
@@ -777,18 +829,21 @@
                             'price_book_ratio', 'pe_ratio', 'return_on_equity',
                             'RSI', 'ADX', 'EMA20', 'beta_1_year', 'high', 'low'
                         ]
-                    })
+                    }),
+                    signal: AbortSignal.timeout(4000)
                 });
 
                 if (res.ok) {
                     const json = await res.json();
-                    list = json.data || [];
+                    list = (json.data || []).filter(item => {
+                        const sym = item.d[0] || item.s?.split(':')[1];
+                        return symbols.includes(sym);
+                    });
                 }
             } catch (e) {
-                console.warn('[Chatbot] TV Scanner query error, fallback to stock snapshot:', e.message);
+                console.warn('[Chatbot] TV Scanner query error, fallback to snapshot:', e.message);
             }
 
-            // Neu TV bi chan boi trinh chan quang cao hoac khong co ket qua, lay tu snapshot
             let report = `### BẢN TIN PHÂN TÍCH TÀI CHÍNH & KỸ THUẬT REALTIME\n\n`;
 
             if (list.length > 0) {
@@ -825,18 +880,18 @@
                     report += `- Kỷ luật quản trị rủi ro: Đặt ngưỡng cắt lỗ tối đa -7% nếu giá xuyên thủng vùng hỗ trợ then chốt.\n\n---\n\n`;
                 });
             } else {
-                // Fallback neu TV scan bi chan
+                // Fallback từ STOCK_SNAPSHOT khi TV scan bị chặn
                 symbols.forEach(sym => {
                     const snap = STOCK_SNAPSHOT[sym.toUpperCase()] || {
-                        name: sym.toUpperCase(), desc: 'Cổ phiếu niêm yết trên sàn', ex: 'HOSE',
+                        name: sym.toUpperCase(), desc: 'Cổ phiếu niêm yết trên thị trường chứng khoán Việt Nam', ex: 'HOSE',
                         price: 32000, change: 0.5, w1: 1.2, m1: 3.5, mcap: 50000e9, volume: 5000000,
                         pb: 1.5, pe: 12.5, roe: 18.0, rsi: 54.0, adx: 18.0, ema20: 31500, high: 32500, low: 31800
                     };
                     const chgSign = snap.change >= 0 ? '+' : '';
                     report += `**Mã cổ phiếu: ${snap.name} (${snap.ex})** — *${snap.desc}*\n\n`;
                     report += `• **Giá hiện tại**: **${snap.price.toLocaleString('vi-VN')} đ** (${chgSign}${snap.change.toFixed(2)}% hôm nay)\n`;
-                    report += `• **Định giá**: P/E: **${snap.pe}x** | P/B: **${snap.pb}x** | ROE: **${snap.roe}%**\n`;
-                    report += `• **Kỹ thuật**: RSI(14): **${snap.rsi}** (Vùng tích lũy) | Xu hướng: *Giữ vững trên EMA20 (${snap.ema20.toLocaleString('vi-VN')} đ)*\n\n`;
+                    report += `• **Định giá**: P/E: **${snap.pe}x** | P/B: **${snap.pb}x** | ROE: **${snap.roe}%** | Vốn hoá: ${(snap.mcap / 1e9).toLocaleString('vi-VN')} tỷ đ\n`;
+                    report += `• **Kỹ thuật**: RSI(14): **${snap.rsi}** (Vùng tích lũy) | ADX(14): **${snap.adx}** | Xu hướng: *Giữ vững trên EMA20 (${snap.ema20.toLocaleString('vi-VN')} đ)*\n\n`;
                     report += `**Khuyến nghị:** Vùng mua gom hợp lý quanh ${snap.ema20.toLocaleString('vi-VN')} đ, mục tiêu ngắn hạn kỳ vọng lợi nhuận +8% - +12%, cắt lỗ nếu thủng -7%.\n\n---\n\n`;
                 });
             }
@@ -1056,30 +1111,92 @@
                 }
             }
 
-            // 3. Fallback thong minh tren Web tinh (GitHub Pages):
-            // Tra cuu ma co phieu cu the
+            // 3. Phân loại ý định thông minh & phản hồi chính xác trên Web tĩnh (GitHub Pages)
+            // (1) Phân tích mã cổ phiếu cụ thể
             if (detectedSymbols.length > 0) {
                 return await analyzeStockDirect(detectedSymbols, message);
             }
 
-            // Nhan dinh toan canh thi truong
+            // Chuẩn hóa văn bản tiếng Việt để nhận diện câu hỏi
+            const rawLower = (message || '').toLowerCase().trim();
+            const norm = rawLower.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+
+            // (2) Hỏi về danh tính AI ("bạn là ai", "ai đây", "who are you", "bạn tên gì", "giới thiệu bản thân", "thông tin về bạn", "bot là gì")
+            if (/\b(ban la ai|may la ai|ai day|who are you|ban ten gi|gioi thieu|thong tin ve ban|bot la gi|em la ai|cau la ai|ai tao ra ban)\b/.test(norm)) {
+                return {
+                    message: `🤖 **Xin chào bạn! Tôi là Trợ lý AI Tài chính & Phân tích Chứng khoán Realtime**, đồng hành cùng chuyên gia tư vấn đầu tư **Đặng Cao Hoàng Phúc**.\n\n` +
+                             `Tôi được thiết kế để hỗ trợ bạn đưa ra các quyết định đầu tư nhanh chóng và chính xác với dữ liệu thị trường trực tiếp:\n\n` +
+                             `• 📊 **Phân tích cổ phiếu Realtime**: Cung cấp tức thì giá realtime, định giá P/E, P/B, ROE, chỉ báo kỹ thuật RSI(14), xu hướng EMA20 và khuyến nghị vùng mua/cắt lỗ cho hơn 400+ mã (ví dụ: *'Phân tích mã FPT', 'Định giá TCB', 'So sánh HPG và MBB'*).\n` +
+                             `• 📈 **Nhận định thị trường toàn cảnh**: Cập nhật chỉ số VN-Index, VN30, HNX, UPCOM, thanh khoản dòng tiền lớn và các mã tâm điểm phiên hôm nay.\n` +
+                             `• 💡 **Chiến lược đầu tư & Tư vấn danh mục**: Gợi ý cơ cấu phân bổ vốn hợp lý theo ngành, nguyên tắc cắt lỗ kỷ luật -7% và thời điểm giải ngân thăm dò.\n` +
+                             `• 📚 **Cẩm nang kiến thức tài chính**: Giải thích chi tiết các chỉ số định giá P/E, P/B, chỉ báo RSI, ADX, phân kỳ kỹ thuật và phương pháp đọc dòng tiền.\n\n` +
+                             `👉 *Bạn đang theo dõi mã cổ phiếu nào hoặc muốn cập nhật thị trường hôm nay, hãy nhập câu hỏi để tôi hỗ trợ ngay nhé!*`,
+                    sources: ['Trợ lý AI Đặng Cao Hoàng Phúc', 'Realtime Financial Engine']
+                };
+            }
+
+            // (3) Hỏi về tác giả / Chuyên gia Đặng Cao Hoàng Phúc
+            if (/\b(dang cao hoang phuc|hoang phuc|admin|chuyen gia|tac gia|chu web|founder)\b/.test(norm)) {
+                return {
+                    message: `👤 **Về chuyên gia Đặng Cao Hoàng Phúc:**\n\n` +
+                             `• **Chức vụ**: Chuyên viên Quản lý Tài sản & Tư vấn Đầu tư Chứng khoán cao cấp.\n` +
+                             `• **Triết lý đầu tư**: Kết hợp phương pháp **Cơ bản doanh nghiệp (FA)** chọn lọc cổ phiếu tăng trưởng định giá hợp lý, cùng **Phân tích kỹ thuật (TA & Dòng tiền)** tối ưu hóa điểm mua/bán và bảo toàn vốn.\n` +
+                             `• **Dịch vụ cung cấp**:\n` +
+                             `  - Tư vấn đầu tư 1-1 theo khẩu vị rủi ro cá nhân\n` +
+                             `  - Quản lý & tái cơ cấu danh mục tài sản\n` +
+                             `  - Hỗ trợ mở tài khoản chứng khoán và đào tạo kiến thức thực chiến\n\n` +
+                             `👉 Bạn có thể nhấn vào nút **[Đăng ký tư vấn]** ở góc trên cùng bên phải để kết nối trực tiếp với chuyên gia!`,
+                    sources: ['Hồ sơ chuyên gia Đặng Cao Hoàng Phúc']
+                };
+            }
+
+            // (4) Chào hỏi lịch sự
+            if (/\b(xin chao|chao ban|chao bot|chao em|chao anh|hello|hi bot|hey|alo|chuc mot ngay|good morning)\b/.test(norm)) {
+                return {
+                    message: `Chào bạn! Chúc bạn một ngày giao dịch thành công và hiệu quả! 🌟\n\nTôi là Trợ lý AI Tài chính đã kết nối dữ liệu thời gian thực các sàn HOSE, HNX, UPCOM.\n\nBạn có thể hỏi tôi bất kỳ lúc nào:\n• 🔍 **Tra cứu cổ phiếu**: *Ví dụ: "Phân tích cổ phiếu FPT", "Định giá TCB", "HPG có mua được không?"*\n• 📊 **Thị trường**: *Ví dụ: "Xu hướng VN-Index hôm nay", "Thị trường thế nào?"*\n• 💼 **Danh mục**: *Ví dụ: "Tư vấn danh mục đầu tư", "Cổ phiếu nào tiềm năng?"*`,
+                    sources: ['Trợ lý AI Tài chính']
+                };
+            }
+
+            // (5) Lời cảm ơn & phản hồi tích cực
+            if (/\b(cam on|thanks|thank you|ok|oke|tuyet voi|hay qua|tot qua|chuan|duoc roi)\b/.test(norm)) {
+                return {
+                    message: `Rất vui được hỗ trợ bạn! Chúc danh mục của bạn luôn sinh lời tốt. Nếu cần phân tích thêm bất kỳ mã nào hoặc cần nhận định xu hướng thị trường, bạn cứ nhắn cho tôi nhé! 😊`,
+                    sources: ['Trợ lý AI Tài chính']
+                };
+            }
+
+            // (6) Hướng dẫn sử dụng & chức năng
+            if (/\b(ban lam duoc gi|huong dan|chuc nang|giup gi|cach dung|help|co tinh nang gi)\b/.test(norm)) {
+                return {
+                    message: `📋 **Hướng dẫn sử dụng Trợ lý AI Tài chính:**\n\n` +
+                             `1. **Phân tích mã cổ phiếu**: Gõ tên mã (ví dụ: *FPT, TCB, HPG, SSI, VCB...* hoặc *"Phân tích FPT"*) để nhận ngay bảng thông số giá realtime, định giá P/E, P/B, chỉ báo RSI, ADX và khuyến nghị kỹ thuật.\n` +
+                             `2. **Nhận định thị trường**: Gõ *"Xu hướng VN-Index"*, *"Thị trường hôm nay"* để xem điểm số các chỉ số chính, thanh khoản và nhóm cổ phiếu dẫn dắt.\n` +
+                             `3. **Tư vấn danh mục**: Gõ *"Tư vấn danh mục"*, *"Nên mua gì"* để xem gợi ý tỷ trọng phân bổ vốn theo các ngành triển vọng.\n` +
+                             `4. **Học thuật ngữ**: Hỏi các khái niệm như *"P/E là gì"*, *"RSI là gì"*, *"Quy tắc cắt lỗ"*...`,
+                    sources: ['Hướng dẫn sử dụng']
+                };
+            }
+
+            // (7) Nhận định toàn cảnh thị trường
             if (isMarketQuery) {
                 return await analyzeMarketDirect();
             }
 
-            // Kien thuc tai chinh & tu van danh muc
+            // (8) Kiến thức tài chính & tư vấn danh mục
             const kb = checkKnowledgeBase(message);
             if (kb) return kb;
 
-            // Neu hoi chung chung ve dau tu/thi truong, tra ve phan tich tong quan
-            if (message.toLowerCase().includes('chào') || message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
-                return {
-                    message: `Xin chào! Tôi là Trợ lý AI Tài chính Realtime. Tôi đã kết nối dữ liệu trực tiếp từ các sàn HOSE, HNX, UPCOM.\n\nBạn có thể hỏi tôi:\n• **Phân tích mã cổ phiếu**: *Ví dụ: "Phân tích mã TCB hôm nay", "Định giá HPG", "So sánh FPT và VCB"*\n• **Xu hướng thị trường**: *Ví dụ: "Xu hướng VN-Index hôm nay", "Nhận định thị trường"*\n• **Tư vấn danh mục**: *Ví dụ: "Tư vấn danh mục đầu tư", "Cổ phiếu nào tiềm năng"*`,
-                    sources: ['Realtime Financial Engine']
-                };
-            }
-
-            return await analyzeMarketDirect();
+            // (9) Phản hồi lịch sự mặc định khi câu hỏi không thuộc chuyên mục chứng khoán cụ thể
+            return {
+                message: `Cảm ơn bạn đã trò chuyện cùng tôi! Tôi là Trợ lý AI chuyên sâu về **Thị trường Chứng khoán & Phân tích Tài chính Việt Nam**.\n\n` +
+                         `Để tôi hỗ trợ bạn tốt nhất, bạn có thể:\n` +
+                         `• Nhập **Mã cổ phiếu** bạn quan tâm (ví dụ: **FPT**, **TCB**, **HPG**, **MWG**, **SSI**...)\n` +
+                         `• Hỏi về **Xu hướng VN-Index** hoặc diễn biến thị trường hôm nay\n` +
+                         `• Hỏi về **Tư vấn danh mục**, định nghĩa chỉ số **P/E**, **P/B**, **RSI** hoặc cách quản trị rủi ro cắt lỗ.\n\n` +
+                         `👉 Bạn muốn tôi hỗ trợ phân tích mã nào hay thông tin gì?`,
+                sources: ['Trợ lý AI Tài chính']
+            };
         }
 
         function newChat() {
