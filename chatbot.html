@@ -1213,6 +1213,20 @@
                 </div>
             `;
         }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const query = params.get('ask') || params.get('q') || params.get('symbol');
+            if (query) {
+                const text = query.trim();
+                const prompt = (text.length <= 5 && !text.includes(' ')) ? `Phân tích chi tiết cổ phiếu ${text.toUpperCase()}` : text;
+                const input = document.getElementById('chatInput');
+                if (input) {
+                    input.value = prompt;
+                    setTimeout(() => sendMessage(), 400);
+                }
+            }
+        });
     </script>
 </body>
 </html>
