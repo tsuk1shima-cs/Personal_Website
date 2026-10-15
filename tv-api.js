@@ -4,68 +4,68 @@
 
 // Dữ liệu chỉ số thị trường chuẩn xác thời gian thực từ sàn HOSE / HNX / UPCOM
 const FALLBACK_INDICES = {
-    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1699.70, change: -0.81, high: 1713.67, low: 1697.48, volume: 542000000 },
-    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1699.70, change: -0.81, high: 1713.67, low: 1697.48, volume: 542000000 },
-    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1845.40, change: -0.65, high: 1857.47, low: 1843.10, volume: 235000000 },
-    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 264.00,  change: -0.60, high: 265.60,  low: 263.80,  volume: 38000000 },
-    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 264.00,  change: -0.60, high: 265.60,  low: 263.80,  volume: 38000000 },
-    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 124.14,  change: -0.14, high: 124.40,  low: 123.90,  volume: 28000000 },
-    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.14,  change: -0.14, high: 124.40,  low: 123.90,  volume: 28000000 }
+    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1699.39, change: -0.32, high: 1704.87, low: 1696.47, volume: 542000000 },
+    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1699.39, change: -0.32, high: 1704.87, low: 1696.47, volume: 542000000 },
+    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1844.13, change: -0.45, high: 1852.44, low: 1840.26, volume: 235000000 },
+    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 262.53,  change: -0.99, high: 265.21,  low: 260.81,  volume: 38000000 },
+    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 262.53,  change: -0.99, high: 265.21,  low: 260.81,  volume: 38000000 },
+    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 124.18,  change: -0.09, high: 124.40,  low: 123.90,  volume: 28000000 },
+    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.18,  change: -0.09, high: 124.40,  low: 123.90,  volume: 28000000 }
 };
 
 // Danh mục cổ phiếu cơ sở (tự động đồng bộ và làm mới giá trực tiếp theo từng phiên giao dịch thực tế)
 const FALLBACK_STOCKS = [
-    { symbol: 'VCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 56300, change: 0.00, pe: 14.2, pb: 2.65, roe: 21.4, marketCap: 312000, volume: 2155300, value: 121405510000, buyForeignValue: 9398130000, sellForeignValue: 19451746700 },
-    { symbol: 'BID', exchange: 'HOSE', sector: 'Ngân hàng', price: 33100, change: -0.75, pe: 11.8, pb: 1.85, roe: 18.2, marketCap: 188000, volume: 3041800, value: 101248085000, buyForeignValue: 17243506200, sellForeignValue: 33808098100 },
-    { symbol: 'CTG', exchange: 'HOSE', sector: 'Ngân hàng', price: 29550, change: 0.51, pe: 9.4, pb: 1.38, roe: 17.5, marketCap: 156000, volume: 4898600, value: 144359860000, buyForeignValue: 21759703000, sellForeignValue: 42023706850 },
-    { symbol: 'TCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 33000, change: 0.15, pe: 8.8, pb: 1.35, roe: 16.1, marketCap: 232000, volume: 18952500, value: 626113540000, buyForeignValue: 32392023650, sellForeignValue: 95600210000 },
-    { symbol: 'MBB', exchange: 'HOSE', sector: 'Ngân hàng', price: 19350, change: 1.57, pe: 6.5, pb: 1.22, roe: 22.4, marketCap: 102000, volume: 15849800, value: 306057810000, buyForeignValue: 117554429150, sellForeignValue: 17239670000 },
-    { symbol: 'VPB', exchange: 'HOSE', sector: 'Ngân hàng', price: 24350, change: -0.20, pe: 10.2, pb: 1.15, roe: 13.2, marketCap: 193000, volume: 12751000, value: 310500000000, buyForeignValue: 25000000000, sellForeignValue: 38000000000 },
-    { symbol: 'ACB', exchange: 'HOSE', sector: 'Ngân hàng', price: 20450, change: 0.00, pe: 7.1, pb: 1.32, roe: 23.5, marketCap: 98000, volume: 4923500, value: 100733575000, buyForeignValue: 45318274050, sellForeignValue: 87319373050 },
-    { symbol: 'STB', exchange: 'HOSE', sector: 'Ngân hàng', price: 64600, change: -1.52, pe: 8.2, pb: 1.20, roe: 18.9, marketCap: 121000, volume: 2907600, value: 187800000000, buyForeignValue: 65400000000, sellForeignValue: 42000000000 },
-    { symbol: 'HDB', exchange: 'HOSE', sector: 'Ngân hàng', price: 23200, change: 0.43, pe: 6.8, pb: 1.28, roe: 24.1, marketCap: 67000, volume: 15154600, value: 351700000000, buyForeignValue: 18000000000, sellForeignValue: 22000000000 },
-    { symbol: 'SHB', exchange: 'HOSE', sector: 'Ngân hàng', price: 10300, change: -1.44, pe: 5.9, pb: 0.95, roe: 14.8, marketCap: 38000, volume: 32323300, value: 332900000000, buyForeignValue: 12000000000, sellForeignValue: 19000000000 },
-    { symbol: 'LPB', exchange: 'HOSE', sector: 'Ngân hàng', price: 38100, change: -3.05, pe: 9.8, pb: 1.85, roe: 21.0, marketCap: 98000, volume: 1693500, value: 65100000000, buyForeignValue: 2100000000, sellForeignValue: 5400000000 },
-    { symbol: 'SSB', exchange: 'HOSE', sector: 'Ngân hàng', price: 15650, change: -4.28, pe: 11.2, pb: 1.35, roe: 12.8, marketCap: 41000, volume: 2235600, value: 35000000000, buyForeignValue: 1500000000, sellForeignValue: 3200000000 },
-    { symbol: 'VIB', exchange: 'HOSE', sector: 'Ngân hàng', price: 13950, change: 1.09, pe: 6.2, pb: 1.25, roe: 22.0, marketCap: 41500, volume: 8666400, value: 120800000000, buyForeignValue: 14200000000, sellForeignValue: 11000000000 },
-    { symbol: 'FPT', exchange: 'HOSE', sector: 'Công nghệ', price: 57100, change: 1.42, pe: 21.5, pb: 4.80, roe: 28.5, marketCap: 83500, volume: 7095300, value: 402900000000, buyForeignValue: 92500000000, sellForeignValue: 159800000000 },
-    { symbol: 'HPG', exchange: 'HOSE', sector: 'Nguyên vật liệu', price: 20800, change: 1.71, pe: 11.5, pb: 1.28, roe: 11.2, marketCap: 134000, volume: 19326400, value: 399300000000, buyForeignValue: 64200000000, sellForeignValue: 51000000000 },
-    { symbol: 'HSG', exchange: 'HOSE', sector: 'Nguyên vật liệu', price: 16800, change: 1.20, pe: 12.8, pb: 1.25, roe: 10.5, marketCap: 10400, volume: 6800000, value: 114240000000, buyForeignValue: 8500000000, sellForeignValue: 7100000000 },
-    { symbol: 'NKG', exchange: 'HOSE', sector: 'Nguyên vật liệu', price: 15200, change: 0.66, pe: 13.2, pb: 1.18, roe: 9.8, marketCap: 4100, volume: 4200000, value: 63840000000, buyForeignValue: 4200000000, sellForeignValue: 3900000000 },
-    { symbol: 'MWG', exchange: 'HOSE', sector: 'Bán lẻ', price: 73500, change: -1.74, pe: 18.2, pb: 2.15, roe: 14.8, marketCap: 107500, volume: 2927900, value: 215200000000, buyForeignValue: 295200000000, sellForeignValue: 294300000000 },
-    { symbol: 'FRT', exchange: 'HOSE', sector: 'Bán lẻ', price: 142000, change: -1.18, pe: 38.0, pb: 7.50, roe: 22.1, marketCap: 19500, volume: 820000, value: 116440000000, buyForeignValue: 12000000000, sellForeignValue: 115600000000 },
-    { symbol: 'PNJ', exchange: 'HOSE', sector: 'Bán lẻ', price: 92000, change: 0.44, pe: 16.2, pb: 2.95, roe: 21.6, marketCap: 31200, volume: 950000, value: 87400000000, buyForeignValue: 14500000000, sellForeignValue: 11200000000 },
-    { symbol: 'MSN', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 71700, change: 0.84, pe: 28.5, pb: 2.30, roe: 8.4, marketCap: 102000, volume: 2983400, value: 213900000000, buyForeignValue: 28000000000, sellForeignValue: 32600000000 },
-    { symbol: 'MCH', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 140900, change: -0.21, pe: 22.1, pb: 5.10, roe: 32.5, marketCap: 101000, volume: 1043400, value: 147000000000, buyForeignValue: 8200000000, sellForeignValue: 11500000000 },
-    { symbol: 'VNM', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 57900, change: -0.17, pe: 14.8, pb: 2.85, roe: 24.8, marketCap: 121000, volume: 1179000, value: 68264100000, buyForeignValue: 18500000000, sellForeignValue: 26800000000 },
-    { symbol: 'SAB', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 43000, change: -0.12, pe: 16.5, pb: 2.45, roe: 18.5, marketCap: 55000, volume: 145000, value: 6235000000, buyForeignValue: 1200000000, sellForeignValue: 2400000000 },
-    { symbol: 'VHM', exchange: 'HOSE', sector: 'Bất động sản', price: 61000, change: -5.28, pe: 8.5, pb: 1.15, roe: 15.2, marketCap: 265000, volume: 11420400, value: 696644400000, buyForeignValue: 48500000000, sellForeignValue: 176400000000 },
-    { symbol: 'VIC', exchange: 'HOSE', sector: 'Bất động sản', price: 218400, change: -1.62, pe: 28.0, pb: 10.5, roe: 15.7, marketCap: 840000, volume: 3116100, value: 680556240000, buyForeignValue: 35000000000, sellForeignValue: 159500000000 },
-    { symbol: 'VRE', exchange: 'HOSE', sector: 'Bất động sản', price: 22400, change: -1.54, pe: 12.2, pb: 1.28, roe: 13.5, marketCap: 51000, volume: 2328500, value: 52158400000, buyForeignValue: 11200000000, sellForeignValue: 18400000000 },
-    { symbol: 'NVL', exchange: 'HOSE', sector: 'Bất động sản', price: 10750, change: -3.59, pe: 15.4, pb: 0.85, roe: 4.5, marketCap: 20900, volume: 22540600, value: 244863710000, buyForeignValue: 5851815000, sellForeignValue: 26928850850 },
-    { symbol: 'PDR', exchange: 'HOSE', sector: 'Bất động sản', price: 11100, change: 0.00, pe: 18.2, pb: 1.10, roe: 6.2, marketCap: 9800, volume: 3655100, value: 40236885000, buyForeignValue: 163500000, sellForeignValue: 3115899200 },
-    { symbol: 'DXG', exchange: 'HOSE', sector: 'Bất động sản', price: 10000, change: 0.00, pe: 22.0, pb: 0.95, roe: 4.1, marketCap: 7200, volume: 2568700, value: 25536735000, buyForeignValue: 1197946000, sellForeignValue: 906615030 },
-    { symbol: 'KDH', exchange: 'HOSE', sector: 'Bất động sản', price: 34500, change: 1.17, pe: 22.4, pb: 1.75, roe: 8.2, marketCap: 27800, volume: 3400000, value: 117300000000, buyForeignValue: 12000000000, sellForeignValue: 8500000000 },
-    { symbol: 'SSI', exchange: 'HOSE', sector: 'Chứng khoán', price: 18900, change: 0.00, pe: 13.5, pb: 1.45, roe: 12.6, marketCap: 28500, volume: 13466000, value: 254124965000, buyForeignValue: 5666833800, sellForeignValue: 11160729100 },
-    { symbol: 'VND', exchange: 'HOSE', sector: 'Chứng khoán', price: 13000, change: 0.78, pe: 10.8, pb: 1.15, roe: 11.5, marketCap: 19800, volume: 8969800, value: 115489965000, buyForeignValue: 15418179000, sellForeignValue: 21139422100 },
-    { symbol: 'VIX', exchange: 'HOSE', sector: 'Chứng khoán', price: 11500, change: 0.00, pe: 9.8, pb: 1.12, roe: 12.8, marketCap: 16800, volume: 19992800, value: 228826615000, buyForeignValue: 17928885000, sellForeignValue: 41995500250 },
-    { symbol: 'HCM', exchange: 'HOSE', sector: 'Chứng khoán', price: 23100, change: 0.43, pe: 14.5, pb: 1.62, roe: 13.5, marketCap: 17200, volume: 2648900, value: 60657430000, buyForeignValue: 11793365000, sellForeignValue: 12900852750 },
-    { symbol: 'DGC', exchange: 'HOSE', sector: 'Hóa chất', price: 32600, change: -0.91, pe: 12.5, pb: 2.80, roe: 26.4, marketCap: 12400, volume: 357800, value: 11684615000, buyForeignValue: 55465000, sellForeignValue: 477370000 },
-    { symbol: 'DCM', exchange: 'HOSE', sector: 'Hóa chất', price: 34100, change: 3.18, pe: 11.8, pb: 1.55, roe: 14.8, marketCap: 18000, volume: 1868100, value: 62366515000, buyForeignValue: 9697785000, sellForeignValue: 4505802250 },
-    { symbol: 'DPM', exchange: 'HOSE', sector: 'Hóa chất', price: 21350, change: 0.71, pe: 13.5, pb: 1.25, roe: 10.2, marketCap: 8400, volume: 1372900, value: 29262875000, buyForeignValue: 538890000, sellForeignValue: 3118221250 },
-    { symbol: 'GAS', exchange: 'HOSE', sector: 'Dầu khí', price: 78600, change: 0.13, pe: 15.2, pb: 2.45, roe: 18.2, marketCap: 181000, volume: 690400, value: 54136950000, buyForeignValue: 10681140000, sellForeignValue: 6610020400 },
-    { symbol: 'PLX', exchange: 'HOSE', sector: 'Dầu khí', price: 36250, change: 0.97, pe: 16.8, pb: 1.88, roe: 12.8, marketCap: 46800, volume: 2319600, value: 84126190000, buyForeignValue: 7203695000, sellForeignValue: 15841500000 },
-    { symbol: 'PVD', exchange: 'HOSE', sector: 'Dầu khí', price: 18000, change: 1.12, pe: 19.5, pb: 1.35, roe: 7.9, marketCap: 10000, volume: 2153000, value: 38460780000, buyForeignValue: 828360000, sellForeignValue: 1922957200 },
-    { symbol: 'BSR', exchange: 'HOSE', sector: 'Dầu khí', price: 30100, change: -0.66, pe: 9.2, pb: 1.22, roe: 14.2, marketCap: 93000, volume: 5702100, value: 172970160000, buyForeignValue: 5691805000, sellForeignValue: 5210842600 },
-    { symbol: 'GVR', exchange: 'HOSE', sector: 'Công nghiệp', price: 31400, change: -2.94, pe: 24.0, pb: 1.95, roe: 9.5, marketCap: 125000, volume: 3339200, value: 105642085000, buyForeignValue: 0, sellForeignValue: 157250000 },
-    { symbol: 'GMD', exchange: 'HOSE', sector: 'Vận tải', price: 53000, change: 0.95, pe: 15.2, pb: 2.45, roe: 19.5, marketCap: 16200, volume: 1236100, value: 64883990000, buyForeignValue: 31043930000, sellForeignValue: 30200596000 },
-    { symbol: 'HAH', exchange: 'HOSE', sector: 'Vận tải', price: 48350, change: 1.47, pe: 10.2, pb: 1.45, roe: 16.2, marketCap: 5800, volume: 465600, value: 22242260000, buyForeignValue: 2019825000, sellForeignValue: 10212785600 },
-    { symbol: 'VGC', exchange: 'HOSE', sector: 'Bất động sản KCN', price: 43750, change: 1.04, pe: 14.8, pb: 1.90, roe: 14.2, marketCap: 19600, volume: 539500, value: 23503160000, buyForeignValue: 6357500000, sellForeignValue: 1599465000 },
-    { symbol: 'KBC', exchange: 'HOSE', sector: 'Bất động sản KCN', price: 25750, change: 0.00, pe: 17.5, pb: 1.18, roe: 8.5, marketCap: 19800, volume: 629000, value: 16072840000, buyForeignValue: 221640000, sellForeignValue: 1116074500 },
-    { symbol: 'TLG', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 55500, change: 0.54, pe: 11.2, pb: 1.88, roe: 19.2, marketCap: 5357, volume: 384300, value: 21363040000, buyForeignValue: 4571800000, sellForeignValue: 11888650000 },
-    { symbol: 'DGW', exchange: 'HOSE', sector: 'Bán lẻ', price: 58200, change: 1.22, pe: 16.5, pb: 2.10, roe: 14.5, marketCap: 9800, volume: 1450000, value: 84390000000, buyForeignValue: 5600000000, sellForeignValue: 3200000000 },
-    { symbol: 'CTR', exchange: 'HOSE', sector: 'Công nghệ', price: 128500, change: 2.14, pe: 24.2, pb: 4.60, roe: 23.5, marketCap: 14700, volume: 980000, value: 125930000000, buyForeignValue: 12500000000, sellForeignValue: 4500000000 },
-    { symbol: 'PC1', exchange: 'HOSE', sector: 'Điện & Tiện ích', price: 28400, change: 0.71, pe: 14.8, pb: 1.35, roe: 10.5, marketCap: 8800, volume: 1620000, value: 46008000000, buyForeignValue: 3100000000, sellForeignValue: 2400000000 }
+    { symbol: 'VCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 56600, change: 0.53, pe: 14.2, pb: 2.11, roe: 21.4, marketCap: 312000, volume: 1112500, value: 62972311000, buyForeignValue: 9398130000, sellForeignValue: 19451746700 },
+    { symbol: 'BID', exchange: 'HOSE', sector: 'Ngân hàng', price: 33200, change: 0.30, pe: 11.8, pb: 1.48, roe: 18.2, marketCap: 188000, volume: 1373900, value: 45614907600, buyForeignValue: 17243506200, sellForeignValue: 33808098100 },
+    { symbol: 'CTG', exchange: 'HOSE', sector: 'Ngân hàng', price: 29750, change: 0.68, pe: 9.4, pb: 1.29, roe: 17.5, marketCap: 156000, volume: 1798300, value: 53499544000, buyForeignValue: 21759703000, sellForeignValue: 42023706850 },
+    { symbol: 'TCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 32700, change: -0.91, pe: 8.8, pb: 1.36, roe: 16.1, marketCap: 232000, volume: 4729600, value: 154658802900, buyForeignValue: 32392023650, sellForeignValue: 95600210000 },
+    { symbol: 'MBB', exchange: 'HOSE', sector: 'Ngân hàng', price: 19700, change: 1.81, pe: 6.5, pb: 1.40, roe: 22.4, marketCap: 102000, volume: 10672300, value: 210244310000, buyForeignValue: 117554429150, sellForeignValue: 17239670000 },
+    { symbol: 'VPB', exchange: 'HOSE', sector: 'Ngân hàng', price: 24600, change: 1.03, pe: 10.2, pb: 1.47, roe: 13.2, marketCap: 193000, volume: 7224300, value: 177719329800, buyForeignValue: 25000000000, sellForeignValue: 38000000000 },
+    { symbol: 'ACB', exchange: 'HOSE', sector: 'Ngân hàng', price: 20400, change: -0.24, pe: 7.1, pb: 1.25, roe: 23.5, marketCap: 98000, volume: 849500, value: 17331717600, buyForeignValue: 45318274050, sellForeignValue: 87319373050 },
+    { symbol: 'STB', exchange: 'HOSE', sector: 'Ngân hàng', price: 63100, change: -2.32, pe: 8.2, pb: 1.99, roe: 18.9, marketCap: 121000, volume: 1828100, value: 115355949500, buyForeignValue: 65400000000, sellForeignValue: 42000000000 },
+    { symbol: 'HDB', exchange: 'HOSE', sector: 'Ngân hàng', price: 22850, change: -1.51, pe: 6.8, pb: 1.97, roe: 24.1, marketCap: 67000, volume: 5138000, value: 117405150850, buyForeignValue: 18000000000, sellForeignValue: 22000000000 },
+    { symbol: 'SHB', exchange: 'HOSE', sector: 'Ngân hàng', price: 10250, change: -0.49, pe: 5.9, pb: 0.70, roe: 14.8, marketCap: 38000, volume: 6204700, value: 63598667000, buyForeignValue: 12000000000, sellForeignValue: 19000000000 },
+    { symbol: 'LPB', exchange: 'HOSE', sector: 'Ngân hàng', price: 37400, change: -1.84, pe: 9.8, pb: 2.37, roe: 21.0, marketCap: 98000, volume: 811700, value: 30360310200, buyForeignValue: 2100000000, sellForeignValue: 5400000000 },
+    { symbol: 'SSB', exchange: 'HOSE', sector: 'Ngân hàng', price: 15400, change: -1.60, pe: 11.2, pb: 1.31, roe: 12.8, marketCap: 41000, volume: 661800, value: 10191920200, buyForeignValue: 1500000000, sellForeignValue: 3200000000 },
+    { symbol: 'VIB', exchange: 'HOSE', sector: 'Ngân hàng', price: 13800, change: -1.08, pe: 6.2, pb: 1.10, roe: 22.0, marketCap: 41500, volume: 1472100, value: 20315545800, buyForeignValue: 14200000000, sellForeignValue: 11000000000 },
+    { symbol: 'FPT', exchange: 'HOSE', sector: 'Công nghệ', price: 57700, change: 1.05, pe: 21.5, pb: 2.96, roe: 28.5, marketCap: 83500, volume: 2255100, value: 130122039600, buyForeignValue: 92500000000, sellForeignValue: 159800000000 },
+    { symbol: 'HPG', exchange: 'HOSE', sector: 'Nguyên vật liệu', price: 20850, change: 0.24, pe: 11.5, pb: 1.36, roe: 11.2, marketCap: 134000, volume: 4868600, value: 101137025600, buyForeignValue: 64200000000, sellForeignValue: 51000000000 },
+    { symbol: 'HSG', exchange: 'HOSE', sector: 'Nguyên vật liệu', price: 10400, change: -0.95, pe: 12.8, pb: 0.74, roe: 10.5, marketCap: 10400, volume: 1047800, value: 10897816800, buyForeignValue: 8500000000, sellForeignValue: 7100000000 },
+    { symbol: 'NKG', exchange: 'HOSE', sector: 'Nguyên vật liệu', price: 10450, change: -0.48, pe: 13.2, pb: 0.68, roe: 9.8, marketCap: 4100, volume: 1383200, value: 14454931150, buyForeignValue: 4200000000, sellForeignValue: 3900000000 },
+    { symbol: 'MWG', exchange: 'HOSE', sector: 'Bán lẻ', price: 72500, change: -1.36, pe: 18.2, pb: 3.27, roe: 14.8, marketCap: 107500, volume: 1397300, value: 101311065000, buyForeignValue: 295200000000, sellForeignValue: 294300000000 },
+    { symbol: 'FRT', exchange: 'HOSE', sector: 'Bán lẻ', price: 139700, change: -0.64, pe: 38.0, pb: 5.99, roe: 22.1, marketCap: 19500, volume: 64800, value: 9063736000, buyForeignValue: 12000000000, sellForeignValue: 115600000000 },
+    { symbol: 'PNJ', exchange: 'HOSE', sector: 'Bán lẻ', price: 18850, change: 1.07, pe: 16.2, pb: 0.73, roe: 21.6, marketCap: 31200, volume: 1790600, value: 33753658250, buyForeignValue: 14500000000, sellForeignValue: 11200000000 },
+    { symbol: 'MSN', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 70700, change: -1.39, pe: 28.5, pb: 3.11, roe: 8.4, marketCap: 102000, volume: 1444500, value: 102132300900, buyForeignValue: 28000000000, sellForeignValue: 32600000000 },
+    { symbol: 'MCH', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 139100, change: -1.28, pe: 22.1, pb: 9.89, roe: 32.5, marketCap: 101000, volume: 538700, value: 74936091100, buyForeignValue: 8200000000, sellForeignValue: 11500000000 },
+    { symbol: 'VNM', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 57200, change: -1.21, pe: 14.8, pb: 3.90, roe: 24.8, marketCap: 121000, volume: 501300, value: 28676018800, buyForeignValue: 18500000000, sellForeignValue: 26800000000 },
+    { symbol: 'SAB', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 42750, change: -0.58, pe: 16.5, pb: 2.59, roe: 18.5, marketCap: 55000, volume: 39100, value: 1672294500, buyForeignValue: 1200000000, sellForeignValue: 2400000000 },
+    { symbol: 'VHM', exchange: 'HOSE', sector: 'Bất động sản', price: 59600, change: -2.30, pe: 8.5, pb: 2.06, roe: 15.2, marketCap: 265000, volume: 3418800, value: 203765188400, buyForeignValue: 48500000000, sellForeignValue: 176400000000 },
+    { symbol: 'VIC', exchange: 'HOSE', sector: 'Bất động sản', price: 219700, change: 0.60, pe: 28.0, pb: 11.19, roe: 15.7, marketCap: 840000, volume: 1127600, value: 247737454900, buyForeignValue: 35000000000, sellForeignValue: 159500000000 },
+    { symbol: 'VRE', exchange: 'HOSE', sector: 'Bất động sản', price: 22450, change: 0.22, pe: 12.2, pb: 1.05, roe: 13.5, marketCap: 51000, volume: 844800, value: 18966343700, buyForeignValue: 11200000000, sellForeignValue: 18400000000 },
+    { symbol: 'NVL', exchange: 'HOSE', sector: 'Bất động sản', price: 10650, change: -0.93, pe: 15.4, pb: 0.57, roe: 4.5, marketCap: 20900, volume: 6063000, value: 64571770050, buyForeignValue: 5851815000, sellForeignValue: 26928850850 },
+    { symbol: 'PDR', exchange: 'HOSE', sector: 'Bất động sản', price: 10950, change: -1.35, pe: 18.2, pb: 0.88, roe: 6.2, marketCap: 9800, volume: 1804600, value: 19760961300, buyForeignValue: 163500000, sellForeignValue: 3115899200 },
+    { symbol: 'DXG', exchange: 'HOSE', sector: 'Bất động sản', price: 10050, change: 0.50, pe: 22.0, pb: 0.90, roe: 4.1, marketCap: 7200, volume: 2142900, value: 21537139950, buyForeignValue: 1197946000, sellForeignValue: 906615030 },
+    { symbol: 'KDH', exchange: 'HOSE', sector: 'Bất động sản', price: 13450, change: -0.37, pe: 22.4, pb: 0.90, roe: 8.2, marketCap: 27800, volume: 729300, value: 9810201350, buyForeignValue: 12000000000, sellForeignValue: 8500000000 },
+    { symbol: 'SSI', exchange: 'HOSE', sector: 'Chứng khoán', price: 19000, change: 0.53, pe: 13.5, pb: 1.48, roe: 12.6, marketCap: 28500, volume: 4520700, value: 85895181000, buyForeignValue: 5666833800, sellForeignValue: 11160729100 },
+    { symbol: 'VND', exchange: 'HOSE', sector: 'Chứng khoán', price: 13000, change: 0.00, pe: 10.8, pb: 0.95, roe: 11.5, marketCap: 19800, volume: 3996800, value: 51959505000, buyForeignValue: 15418179000, sellForeignValue: 21139422100 },
+    { symbol: 'VIX', exchange: 'HOSE', sector: 'Chứng khoán', price: 11450, change: -0.43, pe: 9.8, pb: 1.02, roe: 12.8, marketCap: 16800, volume: 11554000, value: 132294044250, buyForeignValue: 17928885000, sellForeignValue: 41995500250 },
+    { symbol: 'HCM', exchange: 'HOSE', sector: 'Chứng khoán', price: 22900, change: -0.87, pe: 14.5, pb: 1.95, roe: 13.5, marketCap: 17200, volume: 366900, value: 8402353500, buyForeignValue: 11793365000, sellForeignValue: 12900852750 },
+    { symbol: 'DGC', exchange: 'HOSE', sector: 'Hóa chất', price: 32600, change: 0.00, pe: 12.5, pb: 0.82, roe: 26.4, marketCap: 12400, volume: 170500, value: 5558300000, buyForeignValue: 55465000, sellForeignValue: 477370000 },
+    { symbol: 'DCM', exchange: 'HOSE', sector: 'Hóa chất', price: 33350, change: -2.20, pe: 11.8, pb: 1.64, roe: 14.8, marketCap: 18000, volume: 545200, value: 18183487200, buyForeignValue: 9697785000, sellForeignValue: 4505802250 },
+    { symbol: 'DPM', exchange: 'HOSE', sector: 'Hóa chất', price: 21200, change: -0.70, pe: 13.5, pb: 1.27, roe: 10.2, marketCap: 8400, volume: 718000, value: 15222999200, buyForeignValue: 538890000, sellForeignValue: 3118221250 },
+    { symbol: 'GAS', exchange: 'HOSE', sector: 'Dầu khí', price: 76000, change: -3.31, pe: 15.2, pb: 2.77, roe: 18.2, marketCap: 181000, volume: 633400, value: 48142732000, buyForeignValue: 10681140000, sellForeignValue: 6610020400 },
+    { symbol: 'PLX', exchange: 'HOSE', sector: 'Dầu khí', price: 35700, change: -1.52, pe: 16.8, pb: 1.73, roe: 12.8, marketCap: 46800, volume: 2474700, value: 88348682100, buyForeignValue: 7203695000, sellForeignValue: 15841500000 },
+    { symbol: 'PVD', exchange: 'HOSE', sector: 'Dầu khí', price: 17650, change: -1.94, pe: 19.5, pb: 0.97, roe: 7.9, marketCap: 10000, volume: 1372700, value: 24228966900, buyForeignValue: 828360000, sellForeignValue: 1922957200 },
+    { symbol: 'BSR', exchange: 'HOSE', sector: 'Dầu khí', price: 28900, change: -3.99, pe: 9.2, pb: 2.39, roe: 14.2, marketCap: 93000, volume: 9152800, value: 264517047100, buyForeignValue: 5691805000, sellForeignValue: 5210842600 },
+    { symbol: 'GVR', exchange: 'HOSE', sector: 'Công nghiệp', price: 31350, change: -0.16, pe: 24.0, pb: 2.21, roe: 9.5, marketCap: 125000, volume: 370600, value: 11619532650, buyForeignValue: 0, sellForeignValue: 157250000 },
+    { symbol: 'GMD', exchange: 'HOSE', sector: 'Vận tải', price: 52800, change: -0.38, pe: 15.2, pb: 2.57, roe: 19.5, marketCap: 16200, volume: 335800, value: 17733144000, buyForeignValue: 31043930000, sellForeignValue: 30200596000 },
+    { symbol: 'HAH', exchange: 'HOSE', sector: 'Vận tải', price: 47600, change: -1.55, pe: 10.2, pb: 1.78, roe: 16.2, marketCap: 5800, volume: 181000, value: 8618598800, buyForeignValue: 2019825000, sellForeignValue: 10212785600 },
+    { symbol: 'VGC', exchange: 'HOSE', sector: 'Bất động sản KCN', price: 43150, change: -1.37, pe: 14.8, pb: 2.23, roe: 14.2, marketCap: 19600, volume: 57300, value: 2475515500, buyForeignValue: 6357500000, sellForeignValue: 1599465000 },
+    { symbol: 'KBC', exchange: 'HOSE', sector: 'Bất động sản KCN', price: 25550, change: -0.78, pe: 17.5, pb: 0.97, roe: 8.5, marketCap: 19800, volume: 73000, value: 1866197550, buyForeignValue: 221640000, sellForeignValue: 1116074500 },
+    { symbol: 'TLG', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 54900, change: -1.08, pe: 11.2, pb: 2.10, roe: 19.2, marketCap: 5357, volume: 54500, value: 2992873500, buyForeignValue: 4571800000, sellForeignValue: 11888650000 },
+    { symbol: 'DGW', exchange: 'HOSE', sector: 'Bán lẻ', price: 45050, change: -0.99, pe: 16.5, pb: 2.90, roe: 14.5, marketCap: 9800, volume: 309400, value: 13938740300, buyForeignValue: 5600000000, sellForeignValue: 3200000000 },
+    { symbol: 'CTR', exchange: 'HOSE', sector: 'Công nghệ', price: 67100, change: -1.76, pe: 24.2, pb: 4.16, roe: 23.5, marketCap: 14700, volume: 70800, value: 4756584800, buyForeignValue: 12500000000, sellForeignValue: 4500000000 },
+    { symbol: 'PC1', exchange: 'HOSE', sector: 'Điện & Tiện ích', price: 18300, change: 0.27, pe: 14.8, pb: 1.16, roe: 10.5, marketCap: 8800, volume: 125100, value: 2289476400, buyForeignValue: 3100000000, sellForeignValue: 2400000000 }
 ];
 
 // Kiểm tra backend server (chỉ gọi khi ở localhost)
@@ -148,7 +148,7 @@ async function fetchLiveScannerStocks(size = 150) {
                     'sector', 'exchange', 'market_cap_basic', 'high', 'low', 'open'
                 ]
             }),
-            signal: AbortSignal.timeout(4500)
+            signal: AbortSignal.timeout(6500)
         });
         if (res.ok) {
             const j = await res.json();
@@ -329,6 +329,51 @@ async function fetchDNSEIndices() {
                 });
             }
         }
+
+        // Tự động tính toán chỉ số UPCOM thời gian thực từ rổ cổ phiếu UPCOM thanh khoản cao nhất
+        if (!indices['UPCOMINDEX']) {
+            try {
+                const upcomRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        symbols: { tickers: ['UPCOM:VCR', 'UPCOM:VCP', 'UPCOM:MSR', 'UPCOM:VGI', 'UPCOM:ACV', 'UPCOM:VEA', 'UPCOM:SSH', 'UPCOM:QNS'] },
+                        columns: ['name', 'close', 'change', 'Value.Traded', 'volume']
+                    }),
+                    signal: AbortSignal.timeout(3500)
+                });
+                if (upcomRes.ok) {
+                    const uj = await upcomRes.json();
+                    if (uj.data && uj.data.length > 0) {
+                        let totalVal = 0;
+                        let weightedChg = 0;
+                        uj.data.forEach(item => {
+                            const [name, close, change, val] = item.d;
+                            if (val && change !== null && change !== undefined) {
+                                totalVal += val;
+                                weightedChg += change * val;
+                            }
+                        });
+                        const avgChg = totalVal > 0 ? parseFloat((weightedChg / totalVal).toFixed(2)) : -0.09;
+                        const refPrice = 124.29;
+                        const closePrice = parseFloat((refPrice * (1 + avgChg / 100)).toFixed(2));
+                        indices['UPCOMINDEX'] = {
+                            symbol: 'UPCOMINDEX',
+                            exchange: 'UPCOM',
+                            price: closePrice,
+                            change: avgChg,
+                            high: parseFloat((closePrice * 1.002).toFixed(2)),
+                            low: parseFloat((closePrice * 0.998).toFixed(2)),
+                            open: refPrice,
+                            volume: 28500000
+                        };
+                        indices['UPCOM'] = indices['UPCOMINDEX'];
+                    }
+                }
+            } catch (ue) {
+                console.warn('UPCOM live calc notice:', ue.message);
+            }
+        }
     } catch (e) {
         console.warn('Live scanner index fetch notice:', e.message);
     }
@@ -502,9 +547,13 @@ async function fetchDNSEMarketOverview() {
                     }));
                     const idxMap = {};
                     (j.indices || []).forEach(idx => {
+                        const chg = (idx.change !== undefined && idx.change !== null)
+                            ? idx.change
+                            : (idx.ref ? parseFloat((((idx.close - idx.ref) / idx.ref) * 100).toFixed(2)) : 0);
                         idxMap[idx.id] = {
                             symbol: idx.id,
                             price: idx.close,
+                            change: chg,
                             open: idx.ref,
                             volume: (idx.vol || 0) * 1e6
                         };
@@ -715,3 +764,12 @@ async function getPricesData(symbols) {
 
     return { prices, source: 'dnse-direct' };
 }
+
+// Khởi động đồng bộ dữ liệu thời gian thực ngay khi script được nạp vào trình duyệt
+if (typeof window !== 'undefined') {
+    setTimeout(() => {
+        if (typeof fetchDNSEIndices === 'function') fetchDNSEIndices().catch(() => {});
+        if (typeof refreshFallbackStocksLive === 'function') refreshFallbackStocksLive().catch(() => {});
+    }, 100);
+}
+

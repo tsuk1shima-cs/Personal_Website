@@ -3165,21 +3165,29 @@ body {
       if (!track) return;
 
       const indices = [
-        { name: 'VN-INDEX', key: 'VNINDEX', fallback: 1698.45, chg: -0.38 },
-        { name: 'VN30', key: 'VN30', fallback: 1844.46, chg: -0.45 },
-        { name: 'HNX', key: 'HNXINDEX', fallback: 263.43, chg: -0.65 },
-        { name: 'UPCOM', key: 'UPCOMINDEX', fallback: 124.14, chg: -0.14 }
+        { name: 'VN-INDEX', key: 'VNINDEX', fallback: 1699.39, chg: -0.32 },
+        { name: 'VN30', key: 'VN30', fallback: 1844.13, chg: -0.45 },
+        { name: 'HNX', key: 'HNXINDEX', fallback: 262.53, chg: -0.99 },
+        { name: 'UPCOM', key: 'UPCOMINDEX', fallback: 124.18, chg: -0.09 }
       ];
 
-      const stocks = (stockDataList && stockDataList.length > 0) ? stockDataList.slice(0, 22) : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.slice(0, 22) : []);
+      // Ưu tiên danh mục thực tế từ Live Scanner, sắp xếp theo thanh khoản cao nhất
+      let stocks = (stockDataList && stockDataList.length > 0) ? [...stockDataList] : [];
+      if (!stocks.length && typeof FALLBACK_STOCKS !== 'undefined') {
+        stocks = [...FALLBACK_STOCKS];
+      }
+      stocks.sort((a, b) => (b.value || b.volume || 0) - (a.value || a.volume || 0));
+      const displayStocks = stocks.slice(0, 24);
 
       let html = '';
 
-      // 1. Chỉ số thị trường
+      // 1. Chỉ số thị trường thời gian thực
       indices.forEach(idx => {
         const d = (marketIndices && marketIndices[idx.key]) || {};
         const p = d.price || idx.fallback;
-        const c = d.change !== undefined && d.change !== null ? d.change : idx.chg;
+        const c = (d.change !== undefined && d.change !== null)
+          ? d.change
+          : (d.open ? parseFloat((((p - d.open) / d.open) * 100).toFixed(2)) : idx.chg);
         const colorCls = c > 0 ? 'text-up' : (c < 0 ? 'text-down' : 'text-ref');
         const arrow = c > 0 ? '▲' : (c < 0 ? '▼' : '■');
         const sign = c > 0 ? '+' : '';
@@ -3193,8 +3201,8 @@ body {
         `;
       });
 
-      // 2. Cổ phiếu dẫn dắt
-      stocks.forEach(s => {
+      // 2. Cổ phiếu dẫn dắt thị trường thời gian thực
+      displayStocks.forEach(s => {
         const c = s.change !== undefined && s.change !== null ? s.change : 0;
         let colorCls = 'text-ref';
         let arrow = '■';
@@ -3293,10 +3301,10 @@ body {
       renderTickerBanner();
       startLiveOrderTape();
 
-      // Cứ mỗi 10 giây làm mới nội dung thanh chạy Ticker Banner
-      setInterval(renderTickerBanner, 10000);
+      // Cứ mỗi 7 giây làm mới nội dung thanh chạy Ticker Banner
+      setInterval(renderTickerBanner, 7000);
 
-      // Polling ngầm dữ liệu giá DNSE & TradingView liên tục mỗi 3.5 giây
+      // Polling ngầm dữ liệu giá DNSE & TradingView liên tục mỗi 7 giây
       setInterval(async () => {
         if (isPolling) return;
         isPolling = true;
@@ -3358,12 +3366,15 @@ body {
             }
           });
 
+          // Cập nhật lại thanh chạy Ticker Banner với dữ liệu thực tế mới nhất
+          renderTickerBanner();
+
         } catch (err) {
           console.warn('Realtime ticker poll notice:', err);
         } finally {
           isPolling = false;
         }
-      }, 3500);
+      }, 7000);
     }
 
     function flashStockRow(sym, isUp, stock) {
@@ -3460,6 +3471,7 @@ body {
         renderTASignals();
         renderFAScreener();
         renderNewsList();
+        renderTickerBanner();
       } catch (err) {
         console.warn('Sync baseline notice:', err);
       }
@@ -5279,8 +5291,8 @@ ${leaderDetails}
       await syncMarketBaseline();
       startAutoRunningTicker();
 
-      // Cứ mỗi 15s đồng bộ lại dữ liệu nền từ TradingView âm thầm không gián đoạn UI
-      setInterval(syncMarketBaseline, 15000);
+      // Cứ mỗi 7s đồng bộ lại dữ liệu nền từ TradingView âm thầm không gián đoạn UI
+      setInterval(syncMarketBaseline, 7000);
     });
   </script>
 </body>
