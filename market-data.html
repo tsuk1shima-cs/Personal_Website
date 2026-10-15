@@ -336,19 +336,20 @@
 
         async function loadIndices() {
             try {
-                const { prices } = await getPricesData(['VNI', 'VN30', 'HNX', 'UPCOM']);
+                const { prices } = await getPricesData(['VNINDEX', 'VNI', 'VN30', 'HNXINDEX', 'HNX', 'UPCOMINDEX', 'UPCOM']);
                 const grid = document.getElementById('indicesGrid');
                 const indices = [
-                    { name: 'VN-INDEX',    key: 'VNI',   fbVal: 1285.45, fbChg: 0.45 },
-                    { name: 'VN30-INDEX',  key: 'VN30',  fbVal: 1342.10, fbChg: 0.62 },
-                    { name: 'HNX-INDEX',   key: 'HNX',   fbVal: 238.60,  fbChg: -0.15 },
-                    { name: 'UPCOM-INDEX', key: 'UPCOM', fbVal: 92.40,   fbChg: 0.12 },
+                    { name: 'VN-INDEX',    key: 'VNINDEX', altKey: 'VNI' },
+                    { name: 'VN30-INDEX',  key: 'VN30',    altKey: 'VN30' },
+                    { name: 'HNX-INDEX',   key: 'HNXINDEX', altKey: 'HNX' },
+                    { name: 'UPCOM-INDEX', key: 'UPCOMINDEX', altKey: 'UPCOM' },
                 ];
 
                 grid.innerHTML = indices.map(idx => {
-                    const d   = prices?.[idx.key];
-                    const val = d?.price || idx.fbVal;
-                    const chg = d?.change !== null && d?.change !== undefined ? d.change : idx.fbChg;
+                    const fb = (typeof FALLBACK_INDICES !== 'undefined' && (FALLBACK_INDICES[idx.key] || FALLBACK_INDICES[idx.altKey])) || {};
+                    const d   = prices?.[idx.key] || prices?.[idx.altKey] || fb;
+                    const val = d?.price || fb.price || 0;
+                    const chg = d?.change !== null && d?.change !== undefined ? d.change : (fb.change || 0);
                     const cls   = chg > 0 ? 'positive' : chg < 0 ? 'negative' : '';
                     const arrow = chg > 0 ? '▲' : chg < 0 ? '▼' : '—';
                     const sign  = chg > 0 ? '+' : '';
@@ -356,7 +357,7 @@
                         <div class="index-name">${idx.name}</div>
                         <div class="index-value">${val ? val.toLocaleString('vi-VN') : '—'}</div>
                         <div class="index-change ${cls}">
-                            ${val ? `${arrow} ${sign}${chg?.toFixed(2) || 0}%` : '—'}
+                            ${val ? `${arrow} ${sign}${Number(chg).toFixed(2)}%` : '—'}
                         </div>
                     </div>`;
                 }).join('');

@@ -481,18 +481,40 @@
                 console.warn('TV scanner direct fetch error in TA signals:', err);
             }
 
-            // Fallback du lieu thuc te cua cac co phieu tru cot neu mang cham
-            if (!rawStocks.length) {
-                rawStocks = [
-                    { symbol: 'TCB', exch: 'HOSE', price: 33050, change: 0.30, roe: 16.1, pb: 1.38, rsi: 55.8, ema20: 32500, high: 33500, volume: 15500000 },
-                    { symbol: 'FPT', exch: 'HOSE', price: 135200, change: 1.65, roe: 28.5, pb: 5.2, rsi: 62.4, ema20: 133000, high: 136000, volume: 4200000 },
-                    { symbol: 'HPG', exch: 'HOSE', price: 20450, change: 0.00, roe: 11.2, pb: 1.25, rsi: 48.2, ema20: 20500, high: 20700, volume: 18200000 },
-                    { symbol: 'MBB', exch: 'HOSE', price: 24800, change: 0.81, roe: 22.4, pb: 1.28, rsi: 58.6, ema20: 24200, high: 25000, volume: 14100000 },
-                    { symbol: 'MWG', exch: 'HOSE', price: 68600, change: 1.78, roe: 14.8, pb: 2.1, rsi: 64.1, ema20: 66800, high: 69000, volume: 6800000 },
-                    { symbol: 'SSI', exch: 'HOSE', price: 31200, change: 1.30, roe: 12.6, pb: 1.65, rsi: 59.2, ema20: 30500, high: 31500, volume: 12500000 },
-                    { symbol: 'VHM', exch: 'HOSE', price: 42400, change: -1.40, roe: 15.2, pb: 0.95, rsi: 36.5, ema20: 43500, high: 43200, volume: 8900000 },
-                    { symbol: 'DGC', exch: 'HOSE', price: 114500, change: 2.23, roe: 26.4, pb: 3.4, rsi: 66.8, ema20: 111000, high: 115000, volume: 3100000 }
-                ];
+            // Fallback du lieu thuc te tu tvScreener hoac FALLBACK_STOCKS da lam moi realtime
+            if (!rawStocks.length && typeof tvScreener === 'function') {
+                try {
+                    const scr = await tvScreener(60);
+                    if (scr && scr.length) {
+                        rawStocks = scr.map(s => ({
+                            symbol: s.symbol,
+                            exch: s.exchange || 'HOSE',
+                            price: s.price,
+                            change: s.change,
+                            roe: s.roe,
+                            pb: s.pb,
+                            rsi: s.change > 0 ? 58 : 42,
+                            ema20: Math.round(s.price * 0.985),
+                            high: Math.round(s.price * 1.015),
+                            volume: s.volume || 5000000
+                        }));
+                    }
+                } catch { /* ignore */ }
+            }
+
+            if (!rawStocks.length && typeof FALLBACK_STOCKS !== 'undefined') {
+                rawStocks = FALLBACK_STOCKS.map(s => ({
+                    symbol: s.symbol,
+                    exch: s.exchange || 'HOSE',
+                    price: s.price,
+                    change: s.change,
+                    roe: s.roe,
+                    pb: s.pb,
+                    rsi: s.change > 0 ? 58 : 42,
+                    ema20: Math.round(s.price * 0.985),
+                    high: Math.round(s.price * 1.015),
+                    volume: s.volume || 5000000
+                }));
             }
 
             const today = new Date();

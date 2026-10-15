@@ -2911,14 +2911,26 @@ body {
     // 2. KHỞI TẠO BIỂU ĐỒ INTRADAY ĐƯỜNG CONG
     // ==========================================
     function initIntradayCurve() {
-      // Dựng đường cong trong phiên ngày 14/10/2026 của VN-INDEX
-      // Đỉnh: 1.722,65 | Đáy: 1.699,23 | Đóng phiên: 1.704,87
-      intradayPoints = [
-        1718.50, 1719.20, 1720.80, 1722.65, 1721.40, 1719.80, 1716.50, 1714.20,
-        1712.50, 1710.80, 1708.40, 1709.60, 1711.20, 1712.10, 1711.50, 1710.00,
-        1708.20, 1706.50, 1705.10, 1703.80, 1702.40, 1700.80, 1699.23, 1700.50,
-        1702.10, 1703.40, 1704.20, 1704.87
-      ];
+      // Dựng đường cong trong phiên hôm nay của VN-INDEX dựa trên mức giá thực tế
+      const vni = (typeof marketIndices !== 'undefined' && marketIndices['VNINDEX']) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES['VNINDEX']) || { price: 1700, open: 1710 };
+      const cur = vni.price || 1700;
+      const ref = vni.open || (cur * 1.002);
+      const high = vni.high || Math.max(ref, cur) * 1.003;
+      const low = vni.low || Math.min(ref, cur) * 0.997;
+
+      const pts = [ref];
+      const length = 28;
+      const step = (cur - ref) / (length - 1);
+      for (let i = 1; i < length - 1; i++) {
+        const mid = ref + step * i;
+        const noise = (Math.sin(i * 1.4) * 0.5 + (i % 2 === 0 ? 0.3 : -0.3)) * Math.abs(cur - ref || ref * 0.003);
+        let val = mid + noise;
+        if (high && val > high) val = high;
+        if (low && val < low) val = low;
+        pts.push(parseFloat(val.toFixed(2)));
+      }
+      pts.push(cur);
+      intradayPoints = pts;
       renderIntradaySvg();
     }
 
@@ -2995,16 +3007,14 @@ body {
             const oldIdxPrice = marketIndices['VNINDEX']?.price;
             marketIndices = { ...marketIndices, ...dnseIndices };
 
-            if (oldIdxPrice && oldIdxPrice !== marketIndices['VNINDEX'].price) {
-              const isUp = marketIndices['VNINDEX'].price >= oldIdxPrice;
-              renderHeroIndex(isUp);
-              updateIndexCards();
-            }
+            const isUp = oldIdxPrice ? marketIndices['VNINDEX'].price >= oldIdxPrice : true;
+            renderHeroIndex(isUp);
+            updateIndexCards();
           }
 
           // 2. Cập nhật giá một số cổ phiếu trọng yếu từ DNSE
           if (typeof fetchDNSEStock === 'function') {
-            const keySymbols = ['FPT', 'HPG', 'TCB', 'MBB', 'MWG', 'VHM', 'VIC', 'SSI'];
+            const keySymbols = ['FPT', 'HPG', 'TCB', 'MBB', 'MWG', 'VHM', 'VIC', 'SSI', 'TLG', 'VCB'];
             const sampleSym = keySymbols[Math.floor(Math.random() * keySymbols.length)];
             const quote = await fetchDNSEStock(sampleSym);
             if (quote && quote.price) {
@@ -3012,6 +3022,7 @@ body {
               const curStock = stockDataList.find(s => s.symbol === quote.symbol);
               if (curStock) {
                 curStock.price = quote.price;
+                if (quote.change !== undefined) curStock.change = quote.change;
                 if (quote.volume) curStock.volume = quote.volume;
               }
               if (oldPrice && oldPrice !== quote.price) {
@@ -4820,6 +4831,24 @@ ${leaderDetails}
     function openDerivativesModal() {
       const m = document.getElementById('derivativesModal');
       if (m) m.style.display = 'flex';
+
+      const now = new Date();
+      const yy = String(now.getFullYear()).slice(-2);
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const contractCode = `VN30F${yy}${mm}`;
+
+      const vn30 = (typeof marketIndices !== 'undefined' && marketIndices['VN30']) || { price: 1845.40 };
+      const vn30P = vn30.price || 1845.4;
+      const f1mP = parseFloat((vn30P + 1.2).toFixed(1));
+      const basis = parseFloat((f1mP - vn30P).toFixed(2));
+      const basisSign = basis >= 0 ? '+' : '';
+
+      const pEl = document.getElementById('f1mPrice');
+      const chgEl = document.getElementById('f1mChg');
+      const bEl = document.getElementById('f1mBasis');
+      if (pEl) pEl.textContent = f1mP.toLocaleString('vi-VN');
+      if (chgEl) chgEl.textContent = `${basisSign}${basis} (${basisSign}${(basis/vn30P*100).toFixed(2)}%)`;
+      if (bEl) bEl.textContent = `${basisSign}${basis} đ`;
     }
     function closeDerivativesModal() {
       const m = document.getElementById('derivativesModal');
@@ -4906,8 +4935,8 @@ ${leaderDetails}
       await syncMarketBaseline();
       startAutoRunningTicker();
 
-      // Cứ mỗi 25s đồng bộ lại dữ liệu nền từ TradingView âm thầm không gián đoạn UI
-      setInterval(syncMarketBaseline, 25000);
+      // Cứ mỗi 15s đồng bộ lại dữ liệu nền từ TradingView âm thầm không gián đoạn UI
+      setInterval(syncMarketBaseline, 15000);
     });
   </script>
 </body>

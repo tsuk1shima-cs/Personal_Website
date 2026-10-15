@@ -500,6 +500,8 @@
                 'Tin tức từ VnExpress, CafeF, VnEconomy, Dân trí — ' +
                 now.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
             loadRSS();
+            // Tu dong lam moi tin tuc lien tuc moi 45 giay
+            setInterval(loadRSS, 45000);
         });
 
         async function loadRSS() {
@@ -601,30 +603,23 @@
             const dateStr = now.toLocaleDateString('vi-VN', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
             const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
-            const vni = overview?.indices?.['VNINDEX'] || overview?.indices?.['VNI'];
-            const vn30 = overview?.indices?.['VN30'];
-            const hnx = overview?.indices?.['HNXINDEX'] || overview?.indices?.['HNX'];
-            const upcom = overview?.indices?.['UPCOMINDEX'] || overview?.indices?.['UPCOM'];
+            const fbIdx = typeof FALLBACK_INDICES !== 'undefined' ? FALLBACK_INDICES : {};
+            const vni = overview?.indices?.['VNINDEX'] || overview?.indices?.['VNI'] || fbIdx['VNINDEX'] || {};
+            const vn30 = overview?.indices?.['VN30'] || fbIdx['VN30'] || {};
+            const hnx = overview?.indices?.['HNXINDEX'] || overview?.indices?.['HNX'] || fbIdx['HNXINDEX'] || {};
+            const upcom = overview?.indices?.['UPCOMINDEX'] || overview?.indices?.['UPCOM'] || fbIdx['UPCOMINDEX'] || {};
 
-            const vniChg = vni?.change !== undefined && vni?.change !== null ? vni.change : -0.5;
+            const vniChg = vni?.change !== undefined && vni?.change !== null ? vni.change : 0;
             const vniSign = vniChg >= 0 ? '+' : '';
             const vniStatus = vniChg > 0.5 ? 'tăng điểm tích cực' : (vniChg < -0.5 ? 'chịu áp lực rung lắc điều chỉnh' : 'giằng co phân hóa quanh tham chiếu');
 
-            const gainers = overview?.gainers?.length ? overview.gainers : [
-                { symbol: 'FPT', price: 135000, change: 2.1, pe: 24.2, roe: 28.5 },
-                { symbol: 'TCB', price: 33100, change: 1.5, pe: 8.9, roe: 16.1 },
-                { symbol: 'MWG', price: 68500, change: 1.8, pe: 19.5, roe: 14.2 }
-            ];
+            const stocks = (overview?.stocks?.length ? overview.stocks : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []));
+            const gainers = overview?.gainers?.length ? overview.gainers : [...stocks].sort((a,b) => (b.change||0) - (a.change||0)).slice(0, 5);
+            const losers = overview?.losers?.length ? overview.losers : [...stocks].sort((a,b) => (a.change||0) - (b.change||0)).slice(0, 5);
 
-            const losers = overview?.losers?.length ? overview.losers : [
-                { symbol: 'VHM', price: 42300, change: -1.6 },
-                { symbol: 'VIC', price: 219800, change: -0.99 },
-                { symbol: 'MSN', price: 74200, change: -1.2 }
-            ];
-
-            const advCount = overview?.breadth?.adv || 165;
-            const decCount = overview?.breadth?.dec || 210;
-            const uncCount = overview?.breadth?.unc || 68;
+            const advCount = overview?.breadth?.adv || stocks.filter(s => s.change > 0).length || 20;
+            const decCount = overview?.breadth?.dec || stocks.filter(s => s.change < 0).length || 25;
+            const uncCount = overview?.breadth?.unc || (stocks.length - advCount - decCount) || 6;
 
             return `
                 <div style="margin-bottom:20px;">
@@ -636,23 +631,23 @@
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px;">
                     <div style="background:#f8fafc;padding:14px 16px;border-radius:8px;border:1px solid #e2e8f0;">
                         <div style="font-size:12px;color:#64748b;font-weight:600;">VN-INDEX</div>
-                        <div style="font-size:22px;font-weight:700;font-family:var(--font-data);color:#0f172a;">${vni?.price ? vni.price.toLocaleString('vi-VN') : '1.710,88'}</div>
-                        <div style="font-size:13px;font-weight:600;color:${vniChg >= 0 ? '#16a34a' : '#dc2626'}">${vniSign}${vniChg.toFixed(2)}%</div>
+                        <div style="font-size:22px;font-weight:700;font-family:var(--font-data);color:#0f172a;">${vni?.price ? vni.price.toLocaleString('vi-VN') : '—'}</div>
+                        <div style="font-size:13px;font-weight:600;color:${vniChg >= 0 ? '#16a34a' : '#dc2626'}">${vniSign}${Number(vniChg).toFixed(2)}%</div>
                     </div>
                     <div style="background:#f8fafc;padding:14px 16px;border-radius:8px;border:1px solid #e2e8f0;">
                         <div style="font-size:12px;color:#64748b;font-weight:600;">VN30-INDEX</div>
-                        <div style="font-size:22px;font-weight:700;font-family:var(--font-data);color:#0f172a;">${vn30?.price ? vn30.price.toLocaleString('vi-VN') : '1.854,80'}</div>
-                        <div style="font-size:13px;font-weight:600;color:${(vn30?.change||0) >= 0 ? '#16a34a' : '#dc2626'}">${(vn30?.change||0) >= 0 ? '+' : ''}${(vn30?.change||0).toFixed(2)}%</div>
+                        <div style="font-size:22px;font-weight:700;font-family:var(--font-data);color:#0f172a;">${vn30?.price ? vn30.price.toLocaleString('vi-VN') : '—'}</div>
+                        <div style="font-size:13px;font-weight:600;color:${(vn30?.change||0) >= 0 ? '#16a34a' : '#dc2626'}">${(vn30?.change||0) >= 0 ? '+' : ''}${Number(vn30?.change||0).toFixed(2)}%</div>
                     </div>
                     <div style="background:#f8fafc;padding:14px 16px;border-radius:8px;border:1px solid #e2e8f0;">
                         <div style="font-size:12px;color:#64748b;font-weight:600;">HNX-INDEX</div>
-                        <div style="font-size:22px;font-weight:700;font-family:var(--font-data);color:#0f172a;">${hnx?.price ? hnx.price.toLocaleString('vi-VN') : '263,58'}</div>
-                        <div style="font-size:13px;font-weight:600;color:${(hnx?.change||0) >= 0 ? '#16a34a' : '#dc2626'}">${(hnx?.change||0) >= 0 ? '+' : ''}${(hnx?.change||0).toFixed(2)}%</div>
+                        <div style="font-size:22px;font-weight:700;font-family:var(--font-data);color:#0f172a;">${hnx?.price ? hnx.price.toLocaleString('vi-VN') : '—'}</div>
+                        <div style="font-size:13px;font-weight:600;color:${(hnx?.change||0) >= 0 ? '#16a34a' : '#dc2626'}">${(hnx?.change||0) >= 0 ? '+' : ''}${Number(hnx?.change||0).toFixed(2)}%</div>
                     </div>
                     <div style="background:#f8fafc;padding:14px 16px;border-radius:8px;border:1px solid #e2e8f0;">
                         <div style="font-size:12px;color:#64748b;font-weight:600;">UPCOM-INDEX</div>
-                        <div style="font-size:22px;font-weight:700;font-family:var(--font-data);color:#0f172a;">${upcom?.price ? upcom.price.toLocaleString('vi-VN') : '121,85'}</div>
-                        <div style="font-size:13px;font-weight:600;color:${(upcom?.change||0) >= 0 ? '#16a34a' : '#dc2626'}">${(upcom?.change||0) >= 0 ? '+' : ''}${(upcom?.change||0).toFixed(2)}%</div>
+                        <div style="font-size:22px;font-weight:700;font-family:var(--font-data);color:#0f172a;">${upcom?.price ? upcom.price.toLocaleString('vi-VN') : '—'}</div>
+                        <div style="font-size:13px;font-weight:600;color:${(upcom?.change||0) >= 0 ? '#16a34a' : '#dc2626'}">${(upcom?.change||0) >= 0 ? '+' : ''}${Number(upcom?.change||0).toFixed(2)}%</div>
                     </div>
                 </div>
 

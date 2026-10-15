@@ -472,26 +472,19 @@
                 console.warn('getScreenerData error, using fallback:', err);
             }
 
-            // Fallback du lieu thuc te neu mat ket noi hoac bi chan adblock
-            if (!allStocks.length) {
-                allStocks = [
-                    { symbol: 'VCB', exchange: 'HOSE', sector: 'Finance', price: 92500, change: 0.54, pe: 14.8, pb: 2.85, roe: 21.4, marketCap: 512000 },
-                    { symbol: 'BID', exchange: 'HOSE', sector: 'Finance', price: 49200, change: 0.41, pe: 12.2, pb: 1.95, roe: 18.2, marketCap: 280000 },
-                    { symbol: 'CTG', exchange: 'HOSE', sector: 'Finance', price: 36800, change: 0.82, pe: 9.8, pb: 1.45, roe: 17.5, marketCap: 195000 },
-                    { symbol: 'TCB', exchange: 'HOSE', sector: 'Finance', price: 33050, change: 0.30, pe: 8.9, pb: 1.38, roe: 16.1, marketCap: 233500 },
-                    { symbol: 'MBB', exchange: 'HOSE', sector: 'Finance', price: 24800, change: 0.81, pe: 6.8, pb: 1.28, roe: 22.4, marketCap: 130000 },
-                    { symbol: 'FPT', exchange: 'HOSE', sector: 'Technology Services', price: 135200, change: 1.65, pe: 24.2, pb: 5.20, roe: 28.5, marketCap: 198000 },
-                    { symbol: 'HPG', exchange: 'HOSE', sector: 'Non-Energy Minerals', price: 20450, change: 0.00, pe: 11.2, pb: 1.25, roe: 11.2, marketCap: 132000 },
-                    { symbol: 'MWG', exchange: 'HOSE', sector: 'Retail Trade', price: 68600, change: 1.78, pe: 19.5, pb: 2.10, roe: 14.8, marketCap: 100500 },
-                    { symbol: 'MSN', exchange: 'HOSE', sector: 'Consumer Non-Durables', price: 74200, change: -1.20, pe: 32.5, pb: 2.45, roe: 8.4, marketCap: 106000 },
-                    { symbol: 'VHM', exchange: 'HOSE', sector: 'Real Estate Development', price: 42400, change: -1.40, pe: 7.2, pb: 0.95, roe: 15.2, marketCap: 184500 },
-                    { symbol: 'VIC', exchange: 'HOSE', sector: 'Finance', price: 219800, change: -0.99, pe: 28.4, pb: 11.2, roe: 15.7, marketCap: 845000 },
-                    { symbol: 'SSI', exchange: 'HOSE', sector: 'Finance', price: 31200, change: 1.30, pe: 16.5, pb: 1.65, roe: 12.6, marketCap: 47000 },
-                    { symbol: 'DGC', exchange: 'HOSE', sector: 'Process Industries', price: 114500, change: 2.23, pe: 13.8, pb: 3.40, roe: 26.4, marketCap: 43500 },
-                    { symbol: 'VGC', exchange: 'HOSE', sector: 'Process Industries', price: 42400, change: 0.47, pe: 14.5, pb: 1.85, roe: 14.2, marketCap: 19000 },
-                    { symbol: 'FRT', exchange: 'HOSE', sector: 'Retail Trade', price: 168000, change: 1.20, pe: 45.2, pb: 8.90, roe: 22.1, marketCap: 23000 },
-                    { symbol: 'PVS', exchange: 'HNX', sector: 'Industrial Services', price: 39500, change: 0.76, pe: 15.2, pb: 1.42, roe: 9.8, marketCap: 18900 }
-                ];
+            // Fallback du lieu thuc te tu FALLBACK_STOCKS da duoc dong bo realtime
+            if (!allStocks.length && typeof FALLBACK_STOCKS !== 'undefined') {
+                allStocks = FALLBACK_STOCKS.map(s => ({
+                    symbol: s.symbol,
+                    exchange: s.exchange || 'HOSE',
+                    sector: s.sector || 'Finance',
+                    price: s.price,
+                    change: s.change,
+                    pe: s.pe || 12,
+                    pb: s.pb || 1.5,
+                    roe: s.roe || 16,
+                    marketCap: s.marketCap || (s.volume ? Math.round(s.price * s.volume / 1e7) : 50000)
+                }));
             }
 
             const now = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
