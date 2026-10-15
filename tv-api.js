@@ -773,3 +773,15 @@ if (typeof window !== 'undefined') {
     }, 100);
 }
 
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        FALLBACK_INDICES,
+        FALLBACK_STOCKS,
+        fetchLiveScannerStocks,
+        fetchDNSEIndices,
+        refreshFallbackStocksLive,
+        getPricesData,
+        getScreenerData
+    };
+}
+

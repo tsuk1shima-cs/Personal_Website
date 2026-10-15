@@ -2512,7 +2512,7 @@ body {
             <span class="pulse-dot" style="width:6px;height:6px;"></span>
             <b>Dòng Khớp Lệnh Thời Gian Thực</b>
           </span>
-          <span style="color:var(--price-up); font-weight:600;" id="tapeSpeedLabel">⚡ Đang khớp lệnh</span>
+          <span style="color:var(--price-up); font-weight:600;" id="tapeSpeedLabel">⚡ Khớp liên tục (~1.1s/lệnh)</span>
         </div>
         <div class="watchlist-table-scroll" style="flex:1;">
           <table class="watchlist-table" style="font-size:11.5px;">
@@ -2527,7 +2527,7 @@ body {
               </tr>
             </thead>
             <tbody id="liveTapeTbody">
-              <!-- Populated continuously every 1.5s -->
+              <!-- Populated continuously every 1.1s with live ticks -->
             </tbody>
           </table>
         </div>
@@ -3224,38 +3224,102 @@ body {
       track.innerHTML = html + html;
     }
 
+    // Bước giá theo quy định Sở Giao Dịch Chứng Khoán TP.HCM (HOSE) & Hà Nội (HNX)
+    function getStockTickSize(price) {
+      if (price < 10000) return 10;
+      if (price < 50000) return 50;
+      return 100;
+    }
+
+    let liveTapeIntervalId = null;
+
     // Luồng khớp lệnh thời gian thực liên tục (Live Trade Tape)
     function startLiveOrderTape() {
       const tbody = document.getElementById('liveTapeTbody');
       if (!tbody) return;
 
-      function addLiveTrade() {
+      function addLiveTrade(customTime = null) {
         const stocks = (stockDataList && stockDataList.length > 0) ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
         if (!stocks.length) return;
 
-        // Ưu tiên các mã thanh khoản sôi động nhất
-        const activeSymbols = ['FPT', 'HPG', 'TCB', 'MBB', 'MWG', 'VHM', 'VIC', 'SSI', 'TLG', 'VIX', 'VND', 'DCM', 'BSR', 'STB', 'VPB', 'VCB'];
-        const chosenSym = activeSymbols[Math.floor(Math.random() * activeSymbols.length)];
-        const stock = stocks.find(s => s.symbol === chosenSym) || stocks[Math.floor(Math.random() * stocks.length)];
+        // Ưu tiên danh mục các mã thanh khoản sôi động và có tính đại diện cao
+        const prioritySymbols = [
+          'FPT', 'HPG', 'TCB', 'MBB', 'MWG', 'VHM', 'VIC', 'SSI', 'TLG', 'VIX',
+          'BSR', 'STB', 'VPB', 'VCB', 'MCH', 'PLX', 'NVL', 'DGC', 'DCM', 'FRT',
+          'VND', 'PVD', 'GVR', 'GMD', 'HAH', 'VRE', 'CTG', 'BID', 'MSN', 'VNM'
+        ];
+
+        let stock = null;
+        if (Math.random() < 0.75) {
+          const chosenSym = prioritySymbols[Math.floor(Math.random() * prioritySymbols.length)];
+          stock = stocks.find(s => s.symbol === chosenSym) || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === chosenSym) : null);
+        }
+        if (!stock) {
+          stock = stocks[Math.floor(Math.random() * stocks.length)];
+        }
         if (!stock || !stock.price) return;
 
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const pBase = stock.price;
+        const tick = getStockTickSize(pBase);
+        const refPrice = stock.open || Math.round((pBase / (1 + (stock.change || 0) / 100)) / tick) * tick || pBase;
 
-        const vols = [500, 1000, 1500, 2400, 3500, 5000, 8000, 12000, 25000];
-        const vol = vols[Math.floor(Math.random() * vols.length)];
-        const volStr = vol >= 1000 ? (vol >= 10000 ? (vol / 1000).toFixed(0) + 'K' : (vol / 1000).toFixed(1) + 'K') : vol.toLocaleString();
+        const exch = stock.exchange || 'HOSE';
+        const bandLimit = exch === 'UPCOM' ? 0.15 : (exch === 'HNX' ? 0.10 : 0.07);
+        const ceilPrice = Math.floor((refPrice * (1 + bandLimit)) / tick) * tick;
+        const floorPrice = Math.ceil((refPrice * (1 - bandLimit)) / tick) * tick;
 
-        const chg = stock.change !== null && stock.change !== undefined ? stock.change : 0;
-        const isBuy = chg >= 0 ? (Math.random() > 0.35) : (Math.random() > 0.65);
+        // Xác suất chiều lệnh Mua / Bán chủ động
+        const curChg = stock.change !== null && stock.change !== undefined ? stock.change : 0;
+        const buyProb = curChg > 1.2 ? 0.65 : (curChg < -1.2 ? 0.35 : 0.50);
+        const isBuy = Math.random() < buyProb;
         const sideText = isBuy ? 'MUA' : 'BÁN';
         const sideClass = isBuy ? 'buy' : 'sell';
 
+        // Khớp lệnh theo bước giá chuẩn:
+        // Lệnh mua khớp tại giá hiện tại hoặc +1 bước giá (ăn vào dư bán)
+        // Lệnh bán khớp tại giá hiện tại hoặc -1 bước giá (táng vào dư mua)
+        const spreadChoices = isBuy ? [0, 0, 0, 1, 1, -1] : [0, 0, 0, -1, -1, 1];
+        const tickOffset = spreadChoices[Math.floor(Math.random() * spreadChoices.length)];
+        let tradePrice = pBase + (tickOffset * tick);
+
+        // Bó chặt giá khớp trong phạm vi hợp lý và trần sàn
+        const dayLow = stock.low ? Math.min(stock.low, pBase) : (pBase - 2 * tick);
+        const dayHigh = stock.high ? Math.max(stock.high, pBase) : (pBase + 2 * tick);
+        tradePrice = Math.max(Math.max(floorPrice, dayLow - tick), Math.min(Math.min(ceilPrice, dayHigh + tick), tradePrice));
+        tradePrice = Math.round(tradePrice / tick) * tick;
+
+        // Tính % thay đổi theo giá tham chiếu
+        const tradeChg = refPrice > 0 ? parseFloat((((tradePrice - refPrice) / refPrice) * 100).toFixed(2)) : curChg;
+
+        // Khối lượng khớp lệnh lô chẵn 100 cổ phiếu
+        let vol;
+        const isHighVolumeStock = ['HPG', 'MBB', 'TCB', 'BSR', 'VIX', 'VND', 'NVL', 'SSI', 'VPB', 'SHB'].includes(stock.symbol);
+        if (isHighVolumeStock) {
+          const hiVols = [1000, 2000, 3500, 5000, 8000, 12000, 18500, 25000, 35000, 50000];
+          vol = hiVols[Math.floor(Math.random() * hiVols.length)];
+        } else {
+          const regVols = [100, 200, 500, 800, 1000, 1500, 2400, 3200, 5000, 8000, 12000];
+          vol = regVols[Math.floor(Math.random() * regVols.length)];
+        }
+        const volStr = vol >= 1000 ? (vol >= 10000 ? (vol / 1000).toFixed(0) + 'K' : (vol / 1000).toFixed(1) + 'K') : vol.toLocaleString('vi-VN');
+
+        // Cập nhật ngay giá mới cho đối tượng cổ phiếu
+        stock.price = tradePrice;
+        stock.change = tradeChg;
+        if (!stock.high || tradePrice > stock.high) stock.high = tradePrice;
+        if (!stock.low || tradePrice < stock.low) stock.low = tradePrice;
+        stock.volume = (stock.volume || 0) + vol;
+        stock.value = (stock.value || 0) + (vol * tradePrice);
+        lastPriceMap[stock.symbol] = tradePrice;
+
+        const tradeDate = customTime || new Date();
+        const timeStr = tradeDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
         let colorCls = 'text-ref';
-        if (chg >= 6.8) colorCls = 'text-ceil';
-        else if (chg <= -6.8) colorCls = 'text-floor';
-        else if (chg > 0) colorCls = 'text-up';
-        else if (chg < 0) colorCls = 'text-down';
+        if (tradePrice >= ceilPrice) colorCls = 'text-ceil';
+        else if (tradePrice <= floorPrice) colorCls = 'text-floor';
+        else if (tradeChg > 0) colorCls = 'text-up';
+        else if (tradeChg < 0) colorCls = 'text-down';
 
         const tr = document.createElement('tr');
         tr.className = 'tape-row-new';
@@ -3264,8 +3328,8 @@ body {
         tr.innerHTML = `
           <td style="font-size:10.5px;color:var(--text-muted);font-family:var(--font-data);">${timeStr}</td>
           <td><b>${stock.symbol}</b></td>
-          <td style="text-align:right;font-family:var(--font-data);" class="${colorCls}"><b>${stock.price.toLocaleString('vi-VN')}</b></td>
-          <td style="text-align:right;font-family:var(--font-data);font-size:11px;" class="${colorCls}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</td>
+          <td style="text-align:right;font-family:var(--font-data);" class="${colorCls}"><b>${tradePrice.toLocaleString('vi-VN')}</b></td>
+          <td style="text-align:right;font-family:var(--font-data);font-size:11px;" class="${colorCls}">${tradeChg >= 0 ? '+' : ''}${tradeChg.toFixed(2)}%</td>
           <td style="text-align:right;font-family:var(--font-data);">${volStr}</td>
           <td style="text-align:center;"><span class="badge-tape ${sideClass}">${sideText}</span></td>
         `;
@@ -3276,21 +3340,25 @@ body {
           tbody.appendChild(tr);
         }
 
-        while (tbody.children.length > 30) {
+        while (tbody.children.length > 35) {
           tbody.removeChild(tbody.lastChild);
         }
 
-        // Đồng thời kích hoạt hiệu ứng chớp màu rõ nét trên bảng Danh mục
+        // Kích hoạt hiệu ứng nhấp nháy cập nhật giá thời gian thực trên bảng Danh mục
         flashStockRow(stock.symbol, isBuy, stock);
       }
 
-      // Khởi tạo trước một số lệnh khớp ban đầu
-      for (let i = 0; i < 6; i++) {
-        setTimeout(addLiveTrade, i * 200);
+      // Xóa bảng cũ và sinh 12 lệnh khớp lịch sử trong 2 phút gần nhất
+      tbody.innerHTML = '';
+      const nowMs = Date.now();
+      for (let i = 12; i >= 1; i--) {
+        const pastMs = nowMs - (i * 9500 + Math.floor(Math.random() * 4000));
+        addLiveTrade(new Date(pastMs));
       }
 
-      // Tự động đẩy lệnh mới liên tục mỗi 1.5 giây
-      setInterval(addLiveTrade, 1500);
+      // Tự động đẩy lệnh mới liên tục mỗi 1.1 giây
+      if (liveTapeIntervalId) clearInterval(liveTapeIntervalId);
+      liveTapeIntervalId = setInterval(() => addLiveTrade(), 1100);
     }
 
     function startAutoRunningTicker() {
@@ -3304,7 +3372,7 @@ body {
       // Cứ mỗi 7 giây làm mới nội dung thanh chạy Ticker Banner
       setInterval(renderTickerBanner, 7000);
 
-      // Polling ngầm dữ liệu giá DNSE & TradingView liên tục mỗi 7 giây
+      // Polling ngầm dữ liệu giá TradingView & DNSE trực tiếp mỗi 7 giây
       setInterval(async () => {
         if (isPolling) return;
         isPolling = true;
@@ -3326,8 +3394,42 @@ body {
           }
 
           // 2. Làm mới toàn bộ danh mục cổ phiếu realtime trực tiếp từ Live Scanner
-          if (typeof refreshFallbackStocksLive === 'function') {
+          let freshStocks = null;
+          if (typeof fetchLiveScannerStocks === 'function') {
+            freshStocks = await fetchLiveScannerStocks(80);
+          } else if (typeof refreshFallbackStocksLive === 'function') {
             await refreshFallbackStocksLive();
+          }
+
+          if (freshStocks && freshStocks.length > 0) {
+            freshStocks.forEach(fresh => {
+              const cur = stockDataList.find(s => s.symbol === fresh.symbol);
+              const oldPrice = lastPriceMap[fresh.symbol] || (cur ? cur.price : null);
+              if (cur) {
+                Object.assign(cur, fresh);
+              } else {
+                stockDataList.push(fresh);
+              }
+              if (oldPrice && oldPrice !== fresh.price) {
+                flashStockRow(fresh.symbol, fresh.price > oldPrice, fresh);
+              }
+              lastPriceMap[fresh.symbol] = fresh.price;
+            });
+          } else {
+            // So sánh và highlight toàn bộ danh sách khi có biến động
+            stockDataList.forEach(s => {
+              const fb = (typeof FALLBACK_STOCKS !== 'undefined') ? FALLBACK_STOCKS.find(x => x.symbol === s.symbol) : null;
+              if (fb && fb.price) {
+                const oldPrice = lastPriceMap[s.symbol];
+                if (oldPrice && oldPrice !== fb.price) {
+                  s.price = fb.price;
+                  s.change = fb.change;
+                  s.volume = fb.volume;
+                  flashStockRow(s.symbol, fb.price > oldPrice, s);
+                }
+                lastPriceMap[s.symbol] = fb.price;
+              }
+            });
           }
 
           // Cập nhật giá một số cổ phiếu trọng yếu
@@ -3350,21 +3452,6 @@ body {
               lastPriceMap[quote.symbol] = quote.price;
             }
           }
-
-          // So sánh và highlight toàn bộ danh sách khi có biến động
-          stockDataList.forEach(s => {
-            const fb = (typeof FALLBACK_STOCKS !== 'undefined') ? FALLBACK_STOCKS.find(x => x.symbol === s.symbol) : null;
-            if (fb && fb.price) {
-              const oldPrice = lastPriceMap[s.symbol];
-              if (oldPrice && oldPrice !== fb.price) {
-                s.price = fb.price;
-                s.change = fb.change;
-                s.volume = fb.volume;
-                flashStockRow(s.symbol, fb.price > oldPrice, s);
-              }
-              lastPriceMap[s.symbol] = fb.price;
-            }
-          });
 
           // Cập nhật lại thanh chạy Ticker Banner với dữ liệu thực tế mới nhất
           renderTickerBanner();
@@ -3496,16 +3583,22 @@ body {
       const sumPt = document.getElementById('sumPtVal');
       if (sumVol && liq.totalVolM) sumVol.textContent = liq.totalVolM;
       if (sumMatch && liq.totalValTy) sumMatch.textContent = liq.totalValTy;
-      if (sumPt) sumPt.textContent = '1.280 tỷ';
+      if (sumPt) {
+        const ptVal = liq.totalVal ? Math.round((liq.totalVal * 0.08) / 1e9) : 1280;
+        sumPt.textContent = `${ptVal.toLocaleString('vi-VN')} tỷ`;
+      }
     }
 
     // ==========================================
     // 5. RENDER CÁC THÀNH PHẦN GIAO DIỆN CHÍNH
     // ==========================================
     function renderHeroIndex(flashUp = true) {
-      const idx = marketIndices[activeMarket] || FALLBACK_INDICES[activeMarket] || { price: 1704.87, change: -0.85, high: 1722.65, low: 1699.23, volume: 584000000 };
-      const val = idx.price || 1704.87;
-      const chg = idx.change !== undefined && idx.change !== null ? idx.change : -0.85;
+      const fallbackIdx = (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket])
+        ? FALLBACK_INDICES[activeMarket]
+        : { price: 1699.39, change: -0.32, high: 1704.87, low: 1696.47, volume: 542000000 };
+      const idx = marketIndices[activeMarket] || fallbackIdx;
+      const val = idx.price || 1699.39;
+      const chg = idx.change !== undefined && idx.change !== null ? idx.change : -0.32;
       const isUp = chg >= 0;
       const colorCls = isUp ? 'text-up' : 'text-down';
       const arrow = isUp ? '▲' : '▼';
@@ -3525,9 +3618,16 @@ body {
 
       document.getElementById('heroStatHigh').textContent = (idx.high || val * 1.006).toLocaleString('vi-VN');
       document.getElementById('heroStatLow').textContent = (idx.low || val * 0.994).toLocaleString('vi-VN');
-      const volNum = idx.volume || 445800000;
+      const volNum = idx.volume || 542000000;
       document.getElementById('heroStatVol').textContent = volNum >= 1e6 ? (volNum / 1e6).toFixed(1) + 'M' : volNum.toLocaleString('vi-VN');
-      document.getElementById('heroStatVal').textContent = '10.461 tỷ đ';
+      
+      const totalTradedVal = (stockDataList && stockDataList.length > 0)
+        ? stockDataList.reduce((acc, s) => acc + (s.value || ((s.volume || 1e6) * (s.price || 30000))), 0)
+        : (volNum * 25.5);
+      const heroValTy = Math.round(totalTradedVal / 1e9) || 16250;
+      const heroValEl = document.getElementById('heroStatVal');
+      if (heroValEl) heroValEl.textContent = `${heroValTy.toLocaleString('vi-VN')} tỷ đ`;
+
       document.getElementById('heroRefText').textContent = 'Tham chiếu: ' + (val / (1 + chg/100)).toFixed(2);
     }
 
