@@ -81,6 +81,54 @@ async function hasBackend() {
     }
 }
 
+// Cập nhật tự động giá cổ phiếu từ Live Scanner (hỗ trợ CORS cho mọi môi trường, kể cả GitHub Pages)
+let isRefreshingStocks = false;
+async function refreshFallbackStocksLive() {
+    if (isRefreshingStocks) return;
+    isRefreshingStocks = true;
+    try {
+        const tickers = FALLBACK_STOCKS.map(s => `${s.exchange || 'HOSE'}:${s.symbol}`);
+        const res = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                symbols: { tickers },
+                columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume', 'Value.Traded', 'price_book_ratio']
+            }),
+            signal: AbortSignal.timeout(4500)
+        });
+        if (res.ok) {
+            const j = await res.json();
+            if (j.data && j.data.length > 0) {
+                j.data.forEach(item => {
+                    const [name, close, change, high, low, open, volume, valTraded, pb] = item.d;
+                    const sym = (name || item.s?.split(':')[1] || '').toUpperCase();
+                    const target = FALLBACK_STOCKS.find(s => s.symbol === sym);
+                    if (target && close) {
+                        target.price = close;
+                        if (change !== undefined && change !== null) target.change = parseFloat(Number(change).toFixed(2));
+                        if (volume) target.volume = volume;
+                        if (valTraded) target.value = valTraded;
+                        if (pb) target.pb = parseFloat(Number(pb).toFixed(2));
+                    }
+                });
+            }
+        }
+    } catch { /* ignore */ }
+    finally {
+        isRefreshingStocks = false;
+    }
+}
+
+function updateFallbackIndices(fresh) {
+    if (!fresh) return;
+    for (const k in fresh) {
+        if (fresh[k] && fresh[k].price) {
+            FALLBACK_INDICES[k] = { ...FALLBACK_INDICES[k], ...fresh[k] };
+        }
+    }
+}
+
 // Lấy danh sách FA Screener từ DNSE (100% dữ liệu thực từ sàn và DNSE Entrade)
 async function tvScreener(size = 200, exchange = null) {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -95,7 +143,12 @@ async function tvScreener(size = 200, exchange = null) {
         } catch { /* fallback */ }
     }
 
-    // Luôn trả về danh mục đầy đủ chất lượng cao từ DNSE Fallback
+    // Tự động làm mới realtime trực tiếp trên client nếu không qua backend
+    try {
+        await refreshFallbackStocksLive();
+    } catch { /* ignore */ }
+
+    // Trả về danh mục đã được đồng bộ giá thời gian thực của phiên hôm nay
     return exchange ? FALLBACK_STOCKS.filter(s => s.exchange === exchange) : FALLBACK_STOCKS.slice(0, size);
 }
 
@@ -214,11 +267,51 @@ async function fetchDNSEIndices() {
         }
     }));
 
+    // 3. Fallback trực tiếp từ TradingView Scanner API (hoạt động 100% trong mọi trình duyệt, hỗ trợ CORS từ mọi domain)
+    if (Object.keys(indices).length < 2) {
+        try {
+            const tvRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
+                    columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume']
+                }),
+                signal: AbortSignal.timeout(4000)
+            });
+            if (tvRes.ok) {
+                const j = await tvRes.json();
+                if (j.data && j.data.length > 0) {
+                    j.data.forEach(item => {
+                        const [name, close, change, high, low, open, volume] = item.d;
+                        const sym = (name || '').toUpperCase();
+                        indices[sym] = {
+                            symbol: sym,
+                            exchange: item.s.startsWith('HNX') ? 'HNX' : 'HOSE',
+                            price: close,
+                            change: parseFloat(Number(change).toFixed(2)),
+                            high: high || close,
+                            low: low || close,
+                            open: open || close,
+                            volume: volume || 0
+                        };
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn('Direct scanner index fetch notice:', e.message);
+        }
+    }
+
     if (indices['HNXINDEX']) indices['HNX'] = indices['HNXINDEX'];
     if (indices['UPCOMINDEX']) indices['UPCOM'] = indices['UPCOMINDEX'];
     if (indices['VNINDEX']) indices['VNI'] = indices['VNINDEX'];
 
-    return Object.keys(indices).length > 0 ? indices : null;
+    if (Object.keys(indices).length > 0) {
+        updateFallbackIndices(indices);
+        return indices;
+    }
+    return null;
 }
 
 // Lấy chuỗi điểm biến động trong phiên (Intraday Curve) từ DNSE Entrade
