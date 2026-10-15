@@ -2470,8 +2470,8 @@ body {
         <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));gap:8px;">
           <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;">
             <div style="font-size:10.5px;color:var(--text-secondary);font-weight:600;">HĐ Tháng hiện tại</div>
-            <div style="font-size:16px;font-weight:700;color:var(--primary-brand);margin:2px 0;">VN30F2610</div>
-            <div style="font-size:10px;color:var(--text-muted);">Đáo hạn: 15/10/2026</div>
+            <div style="font-size:16px;font-weight:700;color:var(--primary-brand);margin:2px 0;" id="f1mContractCode">VN30F1M</div>
+            <div style="font-size:10px;color:var(--text-muted);" id="f1mExpiryDate">Đáo hạn HĐ</div>
           </div>
           <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;text-align:center;">
             <div style="font-size:10.5px;color:var(--text-secondary);font-weight:600;">Giá khớp lệnh</div>
@@ -4856,6 +4856,26 @@ ${leaderDetails}
       const yy = String(now.getFullYear()).slice(-2);
       const mm = String(now.getMonth() + 1).padStart(2, '0');
       const contractCode = `VN30F${yy}${mm}`;
+
+      // Tính ngày đáo hạn: Thứ Năm lần thứ 3 của tháng hiện tại
+      let countThursday = 0;
+      let expiryDay = 15;
+      for (let d = 1; d <= 31; d++) {
+        const testDate = new Date(now.getFullYear(), now.getMonth(), d);
+        if (testDate.getMonth() !== now.getMonth()) break;
+        if (testDate.getDay() === 4) {
+          countThursday++;
+          if (countThursday === 3) {
+            expiryDay = d;
+            break;
+          }
+        }
+      }
+      const expiryStr = `${String(expiryDay).padStart(2, '0')}/${mm}/${now.getFullYear()}`;
+      const codeEl = document.getElementById('f1mContractCode');
+      const expEl = document.getElementById('f1mExpiryDate');
+      if (codeEl) codeEl.textContent = contractCode;
+      if (expEl) expEl.textContent = `Đáo hạn: ${expiryStr}`;
 
       const vn30 = (typeof marketIndices !== 'undefined' && marketIndices['VN30']) || { price: 1845.40 };
       const vn30P = vn30.price || 1845.4;

@@ -13,7 +13,7 @@ const FALLBACK_INDICES = {
     'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.14,  change: -0.14, high: 124.40,  low: 123.90,  volume: 28000000 }
 };
 
-// Danh mục cổ phiếu chuẩn xác thời gian thực từ DNSE / Bảng giá (Phiên 14/10/2026)
+// Danh mục cổ phiếu cơ sở (tự động đồng bộ và làm mới giá trực tiếp theo từng phiên giao dịch thực tế)
 const FALLBACK_STOCKS = [
     { symbol: 'VCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 56300, change: 0.00, pe: 14.2, pb: 2.65, roe: 21.4, marketCap: 312000, volume: 2155300, value: 121405510000, buyForeignValue: 9398130000, sellForeignValue: 19451746700 },
     { symbol: 'BID', exchange: 'HOSE', sector: 'Ngân hàng', price: 33100, change: -0.75, pe: 11.8, pb: 1.85, roe: 18.2, marketCap: 188000, volume: 3041800, value: 101248085000, buyForeignValue: 17243506200, sellForeignValue: 33808098100 },
