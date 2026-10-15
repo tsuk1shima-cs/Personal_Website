@@ -3085,7 +3085,7 @@ body {
         const heroState = document.getElementById('heroMarketState');
 
         if (statusText) {
-          statusText.textContent = isTradingHours ? `Trực tiếp • ${todayStr}` : `Live Market • ${todayStr}`;
+          statusText.textContent = isTradingHours ? `Trực tiếp • ${todayStr}` : `Đóng cửa phiên • ${todayStr}`;
         }
 
         if (heroState) {
@@ -3117,6 +3117,38 @@ body {
       }
       setInterval(updateTime, 1000);
       updateTime();
+    }
+
+    // KIỂM TRA THỜI GIAN THỊ TRƯỜNG ĐANG TRONG PHIÊN GIAO DỊCH
+    // HOSE / HNX / UPCOM: Sáng 09:00 - 11:30, Chiều 13:00 - 15:00 (Thứ 2 - Thứ 6)
+    function isMarketTradingNow() {
+      const now = new Date();
+      const day = now.getDay();
+      if (day === 0 || day === 6) return false;
+      const minTotal = now.getHours() * 60 + now.getMinutes();
+      return (minTotal >= 540 && minTotal <= 690) || (minTotal >= 780 && minTotal <= 900);
+    }
+
+    // LẤY MỐC THỜI GIAN CHỐT PHIÊN GẦN NHẤT KHI THỊ TRƯỜNG NGOÀI GIỜ GIAO DỊCH
+    function getMarketSessionCloseTime() {
+      const now = new Date();
+      const day = now.getDay();
+      const d = new Date(now);
+      if (day === 0) {
+        d.setDate(d.getDate() - 2);
+      } else if (day === 6) {
+        d.setDate(d.getDate() - 1);
+      } else {
+        const minTotal = now.getHours() * 60 + now.getMinutes();
+        if (minTotal < 540) {
+          d.setDate(d.getDate() - (day === 1 ? 3 : 1));
+        } else if (minTotal > 690 && minTotal < 780) {
+          d.setHours(11, 30, 0, 0);
+          return d;
+        }
+      }
+      d.setHours(15, 0, 0, 0);
+      return d;
     }
 
     // ==========================================
@@ -3304,7 +3336,7 @@ body {
       const tbody = document.getElementById('liveTapeTbody');
       if (!tbody) return;
 
-      function addLiveTrade(customTime = null) {
+      function addLiveTrade(customTime = null, mutatePrice = true) {
         const stocks = (stockDataList && stockDataList.length > 0) ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
         if (!stocks.length) return;
 
@@ -3344,21 +3376,26 @@ body {
         const sideText = isBuy ? 'MUA' : 'BÁN';
         const sideClass = isBuy ? 'buy' : 'sell';
 
-        // Khớp lệnh theo bước giá chuẩn:
-        // Lệnh mua khớp tại giá hiện tại hoặc +1 bước giá (ăn vào dư bán)
-        // Lệnh bán khớp tại giá hiện tại hoặc -1 bước giá (táng vào dư mua)
-        const spreadChoices = isBuy ? [0, 0, 0, 1, 1, -1] : [0, 0, 0, -1, -1, 1];
-        const tickOffset = spreadChoices[Math.floor(Math.random() * spreadChoices.length)];
-        let tradePrice = pBase + (tickOffset * tick);
+        let tradePrice = pBase;
+        let tradeChg = curChg;
 
-        // Bó chặt giá khớp trong phạm vi hợp lý và trần sàn
-        const dayLow = stock.low ? Math.min(stock.low, pBase) : (pBase - 2 * tick);
-        const dayHigh = stock.high ? Math.max(stock.high, pBase) : (pBase + 2 * tick);
-        tradePrice = Math.max(Math.max(floorPrice, dayLow - tick), Math.min(Math.min(ceilPrice, dayHigh + tick), tradePrice));
-        tradePrice = Math.round(tradePrice / tick) * tick;
+        if (mutatePrice) {
+          // Khớp lệnh theo bước giá chuẩn:
+          // Lệnh mua khớp tại giá hiện tại hoặc +1 bước giá (ăn vào dư bán)
+          // Lệnh bán khớp tại giá hiện tại hoặc -1 bước giá (táng vào dư mua)
+          const spreadChoices = isBuy ? [0, 0, 0, 1, 1, -1] : [0, 0, 0, -1, -1, 1];
+          const tickOffset = spreadChoices[Math.floor(Math.random() * spreadChoices.length)];
+          tradePrice = pBase + (tickOffset * tick);
 
-        // Tính % thay đổi theo giá tham chiếu
-        const tradeChg = refPrice > 0 ? parseFloat((((tradePrice - refPrice) / refPrice) * 100).toFixed(2)) : curChg;
+          // Bó chặt giá khớp trong phạm vi hợp lý và trần sàn
+          const dayLow = stock.low ? Math.min(stock.low, pBase) : (pBase - 2 * tick);
+          const dayHigh = stock.high ? Math.max(stock.high, pBase) : (pBase + 2 * tick);
+          tradePrice = Math.max(Math.max(floorPrice, dayLow - tick), Math.min(Math.min(ceilPrice, dayHigh + tick), tradePrice));
+          tradePrice = Math.round(tradePrice / tick) * tick;
+
+          // Tính % thay đổi theo giá tham chiếu
+          tradeChg = refPrice > 0 ? parseFloat((((tradePrice - refPrice) / refPrice) * 100).toFixed(2)) : curChg;
+        }
 
         // Khối lượng khớp lệnh lô chẵn 100 cổ phiếu
         let vol;
@@ -3372,14 +3409,16 @@ body {
         }
         const volStr = vol >= 1000 ? (vol >= 10000 ? (vol / 1000).toFixed(0) + 'K' : (vol / 1000).toFixed(1) + 'K') : vol.toLocaleString('vi-VN');
 
-        // Cập nhật ngay giá mới cho đối tượng cổ phiếu
-        stock.price = tradePrice;
-        stock.change = tradeChg;
-        if (!stock.high || tradePrice > stock.high) stock.high = tradePrice;
-        if (!stock.low || tradePrice < stock.low) stock.low = tradePrice;
-        stock.volume = (stock.volume || 0) + vol;
-        stock.value = (stock.value || 0) + (vol * tradePrice);
-        lastPriceMap[stock.symbol] = tradePrice;
+        if (mutatePrice) {
+          // Cập nhật ngay giá mới cho đối tượng cổ phiếu
+          stock.price = tradePrice;
+          stock.change = tradeChg;
+          if (!stock.high || tradePrice > stock.high) stock.high = tradePrice;
+          if (!stock.low || tradePrice < stock.low) stock.low = tradePrice;
+          stock.volume = (stock.volume || 0) + vol;
+          stock.value = (stock.value || 0) + (vol * tradePrice);
+          lastPriceMap[stock.symbol] = tradePrice;
+        }
 
         const tradeDate = customTime || new Date();
         const timeStr = tradeDate.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -3413,81 +3452,99 @@ body {
           tbody.removeChild(tbody.lastChild);
         }
 
-        // Kích hoạt hiệu ứng nhấp nháy cập nhật giá thời gian thực trên bảng Danh mục
-        flashStockRow(stock.symbol, isBuy, stock);
+        if (mutatePrice) {
+          // Kích hoạt hiệu ứng nhấp nháy cập nhật giá thời gian thực trên bảng Danh mục
+          flashStockRow(stock.symbol, isBuy, stock);
 
-        // ==============================================================
-        // ĐỒNG BỘ TỨC THỜI CỘT BÊN TRÁI (VNINDEX, VN30, INTRA-CHART, HERO)
-        // GIÚP CỘT TRÁI VÀ CỘT PHẢI CÙNG NHẢY ĐỒNG BỘ THỜI GIAN THỰC
-        // ==============================================================
-        const isHOSEStock = (stock.exchange || 'HOSE') === 'HOSE';
-        const isVN30Stock = ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR'].includes(stock.symbol);
+          // ==============================================================
+          // ĐỒNG BỘ TỨC THỜI CỘT BÊN TRÁI (VNINDEX, VN30, INTRA-CHART, HERO)
+          // GIÚP CỘT TRÁI VÀ CỘT PHẢI CÙNG NHẢY ĐỒNG BỘ THỜI GIAN THỰC
+          // ==============================================================
+          const isHOSEStock = (stock.exchange || 'HOSE') === 'HOSE';
+          const isVN30Stock = ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR'].includes(stock.symbol);
 
-        if (isHOSEStock && marketIndices['VNINDEX']) {
-          const tickDelta = isBuy ? (0.01 + Math.random() * 0.04) : -(0.01 + Math.random() * 0.04);
-          const oldVni = marketIndices['VNINDEX'].price || 1699.39;
-          const vniMin = marketIndices['VNINDEX'].low || 1696.47;
-          const vniMax = marketIndices['VNINDEX'].high || 1704.87;
-          const newVni = parseFloat(Math.max(vniMin, Math.min(vniMax, oldVni + tickDelta)).toFixed(2));
-          marketIndices['VNINDEX'].price = newVni;
+          if (isHOSEStock && marketIndices['VNINDEX']) {
+            const tickDelta = isBuy ? (0.01 + Math.random() * 0.04) : -(0.01 + Math.random() * 0.04);
+            const oldVni = marketIndices['VNINDEX'].price || 1699.39;
+            const vniMin = marketIndices['VNINDEX'].low || 1696.47;
+            const vniMax = marketIndices['VNINDEX'].high || 1704.87;
+            const newVni = parseFloat(Math.max(vniMin, Math.min(vniMax, oldVni + tickDelta)).toFixed(2));
+            marketIndices['VNINDEX'].price = newVni;
 
-          const refVni = 1704.87;
-          marketIndices['VNINDEX'].change = parseFloat((((newVni - refVni) / refVni) * 100).toFixed(2));
-          marketIndices['VNINDEX'].volume = (marketIndices['VNINDEX'].volume || 542000000) + vol;
+            const refVni = 1704.87;
+            marketIndices['VNINDEX'].change = parseFloat((((newVni - refVni) / refVni) * 100).toFixed(2));
+            marketIndices['VNINDEX'].volume = (marketIndices['VNINDEX'].volume || 542000000) + vol;
 
-          if (isVN30Stock && marketIndices['VN30']) {
-            const oldVn30 = marketIndices['VN30'].price || 1844.13;
-            const vn30Min = marketIndices['VN30'].low || 1840.26;
-            const vn30Max = marketIndices['VN30'].high || 1852.44;
-            const newVn30 = parseFloat(Math.max(vn30Min, Math.min(vn30Max, oldVn30 + (tickDelta * 1.15))).toFixed(2));
-            marketIndices['VN30'].price = newVn30;
-            const refVn30 = 1852.44;
-            marketIndices['VN30'].change = parseFloat((((newVn30 - refVn30) / refVn30) * 100).toFixed(2));
-            marketIndices['VN30'].volume = (marketIndices['VN30'].volume || 235000000) + vol;
+            if (isVN30Stock && marketIndices['VN30']) {
+              const oldVn30 = marketIndices['VN30'].price || 1844.13;
+              const vn30Min = marketIndices['VN30'].low || 1840.26;
+              const vn30Max = marketIndices['VN30'].high || 1852.44;
+              const newVn30 = parseFloat(Math.max(vn30Min, Math.min(vn30Max, oldVn30 + (tickDelta * 1.15))).toFixed(2));
+              marketIndices['VN30'].price = newVn30;
+              const refVn30 = 1852.44;
+              marketIndices['VN30'].change = parseFloat((((newVn30 - refVn30) / refVn30) * 100).toFixed(2));
+              marketIndices['VN30'].volume = (marketIndices['VN30'].volume || 235000000) + vol;
+            }
+
+            // Cập nhật đồ thị intraday cột trái với mức giá realtime mới nhất (không làm phẳng biểu đồ)
+            if (intradayPoints && intradayPoints.length > 0) {
+              intradayPoints[intradayPoints.length - 1] = parseFloat(newVni);
+              renderIntradaySvg();
+            }
+
+            // Cập nhật số liệu Hero Index cột trái
+            renderHeroIndex(isBuy);
+
+            // Cập nhật mini cards chỉ số ở đầu cột trái
+            updateIndexCards();
+
+            // Nhấp nháy nhẹ card đang chọn ở cột trái
+            const activeCardEl = document.getElementById(`card_${activeMarket}`);
+            if (activeCardEl) {
+              const cardPulse = isBuy ? 'flash-card-up' : 'flash-card-down';
+              activeCardEl.classList.remove('flash-card-up', 'flash-card-down');
+              void activeCardEl.offsetWidth;
+              activeCardEl.classList.add(cardPulse);
+              setTimeout(() => activeCardEl.classList.remove(cardPulse), 600);
+            }
           }
 
-          // Cập nhật đồ thị intraday cột trái với mức giá realtime mới nhất (không làm phẳng biểu đồ)
-          if (intradayPoints && intradayPoints.length > 0) {
-            intradayPoints[intradayPoints.length - 1] = parseFloat(newVni);
-            renderIntradaySvg();
+          // Cập nhật trực tiếp vào bảng chi tiết mã ở giữa nếu đang mở mã này
+          if (currentStockDetailSymbol === stock.symbol && typeof updateLiveStockDetailTick === 'function') {
+            lastStockDetailTickTime = Date.now();
+            updateLiveStockDetailTick(stock, isBuy, tradePrice, tradeChg, vol, tradeDate);
           }
-
-          // Cập nhật số liệu Hero Index cột trái
-          renderHeroIndex(isBuy);
-
-          // Cập nhật mini cards chỉ số ở đầu cột trái
-          updateIndexCards();
-
-          // Nhấp nháy nhẹ card đang chọn ở cột trái
-          const activeCardEl = document.getElementById(`card_${activeMarket}`);
-          if (activeCardEl) {
-            const cardPulse = isBuy ? 'flash-card-up' : 'flash-card-down';
-            activeCardEl.classList.remove('flash-card-up', 'flash-card-down');
-            void activeCardEl.offsetWidth;
-            activeCardEl.classList.add(cardPulse);
-            setTimeout(() => activeCardEl.classList.remove(cardPulse), 600);
-          }
-        }
-
-        // Cập nhật trực tiếp vào bảng chi tiết mã ở giữa nếu đang mở mã này
-        if (currentStockDetailSymbol === stock.symbol && typeof updateLiveStockDetailTick === 'function') {
-          lastStockDetailTickTime = Date.now();
-          updateLiveStockDetailTick(stock, isBuy, tradePrice, tradeChg, vol, tradeDate);
         }
       }
 
-      // Xóa bảng cũ và sinh 12 lệnh khớp lịch sử trong 2 phút gần nhất
+      // Xóa bảng cũ và khởi tạo danh sách lệnh khớp
       tbody.innerHTML = '';
-      const nowMs = Date.now();
-      for (let i = 12; i >= 1; i--) {
-        const pastMs = nowMs - (i * 9500 + Math.floor(Math.random() * 4000));
-        addLiveTrade(new Date(pastMs));
+      const isTrading = isMarketTradingNow();
+      if (isTrading) {
+        // Trong phiên: Khởi tạo 12 lệnh trong vài phút gần nhất
+        const nowMs = Date.now();
+        for (let i = 12; i >= 1; i--) {
+          const pastMs = nowMs - (i * 9500 + Math.floor(Math.random() * 4000));
+          addLiveTrade(new Date(pastMs), true);
+        }
+      } else {
+        // Ngoài giờ giao dịch (sau 15h, nghỉ trưa hoặc cuối tuần):
+        // Giữ nguyên giá chốt ngày, hiển thị các lệnh chốt phiên trước 15:00
+        const closeTime = getMarketSessionCloseTime();
+        const baseMs = closeTime.getTime();
+        for (let i = 12; i >= 1; i--) {
+          const pastMs = baseMs - (i * 25000 + Math.floor(Math.random() * 12000));
+          addLiveTrade(new Date(pastMs), false);
+        }
       }
 
-      // Tự động đẩy lệnh mới liên tục mỗi 1.1 giây
+      // Tự động đẩy lệnh mới liên tục mỗi 1.1 giây: CHỈ CHẠY KHI ĐANG TRONG PHIÊN
       let tapeTickCount = 0;
       if (liveTapeIntervalId) clearInterval(liveTapeIntervalId);
       liveTapeIntervalId = setInterval(() => {
+        // NẾU NGOÀI GIỜ GIAO DỊCH (SAU 15H HOẶC CUỐI TUẦN): DỪNG ĐẨY LỆNH VÀ CỐ ĐỊNH GIÁ
+        if (!isMarketTradingNow()) return;
+
         addLiveTrade();
         tapeTickCount++;
         if (tapeTickCount % 5 === 0 && typeof renderOverviewCards === 'function') {
@@ -5890,16 +5947,18 @@ body {
       const p = stock.price || 33500;
       const chg = stock.change || 0;
       const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(p) : 50;
-      const nowMs = Date.now();
       const vols = [1000, 2500, 800, 3200, 1500, 4800, 5000, 10000];
 
+      const isTrading = (typeof isMarketTradingNow === 'function') ? isMarketTradingNow() : true;
+      const baseMs = isTrading ? Date.now() : getMarketSessionCloseTime().getTime();
+
       for (let i = 0; i <= 7; i++) {
-        const pastMs = nowMs - (i * 11000 + Math.floor(Math.random() * 4000));
+        const pastMs = baseMs - (i * 18000 + Math.floor(Math.random() * 4000));
         const timeStr = new Date(pastMs).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const tickOff = [-1, 0, 0, 1, 0, 1, -1, 0][i % 8];
+        const tickOff = isTrading ? [-1, 0, 0, 1, 0, 1, -1, 0][i % 8] : 0;
         const tradeP = p + (tickOff * delta);
         const refP = stock.refPrice || stock.open || p;
-        const tradeC = refP > 0 ? parseFloat((((tradeP - refP) / refP) * 100).toFixed(2)) : chg;
+        const tradeC = (tickOff !== 0 && refP > 0) ? parseFloat((((tradeP - refP) / refP) * 100).toFixed(2)) : chg;
         const isUp = tradeC >= 0;
         const colorCls = tradeC >= 6.8 ? 'text-ceil' : (tradeC <= -6.8 ? 'text-floor' : (isUp ? 'text-up' : 'text-down'));
         const vol = vols[i % vols.length];
@@ -6025,6 +6084,7 @@ body {
     }
 
     function triggerDetailStockMicroTick() {
+      if (!isMarketTradingNow()) return;
       if (!currentStockDetailSymbol) return;
       const stock = (stockDataList && stockDataList.find(s => s.symbol === currentStockDetailSymbol))
         || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === currentStockDetailSymbol) : null);
@@ -6675,6 +6735,7 @@ ${leaderDetails}
     let alertRotationIndex = 0;
     function startRealtimeNotificationStream() {
       setInterval(() => {
+        if (!isMarketTradingNow()) return;
         const nowStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
         const vni = marketIndices['VNINDEX'] || FALLBACK_INDICES['VNINDEX'] || {};
         const vniPrice = vni.price ? vni.price.toLocaleString('vi-VN') : '1.702';
