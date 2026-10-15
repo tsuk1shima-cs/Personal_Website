@@ -1270,6 +1270,38 @@ body {
   display: flex;
   flex-direction: column;
 }
+.modal-card-detail {
+  width: 1280px;
+  max-width: 95vw;
+  height: 92vh;
+  max-height: 92vh;
+  background: var(--bg-container);
+  border-radius: var(--radius-md, 8px);
+  border: 1px solid var(--border-stroke);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@media (max-width: 900px) {
+  .modal-card-detail {
+    width: 98vw;
+    max-width: 98vw;
+    height: 96vh;
+    max-height: 96vh;
+  }
+}
 .expert-card-item {
   background: var(--bg-subtle);
   border: 1px solid var(--border-stroke);
@@ -1887,10 +1919,6 @@ body {
           <button class="center-subtab-btn" id="btnSubTab_khoingoai" onclick="switchSubTab('khoingoai', this)">Khối ngoại</button>
           <button class="center-subtab-btn" id="btnSubTab_tinhieu_ta" onclick="switchSubTab('tinhieu_ta', this)">Tín hiệu TA</button>
           <button class="center-subtab-btn" id="btnSubTab_boloc_fa" onclick="switchSubTab('boloc_fa', this)">Bộ lọc FA</button>
-          <button class="center-subtab-btn" id="btnSubTab_chitiet_ma" onclick="switchSubTab('chitiet_ma', this)" style="display:none; align-items:center; gap:5px;">
-            <span>Chi tiết mã</span>
-            <span id="centerDetailBadge" style="background:var(--primary-brand); color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; font-weight:700;">BID</span>
-          </button>
         </div>
 
         <div class="center-tab-controls">
@@ -2515,11 +2543,6 @@ body {
           </div>
         </div>
 
-        <!-- SUBTAB 7: CHI TIẾT MÃ CỔ PHIẾU (HIỂN THỊ TRỰC TIẾP TRONG BẢNG GIỮA - CHUẨN PHONG CÁCH CỘT TRÁI) -->
-        <div id="subview_chitiet_ma" class="tongquan-grid-wrap" style="display:none; flex-direction:column; gap:12px;">
-          <!-- Populated dynamically by renderStockDetailContent(stock) -->
-        </div>
-
       </div>
     </main>
 
@@ -2663,37 +2686,46 @@ body {
 
   </div>
 
-  <!-- POPUP QUICK VIEW MODAL KHI CLICK CỔ PHIẾU -->
-  <div class="modal-overlay" id="stockQuickModal" style="display:none;" onclick="handleModalOverlayClick(event)">
-    <div class="modal-card">
-      <div class="modal-head">
-        <div>
-          <span style="font-size:16px;font-weight:700;" id="qModalSymbol">FPT</span>
-          <span style="font-size:12px;color:var(--text-muted);margin-left:6px;" id="qModalEx">HOSE</span>
+  <!-- MODAL POPUP CHI TIẾT CỔ PHIẾU TOÀN DIỆN (CHUYỂN TOÀN BỘ TÍNH NĂNG THÀNH POPUP) -->
+  <div class="modal-overlay" id="stockDetailModal" style="display:none; z-index:350;" onclick="handleDetailModalOverlayClick(event)">
+    <div class="modal-card modal-card-detail" onclick="event.stopPropagation()">
+      <!-- MODAL HEADER -->
+      <div class="modal-head" style="padding: 12px 18px; border-bottom: 1px solid var(--border-stroke); background: var(--bg-container); flex-shrink:0;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="display:flex; align-items:baseline; gap:8px;">
+            <span style="font-size:22px; font-weight:800; color:var(--text-primary); letter-spacing:0.5px;" id="detailModalSymbol">BID</span>
+            <span style="font-size:11.5px; background:var(--primary-light); color:var(--primary-brand); border:1px solid var(--primary-border); padding:2px 7px; border-radius:4px; font-weight:700;" id="detailModalEx">HOSE</span>
+          </div>
+          <div style="width:1px; height:20px; background:var(--border-stroke);"></div>
+          <div>
+            <div style="font-size:13.5px; color:var(--text-secondary); font-weight:600;" id="detailModalName">Ngân hàng TMCP Đầu tư và Phát triển Việt Nam</div>
+            <div style="font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:8px; margin-top:2px;">
+              <span>Ngành: <b style="color:var(--text-secondary);" id="detailModalSector">Ngân hàng</b></span>
+              <span>•</span>
+              <span class="pulse-dot" style="width:5px;height:5px;display:inline-block;"></span>
+              <span style="color:var(--price-up); font-weight:600;" id="detailModalDataSource">Dữ liệu trực tiếp sàn HOSE</span>
+            </div>
+          </div>
         </div>
-        <button onclick="closeQuickModal()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--text-secondary);">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;" id="qModalName">Công ty Cổ phần FPT (Công nghệ)</div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:10px;margin-bottom:12px;border-bottom:1px solid var(--border-stroke);">
-          <div style="font-size:26px;font-weight:700;" id="qModalPrice">135.200 đ</div>
-          <div style="font-size:14px;font-weight:600;" id="qModalChg" class="text-up">+1.65%</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;font-size:12px;margin-bottom:16px;">
-          <div>P/E: <b id="qModalPe">24.2x</b></div>
-          <div>P/B: <b id="qModalPb">5.20x</b></div>
-          <div>ROE: <b id="qModalRoe">28.5%</b></div>
-          <div>Vốn hoá: <b id="qModalMcap">198.000 tỷ</b></div>
-          <div>Khối lượng: <b id="qModalVol">4.200.000</b></div>
-          <div>RSI (14): <b id="qModalRsi">64.5 (Mua)</b></div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button onclick="askAiFromModal()" class="btn-login-main" style="flex:1;border:none;cursor:pointer;">Hỏi AI Chatbot phân tích</button>
-          <button onclick="openStockDetailFromModal()" class="btn-theme-toggle" title="Xem chi tiết đầy đủ trong Dashboard" style="width:auto;padding:0 12px;display:flex;align-items:center;gap:4px;cursor:pointer;">
-            <span>Toàn màn hình</span>
-            <span style="font-size:12px;">↗</span>
+
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:12px; font-weight:700; color:var(--text-secondary); font-family:var(--font-data);" id="stockDetailRealtimeClock"></span>
+          <div style="width:1px; height:18px; background:var(--border-stroke);"></div>
+          <button onclick="toggleStockDetailChartMode(currentStockDetailSymbol)" id="btnToggleDetailChart" class="btn-theme-toggle" style="width:auto; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer;" title="Chuyển đổi đồ thị nến">
+            📊 Biểu đồ Nến TradingView
           </button>
-          <button onclick="closeQuickModal()" class="btn-theme-toggle" style="width:auto;padding:0 14px;">Đóng</button>
+          <button onclick="askAiStockDetail(currentStockDetailSymbol)" class="btn-login-main" style="height:32px; font-size:12px; gap:6px; border:none; cursor:pointer; padding:0 14px;">
+            <span>⚡ Hỏi AI Chatbot</span>
+          </button>
+          <div style="width:1px; height:18px; background:var(--border-stroke);"></div>
+          <button onclick="closeStockDetailModal()" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); font-size:20px; cursor:pointer; color:var(--text-secondary); width:32px; height:32px; display:flex; align-items:center; justify-content:center; transition:all 0.15s;" onmouseover="this.style.color='var(--text-primary)';this.style.borderColor='var(--primary-brand)'" onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-stroke)'" title="Đóng popup (Esc)">&times;</button>
+        </div>
+      </div>
+
+      <!-- MODAL BODY -->
+      <div class="modal-body" style="padding: 14px 18px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:12px;">
+        <div id="subview_chitiet_ma" class="tongquan-grid-wrap" style="display:flex; flex-direction:column; gap:12px; padding:0;">
+          <!-- Populated dynamically by renderStockDetailContent(stock) -->
         </div>
       </div>
     </div>
@@ -5056,9 +5088,6 @@ body {
       const faView = document.getElementById('subview_boloc_fa');
       if (faView) faView.style.display = subtab === 'boloc_fa' ? 'flex' : 'none';
 
-      const detailView = document.getElementById('subview_chitiet_ma');
-      if (detailView) detailView.style.display = subtab === 'chitiet_ma' ? 'flex' : 'none';
-
       if (subtab === 'bando') renderTreemap();
       else if (subtab === 'cungcau') renderActiveTrades();
       else if (subtab === 'khoingoai') renderForeignHistory();
@@ -5255,117 +5284,102 @@ body {
     }
 
     // ==========================================
-    // 7. MODAL XEM NHANH & CHI TIẾT MÃ CỔ PHIẾU
+    // 7. MODAL CHI TIẾT MÃ CỔ PHIẾU TOÀN DIỆN (POPUP MODAL)
     // ==========================================
-    let currentSelectedStock = 'FPT';
+    let currentSelectedStock = 'BID';
     let currentStockDetailSymbol = null;
     let lastStockDetailTickTime = 0;
     let detailChartMode = 'intraday';
     let detailIntradayPoints = [];
 
-    function closeQuickModal() {
-      const m = document.getElementById('stockQuickModal');
+    function closeStockDetailModal() {
+      const m = document.getElementById('stockDetailModal');
       if (m) m.style.display = 'none';
+      currentStockDetailSymbol = null;
     }
 
-    function openQuickModal(sym) {
-      currentSelectedStock = sym;
-      const stock = stockDataList.find(s => s.symbol === sym) 
-        || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null)
-        || { 
-          symbol: sym, 
-          exchange: 'HOSE',
-          price: sym === 'TLG' ? 54900 : (sym === 'BID' ? 33500 : 30000), 
-          change: sym === 'TLG' ? -1.08 : (sym === 'BID' ? 1.21 : 0.5), 
-          pe: sym === 'TLG' ? 11.2 : 11.8, 
-          pb: sym === 'TLG' ? 1.88 : 1.48, 
-          roe: sym === 'TLG' ? 19.2 : 18.2, 
-          marketCap: sym === 'TLG' ? 5357 : 188000, 
-          volume: sym === 'TLG' ? 114000 : (sym === 'BID' ? 2422300 : 1500000),
-          sector: sym === 'TLG' ? 'Hàng tiêu dùng' : 'Ngân hàng',
-          companyName: sym === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)' : (sym === 'BID' ? 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam' : 'Công ty Cổ phần niêm yết')
-        };
+    function closeQuickModal() {
+      closeStockDetailModal();
+    }
 
-      document.getElementById('qModalSymbol').textContent = stock.symbol;
-      document.getElementById('qModalEx').textContent = stock.exchange || 'HOSE';
-      const compName = stock.companyName || (stock.symbol === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)' : (stock.sector ? `Ngành: ${stock.sector}` : 'Công ty Cổ phần niêm yết'));
-      document.getElementById('qModalName').textContent = compName;
-      document.getElementById('qModalPrice').textContent = (stock.price || 33500).toLocaleString('vi-VN') + ' đ';
-
-      const chg = stock.change !== undefined && stock.change !== null ? stock.change : 0;
-      const chgEl = document.getElementById('qModalChg');
-      chgEl.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
-      chgEl.className = chg >= 0 ? 'text-up' : 'text-down';
-
-      document.getElementById('qModalPe').textContent = stock.pe ? stock.pe.toFixed(1) + 'x' : '11.8x';
-      document.getElementById('qModalPb').textContent = stock.pb ? stock.pb.toFixed(2) + 'x' : '1.48x';
-      document.getElementById('qModalRoe').textContent = stock.roe ? stock.roe.toFixed(1) + '%' : '18.2%';
-      document.getElementById('qModalMcap').textContent = stock.marketCap ? stock.marketCap.toLocaleString('vi-VN') + ' tỷ' : '188.000 tỷ';
-      document.getElementById('qModalVol').textContent = stock.volume ? stock.volume.toLocaleString('vi-VN') : '2.422.300';
-      document.getElementById('qModalRsi').textContent = (50 + (chg * 4)).toFixed(1) + ' (Tích lũy)';
-
-      document.getElementById('stockQuickModal').style.display = 'flex';
-
-      // Lấy ngay dữ liệu trực tiếp từ sàn qua VPS CORS API để cập nhật tức thì
-      if (typeof fetchDNSEStock === 'function') {
-        fetchDNSEStock(sym).then(fresh => {
-          if (fresh && currentSelectedStock === sym) {
-            document.getElementById('qModalPrice').textContent = (fresh.price || stock.price).toLocaleString('vi-VN') + ' đ';
-            const fChg = fresh.change !== undefined && fresh.change !== null ? fresh.change : chg;
-            chgEl.textContent = (fChg >= 0 ? '+' : '') + fChg.toFixed(2) + '%';
-            chgEl.className = fChg >= 0 ? 'text-up' : 'text-down';
-            if (fresh.volume) document.getElementById('qModalVol').textContent = fresh.volume.toLocaleString('vi-VN');
-            if (fresh.pe) document.getElementById('qModalPe').textContent = fresh.pe.toFixed(1) + 'x';
-            if (fresh.pb) document.getElementById('qModalPb').textContent = fresh.pb.toFixed(2) + 'x';
-            if (fresh.roe) document.getElementById('qModalRoe').textContent = fresh.roe.toFixed(1) + '%';
-            if (fresh.marketCap) document.getElementById('qModalMcap').textContent = fresh.marketCap.toLocaleString('vi-VN') + ' tỷ';
-          }
-        }).catch(() => {});
+    function handleDetailModalOverlayClick(e) {
+      if (e.target.id === 'stockDetailModal') {
+        closeStockDetailModal();
       }
     }
 
-    function openStockDetailFromModal() {
-      const sym = currentSelectedStock || 'BID';
-      closeQuickModal();
-      openStockDetailView(sym);
+    function handleModalOverlayClick(e) {
+      if (e.target.id === 'stockQuickModal' || e.target.id === 'stockDetailModal') {
+        closeStockDetailModal();
+      }
     }
 
-    function askAiFromModal() {
-      const sym = currentSelectedStock || 'BID';
-      closeQuickModal();
-      openStockDetailView(sym);
-      setTimeout(() => {
-        askAiStockDetail(`Phân tích toàn diện chiến lược đầu tư và điểm mua bán cổ phiếu ${sym}`);
-      }, 300);
+    function updateDetailModalHeader(stock) {
+      if (!stock) return;
+      const symEl = document.getElementById('detailModalSymbol');
+      const exEl = document.getElementById('detailModalEx');
+      const nameEl = document.getElementById('detailModalName');
+      const sectorEl = document.getElementById('detailModalSector');
+      const sourceEl = document.getElementById('detailModalDataSource');
+      const clockEl = document.getElementById('stockDetailRealtimeClock');
+
+      if (symEl) symEl.textContent = stock.symbol;
+      if (exEl) exEl.textContent = stock.exchange || 'HOSE';
+
+      const compNames = {
+        'BID': 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam (BIDV)',
+        'VCB': 'Ngân hàng TMCP Ngoại thương Việt Nam (Vietcombank)',
+        'CTG': 'Ngân hàng TMCP Công thương Việt Nam (VietinBank)',
+        'TCB': 'Ngân hàng TMCP Kỹ thương Việt Nam (Techcombank)',
+        'MBB': 'Ngân hàng TMCP Quân đội (MB Bank)',
+        'VPB': 'Ngân hàng TMCP Việt Nam Thịnh Vượng (VPBank)',
+        'ACB': 'Ngân hàng TMCP Á Châu (ACB)',
+        'STB': 'Ngân hàng TMCP Sài Gòn Thương Tín (Sacombank)',
+        'FPT': 'Công ty Cổ phần FPT (FPT Corporation)',
+        'HPG': 'Công ty Cổ phần Tập đoàn Hòa Phát (Hoa Phat Group)',
+        'MWG': 'Công ty Cổ phần Đầu tư Thế Giới Di Động (Mobile World)',
+        'MSN': 'Công ty Cổ phần Tập đoàn Masan (Masan Group)',
+        'VHM': 'Công ty Cổ phần Vinhomes (Vinhomes)',
+        'VIC': 'Tập đoàn Vingroup (Vingroup JSC)',
+        'VRE': 'Công ty Cổ phần Vincom Retail (Vincom Retail)',
+        'SSI': 'Công ty Cổ phần Chứng khoán SSI (SSI Securities)',
+        'VND': 'Công ty Cổ phần Chứng khoán VNDIRECT',
+        'VIX': 'Công ty Cổ phần Chứng khoán VIX',
+        'BSR': 'Công ty Cổ phần Lọc hóa dầu Bình Sơn (BSR)',
+        'GAS': 'Tổng Công ty Khí Việt Nam (PV GAS)',
+        'PLX': 'Tập đoàn Xăng dầu Việt Nam (Petrolimex)',
+        'TLG': 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)'
+      };
+      const compName = compNames[stock.symbol] || stock.companyName || `${stock.symbol} - ${stock.sector || 'Công ty Cổ phần niêm yết'}`;
+      if (nameEl) nameEl.textContent = compName;
+      if (sectorEl) sectorEl.textContent = stock.sector || 'Tài chính';
+      if (sourceEl) sourceEl.textContent = `Dữ liệu trực tiếp sàn ${stock.exchange || 'HOSE'}`;
+      if (clockEl) clockEl.textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
-    function openStockDetailView(sym) {
+    function openStockDetailModal(sym) {
       if (!sym) sym = 'BID';
+      currentSelectedStock = sym;
       currentStockDetailSymbol = sym;
       lastStockDetailTickTime = Date.now();
       detailChartMode = 'intraday';
 
-      let stock = stockDataList.find(s => s.symbol === sym)
+      let stock = (stockDataList && stockDataList.find(s => s.symbol === sym))
         || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null)
         || {
           symbol: sym,
           exchange: 'HOSE',
-          price: sym === 'BID' ? 33500 : (sym === 'TLG' ? 54900 : 30000),
-          change: sym === 'BID' ? 1.21 : (sym === 'TLG' ? -1.08 : 0.5),
-          pe: 11.8,
-          pb: 1.48,
-          roe: 18.2,
-          marketCap: 188000,
+          price: sym === 'BID' ? 33500 : (sym === 'TLG' ? 54900 : (sym === 'FPT' ? 135200 : 30000)),
+          change: sym === 'BID' ? 1.21 : (sym === 'TLG' ? -1.08 : (sym === 'FPT' ? 1.65 : 0.5)),
+          pe: sym === 'FPT' ? 24.2 : 11.8,
+          pb: sym === 'FPT' ? 5.20 : 1.48,
+          roe: sym === 'FPT' ? 28.5 : 18.2,
+          marketCap: sym === 'FPT' ? 198000 : 188000,
           volume: sym === 'BID' ? 2422300 : (sym === 'TLG' ? 114000 : 1500000),
           value: 81147050000,
-          sector: 'Ngân hàng',
-          companyName: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam'
+          sector: sym === 'FPT' ? 'Công nghệ' : (sym === 'TLG' ? 'Hàng tiêu dùng' : 'Ngân hàng'),
+          companyName: sym === 'FPT' ? 'Công ty Cổ phần FPT (FPT Corporation)' : 'Công ty Cổ phần niêm yết'
         };
-
-      const detailTabBtn = document.getElementById('btnSubTab_chitiet_ma');
-      const badge = document.getElementById('centerDetailBadge');
-      if (badge) badge.textContent = stock.symbol;
-      if (detailTabBtn) detailTabBtn.style.display = 'inline-flex';
 
       const p = stock.price || 33500;
       const chg = stock.change || 0;
@@ -5382,11 +5396,17 @@ body {
       }
       detailIntradayPoints[detailIntradayPoints.length - 1] = p;
 
+      updateDetailModalHeader(stock);
       renderStockDetailContent(stock);
       seedStockDetailTape(stock);
-      switchSubTab('chitiet_ma', detailTabBtn);
 
-      // Ngay lập tức gọi API sàn trực tiếp (VPS CORS) để lấy số liệu thực tế khớp lệnh phiên hôm nay
+      const modal = document.getElementById('stockDetailModal');
+      if (modal) modal.style.display = 'flex';
+
+      const btnTv = document.getElementById('btnToggleDetailChart');
+      if (btnTv) btnTv.innerHTML = '📊 Biểu đồ Nến TradingView';
+
+      // Lấy ngay dữ liệu trực tiếp từ sàn qua VPS CORS API để cập nhật tức thì
       if (typeof fetchDNSEStock === 'function') {
         fetchDNSEStock(sym).then(fresh => {
           if (fresh && currentStockDetailSymbol === sym) {
@@ -5394,6 +5414,7 @@ body {
             if (exIdx >= 0) stockDataList[exIdx] = { ...stockDataList[exIdx], ...fresh };
             else stockDataList.push(fresh);
 
+            updateDetailModalHeader(fresh);
             renderStockDetailContent(fresh);
             seedStockDetailTape(fresh);
             if (detailIntradayPoints && detailIntradayPoints.length > 0) {
@@ -5403,6 +5424,23 @@ body {
           }
         }).catch(() => {});
       }
+    }
+
+    function openQuickModal(sym) {
+      openStockDetailModal(sym);
+    }
+
+    function openStockDetailView(sym) {
+      openStockDetailModal(sym);
+    }
+
+    function openStockDetailFromModal() {
+      // Đã nằm trong popup modal
+    }
+
+    function askAiFromModal() {
+      const sym = currentSelectedStock || 'BID';
+      askAiStockDetail(`Phân tích toàn diện chiến lược đầu tư và điểm mua bán cổ phiếu ${sym}`);
     }
 
     function renderStockDetailContent(stock) {
@@ -5482,39 +5520,9 @@ body {
         'TLG': 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)'
       };
       const companyTitle = compNames[stock.symbol] || stock.companyName || `${stock.symbol} - ${stock.sector || 'Công ty Cổ phần niêm yết'}`;
-      const nowClockStr = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       const currentHeroState = document.getElementById('heroMarketState')?.textContent || 'Khớp lệnh liên tục';
 
       let html = `
-        <!-- TOP TOOLBAR -->
-        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 14px; flex-wrap:wrap; gap:8px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <button onclick="switchSubTab('tongquan')" class="btn-theme-toggle" style="width:auto; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Quay lại Tổng quan thị trường">
-              <span>←</span> <span>Quay lại Tổng quan</span>
-            </button>
-            <div style="width:1px; height:20px; background:var(--border-stroke);"></div>
-            <div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:19px; font-weight:800; color:var(--text-primary); letter-spacing:0.5px;">${stock.symbol}</span>
-                <span style="font-size:11px; background:var(--primary-light); color:var(--primary-brand); border:1px solid var(--primary-border); padding:1px 6px; border-radius:4px; font-weight:700;">${exch}</span>
-                <span style="font-size:13px; color:var(--text-secondary); font-weight:600;">${companyTitle}</span>
-              </div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
-                Ngành: <b style="color:var(--text-secondary);">${stock.sector || 'Tài chính'}</b> • <span class="pulse-dot" style="width:5px;height:5px;display:inline-block;"></span> <span style="color:var(--price-up); font-weight:600;">Dữ liệu trực tiếp sàn ${exch}</span>
-              </div>
-            </div>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:11.5px; font-weight:700; color:var(--text-secondary); font-family:var(--font-data);" id="stockDetailRealtimeClock">${nowClockStr}</span>
-            <div style="width:1px; height:16px; background:var(--border-stroke);"></div>
-            <button onclick="toggleStockDetailChartMode('${stock.symbol}')" id="btnToggleDetailChart" class="btn-theme-toggle" style="width:auto; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer;" title="Chuyển đổi đồ thị nến">
-              📊 Biểu đồ Nến TradingView
-            </button>
-            <button onclick="askAiStockDetail('${stock.symbol}')" class="btn-login-main" style="height:32px; font-size:12px; gap:6px; border:none; cursor:pointer;">
-              <span>⚡ Hỏi AI Chatbot</span>
-            </button>
-          </div>
-        </div>
 
         <!-- 4 TOP FRAME CARDS (ĐỒNG BỘ 100% VỚI ACTUAL-FRAME-CONTAINER Ở CỘT TRÁI) -->
         <div class="actual-frame-container" style="grid-template-columns: repeat(4, 1fr); padding:6px; gap:6px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke);">
@@ -6522,12 +6530,12 @@ ${leaderDetails}
       return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m]));
     }
 
-    function closeQuickModal() {
-      document.getElementById('stockQuickModal').style.display = 'none';
-    }
-    function handleModalOverlayClick(e) {
-      if (e.target.id === 'stockQuickModal') closeQuickModal();
-    }
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeStockDetailModal();
+        if (typeof closeDerivativesModal === 'function') closeDerivativesModal();
+      }
+    });
 
     function toggleTheme() {
       const html = document.documentElement;
