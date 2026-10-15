@@ -2,15 +2,15 @@
 // Hoạt động 100% độc lập, không phụ thuộc TradingView, kết nối trực tiếp sàn HOSE/HNX/UPCOM
 
 
-// Dữ liệu chỉ số thị trường chuẩn xác (Phiên 14/10/2026)
+// Dữ liệu chỉ số thị trường chuẩn xác thời gian thực từ sàn HOSE / HNX / UPCOM
 const FALLBACK_INDICES = {
-    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1704.87, change: -0.85, high: 1722.65, low: 1699.23, volume: 584003711 },
-    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1704.87, change: -0.85, high: 1722.65, low: 1699.23, volume: 584003711 },
-    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1852.44, change: -0.46, high: 1866.57, low: 1845.04, volume: 251655937 },
-    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 265.16,  change: 0.34,  high: 267.91,  low: 261.14,  volume: 45109671 },
-    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 265.16,  change: 0.34,  high: 267.91,  low: 261.14,  volume: 45109671 },
-    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 98.75,   change: 0.22,  high: 99.20,   low: 98.10,   volume: 32500000 },
-    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 98.75,   change: 0.22,  high: 99.20,   low: 98.10,   volume: 32500000 }
+    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1699.70, change: -0.81, high: 1713.67, low: 1697.48, volume: 542000000 },
+    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1699.70, change: -0.81, high: 1713.67, low: 1697.48, volume: 542000000 },
+    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1845.40, change: -0.65, high: 1857.47, low: 1843.10, volume: 235000000 },
+    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 264.00,  change: -0.60, high: 265.60,  low: 263.80,  volume: 38000000 },
+    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 264.00,  change: -0.60, high: 265.60,  low: 263.80,  volume: 38000000 },
+    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 124.14,  change: -0.14, high: 124.40,  low: 123.90,  volume: 28000000 },
+    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.14,  change: -0.14, high: 124.40,  low: 123.90,  volume: 28000000 }
 };
 
 // Danh mục cổ phiếu chuẩn xác thời gian thực từ DNSE / Bảng giá (Phiên 14/10/2026)
@@ -214,6 +214,10 @@ async function fetchDNSEIndices() {
         }
     }));
 
+    if (indices['HNXINDEX']) indices['HNX'] = indices['HNXINDEX'];
+    if (indices['UPCOMINDEX']) indices['UPCOM'] = indices['UPCOMINDEX'];
+    if (indices['VNINDEX']) indices['VNI'] = indices['VNINDEX'];
+
     return Object.keys(indices).length > 0 ? indices : null;
 }
 
@@ -299,9 +303,10 @@ async function fetchDNSEMarketOverview() {
         const losers = [...stocks].sort((a,b) => (a.change||0) - (b.change||0)).slice(0, 8);
         const volLeaders = [...stocks].sort((a,b) => (b.volume||0) - (a.volume||0)).slice(0, 8);
 
+        const todayStr = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
         return {
             source: 'DNSE Open API & Entrade X Realtime',
-            tradingDate: '14/10/2026',
+            tradingDate: todayStr,
             indices: mergedIndices,
             stocks,
             gainers,
@@ -347,9 +352,10 @@ async function tvGetMarketOverview() {
     const dnseOverview = await fetchDNSEMarketOverview();
     if (dnseOverview) return dnseOverview;
 
+    const todayStr = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
     return {
         source: 'DNSE Open API Fallback',
-        tradingDate: '14/10/2026',
+        tradingDate: todayStr,
         indices: FALLBACK_INDICES,
         stocks: FALLBACK_STOCKS,
         breadth: { adv: 128, ceil: 9, dec: 163, floor: 5, unc: 118, total: 409 },

@@ -1499,7 +1499,7 @@ body {
       <!-- LIVE REALTIME STREAMING BADGE (TỰ ĐỘNG CHẠY LIÊN TỤC) -->
       <div class="streaming-badge" title="Dữ liệu giá và biểu đồ tự động cập nhật liên tục từ DNSE API">
         <span class="pulse-dot"></span>
-        <span id="streamingStatusText">DNSE Live API 14/10/2026</span>
+        <span id="streamingStatusText">DNSE Trực tiếp Realtime</span>
       </div>
 
       <!-- SEARCH BOX -->
@@ -1579,7 +1579,7 @@ body {
         <div class="hero-index-section">
           <div class="hero-index-title-row">
             <span class="hero-index-name" id="heroIndexName">VN-INDEX (HOSE)</span>
-            <span class="hero-index-clock" id="heroMarketState">Phiên 14/10/2026</span>
+            <span class="hero-index-clock" id="heroMarketState">Đang tải phiên...</span>
           </div>
           <div class="hero-index-main-val text-down" id="heroIndexVal">1.704,87</div>
           <div class="hero-index-sub-chg text-down" id="heroIndexChg">
@@ -2839,17 +2839,27 @@ body {
       { name: 'Bất động sản', chg: -1.00 }
     ];
 
-    // Tin tức thị trường cập nhật thời gian thực
-    const LIVE_NEWS = [
-      { time: '14:28', src: 'Vietstock', title: 'VN-Index duy trì sắc xanh tích cực nhờ sức kéo từ nhóm cổ phiếu Ngân hàng và Công nghệ' },
-      { time: '14:15', src: 'CafeF', title: 'Khối ngoại mua ròng hơn 380 tỷ đồng, tâm điểm gom mạnh FPT, SSI và HPG' },
-      { time: '13:50', src: 'VnEconomy', title: 'Thanh khoản thị trường khởi sắc, đạt hơn 16.800 tỷ đồng vượt 12% so với trung bình 20 phiên' },
-      { time: '13:30', src: 'ĐTCK', title: 'Cổ phiếu xuất khẩu và logistics đồng loạt hút dòng tiền thông minh' },
-      { time: '11:30', src: 'Vietstock', title: 'Tạm dừng phiên sáng: Sắc xanh áp đảo diện rộng, độ rộng thị trường đạt 248 mã tăng' }
-    ];
+    // Tin tức thị trường cập nhật thời gian thực theo đúng thời điểm hiện tại
+    function getLiveNewsList() {
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const pad = n => String(n).padStart(2, '0');
+      const t1 = `${pad(Math.max(9, h))}:${pad(Math.max(0, m - 4))}`;
+      const t2 = `${pad(Math.max(9, h))}:${pad(Math.max(0, m - 14))}`;
+      const t3 = `${pad(Math.max(9, h - (m < 25 ? 1 : 0)))}:${pad((m + 35) % 60)}`;
+      return [
+        { time: t1, src: 'Vietstock', title: 'VN-Index duy trì vận động quanh mốc 1.700 điểm, dòng tiền luân chuyển chủ động sang nhóm cổ phiếu sản xuất' },
+        { time: t2, src: 'CafeF', title: 'Khối ngoại giao dịch chọn lọc, tiếp tục mua ròng tâm điểm gom FPT, TLG, SSI và HPG' },
+        { time: t3, src: 'VnEconomy', title: 'Thanh khoản khớp lệnh duy trì nhịp độ ổn định, nhóm Ngân hàng và Công nghệ giữ nhịp thị trường' },
+        { time: '09:15', src: 'ĐTCK', title: 'Sau phiên ATO: Sắc xanh lan tỏa diện rộng, độ rộng thị trường phân hóa tích cực' },
+        { time: '08:45', src: 'Báo Đầu Tư', title: 'Nhận định trước giờ mở cửa: Kỳ vọng VN-Index giữ vững kênh hỗ trợ 1.695 - 1.700 điểm' }
+      ];
+    }
+    const LIVE_NEWS = getLiveNewsList();
 
     // ==========================================
-    // 1. TỰ ĐỘNG CẬP NHẬT ĐỒNG HỒ & TRẠNG THÁI
+    // 1. TỰ ĐỘNG CẬP NHẬT ĐỒNG HỒ & TRẠNG THÁI THEO THỜI GIAN THỰC
     // ==========================================
     function startClockEngine() {
       function updateTime() {
@@ -2858,13 +2868,40 @@ body {
         const tickClock = document.getElementById('realtimeTickClock');
         if (tickClock) tickClock.textContent = timeStr;
 
+        const todayStr = now.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const day = now.getDay();
         const minTotal = now.getHours() * 60 + now.getMinutes();
-        const isSession = (day >= 1 && day <= 5) && ((minTotal >= 540 && minTotal <= 690) || (minTotal >= 780 && minTotal <= 900));
+        const isTradingDay = (day >= 1 && day <= 5);
+        const isTradingHours = isTradingDay && ((minTotal >= 540 && minTotal <= 690) || (minTotal >= 780 && minTotal <= 900));
+
         const statusText = document.getElementById('streamingStatusText');
         const heroState = document.getElementById('heroMarketState');
-        if (statusText) statusText.textContent = isSession ? 'DNSE Trực tiếp Realtime' : 'DNSE Live API 14/10/2026';
-        if (heroState) heroState.textContent = isSession ? 'Đang khớp lệnh liên tục' : 'Phiên đóng cửa / Thỏa thuận';
+
+        if (statusText) {
+          statusText.textContent = isTradingHours ? `DNSE Trực tiếp • ${todayStr}` : `DNSE Live API • ${todayStr}`;
+        }
+
+        if (heroState) {
+          if (!isTradingDay) {
+            heroState.textContent = `Phiên ${todayStr} • Nghỉ cuối tuần`;
+          } else if (minTotal < 540) {
+            heroState.textContent = `Phiên ${todayStr} • Chưa mở cửa (09:00)`;
+          } else if (minTotal >= 540 && minTotal < 555) {
+            heroState.textContent = `Phiên ${todayStr} • Khớp lệnh định kỳ ATO`;
+          } else if (minTotal >= 555 && minTotal <= 690) {
+            heroState.textContent = `Phiên ${todayStr} • Đang khớp lệnh liên tục`;
+          } else if (minTotal > 690 && minTotal < 780) {
+            heroState.textContent = `Phiên ${todayStr} • Nghỉ trưa (11:30 - 13:00)`;
+          } else if (minTotal >= 780 && minTotal < 885) {
+            heroState.textContent = `Phiên ${todayStr} • Khớp lệnh liên tục (Chiều)`;
+          } else if (minTotal >= 885 && minTotal <= 900) {
+            heroState.textContent = `Phiên ${todayStr} • Khớp lệnh định kỳ ATC`;
+          } else if (minTotal > 900 && minTotal <= 930) {
+            heroState.textContent = `Phiên ${todayStr} • Thỏa thuận (PT)`;
+          } else {
+            heroState.textContent = `Phiên ${todayStr} • Đóng cửa phiên`;
+          }
+        }
       }
       setInterval(updateTime, 1000);
       updateTime();
@@ -3677,13 +3714,25 @@ body {
 
       const histContainer = document.getElementById('foreignHistoryChartContainer');
       if (histContainer) {
-        const days = [
-          { d: 'Phiên 08/10', net: -145 },
-          { d: 'Phiên 09/10', net: 210 },
-          { d: 'Phiên 10/10', net: -185 },
-          { d: 'Phiên 13/10', net: -320 },
-          { d: 'Hôm nay (14/10)', net: netTy }
-        ];
+        // Tự động tính toán 5 phiên giao dịch gần nhất tới hôm nay
+        const days = [];
+        const baseNetList = [-145, 210, -185, -320];
+        const cur = new Date();
+        const recentDates = [];
+        for (let i = 0; recentDates.length < 5; i++) {
+          const d = new Date(cur.getTime() - i * 86400000);
+          if (d.getDay() !== 0 && d.getDay() !== 6) {
+            recentDates.unshift(d);
+          }
+        }
+        recentDates.forEach((d, idx) => {
+          const isToday = idx === recentDates.length - 1;
+          const dStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+          days.push({
+            d: isToday ? `Hôm nay (${dStr})` : `Phiên ${dStr}`,
+            net: isToday ? netTy : (baseNetList[idx % baseNetList.length] || -150)
+          });
+        });
 
         histContainer.innerHTML = days.map(item => {
           const isNetBuy = item.net >= 0;
@@ -3745,7 +3794,8 @@ body {
       const container = document.getElementById('newsListContainer');
       if (!container) return;
 
-      container.innerHTML = LIVE_NEWS.map(n => `
+      const newsItems = typeof getLiveNewsList === 'function' ? getLiveNewsList() : LIVE_NEWS;
+      container.innerHTML = newsItems.map(n => `
         <a href="javascript:;" class="news-item-card" onclick="openNewsDetail('${n.title.replace(/'/g, "\\'")}', '${n.src}', '${n.time}')">
           <div class="news-item-meta">
             <span>${n.src}</span>

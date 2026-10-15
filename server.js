@@ -289,10 +289,10 @@ async function getLiveDashboardData() {
         console.warn('[DNSE MCP getMarketIndices notice]:', e.message);
     }
 
-    const vnindexRaw = dnseIndices['VNINDEX'] || { price: 1704.87, open: 1720.91, high: 1722.65, low: 1699.23, volume: 584000000 };
-    const vn30Raw = dnseIndices['VN30'] || { price: 1852.44, open: 1863.17, high: 1866.57, low: 1845.04, volume: 251000000 };
-    const hnxRaw = dnseIndices['HNX'] || { price: 265.16, open: 267.12, high: 267.91, low: 261.14, volume: 45000000 };
-    const upcomRaw = dnseIndices['UPCOM'] || { price: 124.65, open: 123.71, high: 125.10, low: 123.50, volume: 32000000 };
+    const vnindexRaw = dnseIndices['VNINDEX'] || { price: 1699.70, open: 1713.67, high: 1713.67, low: 1697.48, volume: 542000000 };
+    const vn30Raw = dnseIndices['VN30'] || { price: 1845.40, open: 1857.47, high: 1857.47, low: 1843.10, volume: 235000000 };
+    const hnxRaw = dnseIndices['HNX'] || { price: 264.00, open: 265.60, high: 265.60, low: 263.80, volume: 38000000 };
+    const upcomRaw = dnseIndices['UPCOM'] || { price: 124.14, open: 124.31, high: 124.40, low: 123.90, volume: 28000000 };
 
     // 2. Chuan hoa danh sach co phieu tu nguon DNSE
     const stocks = DNSE_MASTER_STOCKS.map(item => {
@@ -834,11 +834,13 @@ app.get(['/api/market/stock/:symbol', '/api/dnse/stock/:symbol'], async (req, re
             const master = DNSE_MASTER_STOCKS.find(s => s.symbol === quote.symbol);
             const enriched = {
                 ...quote,
+                companyName: quote.companyName || (quote.symbol === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long' : (master?.sector ? `${master.symbol} - ${master.sector}` : quote.symbol)),
+                exchange: quote.exchange || master?.exchange || 'HOSE',
                 pe: master?.pe || 11.2,
                 pb: master?.pb || 1.88,
                 roe: master?.roe || 19.2,
                 marketCap: master?.marketCap || (quote.volume ? Math.round(quote.price * 96.5 / 1000) : 5357),
-                sector: master?.sector || (quote.companyName?.includes('Thiên Long') ? 'Hàng tiêu dùng' : 'Niêm yết')
+                sector: master?.sector || (quote.companyName?.includes('Thiên Long') || quote.symbol === 'TLG' ? 'Hàng tiêu dùng' : 'Niêm yết')
             };
             return res.json({ success: true, data: enriched });
         }
@@ -897,6 +899,10 @@ app.get('/api/dnse/indices', async (req, res) => {
         });
 
         if (Object.keys(indices).length > 0) {
+            if (indices['HNX']) indices['HNXINDEX'] = { ...indices['HNX'], symbol: 'HNXINDEX' };
+            if (indices['UPCOM']) indices['UPCOMINDEX'] = { ...indices['UPCOM'], symbol: 'UPCOMINDEX' };
+            if (indices['VNINDEX']) indices['VNI'] = { ...indices['VNINDEX'], symbol: 'VNI' };
+
             dnseCache.indices = indices;
             dnseCache.indicesTime = now;
             return res.json({ success: true, data: indices, cached: false, provider: 'DNSE Entrade API' });
@@ -911,14 +917,18 @@ app.get('/api/dnse/indices', async (req, res) => {
 
 // Lay chart OHLC index tu DNSE Entrade (ho tro resolution: 1, 5, 15, 30, 1D)
 app.get('/api/dnse/chart/index/:symbol', async (req, res) => {
-    const { symbol } = req.params;
+    let { symbol } = req.params;
+    let sym = (symbol || '').toUpperCase().trim();
+    if (sym === 'HNXINDEX') sym = 'HNX';
+    if (sym === 'UPCOMINDEX') sym = 'UPCOM';
+    if (sym === 'VNI') sym = 'VNINDEX';
     const { resolution = '1', from, to } = req.query;
     const now = Math.floor(Date.now() / 1000);
     const fromTime = from || (now - 2 * 86400);
     const toTime = to || now;
 
     try {
-        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${encodeURIComponent(symbol.toUpperCase())}&resolution=${resolution}&from=${fromTime}&to=${toTime}`;
+        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${encodeURIComponent(sym)}&resolution=${resolution}&from=${fromTime}&to=${toTime}`;
         const response = await axios.get(url, {
             headers: {
                 'Accept': 'application/json',

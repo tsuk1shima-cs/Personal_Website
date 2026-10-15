@@ -70,6 +70,10 @@ async function getMarketIndices() {
         indices[item.symbol] = item;
     });
 
+    if (indices['HNX']) indices['HNXINDEX'] = { ...indices['HNX'], symbol: 'HNXINDEX' };
+    if (indices['UPCOM']) indices['UPCOMINDEX'] = { ...indices['UPCOM'], symbol: 'UPCOMINDEX' };
+    if (indices['VNINDEX']) indices['VNI'] = { ...indices['VNINDEX'], symbol: 'VNI' };
+
     setCached('indices', indices);
     return indices;
 }
@@ -186,9 +190,10 @@ async function getChartHistory(symbol, resolution = '5', isIndex = false) {
 // 4. Tool: Lấy toàn cảnh thị trường & độ rộng
 async function getMarketOverview() {
     const indices = await getMarketIndices();
+    const today = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
     return {
         provider: 'DNSE Open API & Entrade X',
-        tradingSession: '14/10/2026',
+        tradingSession: today,
         indices,
         keyLeaders: ['FPT', 'HPG', 'TCB', 'MBB', 'VCB', 'SSI', 'MWG'],
         marketStatus: 'Active Session'
