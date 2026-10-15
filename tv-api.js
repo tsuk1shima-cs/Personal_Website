@@ -4,13 +4,13 @@
 
 // Dữ liệu chỉ số thị trường chuẩn xác thời gian thực từ sàn HOSE / HNX / UPCOM
 const FALLBACK_INDICES = {
-    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1702.20, change: -0.16, high: 1707.90, low: 1701.50, volume: 425000000 },
-    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1702.20, change: -0.16, high: 1707.90, low: 1701.50, volume: 425000000 },
-    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1846.50, change: -0.32, high: 1851.20, low: 1845.80, volume: 175000000 },
-    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 260.71,  change: -1.68, high: 265.16,  low: 259.96,  volume: 45000000 },
-    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 260.71,  change: -1.68, high: 265.16,  low: 259.96,  volume: 45000000 },
-    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 124.34,  change: 0.32,  high: 124.40,  low: 123.90,  volume: 19000000 },
-    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.34,  change: 0.32,  high: 124.40,  low: 123.90,  volume: 19000000 }
+    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1702.20, change: -0.16, high: 1709.54, low: 1696.47, open: 1704.87, volume: 526987695, value: 11072000000000, valueTy: 11072, breadth: { adv: 152, dec: 162, unc: 43 } },
+    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1702.20, change: -0.16, high: 1709.54, low: 1696.47, open: 1704.87, volume: 526987695, value: 11072000000000, valueTy: 11072, breadth: { adv: 152, dec: 162, unc: 43 } },
+    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1846.50, change: -0.32, high: 1853.55, low: 1840.26, open: 1852.44, volume: 212343072, value: 6237000000000, valueTy: 6237, breadth: { adv: 13, dec: 15, unc: 2 } },
+    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 260.71,  change: -1.68, high: 265.21,  low: 259.20,  open: 265.16, volume: 51736012, value: 730000000000, valueTy: 730, breadth: { adv: 59, dec: 61, unc: 50 } },
+    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 260.71,  change: -1.68, high: 265.21,  low: 259.20,  open: 265.16, volume: 51736012, value: 730000000000, valueTy: 730, breadth: { adv: 59, dec: 61, unc: 50 } },
+    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 124.39,  change: 0.36,  high: 124.80,  low: 123.90,  open: 123.94, volume: 23758007, value: 776000000000, valueTy: 776, breadth: { adv: 101, dec: 65, unc: 80 } },
+    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.39,  change: 0.36,  high: 124.80,  low: 123.90,  open: 123.94, volume: 23758007, value: 776000000000, valueTy: 776, breadth: { adv: 101, dec: 65, unc: 80 } }
 };
 
 // Danh mục cổ phiếu cơ sở (tự động đồng bộ và làm mới giá trực tiếp theo từng phiên giao dịch thực tế)
@@ -397,123 +397,104 @@ async function fetchDNSEIndices() {
         } catch { /* fallback direct */ }
     }
 
-    // 2. Trên GitHub Pages hoặc Client trực tiếp: Gọi ngay Live Index Feed từ VPS (100% CORS-friendly cho mọi môi trường)
+    // 2. Gọi đồng thời Live Index Detail từ VPS và TradingView Scanner để lấy giá, khối lượng, giá trị, độ rộng và đỉnh/đáy chuẩn nhất
     const indices = {};
     try {
-        const vpsRes = await fetch('https://bgapidatafeed.vps.com.vn/getlistindexdetail/10,11,02,03', {
-            signal: AbortSignal.timeout(3500)
-        });
-        if (vpsRes.ok) {
-            const list = await vpsRes.json();
-            if (Array.isArray(list) && list.length > 0) {
-                const mapCode = { '10': 'VNINDEX', '11': 'VN30', '02': 'HNXINDEX', '03': 'UPCOMINDEX' };
-                const mapEx = { '10': 'HOSE', '11': 'HOSE', '02': 'HNX', '03': 'UPCOM' };
-                list.forEach(item => {
-                    const sym = mapCode[item.hashValue];
-                    if (!sym) return;
-                    const curPrice = item.cIndex || 0;
-                    const refPrice = item.oIndex || curPrice;
-                    const chg = refPrice > 0 ? parseFloat((((curPrice - refPrice) / refPrice) * 100).toFixed(2)) : 0;
-                    indices[sym] = {
-                        symbol: sym,
-                        exchange: mapEx[item.hashValue] || 'HOSE',
-                        price: curPrice,
-                        change: chg,
-                        open: refPrice,
-                        high: curPrice,
-                        low: refPrice,
-                        volume: item.vol || 0,
-                        value: item.value ? Math.round(Number(item.value) * 1e6) : 0,
-                        time: item.time
-                    };
-                });
-                if (indices['VNINDEX']) {
-                    updateFallbackIndices(indices);
-                    return indices;
-                }
-            }
-        }
-    } catch (err) {
-        console.warn('VPS live indices notice:', err.message);
-    }
+        const [vpsResSettled, tvResSettled] = await Promise.allSettled([
+            fetch('https://bgapidatafeed.vps.com.vn/getlistindexdetail/10,11,02,03', {
+                signal: AbortSignal.timeout(3500)
+            }).then(r => r.ok ? r.json() : null),
+            fetch('https://scanner.tradingview.com/vietnam/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
+                    columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume']
+                }),
+                signal: AbortSignal.timeout(3500)
+            }).then(r => r.ok ? r.json() : null)
+        ]);
 
-    // 2.1 Dự phòng: Gọi TradingView Scanner API nếu VPS không khả dụng
-    try {
-        const tvRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
-                columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume']
-            }),
-            signal: AbortSignal.timeout(3500)
-        });
-        if (tvRes.ok) {
-            const j = await tvRes.json();
-            if (j.data && j.data.length > 0) {
-                j.data.forEach(item => {
-                    const [name, close, change, high, low, open, volume] = item.d;
-                    const sym = (name || '').toUpperCase();
-                    indices[sym] = {
-                        symbol: sym,
-                        exchange: item.s.startsWith('HNX') ? 'HNX' : 'HOSE',
-                        price: close,
-                        change: parseFloat(Number(change).toFixed(2)),
-                        high: high || close,
-                        low: low || close,
-                        open: open || close,
-                        volume: volume || 0
-                    };
-                });
-            }
+        const tvMap = {};
+        if (tvResSettled.status === 'fulfilled' && tvResSettled.value?.data?.length) {
+            tvResSettled.value.data.forEach(item => {
+                const [name, close, change, high, low, open, volume] = item.d;
+                const sym = (name || '').toUpperCase();
+                tvMap[sym] = {
+                    price: close,
+                    change: parseFloat(Number(change).toFixed(2)),
+                    high,
+                    low,
+                    open,
+                    volume
+                };
+            });
         }
 
-        // Tự động tính toán chỉ số UPCOM thời gian thực từ rổ cổ phiếu UPCOM thanh khoản cao nhất
-        if (!indices['UPCOMINDEX']) {
-            try {
-                const upcomRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        symbols: { tickers: ['UPCOM:VCR', 'UPCOM:VCP', 'UPCOM:MSR', 'UPCOM:VGI', 'UPCOM:ACV', 'UPCOM:VEA', 'UPCOM:SSH', 'UPCOM:QNS'] },
-                        columns: ['name', 'close', 'change', 'Value.Traded', 'volume']
-                    }),
-                    signal: AbortSignal.timeout(3500)
-                });
-                if (upcomRes.ok) {
-                    const uj = await upcomRes.json();
-                    if (uj.data && uj.data.length > 0) {
-                        let totalVal = 0;
-                        let weightedChg = 0;
-                        uj.data.forEach(item => {
-                            const [name, close, change, val] = item.d;
-                            if (val && change !== null && change !== undefined) {
-                                totalVal += val;
-                                weightedChg += change * val;
-                            }
-                        });
-                        const avgChg = totalVal > 0 ? parseFloat((weightedChg / totalVal).toFixed(2)) : -0.09;
-                        const refPrice = 124.29;
-                        const closePrice = parseFloat((refPrice * (1 + avgChg / 100)).toFixed(2));
-                        indices['UPCOMINDEX'] = {
-                            symbol: 'UPCOMINDEX',
-                            exchange: 'UPCOM',
-                            price: closePrice,
-                            change: avgChg,
-                            high: parseFloat((closePrice * 1.002).toFixed(2)),
-                            low: parseFloat((closePrice * 0.998).toFixed(2)),
-                            open: refPrice,
-                            volume: 28500000
-                        };
-                        indices['UPCOM'] = indices['UPCOMINDEX'];
+        if (vpsResSettled.status === 'fulfilled' && Array.isArray(vpsResSettled.value) && vpsResSettled.value.length > 0) {
+            const list = vpsResSettled.value;
+            const mapCode = { '10': 'VNINDEX', '11': 'VN30', '02': 'HNXINDEX', '03': 'UPCOMINDEX' };
+            const mapEx = { '10': 'HOSE', '11': 'HOSE', '02': 'HNX', '03': 'UPCOM' };
+            list.forEach(item => {
+                const sym = mapCode[item.hashValue];
+                if (!sym) return;
+                const curPrice = item.cIndex || 0;
+                const refPrice = item.oIndex || curPrice;
+                const chg = refPrice > 0 ? parseFloat((((curPrice - refPrice) / refPrice) * 100).toFixed(2)) : 0;
+                
+                // Parse độ rộng từ trường ot: changePt|changePct|tradingValue|adv|dec|unc
+                let adv = 0, dec = 0, unc = 0;
+                if (item.ot) {
+                    const parts = item.ot.split('|');
+                    if (parts.length >= 6) {
+                        adv = parseInt(parts[3], 10) || 0;
+                        dec = parseInt(parts[4], 10) || 0;
+                        unc = parseInt(parts[5], 10) || 0;
                     }
                 }
-            } catch (ue) {
-                console.warn('UPCOM live calc notice:', ue.message);
-            }
+
+                const tvData = tvMap[sym];
+                const high = (tvData && tvData.high) ? tvData.high : Math.max(curPrice, refPrice);
+                const low = (tvData && tvData.low) ? tvData.low : Math.min(curPrice, refPrice);
+                const open = (tvData && tvData.open) ? tvData.open : refPrice;
+                const rawVal = item.value ? Number(item.value) : 0;
+                const valueVND = Math.round(rawVal * 1e6); // Triệu đồng -> VNĐ
+                const valueTy = Math.round(rawVal / 1000); // Tỷ đồng
+
+                indices[sym] = {
+                    symbol: sym,
+                    exchange: mapEx[item.hashValue] || 'HOSE',
+                    price: curPrice,
+                    change: chg,
+                    open,
+                    high,
+                    low,
+                    volume: item.vol || (tvData?.volume) || 0,
+                    value: valueVND,
+                    valueTy,
+                    breadth: { adv, dec, unc },
+                    time: item.time
+                };
+            });
+        } else if (Object.keys(tvMap).length > 0) {
+            // Dự phòng khi VPS không khả dụng: Dùng Scanner TV
+            Object.entries(tvMap).forEach(([sym, d]) => {
+                indices[sym] = {
+                    symbol: sym,
+                    exchange: sym.startsWith('HNX') ? 'HNX' : 'HOSE',
+                    price: d.price,
+                    change: d.change,
+                    open: d.open,
+                    high: d.high,
+                    low: d.low,
+                    volume: d.volume,
+                    value: Math.round(d.volume * d.price * 1000),
+                    valueTy: Math.round((d.volume * d.price * 1000) / 1e9)
+                };
+            });
         }
-    } catch (e) {
-        console.warn('Live scanner index fetch notice:', e.message);
+    } catch (err) {
+        console.warn('Realtime index fetch notice:', err.message);
     }
 
     // 3. Nếu vẫn thiếu chỉ số và đang ở môi trường local, thử gọi Entrade API
@@ -815,8 +796,20 @@ async function fetchDNSEMarketOverview() {
         const ceil = stocks.filter(s => s.change >= 6.8).length;
         const floor = stocks.filter(s => s.change <= -6.8).length;
 
-        const totalVol = stocks.reduce((sum, s) => sum + (s.volume || 0), 0);
-        const totalVal = Math.round(stocks.reduce((sum, s) => sum + (s.value || 0), 0) * 1.5) || 18450000000000;
+        const vni = mergedIndices['VNINDEX'] || mergedIndices['VNI'] || {};
+        const totalVol = (vni.volume && vni.volume > 1e7) ? vni.volume : stocks.reduce((sum, s) => sum + (s.volume || 0), 0);
+        const totalVal = (vni.value && vni.value > 1e11) ? vni.value : (Math.round(stocks.reduce((sum, s) => sum + (s.value || 0), 0) * 1.5) || 18450000000000);
+        const totalVolM = totalVol >= 1e6 ? (totalVol / 1e6).toFixed(1) + 'M' : totalVol.toLocaleString();
+        const totalValTy = (vni.valueTy ? vni.valueTy.toLocaleString('vi-VN') : Math.round(totalVal / 1e9).toLocaleString('vi-VN')) + ' tỷ';
+        const marketBreadth = (vni.breadth && (vni.breadth.adv || vni.breadth.dec)) ? {
+            adv: vni.breadth.adv,
+            dec: vni.breadth.dec,
+            unc: vni.breadth.unc,
+            ceil: stocks.filter(s => s.change >= 6.8).length,
+            floor: stocks.filter(s => s.change <= -6.8).length,
+            total: (vni.breadth.adv + vni.breadth.dec + vni.breadth.unc) || stocks.length
+        } : { adv, ceil, dec, floor, unc, total: stocks.length };
+
         const buyForeign = stocks.reduce((sum, s) => sum + (s.buyForeignValue || 0), 0);
         const sellForeign = stocks.reduce((sum, s) => sum + (s.sellForeignValue || 0), 0);
 
@@ -829,12 +822,12 @@ async function fetchDNSEMarketOverview() {
             gainers,
             losers,
             volLeaders,
-            breadth: { adv, ceil, dec, floor, unc, total: stocks.length },
+            breadth: marketBreadth,
             liquidity: {
                 totalVol,
                 totalVal,
-                totalVolM: totalVol >= 1e6 ? (totalVol / 1e6).toFixed(1) + 'M' : totalVol.toLocaleString(),
-                totalValTy: (totalVal / 1e9).toFixed(1) + ' tỷ'
+                totalVolM,
+                totalValTy
             },
             foreign: {
                 buyVal: buyForeign,
