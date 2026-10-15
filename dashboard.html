@@ -1687,9 +1687,9 @@ body {
 
     <div class="header-right">
       <!-- LIVE REALTIME STREAMING BADGE (TỰ ĐỘNG CHẠY LIÊN TỤC) -->
-      <div class="streaming-badge" title="Dữ liệu giá và biểu đồ tự động cập nhật liên tục từ DNSE API">
+      <div class="streaming-badge" title="Dữ liệu giá và biểu đồ tự động cập nhật liên tục">
         <span class="pulse-dot"></span>
-        <span id="streamingStatusText">DNSE Trực tiếp Realtime</span>
+        <span id="streamingStatusText">Trực tiếp Realtime</span>
       </div>
 
       <!-- SEARCH BOX -->
@@ -2316,7 +2316,7 @@ body {
               <div style="display:flex; align-items:center; gap:6px;">
                 <span class="blue-accent-bar"></span>
                 <span style="font-weight:700; font-size:13.5px;">Hệ thống Quét & Phát hiện Tín hiệu Kỹ thuật Realtime</span>
-                <span class="tongquan-card-subtitle">(HOSE / HNX / UPCOM kết nối DNSE)</span>
+                <span class="tongquan-card-subtitle">(HOSE / HNX / UPCOM Realtime)</span>
               </div>
               <span id="taLiveUpdateBadge" style="font-size:11px; color:var(--price-up); font-weight:600; display:inline-flex; align-items:center; gap:4px;">
                 <span class="pulse-dot" style="width:6px;height:6px;"></span> Tự động quét theo nhịp thị trường
@@ -2399,7 +2399,7 @@ body {
               <div style="display:flex; align-items:center; gap:6px;">
                 <span class="blue-accent-bar"></span>
                 <span style="font-weight:700; font-size:13.5px;">Bộ Lọc Cổ Phiếu Theo Chỉ Số Tài Chính & Định Giá (FA Screener)</span>
-                <span class="tongquan-card-subtitle">(Dữ liệu cơ bản & định giá P/E, P/B, ROE từ DNSE)</span>
+                <span class="tongquan-card-subtitle">(Dữ liệu cơ bản & định giá P/E, P/B, ROE Realtime)</span>
               </div>
               <span id="faScreenerCountBadge" style="font-size:11.5px; color:var(--primary-brand); font-weight:700;">
                 Khớp 24/47 mã
@@ -2616,7 +2616,7 @@ body {
           <div style="display:flex; align-items:center; gap:6px;">
             <div class="ai-avatar-badge" style="width:24px; height:24px; font-size:12px;">⚡</div>
             <div>
-              <div style="font-size:12px; font-weight:700;">AI Realtime (DNSE MCP)</div>
+              <div style="font-size:12px; font-weight:700;">Trợ lý AI Phân tích Realtime</div>
               <div style="font-size:10px; color:var(--price-up); display:flex; align-items:center; gap:3px;">
                 <span class="pulse-dot" style="width:4px;height:4px;"></span>
                 <span>Dữ liệu trực tiếp sàn HOSE/HNX</span>
@@ -2632,7 +2632,7 @@ body {
         <div class="ai-messages-scroll" id="aiChatMessages" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px;">
           <div class="ai-msg-item bot">
             <div class="ai-bubble" style="font-size:12px; line-height:1.45;">
-              <p><strong>Xin chào! Tôi là Trợ lý AI kết nối trực tiếp với DNSE MCP Protocol.</strong></p>
+              <p><strong>Xin chào! Tôi là Trợ lý AI phân tích thị trường chứng khoán Realtime.</strong></p>
               <p>Dữ liệu VN-Index, độ rộng thị trường và giá các mã (FPT, TCB, HPG, SSI...) được cập nhật realtime từ sàn giao dịch.</p>
               <p>Bạn có thể hỏi tôi:</p>
               <ul style="padding-left:16px; margin:4px 0;">
@@ -2707,7 +2707,7 @@ body {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-brand)" stroke-width="2.2"><path d="M3 3v18h18M18 9l-5 5-4-4-6 6"/></svg>
           <div>
             <div style="font-size:15px;font-weight:700;">Thị trường Chứng khoán Phái sinh (VN30 Futures)</div>
-            <div style="font-size:11px;color:var(--text-muted);">Dữ liệu giao dịch Hợp đồng tương lai kết nối realtime sàn HNX & DNSE</div>
+            <div style="font-size:11px;color:var(--text-muted);">Dữ liệu giao dịch Hợp đồng tương lai kết nối realtime sàn HNX</div>
           </div>
         </div>
         <button onclick="closeDerivativesModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-secondary);">&times;</button>
@@ -3085,7 +3085,7 @@ body {
         const heroState = document.getElementById('heroMarketState');
 
         if (statusText) {
-          statusText.textContent = isTradingHours ? `DNSE Trực tiếp • ${todayStr}` : `DNSE Live API • ${todayStr}`;
+          statusText.textContent = isTradingHours ? `Trực tiếp • ${todayStr}` : `Live Market • ${todayStr}`;
         }
 
         if (heroState) {
@@ -4171,7 +4171,7 @@ body {
 
       const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
       if (!stocks || stocks.length === 0) {
-        container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Đang tải dữ liệu DNSE...</div>';
+        container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Đang tải dữ liệu Realtime...</div>';
         return;
       }
 
@@ -4662,7 +4662,7 @@ body {
 
       const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
       if (!stocks || stocks.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--text-muted);">Đang kết nối dữ liệu DNSE...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--text-muted);">Đang kết nối dữ liệu Realtime...</td></tr>';
         return;
       }
 
@@ -4811,7 +4811,7 @@ body {
 
       const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
       if (!stocks || stocks.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:var(--text-muted);">Đang kết nối dữ liệu DNSE...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:var(--text-muted);">Đang kết nối dữ liệu Realtime...</td></tr>';
         return;
       }
 
@@ -5693,11 +5693,11 @@ body {
               <div style="display:flex; align-items:center; gap:8px;">
                 <div class="ai-avatar-badge" style="width:26px; height:26px; font-size:13px;">⚡</div>
                 <div>
-                  <div style="font-size:13px; font-weight:700;">Trợ lý AI Phân tích Cổ phiếu ${stock.symbol} (DNSE MCP Protocol)</div>
+                  <div style="font-size:13px; font-weight:700;">Trợ lý AI Phân tích Cổ phiếu ${stock.symbol} Realtime</div>
                   <div style="font-size:11px; color:var(--text-muted);">Phân tích định giá, kỹ thuật và điểm mua/bán tối ưu trực tiếp trong Dashboard</div>
                 </div>
               </div>
-              <span class="badge-tape buy" style="font-size:10px;">MCP Online</span>
+              <span class="badge-tape buy" style="font-size:10px;">AI Online</span>
             </div>
 
             <!-- PROMPT QUICK PILLS -->
@@ -6083,7 +6083,7 @@ body {
         box.innerHTML = `
           <div style="color:var(--primary-brand);font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
             <span>⚡ Kết quả Phân tích AI • ${currentStockDetailSymbol}</span>
-            <span style="font-size:10.5px;color:var(--text-muted);">${res.source || 'DNSE MCP Protocol'}</span>
+            <span style="font-size:10.5px;color:var(--text-muted);">${res.source || 'AI Market Engine'}</span>
           </div>
           <div style="color:var(--text-primary);line-height:1.65;">
             ${formatAiMarkdown(res.message)}
@@ -6233,9 +6233,9 @@ body {
               const mcpTools = resJson.mcp?.toolsUsed?.length
                 ? ` [Tools: ${resJson.mcp.toolsUsed.join(', ')}]`
                 : '';
-              const mcpLabel = (resJson.dataSources && resJson.dataSources.includes('DNSE MCP Realtime Protocol'))
-                ? `DNSE MCP Realtime Protocol${mcpTools}`
-                : 'DNSE Open API & AI Assistant';
+              const mcpLabel = (resJson.dataSources && resJson.dataSources.length)
+                ? resJson.dataSources.map(s => s.replace(/DNSE\s*/gi, '')).join(', ') + mcpTools
+                : 'Hệ thống Phân tích AI Realtime';
               return {
                 message: resJson.message,
                 source: `⚡ ${mcpLabel}`
@@ -6275,7 +6275,7 @@ body {
             const json = await r.json();
             const text = json.choices?.[0]?.message?.content;
             if (text) {
-              return { message: text, source: 'OpenRouter AI + Live DNSE Memory' };
+              return { message: text, source: 'OpenRouter AI + Live Market Memory' };
             }
           }
         } catch (e) {
@@ -6783,8 +6783,8 @@ ${leaderDetails}
             const pill = document.getElementById('aiDrawerMcpPill');
             const subText = document.getElementById('aiMcpSubText');
             if (d.success && d.configured) {
-              if (pill) pill.innerHTML = `<span class="mcp-dot"></span> MCP: DNSE Online`;
-              if (subText) subText.textContent = `DNSE MCP Protocol Active (Key OK)`;
+              if (pill) pill.innerHTML = `<span class="mcp-dot"></span> AI: Online`;
+              if (subText) subText.textContent = `Hệ thống AI Phân tích Realtime Active`;
               return;
             }
           }
@@ -6795,7 +6795,7 @@ ${leaderDetails}
       const pill = document.getElementById('aiDrawerMcpPill');
       const subText = document.getElementById('aiMcpSubText');
       if (pill) pill.innerHTML = `<span class="mcp-dot" style="background:#16a34a;box-shadow:0 0 8px rgba(22,163,74,0.7);"></span> ⚡ Trực tiếp: Realtime Stream`;
-      if (subText) subText.textContent = `TradingView & DNSE Live Stream (HOSE/HNX Online)`;
+      if (subText) subText.textContent = `Realtime Live Stream (HOSE/HNX Online)`;
     }
 
     // KHỞI ĐỘNG HỆ THỐNG

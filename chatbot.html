@@ -499,7 +499,7 @@
                     </div>
                     <div class="mcp-pill" id="chatbotMcpPill">
                         <span class="mcp-dot"></span>
-                        <span id="chatbotMcpText">DNSE MCP Protocol Realtime</span>
+                        <span id="chatbotMcpText">Live Realtime Market Protocol</span>
                     </div>
                     <ul class="model-features">
                         <li>Tốc độ phản hồi cực nhanh (2 - 4 giây)</li>
@@ -1084,8 +1084,8 @@
                         if (data.success && data.message) {
                             const mcpTools = data.mcp?.toolsUsed?.length ? ` [${data.mcp.toolsUsed.join(', ')}]` : '';
                             const mcpSource = data.dataSources && data.dataSources.length 
-                                ? data.dataSources.map(s => s + mcpTools)
-                                : ['DNSE MCP Realtime Protocol'];
+                                ? data.dataSources.map(s => s.replace(/DNSE\s*/gi, '') + mcpTools)
+                                : ['Live Market Realtime Protocol'];
                             return {
                                 message: data.message,
                                 sources: mcpSource
@@ -1228,7 +1228,7 @@
                     <div class="empty-state-icon">⚡</div>
                     <div class="empty-state-text">
                         <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime (${info.title}).</strong><br>
-                        Hệ thống đã được kết nối trực tiếp qua giao thức <strong>Model Context Protocol (MCP)</strong> với <strong>DNSE Open API & Entrade X</strong>.<br><br>
+                        Hệ thống đã được kết nối trực tiếp với <strong>Dữ liệu Bảng giá & Thị trường Realtime</strong>.<br><br>
                         <span style="font-size: 13px; color: #737373;">Bạn có thể hỏi tôi về phân tích mã cổ phiếu (TCB, HPG, FPT, VCB...), tra cứu định giá P/E, P/B, ROE, chỉ báo RSI/ADX hoặc nhận định xu hướng thị trường hôm nay.</span>
                     </div>
                 </div>
@@ -1247,7 +1247,7 @@
                     const d = await res.json();
                     const pillText = document.getElementById('chatbotMcpText');
                     if (pillText && d.success && d.configured) {
-                        pillText.textContent = 'DNSE MCP Protocol Active (Key OK)';
+                        pillText.textContent = 'Live Market Realtime Protocol Active';
                     }
                 }
             } catch {}

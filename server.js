@@ -547,9 +547,9 @@ async function fetchStockContextForPrompt(userText) {
                 }
             });
             if (dnseLines.length > 0) {
-                contextParts.push('[DỮ LIỆU THỰC TẾ TỪ DNSE OPEN API (MODEL CONTEXT PROTOCOL - MCP)]:\n' + dnseLines.join('\n'));
-                sources.push('DNSE MCP Realtime Protocol');
-                mcpTools.push('dnse_get_stock_quote');
+                contextParts.push('[DỮ LIỆU THỰC TẾ THỊ TRƯỜNG REALTIME (MCP)]:\n' + dnseLines.join('\n'));
+                sources.push('Live Market Realtime Protocol');
+                mcpTools.push('get_stock_quote');
             }
         } catch (err) {
             console.warn('[DNSE MCP Context] Error:', err.message);
@@ -577,9 +577,9 @@ async function fetchStockContextForPrompt(userText) {
                     const sign = Number(chg) >= 0 ? '+' : '';
                     idxLines.push(`• Chỉ số ${ix.symbol}: ${ix.price?.toLocaleString('vi-VN')} điểm (${sign}${chg}), Mở cửa: ${ix.open?.toLocaleString('vi-VN')}, Cao nhất: ${ix.high?.toLocaleString('vi-VN')}, Thấp nhất: ${ix.low?.toLocaleString('vi-VN')}`);
                 });
-                contextParts.push('[CHỈ SỐ THỊ TRƯỜNG REALTIME TỪ DNSE OPEN API (MCP)]:\n' + idxLines.join('\n'));
-                if (!sources.includes('DNSE MCP Realtime Protocol')) sources.push('DNSE MCP Realtime Protocol');
-                mcpTools.push('dnse_get_market_indices');
+                contextParts.push('[CHỈ SỐ THỊ TRƯỜNG REALTIME (MCP)]:\n' + idxLines.join('\n'));
+                if (!sources.includes('Live Market Realtime Protocol')) sources.push('Live Market Realtime Protocol');
+                mcpTools.push('get_market_indices');
             }
         } catch { /* fallback */ }
     }
@@ -609,15 +609,15 @@ app.post('/api/chat', async (req, res) => {
         const stockContext = await fetchStockContextForPrompt(lastUserMsg);
 
         // Xay dung System Prompt chuyen sau ve Tai chinh & Chung khoan Viet Nam
-        const systemPrompt = `Bạn là Trợ lý AI Phân tích Tài chính & Đầu tư Chứng khoán chuyên nghiệp tại Việt Nam, tích hợp trực tiếp qua giao thức Model Context Protocol (MCP) với DNSE Open API & Entrade X.
+        const systemPrompt = `Bạn là Trợ lý AI Phân tích Tài chính & Đầu tư Chứng khoán chuyên nghiệp tại Việt Nam, tích hợp trực tiếp dữ liệu thời gian thực các sàn HOSE, HNX, UPCOM.
 Nhiệm vụ của bạn:
 1. Trả lời bằng tiếng Việt, súc tích, văn phong chuyên nghiệp và có chiều sâu phân tích tài chính.
-2. Khi người dùng hỏi về cổ phiếu hoặc thị trường, BẮT BUỘC sử dụng các số liệu thực tế được cung cấp dưới đây từ DNSE MCP (giá hiện tại, % tăng giảm, P/E, P/B, ROE, vốn hoá, khối lượng, RSI). Tuyệt đối không tự suy đoán sai lệch số liệu.
+2. Khi người dùng hỏi về cổ phiếu hoặc thị trường, BẮT BUỘC sử dụng các số liệu thực tế được cung cấp dưới đây từ dữ liệu thị trường Realtime (giá hiện tại, % tăng giảm, P/E, P/B, ROE, vốn hoá, khối lượng, RSI). Tuyệt đối không tự suy đoán sai lệch số liệu.
 3. Cung cấp góc nhìn phân tích kết hợp:
    - Cơ bản & Định giá (P/E, P/B, ROE, vị thế doanh nghiệp).
    - Kỹ thuật & Dòng tiền (vùng hỗ trợ, kháng cự, RSI, xu hướng ngắn/trung hạn).
 4. Luôn kèm khuyến nghị quản trị rủi ro (kỷ luật chốt lời/cắt lỗ).
-${stockContext.text ? `\n--- DỮ LIỆU THỰC TẾ DNSE MCP REALTIME ---\n${stockContext.text}\n--- HẾT DỮ LIỆU THỰC TẾ ---` : ''}`;
+${stockContext.text ? `\n--- DỮ LIỆU THỰC TẾ THỊ TRƯỜNG REALTIME ---\n${stockContext.text}\n--- HẾT DỮ LIỆU THỰC TẾ ---` : ''}`;
 
         // Tao danh sach messages moi voi system prompt cap nhat
         const finalMessages = messages.filter(m => m.role !== 'system');
@@ -643,7 +643,7 @@ ${stockContext.text ? `\n--- DỮ LIỆU THỰC TẾ DNSE MCP REALTIME ---\n${st
             mcp: {
                 connected: true,
                 protocol: 'Model Context Protocol (MCP)',
-                provider: 'DNSE Open API & Entrade X',
+                provider: 'Live Realtime Market Data',
                 toolsUsed: stockContext.mcpTools,
                 keyConfigured: Boolean(DNSE_API_KEY)
             }
