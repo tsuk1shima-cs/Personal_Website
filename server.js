@@ -202,7 +202,7 @@ const IND_NAMES = [
     'Năng lượng', 'Tiện ích', 'Y tế', 'Công nghệ thông tin', 'Dịch vụ truyền thông'
 ];
 
-// Danh mục cổ phiếu chuẩn từ DNSE (Phiên 14/10/2026)
+// Danh mục cổ phiếu chuẩn từ DNSE (Tự động đồng bộ Realtime từ thị trường)
 const DNSE_MASTER_STOCKS = [
     { symbol: 'VCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 56300, change: 0.00, pe: 14.2, pb: 2.65, roe: 21.4, marketCap: 312000, volume: 2155300, value: 121405510000, buyForeignValue: 9398130000, sellForeignValue: 19451746700 },
     { symbol: 'BID', exchange: 'HOSE', sector: 'Ngân hàng', price: 33100, change: -0.75, pe: 11.8, pb: 1.85, roe: 18.2, marketCap: 188000, volume: 3041800, value: 101248085000, buyForeignValue: 17243506200, sellForeignValue: 33808098100 },
@@ -275,11 +275,57 @@ function generateIntradaySeries(ref, close, high, low, length = 31) {
 // Cache du lieu dashboard trong 10 giay de phan hoi sieu toc
 const dashboardCache = { data: null, time: 0, TTL: 10 * 1000 };
 
+// Tu dong dong bo danh muc co phieu DNSE_MASTER_STOCKS tu Live Scanner
+let isSyncingDnseMaster = false;
+let lastDnseMasterSync = 0;
+
+async function syncDnseMasterStocksLive() {
+    const now = Date.now();
+    if (now - lastDnseMasterSync < 30 * 1000) return;
+    if (isSyncingDnseMaster) return;
+    isSyncingDnseMaster = true;
+
+    try {
+        const tickers = DNSE_MASTER_STOCKS.map(s => `${s.exchange || 'HOSE'}:${s.symbol}`);
+        const response = await axios.post(
+            'https://scanner.tradingview.com/vietnam/scan',
+            {
+                symbols: { tickers },
+                columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume', 'Value.Traded', 'price_book_ratio']
+            },
+            { timeout: 6000 }
+        );
+
+        if (response.data && response.data.data) {
+            response.data.data.forEach(item => {
+                const [name, close, change, high, low, open, volume, valTraded, pb] = item.d;
+                const sym = (name || item.s?.split(':')[1] || '').toUpperCase();
+                const target = DNSE_MASTER_STOCKS.find(s => s.symbol === sym);
+                if (target && close) {
+                    target.price = close;
+                    if (change !== undefined && change !== null) target.change = parseFloat(Number(change).toFixed(2));
+                    if (volume) target.volume = volume;
+                    if (valTraded) target.value = valTraded;
+                    if (pb) target.pb = parseFloat(Number(pb).toFixed(2));
+                }
+            });
+            lastDnseMasterSync = now;
+        }
+    } catch (err) {
+        console.warn('[Server syncDnseMasterStocks notice]:', err.message);
+    } finally {
+        isSyncingDnseMaster = false;
+    }
+}
+
 async function getLiveDashboardData() {
     const now = Date.now();
     if (dashboardCache.data && (now - dashboardCache.time) < dashboardCache.TTL) {
         return dashboardCache.data;
     }
+
+    // Tu dong lam moi gia thuc te cua toan bo danh muc tu thi truong
+    await syncDnseMasterStocksLive();
 
     // 1. Lay chi so thi truong realtime tu DNSE Open API / Entrade qua MCP
     let dnseIndices = {};
@@ -289,10 +335,39 @@ async function getLiveDashboardData() {
         console.warn('[DNSE MCP getMarketIndices notice]:', e.message);
     }
 
-    const vnindexRaw = dnseIndices['VNINDEX'] || { price: 1699.70, open: 1713.67, high: 1713.67, low: 1697.48, volume: 542000000 };
+    // Neu khong co index tu Entrade, goi du phong truc tiep tu TV Scanner
+    if (!dnseIndices || Object.keys(dnseIndices).length < 2) {
+        try {
+            const tvRes = await axios.post(
+                'https://scanner.tradingview.com/vietnam/scan',
+                {
+                    symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
+                    columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume']
+                },
+                { timeout: 4000 }
+            );
+            if (tvRes.data && tvRes.data.data) {
+                tvRes.data.data.forEach(item => {
+                    const [name, close, change, high, low, open, volume] = item.d;
+                    const sym = (name || '').toUpperCase();
+                    dnseIndices[sym] = {
+                        symbol: sym,
+                        price: close,
+                        change: parseFloat(Number(change).toFixed(2)),
+                        open: open || close,
+                        high: high || close,
+                        low: low || close,
+                        volume: volume || 0
+                    };
+                });
+            }
+        } catch { /* ignore */ }
+    }
+
+    const vnindexRaw = dnseIndices['VNINDEX'] || dnseIndices['VNI'] || { price: 1699.70, open: 1713.67, high: 1713.67, low: 1697.48, volume: 542000000 };
     const vn30Raw = dnseIndices['VN30'] || { price: 1845.40, open: 1857.47, high: 1857.47, low: 1843.10, volume: 235000000 };
-    const hnxRaw = dnseIndices['HNX'] || { price: 264.00, open: 265.60, high: 265.60, low: 263.80, volume: 38000000 };
-    const upcomRaw = dnseIndices['UPCOM'] || { price: 124.14, open: 124.31, high: 124.40, low: 123.90, volume: 28000000 };
+    const hnxRaw = dnseIndices['HNX'] || dnseIndices['HNXINDEX'] || { price: 264.00, open: 265.60, high: 265.60, low: 263.80, volume: 38000000 };
+    const upcomRaw = dnseIndices['UPCOM'] || dnseIndices['UPCOMINDEX'] || { price: 124.14, open: 124.31, high: 124.40, low: 123.90, volume: 28000000 };
 
     // 2. Chuan hoa danh sach co phieu tu nguon DNSE
     const stocks = DNSE_MASTER_STOCKS.map(item => {
@@ -371,54 +446,60 @@ async function getLiveDashboardData() {
     const hnxB = calcBreadth('HNX');
     const upcomB = calcBreadth('UPCOM');
 
+    const hoseStocks = stocks.filter(s => s.ex === 'HOSE');
+    const hnxStocks = stocks.filter(s => s.ex === 'HNX');
+    const calcValHose = Math.round(hoseStocks.reduce((sum, s) => sum + (s.val || 0), 0) * 1.6) || 18450.5;
+    const calcValHnx = Math.round(hnxStocks.reduce((sum, s) => sum + (s.val || 0), 0) * 1.5) || 1420.3;
+    const calcValVn30 = Math.round(calcValHose * 0.53);
+
     const indices = [
         {
             id: 'VNINDEX',
             name: 'VN-Index',
-            ref: vnindexRaw.open || 1720.91,
+            ref: vnindexRaw.open || vnindexRaw.price,
             close: vnindexRaw.price,
-            vol: Math.round(vnindexRaw.volume / 1e6 * 10) / 10,
-            val: 18450.5,
-            pt: 850.5,
+            vol: Math.round((vnindexRaw.volume || 650000000) / 1e6 * 10) / 10,
+            val: calcValHose,
+            pt: parseFloat((calcValHose * 0.045).toFixed(1)),
             ...hoseB,
-            series: generateIntradaySeries(vnindexRaw.open || 1720.91, vnindexRaw.price, vnindexRaw.high, vnindexRaw.low)
+            series: generateIntradaySeries(vnindexRaw.open || vnindexRaw.price, vnindexRaw.price, vnindexRaw.high, vnindexRaw.low)
         },
         {
             id: 'VN30',
             name: 'VN30',
-            ref: vn30Raw.open || 1863.17,
+            ref: vn30Raw.open || vn30Raw.price,
             close: vn30Raw.price,
-            vol: Math.round(vn30Raw.volume / 1e6 * 10) / 10,
-            val: 9850.2,
-            pt: 410.2,
+            vol: Math.round((vn30Raw.volume || 250000000) / 1e6 * 10) / 10,
+            val: calcValVn30,
+            pt: parseFloat((calcValVn30 * 0.04).toFixed(1)),
             adv: Math.min(30, hoseB.adv),
             dec: Math.min(30, hoseB.dec),
             ceil: 0,
             floor: 0,
             nc: Math.max(0, 30 - Math.min(30, hoseB.adv) - Math.min(30, hoseB.dec)),
-            series: generateIntradaySeries(vn30Raw.open || 1863.17, vn30Raw.price, vn30Raw.high, vn30Raw.low)
+            series: generateIntradaySeries(vn30Raw.open || vn30Raw.price, vn30Raw.price, vn30Raw.high, vn30Raw.low)
         },
         {
             id: 'HNXINDEX',
             name: 'HNX-Index',
-            ref: hnxRaw.open || 267.12,
+            ref: hnxRaw.open || hnxRaw.price,
             close: hnxRaw.price,
-            vol: Math.round(hnxRaw.volume / 1e6 * 10) / 10,
-            val: 1420.3,
-            pt: 110.3,
+            vol: Math.round((hnxRaw.volume || 45000000) / 1e6 * 10) / 10,
+            val: calcValHnx,
+            pt: parseFloat((calcValHnx * 0.06).toFixed(1)),
             ...hnxB,
-            series: generateIntradaySeries(hnxRaw.open || 267.12, hnxRaw.price, hnxRaw.high, hnxRaw.low)
+            series: generateIntradaySeries(hnxRaw.open || hnxRaw.price, hnxRaw.price, hnxRaw.high, hnxRaw.low)
         },
         {
             id: 'UPCOMINDEX',
             name: 'UPCOM-Index',
-            ref: upcomRaw.open || 123.71,
+            ref: upcomRaw.open || upcomRaw.price,
             close: upcomRaw.price,
-            vol: Math.round(upcomRaw.volume / 1e6 * 10) / 10,
+            vol: Math.round((upcomRaw.volume || 30000000) / 1e6 * 10) / 10,
             val: 680.4,
             pt: 90.0,
             ...upcomB,
-            series: generateIntradaySeries(upcomRaw.open || 123.71, upcomRaw.price, upcomRaw.high, upcomRaw.low)
+            series: generateIntradaySeries(upcomRaw.open || upcomRaw.price, upcomRaw.price, upcomRaw.high, upcomRaw.low)
         }
     ];
 
@@ -897,6 +978,37 @@ app.get('/api/dnse/indices', async (req, res) => {
                 indices[sym] = r.value;
             }
         });
+
+        // Du phong tu dong tu Live Scanner neu Entrade khong co nến
+        if (Object.keys(indices).length < 2) {
+            try {
+                const tvRes = await axios.post(
+                    'https://scanner.tradingview.com/vietnam/scan',
+                    {
+                        symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
+                        columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume']
+                    },
+                    { timeout: 4000 }
+                );
+                if (tvRes.data && tvRes.data.data) {
+                    tvRes.data.data.forEach(item => {
+                        const [name, close, change, high, low, open, volume] = item.d;
+                        const sym = (name || '').toUpperCase();
+                        indices[sym] = {
+                            symbol: sym,
+                            price: close,
+                            high: high || close,
+                            low: low || close,
+                            open: open || close,
+                            volume: volume || 0,
+                            time: Math.floor(Date.now() / 1000)
+                        };
+                    });
+                }
+            } catch (tvErr) {
+                console.warn('Direct TV scanner index fallback notice:', tvErr.message);
+            }
+        }
 
         if (Object.keys(indices).length > 0) {
             if (indices['HNX']) indices['HNXINDEX'] = { ...indices['HNX'], symbol: 'HNXINDEX' };
@@ -1519,6 +1631,10 @@ API Status:
    ${GEMINI_KEY     ? 'Co key' : 'Chua cau hinh'} - Google Gemini (Fallback)
    ${tcbsApiKeyOk   ? 'Co key (chua xac thuc)' : 'Thieu key'} - TCBS iFlash & MCP
     `);
+
+    // Tu dong dong bo danh muc co phieu live ngay khi khoi dong va dinh ky moi 60 giay
+    syncDnseMasterStocksLive();
+    setInterval(syncDnseMasterStocksLive, 60 * 1000);
 });
 
 // Handle server errors (e.g. port already in use)

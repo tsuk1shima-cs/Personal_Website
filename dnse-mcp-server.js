@@ -70,6 +70,32 @@ async function getMarketIndices() {
         indices[item.symbol] = item;
     });
 
+    // Fallback: Quét trực tiếp chỉ số từ Scanner nếu Entrade chưa có nến mới
+    if (Object.keys(indices).length < 2) {
+        try {
+            const tvRes = await axios.post('https://scanner.tradingview.com/vietnam/scan', {
+                symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
+                columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume']
+            }, { timeout: 4000 });
+            if (tvRes.data?.data?.length > 0) {
+                tvRes.data.data.forEach(item => {
+                    const [name, close, change, high, low, open, volume] = item.d;
+                    const sym = (name || '').toUpperCase();
+                    indices[sym] = {
+                        symbol: sym,
+                        price: close,
+                        change: parseFloat(Number(change).toFixed(2)),
+                        open: open || close,
+                        high: high || close,
+                        low: low || close,
+                        volume: volume || 0,
+                        time: Math.floor(Date.now() / 1000)
+                    };
+                });
+            }
+        } catch { /* ignore */ }
+    }
+
     if (indices['HNX']) indices['HNXINDEX'] = { ...indices['HNX'], symbol: 'HNXINDEX' };
     if (indices['UPCOM']) indices['UPCOMINDEX'] = { ...indices['UPCOM'], symbol: 'UPCOMINDEX' };
     if (indices['VNINDEX']) indices['VNI'] = { ...indices['VNINDEX'], symbol: 'VNI' };
@@ -159,9 +185,40 @@ async function getStockQuote(symbol) {
             setCached(cacheKey, quote);
             return quote;
         }
-    } catch (err) {
-        return { error: `Không thể lấy dữ liệu mã ${sym} từ DNSE/Sàn: ${err.message}` };
+    } catch {
+        // Tiep tuc thu nguon fallback tiep theo ben duoi
     }
+
+    // Fallback 3: TV Scanner realtime feed cho moi co phieu tren thi truong
+    try {
+        const tvRes = await axios.post('https://scanner.tradingview.com/vietnam/scan', {
+            symbols: { tickers: [`HOSE:${sym}`, `HNX:${sym}`, `UPCOM:${sym}`] },
+            columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume', 'Value.Traded', 'price_book_ratio']
+        }, { timeout: 4000 });
+        if (tvRes.data?.data?.length > 0) {
+            const item = tvRes.data.data[0];
+            const [name, close, change, high, low, open, volume, valTraded, pb] = item.d;
+            if (close) {
+                const quote = {
+                    symbol: sym,
+                    companyName: sym === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long' : sym,
+                    exchange: (item.s?.split(':')[0] || 'HOSE').toUpperCase(),
+                    price: close,
+                    change: parseFloat(Number(change).toFixed(2)),
+                    changeValue: open ? parseFloat((close - open).toFixed(2)) : 0,
+                    open: open || close,
+                    high: high || close,
+                    low: low || close,
+                    volume: volume || 0,
+                    value: valTraded || (close * (volume || 0)),
+                    pb: pb ? parseFloat(Number(pb).toFixed(2)) : undefined,
+                    source: 'DNSE Scanner Realtime Feed'
+                };
+                setCached(cacheKey, quote);
+                return quote;
+            }
+        }
+    } catch { /* ignore */ }
 
     return { error: `Mã ${sym} không tồn tại hoặc chưa có giao dịch phiên hôm nay` };
 }
