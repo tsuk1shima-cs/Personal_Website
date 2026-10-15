@@ -3570,8 +3570,9 @@ body {
       // Cứ mỗi 7 giây làm mới nội dung thanh chạy Ticker Banner
       setInterval(renderTickerBanner, 7000);
 
-      // Luôn làm mới dữ liệu sàn trực tiếp cho mã đang xem chi tiết Toàn màn hình
+      // Luôn làm mới dữ liệu sàn trực tiếp cho mã đang xem chi tiết Toàn màn hình (Chỉ khi trong phiên)
       setInterval(async () => {
+        if (!isMarketTradingNow()) return;
         if (!currentStockDetailSymbol) return;
         try {
           if (typeof fetchDNSEStock === 'function') {
@@ -5721,10 +5722,10 @@ body {
           <div class="tongquan-card" style="margin:0;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;">
-                <span class="pulse-dot" style="width:6px;height:6px;"></span>
-                <span>Nhật ký Khớp lệnh Realtime • ${stock.symbol}</span>
+                ${isMarketTradingNow() ? '<span class="pulse-dot" style="width:6px;height:6px;"></span>' : ''}
+                <span>Nhật ký Khớp lệnh ${isMarketTradingNow() ? 'Realtime' : 'Chốt phiên'} • ${stock.symbol}</span>
               </div>
-              <span class="badge-tape buy" style="font-size:10px;">⚡ Khớp liên tục</span>
+              ${isMarketTradingNow() ? '<span class="badge-tape buy" style="font-size:10px;">⚡ Khớp liên tục</span>' : '<span class="badge-tape" style="font-size:10px; background:var(--bg-subtle); color:var(--text-muted); border:1px solid var(--border-stroke);">⏸️ Đóng cửa phiên</span>'}
             </div>
             <div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-stroke); border-radius:var(--radius-sm);">
               <table class="market-table" style="width:100%; font-size:11.5px; border-collapse:collapse;">
@@ -5981,6 +5982,7 @@ body {
     }
 
     function updateLiveStockDetailTick(stock, isBuy, tradePrice, tradeChg, vol = 1500, tradeDate = null) {
+      if (!isMarketTradingNow()) return; // KHÔNG CẬP NHẬT HOẶC ĐẨY LỆNH NẾU NGOÀI GIỜ GIAO DỊCH
       const pEl = document.getElementById('detailCardPriceVal');
       const cEl = document.getElementById('detailCardPriceChg');
       const heroP = document.getElementById('stockDetailHeroPrice');
