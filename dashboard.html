@@ -1155,6 +1155,22 @@ body {
   animation: rowGlowRed 1.2s ease-out;
 }
 
+/* Card pulse animation (Index cards & Detail cards) */
+@keyframes cardPulseUp {
+  0% { border-color: rgba(34, 197, 94, 0.9); box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); background: rgba(34, 197, 94, 0.08); }
+  100% { border-color: var(--border-stroke); box-shadow: none; background: var(--bg-container); }
+}
+@keyframes cardPulseDown {
+  0% { border-color: rgba(239, 68, 68, 0.9); box-shadow: 0 0 10px rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08); }
+  100% { border-color: var(--border-stroke); box-shadow: none; background: var(--bg-container); }
+}
+.flash-card-up {
+  animation: cardPulseUp 0.8s ease-out;
+}
+.flash-card-down {
+  animation: cardPulseDown 0.8s ease-out;
+}
+
 /* Tape Row animation */
 @keyframes tapeSlideIn {
   0% { opacity: 0; transform: translateY(-8px); background-color: rgba(41, 128, 185, 0.15); }
@@ -1826,6 +1842,10 @@ body {
           <button class="center-subtab-btn" id="btnSubTab_khoingoai" onclick="switchSubTab('khoingoai', this)">Khối ngoại</button>
           <button class="center-subtab-btn" id="btnSubTab_tinhieu_ta" onclick="switchSubTab('tinhieu_ta', this)">Tín hiệu TA</button>
           <button class="center-subtab-btn" id="btnSubTab_boloc_fa" onclick="switchSubTab('boloc_fa', this)">Bộ lọc FA</button>
+          <button class="center-subtab-btn" id="btnSubTab_chitiet_ma" onclick="switchSubTab('chitiet_ma', this)" style="display:none; align-items:center; gap:5px;">
+            <span>Chi tiết mã</span>
+            <span id="centerDetailBadge" style="background:var(--primary-brand); color:#fff; border-radius:10px; padding:1px 6px; font-size:10px; font-weight:700;">BID</span>
+          </button>
         </div>
 
         <div class="center-tab-controls">
@@ -2450,6 +2470,11 @@ body {
           </div>
         </div>
 
+        <!-- SUBTAB 7: CHI TIẾT MÃ CỔ PHIẾU (HIỂN THỊ TRỰC TIẾP TRONG BẢNG GIỮA - CHUẨN PHONG CÁCH CỘT TRÁI) -->
+        <div id="subview_chitiet_ma" class="tongquan-grid-wrap" style="display:none; flex-direction:column; gap:12px;">
+          <!-- Populated dynamically by renderStockDetailContent(stock) -->
+        </div>
+
       </div>
     </main>
 
@@ -2619,7 +2644,10 @@ body {
         </div>
         <div style="display:flex;gap:8px;">
           <button onclick="askAiFromModal()" class="btn-login-main" style="flex:1;border:none;cursor:pointer;">Hỏi AI Chatbot phân tích</button>
-          <a href="chatbot.html" id="modalFullChatLink" target="_blank" class="btn-theme-toggle" title="Mở trang Chatbot toàn màn hình" style="width:auto;padding:0 10px;text-decoration:none;display:flex;align-items:center;">Toàn màn hình ↗</a>
+          <button onclick="openStockDetailFromModal()" class="btn-theme-toggle" title="Xem chi tiết đầy đủ trong Dashboard" style="width:auto;padding:0 12px;display:flex;align-items:center;gap:4px;cursor:pointer;">
+            <span>Toàn màn hình</span>
+            <span style="font-size:12px;">↗</span>
+          </button>
           <button onclick="closeQuickModal()" class="btn-theme-toggle" style="width:auto;padding:0 14px;">Đóng</button>
         </div>
       </div>
@@ -3346,6 +3374,65 @@ body {
 
         // Kích hoạt hiệu ứng nhấp nháy cập nhật giá thời gian thực trên bảng Danh mục
         flashStockRow(stock.symbol, isBuy, stock);
+
+        // ==============================================================
+        // ĐỒNG BỘ TỨC THỜI CỘT BÊN TRÁI (VNINDEX, VN30, INTRA-CHART, HERO)
+        // GIÚP CỘT TRÁI VÀ CỘT PHẢI CÙNG NHẢY ĐỒNG BỘ THỜI GIAN THỰC
+        // ==============================================================
+        const isHOSEStock = (stock.exchange || 'HOSE') === 'HOSE';
+        const isVN30Stock = ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR'].includes(stock.symbol);
+
+        if (isHOSEStock && marketIndices['VNINDEX']) {
+          const tickDelta = isBuy ? (0.01 + Math.random() * 0.04) : -(0.01 + Math.random() * 0.04);
+          const oldVni = marketIndices['VNINDEX'].price || 1699.39;
+          const vniMin = marketIndices['VNINDEX'].low || 1696.47;
+          const vniMax = marketIndices['VNINDEX'].high || 1704.87;
+          const newVni = parseFloat(Math.max(vniMin, Math.min(vniMax, oldVni + tickDelta)).toFixed(2));
+          marketIndices['VNINDEX'].price = newVni;
+
+          const refVni = 1704.87;
+          marketIndices['VNINDEX'].change = parseFloat((((newVni - refVni) / refVni) * 100).toFixed(2));
+          marketIndices['VNINDEX'].volume = (marketIndices['VNINDEX'].volume || 542000000) + vol;
+
+          if (isVN30Stock && marketIndices['VN30']) {
+            const oldVn30 = marketIndices['VN30'].price || 1844.13;
+            const vn30Min = marketIndices['VN30'].low || 1840.26;
+            const vn30Max = marketIndices['VN30'].high || 1852.44;
+            const newVn30 = parseFloat(Math.max(vn30Min, Math.min(vn30Max, oldVn30 + (tickDelta * 1.15))).toFixed(2));
+            marketIndices['VN30'].price = newVn30;
+            const refVn30 = 1852.44;
+            marketIndices['VN30'].change = parseFloat((((newVn30 - refVn30) / refVn30) * 100).toFixed(2));
+            marketIndices['VN30'].volume = (marketIndices['VN30'].volume || 235000000) + vol;
+          }
+
+          // Cập nhật đồ thị intraday cột trái
+          if (intradayPoints && intradayPoints.length > 0) {
+            intradayPoints.push(newVni);
+            if (intradayPoints.length > 35) intradayPoints.shift();
+            renderIntradaySvg();
+          }
+
+          // Cập nhật số liệu Hero Index cột trái
+          renderHeroIndex(isBuy);
+
+          // Cập nhật mini cards chỉ số ở đầu cột trái
+          updateIndexCards();
+
+          // Nhấp nháy nhẹ card đang chọn ở cột trái
+          const activeCardEl = document.getElementById(`card_${activeMarket}`);
+          if (activeCardEl) {
+            const cardPulse = isBuy ? 'flash-card-up' : 'flash-card-down';
+            activeCardEl.classList.remove('flash-card-up', 'flash-card-down');
+            void activeCardEl.offsetWidth;
+            activeCardEl.classList.add(cardPulse);
+            setTimeout(() => activeCardEl.classList.remove(cardPulse), 600);
+          }
+        }
+
+        // Cập nhật trực tiếp vào bảng chi tiết mã ở giữa nếu đang mở mã này
+        if (currentStockDetailSymbol === stock.symbol && typeof updateLiveStockDetailTick === 'function') {
+          updateLiveStockDetailTick(stock, isBuy, tradePrice, tradeChg);
+        }
       }
 
       // Xóa bảng cũ và sinh 12 lệnh khớp lịch sử trong 2 phút gần nhất
@@ -4641,6 +4728,9 @@ body {
       const faView = document.getElementById('subview_boloc_fa');
       if (faView) faView.style.display = subtab === 'boloc_fa' ? 'flex' : 'none';
 
+      const detailView = document.getElementById('subview_chitiet_ma');
+      if (detailView) detailView.style.display = subtab === 'chitiet_ma' ? 'flex' : 'none';
+
       if (subtab === 'bando') renderTreemap();
       else if (subtab === 'cungcau') renderActiveTrades();
       else if (subtab === 'khoingoai') renderForeignHistory();
@@ -4836,9 +4926,17 @@ body {
     }
 
     // ==========================================
-    // 7. MODAL XEM NHANH THÔNG TIN CỔ PHIẾU
+    // 7. MODAL XEM NHANH & CHI TIẾT MÃ CỔ PHIẾU
     // ==========================================
     let currentSelectedStock = 'FPT';
+    let currentStockDetailSymbol = null;
+    let detailChartMode = 'intraday';
+    let detailIntradayPoints = [];
+
+    function closeQuickModal() {
+      const m = document.getElementById('stockQuickModal');
+      if (m) m.style.display = 'none';
+    }
 
     function openQuickModal(sym) {
       currentSelectedStock = sym;
@@ -4847,39 +4945,576 @@ body {
         || { 
           symbol: sym, 
           exchange: 'HOSE',
-          price: sym === 'TLG' ? 55500 : 32000, 
-          change: sym === 'TLG' ? 0.54 : 0.5, 
-          pe: sym === 'TLG' ? 11.2 : 12.5, 
-          pb: sym === 'TLG' ? 1.88 : 1.45, 
-          roe: sym === 'TLG' ? 19.2 : 18.0, 
-          marketCap: sym === 'TLG' ? 5357 : 45000, 
-          volume: sym === 'TLG' ? 384300 : 3500000,
-          sector: sym === 'TLG' ? 'Hàng tiêu dùng' : 'Công ty Cổ phần niêm yết',
-          companyName: sym === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)' : ''
+          price: sym === 'TLG' ? 55500 : 33250, 
+          change: sym === 'TLG' ? 0.54 : 0.45, 
+          pe: sym === 'TLG' ? 11.2 : 11.8, 
+          pb: sym === 'TLG' ? 1.88 : 1.48, 
+          roe: sym === 'TLG' ? 19.2 : 18.2, 
+          marketCap: sym === 'TLG' ? 5357 : 188000, 
+          volume: sym === 'TLG' ? 384300 : 1374900,
+          sector: sym === 'TLG' ? 'Hàng tiêu dùng' : 'Ngân hàng',
+          companyName: sym === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)' : 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam'
         };
 
       document.getElementById('qModalSymbol').textContent = stock.symbol;
       document.getElementById('qModalEx').textContent = stock.exchange || 'HOSE';
       const compName = stock.companyName || (stock.symbol === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)' : (stock.sector ? `Ngành: ${stock.sector}` : 'Công ty Cổ phần niêm yết'));
       document.getElementById('qModalName').textContent = compName;
-      document.getElementById('qModalPrice').textContent = (stock.price || 32000).toLocaleString('vi-VN') + ' đ';
+      document.getElementById('qModalPrice').textContent = (stock.price || 33250).toLocaleString('vi-VN') + ' đ';
 
       const chg = stock.change !== undefined && stock.change !== null ? stock.change : 0;
       const chgEl = document.getElementById('qModalChg');
       chgEl.textContent = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
       chgEl.className = chg >= 0 ? 'text-up' : 'text-down';
 
-      document.getElementById('qModalPe').textContent = stock.pe ? stock.pe.toFixed(1) + 'x' : '11.2x';
-      document.getElementById('qModalPb').textContent = stock.pb ? stock.pb.toFixed(2) + 'x' : '1.88x';
-      document.getElementById('qModalRoe').textContent = stock.roe ? stock.roe.toFixed(1) + '%' : '19.2%';
-      document.getElementById('qModalMcap').textContent = stock.marketCap ? stock.marketCap.toLocaleString('vi-VN') + ' tỷ' : '5.357 tỷ';
-      document.getElementById('qModalVol').textContent = stock.volume ? stock.volume.toLocaleString('vi-VN') : '384.300';
+      document.getElementById('qModalPe').textContent = stock.pe ? stock.pe.toFixed(1) + 'x' : '11.8x';
+      document.getElementById('qModalPb').textContent = stock.pb ? stock.pb.toFixed(2) + 'x' : '1.48x';
+      document.getElementById('qModalRoe').textContent = stock.roe ? stock.roe.toFixed(1) + '%' : '18.2%';
+      document.getElementById('qModalMcap').textContent = stock.marketCap ? stock.marketCap.toLocaleString('vi-VN') + ' tỷ' : '188.000 tỷ';
+      document.getElementById('qModalVol').textContent = stock.volume ? stock.volume.toLocaleString('vi-VN') : '1.374.900';
       document.getElementById('qModalRsi').textContent = (50 + (chg * 4)).toFixed(1) + ' (Tích lũy)';
 
-      const fullChatLink = document.getElementById('modalFullChatLink');
-      if (fullChatLink) fullChatLink.href = `chatbot.html?ask=Phân tích chi tiết cổ phiếu ${sym}`;
-
       document.getElementById('stockQuickModal').style.display = 'flex';
+    }
+
+    function openStockDetailFromModal() {
+      const sym = currentSelectedStock || 'BID';
+      closeQuickModal();
+      openStockDetailView(sym);
+    }
+
+    function askAiFromModal() {
+      const sym = currentSelectedStock || 'BID';
+      closeQuickModal();
+      openStockDetailView(sym);
+      setTimeout(() => {
+        askAiStockDetail(`Phân tích toàn diện chiến lược đầu tư và điểm mua bán cổ phiếu ${sym}`);
+      }, 300);
+    }
+
+    function openStockDetailView(sym) {
+      if (!sym) sym = 'BID';
+      currentStockDetailSymbol = sym;
+      detailChartMode = 'intraday';
+
+      const stock = stockDataList.find(s => s.symbol === sym)
+        || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null)
+        || {
+          symbol: sym,
+          exchange: 'HOSE',
+          price: 33250,
+          change: 0.45,
+          pe: 11.8,
+          pb: 1.48,
+          roe: 18.2,
+          marketCap: 188000,
+          volume: 1374900,
+          value: 45614907600,
+          sector: 'Ngân hàng',
+          companyName: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam'
+        };
+
+      const detailTabBtn = document.getElementById('btnSubTab_chitiet_ma');
+      const badge = document.getElementById('centerDetailBadge');
+      if (badge) badge.textContent = stock.symbol;
+      if (detailTabBtn) detailTabBtn.style.display = 'inline-flex';
+
+      const p = stock.price || 33250;
+      const chg = stock.change || 0;
+      const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(p) : 50;
+      const ref = stock.open || Math.round((p / (1 + chg / 100)) / delta) * delta || p;
+
+      detailIntradayPoints = [];
+      const len = 25;
+      for (let i = 0; i < len; i++) {
+        const prog = i / (len - 1);
+        const noise = (Math.sin(i * 1.5) * 0.4 + (i % 2 === 0 ? 0.2 : -0.2)) * (p * 0.005);
+        const val = ref + (p - ref) * prog + noise;
+        detailIntradayPoints.push(Math.round(val / delta) * delta);
+      }
+      detailIntradayPoints[detailIntradayPoints.length - 1] = p;
+
+      renderStockDetailContent(stock);
+      switchSubTab('chitiet_ma', detailTabBtn);
+    }
+
+    function renderStockDetailContent(stock) {
+      const container = document.getElementById('subview_chitiet_ma');
+      if (!container) return;
+
+      const p = stock.price || 33250;
+      const chg = stock.change !== null && stock.change !== undefined ? stock.change : 0;
+      const isUp = chg >= 0;
+      const colorCls = chg >= 6.8 ? 'text-ceil' : (chg <= -6.8 ? 'text-floor' : (isUp ? 'text-up' : 'text-down'));
+      const arrow = isUp ? '▲' : '▼';
+      const sign = isUp ? '+' : '';
+
+      const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(p) : (p < 10000 ? 10 : (p < 50000 ? 50 : 100));
+      const refPrice = stock.open || Math.round((p / (1 + chg / 100)) / delta) * delta || p;
+      const pointChg = Math.abs(p - refPrice).toLocaleString('vi-VN');
+
+      const exch = stock.exchange || 'HOSE';
+      const bandLimit = exch === 'UPCOM' ? 0.15 : (exch === 'HNX' ? 0.10 : 0.07);
+      const ceilPrice = Math.floor((refPrice * (1 + bandLimit)) / delta) * delta;
+      const floorPrice = Math.ceil((refPrice * (1 - bandLimit)) / delta) * delta;
+
+      const vol = stock.volume || 1374900;
+      const volStr = vol >= 1e6 ? (vol / 1e6).toFixed(2) + 'M' : vol.toLocaleString('vi-VN');
+      const val = stock.value || (vol * p);
+      const valTy = Math.round(val / 1e9);
+      const valStr = valTy > 0 ? valTy.toLocaleString('vi-VN') + ' tỷ đ' : (val / 1e6).toFixed(0) + ' tr đ';
+
+      const high = stock.high || Math.round(Math.max(p, refPrice) * 1.008);
+      const low = stock.low || Math.round(Math.min(p, refPrice) * 0.992);
+
+      const buyForeign = stock.buyForeignValue || Math.round(val * 0.25);
+      const sellForeign = stock.sellForeignValue || Math.round(val * 0.28);
+      const buyForeignStr = (buyForeign / 1e9).toFixed(1) + ' tỷ';
+      const sellForeignStr = (sellForeign / 1e9).toFixed(1) + ' tỷ';
+
+      let buyRatio = 55;
+      if (chg > 1.5) buyRatio = Math.min(85, Math.round(55 + chg * 5));
+      else if (chg < -1.5) buyRatio = Math.max(20, Math.round(45 + chg * 5));
+      const sellRatio = 100 - buyRatio;
+
+      const rsiScore = (50 + chg * 3.5).toFixed(1);
+      let rsiDesc = 'Tín hiệu: Tích cực tích lũy';
+      if (rsiScore >= 70) rsiDesc = 'Tín hiệu: Vùng Quá mua (Cân nhắc chốt lời)';
+      else if (rsiScore <= 35) rsiDesc = 'Tín hiệu: Vùng Quá bán (Cơ hội bắt đáy)';
+      else if (rsiScore >= 55) rsiDesc = 'Tín hiệu: Lực Mua chủ động chiếm ưu thế';
+      else if (rsiScore <= 45) rsiDesc = 'Tín hiệu: Áp lực Bán điều chỉnh trong phiên';
+
+      const compNames = {
+        'BID': 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam (BIDV)',
+        'VCB': 'Ngân hàng TMCP Ngoại thương Việt Nam (Vietcombank)',
+        'CTG': 'Ngân hàng TMCP Công thương Việt Nam (VietinBank)',
+        'TCB': 'Ngân hàng TMCP Kỹ thương Việt Nam (Techcombank)',
+        'MBB': 'Ngân hàng TMCP Quân đội (MB Bank)',
+        'VPB': 'Ngân hàng TMCP Việt Nam Thịnh Vượng (VPBank)',
+        'ACB': 'Ngân hàng TMCP Á Châu (ACB)',
+        'STB': 'Ngân hàng TMCP Sài Gòn Thương Tín (Sacombank)',
+        'FPT': 'Công ty Cổ phần FPT (FPT Corporation)',
+        'HPG': 'Công ty Cổ phần Tập đoàn Hòa Phát (Hoa Phat Group)',
+        'MWG': 'Công ty Cổ phần Đầu tư Thế Giới Di Động (Mobile World)',
+        'MSN': 'Công ty Cổ phần Tập đoàn Masan (Masan Group)',
+        'VHM': 'Công ty Cổ phần Vinhomes (Vinhomes)',
+        'VIC': 'Tập đoàn Vingroup (Vingroup JSC)',
+        'VRE': 'Công ty Cổ phần Vincom Retail (Vincom Retail)',
+        'SSI': 'Công ty Cổ phần Chứng khoán SSI (SSI Securities)',
+        'VND': 'Công ty Cổ phần Chứng khoán VNDIRECT',
+        'VIX': 'Công ty Cổ phần Chứng khoán VIX',
+        'BSR': 'Công ty Cổ phần Lọc hóa dầu Bình Sơn (BSR)',
+        'GAS': 'Tổng Công ty Khí Việt Nam (PV GAS)',
+        'PLX': 'Tập đoàn Xăng dầu Việt Nam (Petrolimex)',
+        'TLG': 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)'
+      };
+      const companyTitle = compNames[stock.symbol] || stock.companyName || `${stock.symbol} - ${stock.sector || 'Công ty Cổ phần niêm yết'}`;
+
+      let html = `
+        <!-- TOP TOOLBAR -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 14px; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button onclick="switchSubTab('tongquan')" class="btn-theme-toggle" style="width:auto; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Quay lại Tổng quan thị trường">
+              <span>←</span> <span>Quay lại Tổng quan</span>
+            </button>
+            <div style="width:1px; height:20px; background:var(--border-stroke);"></div>
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:19px; font-weight:800; color:var(--text-primary); letter-spacing:0.5px;">${stock.symbol}</span>
+                <span style="font-size:11px; background:var(--primary-light); color:var(--primary-brand); border:1px solid var(--primary-border); padding:1px 6px; border-radius:4px; font-weight:700;">${exch}</span>
+                <span style="font-size:13px; color:var(--text-secondary); font-weight:600;">${companyTitle}</span>
+              </div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                Ngành: <b style="color:var(--text-secondary);">${stock.sector || 'Tài chính'}</b> • <span class="pulse-dot" style="width:5px;height:5px;display:inline-block;"></span> <span style="color:var(--price-up); font-weight:600;">Dữ liệu trực tiếp sàn ${exch}</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button onclick="toggleStockDetailChartMode('${stock.symbol}')" id="btnToggleDetailChart" class="btn-theme-toggle" style="width:auto; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer;" title="Chuyển đổi đồ thị nến">
+              📊 Biểu đồ Nến TradingView
+            </button>
+            <button onclick="askAiStockDetail('${stock.symbol}')" class="btn-login-main" style="height:32px; font-size:12px; gap:6px; border:none; cursor:pointer;">
+              <span>⚡ Hỏi AI Chatbot</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 TOP FRAME CARDS (Y HỆT ACTUAL-FRAME-CONTAINER Ở CỘT TRÁI) -->
+        <div class="actual-frame-container" style="grid-template-columns: repeat(4, 1fr); padding:6px; gap:6px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke);">
+          <div class="actual-frame-card active" id="detailCard_Price">
+            <div class="frame-card-head">
+              <span class="frame-card-symbol">GIÁ KHỚP</span>
+              <span class="frame-card-price ${colorCls}" id="detailCardPriceVal">${p.toLocaleString('vi-VN')} đ</span>
+            </div>
+            <div class="frame-card-chg ${colorCls}" id="detailCardPriceChg">${arrow} ${sign}${pointChg} (${sign}${chg.toFixed(2)}%)</div>
+          </div>
+
+          <div class="actual-frame-card">
+            <div class="frame-card-head">
+              <span class="frame-card-symbol">GIÁ TRẦN (CEIL)</span>
+              <span class="frame-card-price text-ceil">${ceilPrice.toLocaleString('vi-VN')} đ</span>
+            </div>
+            <div class="frame-card-chg text-ceil">+${(bandLimit * 100).toFixed(1)}%</div>
+          </div>
+
+          <div class="actual-frame-card">
+            <div class="frame-card-head">
+              <span class="frame-card-symbol">GIÁ SÀN (FLOOR)</span>
+              <span class="frame-card-price text-floor">${floorPrice.toLocaleString('vi-VN')} đ</span>
+            </div>
+            <div class="frame-card-chg text-floor">-${(bandLimit * 100).toFixed(1)}%</div>
+          </div>
+
+          <div class="actual-frame-card">
+            <div class="frame-card-head">
+              <span class="frame-card-symbol">THAM CHIẾU (REF)</span>
+              <span class="frame-card-price text-ref">${refPrice.toLocaleString('vi-VN')} đ</span>
+            </div>
+            <div class="frame-card-chg text-ref">0.00%</div>
+          </div>
+        </div>
+
+        <!-- ROW 1: HERO STOCK CARD & BIỂU ĐỒ INTRADAY TRONG PHIÊN (CHUẨN CỘT TRÁI) -->
+        <div class="grid-row-2col">
+
+          <!-- HERO SECTION CỦA MÃ CỔ PHIẾU -->
+          <div class="tongquan-card" style="margin:0;">
+            <div class="hero-index-title-row">
+              <span class="hero-index-name" style="font-size:15px;">${stock.symbol} • ${companyTitle}</span>
+              <span class="hero-index-clock">Khớp lệnh liên tục</span>
+            </div>
+            <div class="hero-index-main-val ${colorCls}" id="stockDetailHeroPrice" style="font-size:28px;">
+              ${p.toLocaleString('vi-VN')} <span style="font-size:16px;font-weight:500;">đ</span>
+            </div>
+            <div class="hero-index-sub-chg ${colorCls}" id="stockDetailHeroChg">
+              <span>${arrow} ${sign}${pointChg} (${sign}${chg.toFixed(2)}%)</span>
+            </div>
+
+            <div class="hero-index-stats-grid" style="margin-top:10px;">
+              <div>Cao nhất: <b id="stockDetailHeroHigh" class="text-up">${high.toLocaleString('vi-VN')}</b></div>
+              <div>Thấp nhất: <b id="stockDetailHeroLow" class="text-down">${low.toLocaleString('vi-VN')}</b></div>
+              <div>Khối lượng: <b id="stockDetailHeroVol">${volStr}</b> CP</div>
+              <div>Giá trị GD: <b id="stockDetailHeroVal">${valStr}</b></div>
+            </div>
+
+            <!-- CUNG CẦU & KHỐI NGOẠI MINI BAR -->
+            <div style="margin-top:12px; padding-top:10px; border-top:1px dashed var(--border-stroke);">
+              <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px;">
+                <span class="text-up" style="font-weight:600;">Mua CĐ: ${buyRatio}%</span>
+                <span style="color:var(--text-secondary);">NN Mua: ${buyForeignStr} • Bán: ${sellForeignStr}</span>
+                <span class="text-down" style="font-weight:600;">Bán CĐ: ${sellRatio}%</span>
+              </div>
+              <div style="display:flex; height:6px; border-radius:3px; overflow:hidden; background:var(--bg-subtle);">
+                <div style="width:${buyRatio}%; background:var(--price-up);"></div>
+                <div style="width:${sellRatio}%; background:var(--price-down);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BIỂU ĐỒ INTRADAY TRONG PHIÊN HOẶC TRADINGVIEW LIVE -->
+          <div class="tongquan-card" style="margin:0; display:flex; flex-direction:column;">
+            <div class="intraday-header">
+              <span>DIỄN BIẾN TRONG PHIÊN • ${stock.symbol}</span>
+              <span style="color:var(--price-ref)">Tham chiếu: ${refPrice.toLocaleString('vi-VN')}</span>
+            </div>
+            <div id="stockDetailSvgContainer" style="flex:1; min-height:140px; position:relative;">
+              <svg id="stockDetailIntradaySvg" viewBox="0 0 450 140" style="width:100%; height:140px; display:block;"></svg>
+            </div>
+            <div id="stockDetailTvContainer" style="display:none; height:240px; width:100%; border-radius:var(--radius-sm); overflow:hidden;"></div>
+            <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-muted); margin-top:4px;">
+              <span>09:15</span>
+              <span>10:30</span>
+              <span>11:30</span>
+              <span>13:30</span>
+              <span>14:30 (Đóng cửa)</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ROW 2: PHÂN TÍCH KỸ THUẬT & RSI GAUGE + CHỈ SỐ CƠ BẢN FA -->
+        <div class="grid-row-2col">
+
+          <!-- CARD KỸ THUẬT & RSI GAUGE (CHUẨN RSI-SECTION Ở CỘT TRÁI) -->
+          <div class="tongquan-card" style="margin:0;">
+            <div class="rsi-section-title">
+              <span class="blue-accent-bar"></span>
+              Phân tích kỹ thuật & Chỉ báo RSI
+            </div>
+
+            <div class="stats-cards-grid">
+              <div class="stats-card">
+                <div class="stats-card-label">15 Phút</div>
+                <div class="stats-card-value text-up">Tăng</div>
+              </div>
+              <div class="stats-card">
+                <div class="stats-card-label">Hàng giờ</div>
+                <div class="stats-card-value text-up">Tích cực</div>
+              </div>
+              <div class="stats-card active">
+                <div class="stats-card-label">Hàng ngày</div>
+                <div class="stats-card-value text-up">Tích lũy mạnh</div>
+              </div>
+              <div class="stats-card">
+                <div class="stats-card-label">Hàng tuần</div>
+                <div class="stats-card-value text-ref">Trung tính</div>
+              </div>
+            </div>
+
+            <!-- GAUGE CHART (RSI) -->
+            <div class="gauge-panel" style="margin-top:6px;">
+              <div class="gauge-svg-wrap">
+                <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
+                  <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
+                  <path d="M 10 50 A 40 40 0 0 1 ${30 + (rsiScore * 0.55)} ${50 - (Math.sin((rsiScore/100)*Math.PI) * 38)}" fill="none" stroke="${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'}" stroke-width="8" stroke-linecap="round"/>
+                  <circle cx="50" cy="50" r="4" fill="var(--text-primary)"/>
+                  <line x1="50" y1="50" x2="${50 + Math.cos(((100 - rsiScore) / 100) * Math.PI) * 28}" y2="${50 - Math.sin(((100 - rsiScore) / 100) * Math.PI) * 28}" stroke="var(--primary-brand)" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="gauge-info">
+                <div class="gauge-info-title">Chỉ báo RSI (14) của ${stock.symbol}</div>
+                <div class="gauge-info-score" style="color:${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'};">${rsiScore}</div>
+                <div class="gauge-info-desc">${rsiDesc}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD ĐỊNH GIÁ & TÀI CHÍNH FA -->
+          <div class="tongquan-card" style="margin:0;">
+            <div class="rsi-section-title">
+              <span class="blue-accent-bar"></span>
+              Định giá & Chỉ số Cơ bản (FA)
+            </div>
+
+            <div class="cap-boxes-grid" style="grid-template-columns: repeat(2, 1fr); gap:8px;">
+              <div class="cap-stat-box">
+                <div class="cap-stat-name">P/E (Hệ số giá / Lợi nhuận)</div>
+                <div class="cap-stat-val text-up">${stock.pe ? stock.pe.toFixed(1) + 'x' : '11.8x'}</div>
+                <div class="cap-stat-sub">TB ngành: ~14.5x</div>
+              </div>
+              <div class="cap-stat-box">
+                <div class="cap-stat-name">P/B (Giá / Giá trị sổ sách)</div>
+                <div class="cap-stat-val text-up">${stock.pb ? stock.pb.toFixed(2) + 'x' : '1.48x'}</div>
+                <div class="cap-stat-sub">Định giá hấp dẫn</div>
+              </div>
+              <div class="cap-stat-box">
+                <div class="cap-stat-name">ROE (Hiệu quả vốn CSH)</div>
+                <div class="cap-stat-val text-up">${stock.roe ? stock.roe.toFixed(1) + '%' : '18.2%'}</div>
+                <div class="cap-stat-sub">Top doanh nghiệp hiệu quả</div>
+              </div>
+              <div class="cap-stat-box">
+                <div class="cap-stat-name">Vốn hóa thị trường</div>
+                <div class="cap-stat-val text-up">${stock.marketCap ? stock.marketCap.toLocaleString('vi-VN') : '188.000'} tỷ</div>
+                <div class="cap-stat-sub">Rổ cổ phiếu lớn VN30</div>
+              </div>
+            </div>
+
+            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.45; margin-top:8px; padding-top:6px; border-top:1px dashed var(--border-stroke);">
+              💡 <b>Nhận định FA</b>: Mã <b>${stock.symbol}</b> có định giá P/E ở mức ${stock.pe || 11.8}x, thấp hơn trung bình ngành, ROE đạt ${stock.roe || 18.2}% thể hiện sức sinh lời vượt trội và cơ hội đầu tư bền vững.
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ROW 3: KHUNG HỎI TRỢ LÝ AI PHÂN TÍCH TẠI CHỖ (EMBEDDED TRONG DASHBOARD - CHỐNG NHẢY TRANG) -->
+        <div class="tongquan-card" style="margin:0; background:linear-gradient(180deg, var(--bg-container) 0%, var(--bg-subtle) 100%);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div class="ai-avatar-badge" style="width:26px; height:26px; font-size:13px;">⚡</div>
+              <div>
+                <div style="font-size:13px; font-weight:700;">Trợ lý AI Phân tích Cổ phiếu ${stock.symbol} (DNSE MCP Protocol)</div>
+                <div style="font-size:11px; color:var(--text-muted);">Phân tích định giá, kỹ thuật và điểm mua/bán tối ưu trực tiếp trong Dashboard</div>
+              </div>
+            </div>
+            <span class="badge-tape buy" style="font-size:10px;">MCP Online</span>
+          </div>
+
+          <!-- PROMPT QUICK PILLS -->
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;">
+            <button onclick="askAiStockDetail('Đánh giá định giá P/E, P/B và tiềm năng tăng trưởng của ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
+              📊 Định giá & Tiềm năng P/E, P/B
+            </button>
+            <button onclick="askAiStockDetail('Phân tích kỹ thuật, xu hướng dòng tiền và điểm mua/bán tối ưu cho ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
+              📈 Điểm Mua / Bán kỹ thuật
+            </button>
+            <button onclick="askAiStockDetail('Phân tích cung cầu, lực mua chủ động và khối ngoại của ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
+              🛡️ Cung cầu & Quản trị rủi ro
+            </button>
+          </div>
+
+          <!-- INPUT FIELD & SEND -->
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="aiStockPromptInput" placeholder="Đặt câu hỏi phân tích về ${stock.symbol} (ví dụ: target giá bao nhiêu, có nên mua hôm nay?)..." onkeydown="if(event.key==='Enter')submitAiStockDetailPrompt('${stock.symbol}')" style="flex:1; padding:7px 12px; border:1px solid var(--border-stroke); border-radius:var(--radius-sm); background:var(--bg-container); color:var(--text-primary); font-size:12.5px; outline:none;">
+            <button onclick="submitAiStockDetailPrompt('${stock.symbol}')" id="btnSubmitAiStock" class="btn-login-main" style="border:none; cursor:pointer; font-size:12px; padding:0 16px;">
+              Gửi câu hỏi
+            </button>
+          </div>
+
+          <!-- AI RESPONSE BOX -->
+          <div id="aiStockDetailResponseBox" style="margin-top:10px; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border-stroke); background:var(--bg-container); font-size:12.5px; line-height:1.6; display:none;">
+            <!-- AI Answer injected here -->
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+      renderStockDetailIntradaySvg(stock);
+    }
+
+    function renderStockDetailIntradaySvg(stock) {
+      const svg = document.getElementById('stockDetailIntradaySvg');
+      if (!svg || !detailIntradayPoints || detailIntradayPoints.length < 2) return;
+
+      const minVal = Math.min(...detailIntradayPoints) * 0.998;
+      const maxVal = Math.max(...detailIntradayPoints) * 1.002;
+      const range = maxVal - minVal || 1;
+      const w = 450;
+      const h = 140;
+      const padding = 12;
+
+      const coords = detailIntradayPoints.map((val, idx) => {
+        const x = (idx / (detailIntradayPoints.length - 1)) * w;
+        const y = h - padding - ((val - minVal) / range) * (h - padding * 2);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      });
+
+      const polyPoints = coords.join(' ');
+      const lastCoord = coords[coords.length - 1].split(',');
+      const areaPoints = `0,${h} ${polyPoints} ${w},${h}`;
+      const isUp = (stock.change || 0) >= 0;
+      const strokeColor = isUp ? 'var(--price-up)' : 'var(--price-down)';
+      const gradColor = isUp ? 'rgba(22, 163, 74, 0.22)' : 'rgba(220, 38, 38, 0.22)';
+
+      svg.innerHTML = `
+        <defs>
+          <linearGradient id="detailIntraGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${gradColor}"/>
+            <stop offset="100%" stop-color="transparent"/>
+          </linearGradient>
+        </defs>
+        <!-- Đường tham chiếu vàng nét đứt -->
+        <line x1="0" y1="${h/2}" x2="${w}" y2="${h/2}" stroke="var(--price-ref)" stroke-dasharray="4,4" stroke-width="1" opacity="0.65"/>
+        <polygon points="${areaPoints}" fill="url(#detailIntraGrad)"/>
+        <polyline points="${polyPoints}" fill="none" stroke="${strokeColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Điểm hiện tại nhấp nháy phát sáng -->
+        <circle cx="${lastCoord[0]}" cy="${lastCoord[1]}" r="4" fill="${strokeColor}"/>
+        <circle cx="${lastCoord[0]}" cy="${lastCoord[1]}" r="8" fill="${strokeColor}" opacity="0.4">
+          <animate attributeName="r" values="4;10;4" dur="1.6s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.7;0;0.7" dur="1.6s" repeatCount="indefinite"/>
+        </circle>
+      `;
+    }
+
+    function toggleStockDetailChartMode(sym) {
+      const svgCont = document.getElementById('stockDetailSvgContainer');
+      const tvCont = document.getElementById('stockDetailTvContainer');
+      const btn = document.getElementById('btnToggleDetailChart');
+      if (!svgCont || !tvCont || !btn) return;
+
+      if (detailChartMode === 'intraday') {
+        detailChartMode = 'tradingview';
+        svgCont.style.display = 'none';
+        tvCont.style.display = 'block';
+        btn.innerHTML = '📈 Biểu đồ Đường cong Intraday';
+
+        const exch = ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','TLG','BSR'].includes(sym) ? 'HOSE' : 'HNX';
+        tvCont.innerHTML = `
+          <iframe src="https://s.tradingview.com/widgetembed/?symbol=${exch}%3A${sym}&interval=D&hidesidetoolbar=1&symboledit=0&saveimage=0&toolbarbg=f1f3f6&studies=[]&theme=${document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light'}&style=1&timezone=Asia%2FHo_Chi_Minh&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=vi_VN" style="width:100%;height:100%;border:none;"></iframe>
+        `;
+      } else {
+        detailChartMode = 'intraday';
+        svgCont.style.display = 'block';
+        tvCont.style.display = 'none';
+        btn.innerHTML = '📊 Biểu đồ Nến TradingView';
+      }
+    }
+
+    function updateLiveStockDetailTick(stock, isBuy, tradePrice, tradeChg) {
+      const pEl = document.getElementById('detailCardPriceVal');
+      const cEl = document.getElementById('detailCardPriceChg');
+      const heroP = document.getElementById('stockDetailHeroPrice');
+      const heroC = document.getElementById('stockDetailHeroChg');
+
+      const isUp = tradeChg >= 0;
+      const colorCls = tradeChg >= 6.8 ? 'text-ceil' : (tradeChg <= -6.8 ? 'text-floor' : (isUp ? 'text-up' : 'text-down'));
+      const arrow = isUp ? '▲' : '▼';
+      const sign = isUp ? '+' : '';
+      const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(tradePrice) : (tradePrice < 10000 ? 10 : (tradePrice < 50000 ? 50 : 100));
+      const refPrice = stock.open || Math.round((tradePrice / (1 + tradeChg / 100)) / delta) * delta || tradePrice;
+      const pointChg = Math.abs(tradePrice - refPrice).toLocaleString('vi-VN');
+
+      if (pEl) {
+        pEl.textContent = `${tradePrice.toLocaleString('vi-VN')} đ`;
+        pEl.className = `frame-card-price ${colorCls}`;
+      }
+      if (cEl) {
+        cEl.textContent = `${arrow} ${sign}${pointChg} (${sign}${tradeChg.toFixed(2)}%)`;
+        cEl.className = `frame-card-chg ${colorCls}`;
+      }
+      if (heroP) {
+        heroP.innerHTML = `${tradePrice.toLocaleString('vi-VN')} <span style="font-size:16px;font-weight:500;">đ</span>`;
+        heroP.className = `hero-index-main-val ${colorCls}`;
+      }
+      if (heroC) {
+        heroC.innerHTML = `<span>${arrow} ${sign}${pointChg} (${sign}${tradeChg.toFixed(2)}%)</span>`;
+        heroC.className = `hero-index-sub-chg ${colorCls}`;
+      }
+
+      const card = document.getElementById('detailCard_Price');
+      if (card) {
+        const pulse = isBuy ? 'flash-card-up' : 'flash-card-down';
+        card.classList.remove('flash-card-up', 'flash-card-down');
+        void card.offsetWidth;
+        card.classList.add(pulse);
+        setTimeout(() => card.classList.remove(pulse), 600);
+      }
+
+      if (detailIntradayPoints && detailIntradayPoints.length > 0) {
+        detailIntradayPoints.push(tradePrice);
+        if (detailIntradayPoints.length > 35) detailIntradayPoints.shift();
+        renderStockDetailIntradaySvg(stock);
+      }
+    }
+
+    async function askAiStockDetail(query) {
+      const box = document.getElementById('aiStockDetailResponseBox');
+      const input = document.getElementById('aiStockPromptInput');
+      const btn = document.getElementById('btnSubmitAiStock');
+      if (!box) return;
+
+      if (input) input.value = query;
+      box.style.display = 'block';
+      box.innerHTML = `
+        <div style="display:flex;align-items:center;gap:8px;color:var(--text-secondary);">
+          <span class="pulse-dot" style="width:7px;height:7px;"></span>
+          <span><b>AI đang tổng hợp dữ liệu sàn và phân tích chuyên sâu cho ${currentStockDetailSymbol}...</b></span>
+        </div>
+      `;
+      if (btn) btn.disabled = true;
+
+      try {
+        const res = await generateLiveAiResponse(query);
+        box.innerHTML = `
+          <div style="color:var(--primary-brand);font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+            <span>⚡ Kết quả Phân tích AI • ${currentStockDetailSymbol}</span>
+            <span style="font-size:10.5px;color:var(--text-muted);">${res.source || 'DNSE MCP Protocol'}</span>
+          </div>
+          <div style="color:var(--text-primary);line-height:1.65;">
+            ${formatAiMarkdown(res.message)}
+          </div>
+        `;
+      } catch (err) {
+        box.innerHTML = `<div style="color:var(--price-down);">Lỗi khi phân tích: ${err.message}</div>`;
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function submitAiStockDetailPrompt(sym) {
+      const input = document.getElementById('aiStockPromptInput');
+      const q = input ? input.value.trim() : '';
+      if (!q) return;
+      askAiStockDetail(q);
     }
 
     // ==========================================
