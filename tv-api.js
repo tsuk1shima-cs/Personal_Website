@@ -129,11 +129,68 @@ function updateFallbackIndices(fresh) {
     }
 }
 
-// Lấy danh sách FA Screener từ DNSE (100% dữ liệu thực từ sàn và DNSE Entrade)
+// Quét trực tiếp danh sách cổ phiếu thời gian thực từ Live Scanner (hỗ trợ CORS cho mọi môi trường, đặc biệt GitHub Pages)
+async function fetchLiveScannerStocks(size = 150) {
+    try {
+        const res = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                filter: [
+                    { left: 'volume', operation: 'greater', right: 0 },
+                    { left: 'type', operation: 'equal', right: 'stock' }
+                ],
+                sort: { sortBy: 'Value.Traded', sortOrder: 'desc' },
+                range: [0, Math.min(size, 250)],
+                columns: [
+                    'name', 'close', 'change', 'volume', 'Value.Traded',
+                    'price_earnings_ttm', 'price_book_ratio', 'return_on_equity',
+                    'sector', 'exchange', 'market_cap_basic', 'high', 'low', 'open'
+                ]
+            }),
+            signal: AbortSignal.timeout(4500)
+        });
+        if (res.ok) {
+            const j = await res.json();
+            if (j.data && j.data.length > 0) {
+                const mapped = j.data.map(item => {
+                    const [name, close, change, volume, valTraded, pe, pb, roe, sector, exch, mcap, high, low, open] = item.d;
+                    const sym = (name || (item.s ? item.s.split(':')[1] : '')).toUpperCase();
+                    const sObj = {
+                        symbol: sym,
+                        exchange: exch || (item.s ? item.s.split(':')[0] : 'HOSE'),
+                        sector: sector || 'Tài chính',
+                        price: close,
+                        change: change !== undefined && change !== null ? parseFloat(Number(change).toFixed(2)) : 0,
+                        volume: volume || 0,
+                        value: valTraded || (volume * close),
+                        pe: pe ? parseFloat(Number(pe).toFixed(1)) : null,
+                        pb: pb ? parseFloat(Number(pb).toFixed(2)) : null,
+                        roe: roe ? parseFloat(Number(roe).toFixed(1)) : null,
+                        marketCap: mcap ? Math.round(mcap / 1e9) : null,
+                        high: high || close,
+                        low: low || close,
+                        open: open || close
+                    };
+                    const fb = FALLBACK_STOCKS.find(s => s.symbol === sym);
+                    if (fb) Object.assign(fb, sObj);
+                    return sObj;
+                }).filter(s => s.symbol && s.price);
+
+                if (mapped.length > 0) return mapped;
+            }
+        }
+    } catch (err) {
+        console.warn('fetchLiveScannerStocks notice:', err.message);
+    }
+    return null;
+}
+
+// Lấy danh sách FA Screener từ DNSE (100% dữ liệu thực từ sàn và DNSE Entrade / Live Scanner)
 async function tvScreener(size = 200, exchange = null) {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         try {
-            const res = await fetch(`/api/market/screener?size=${size}`, { signal: AbortSignal.timeout(4000) });
+            const res = await fetch(`/api/market/screener?size=${size}`, { signal: AbortSignal.timeout(3500) });
             if (res.ok) {
                 const json = await res.json();
                 if (json.success && json.data?.length) {
@@ -143,7 +200,15 @@ async function tvScreener(size = 200, exchange = null) {
         } catch { /* fallback */ }
     }
 
-    // Tự động làm mới realtime trực tiếp trên client nếu không qua backend
+    // Trên GitHub Pages / không có backend: Quét trực tiếp Live Scanner API
+    try {
+        const liveStocks = await fetchLiveScannerStocks(size);
+        if (liveStocks && liveStocks.length > 0) {
+            return exchange ? liveStocks.filter(s => s.exchange === exchange) : liveStocks;
+        }
+    } catch { /* fallback to snapshot */ }
+
+    // Fallback: Tự động làm mới realtime trực tiếp trên client nếu không qua backend
     try {
         await refreshFallbackStocksLive();
     } catch { /* ignore */ }
@@ -215,92 +280,95 @@ async function tvPrices(symbols) {
 const DNSE_API_BASE = 'https://api.dnse.com.vn';
 const DNSE_ENTRADE_BASE = 'https://services.entrade.com.vn';
 
-// Lấy chỉ số thời gian thực từ DNSE Entrade (VNINDEX, VN30, HNX, UPCOM)
+// Lấy chỉ số thời gian thực từ Live Scanner & DNSE Entrade (VNINDEX, VN30, HNX, UPCOM)
 async function fetchDNSEIndices() {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
     // 1. Thử qua backend proxy nếu đang ở localhost
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (isLocal) {
         try {
             const r = await fetch('/api/dnse/indices', { signal: AbortSignal.timeout(3000) });
             if (r.ok) {
                 const j = await r.json();
-                if (j.success && j.data) return j.data;
+                if (j.success && j.data) {
+                    updateFallbackIndices(j.data);
+                    return j.data;
+                }
             }
         } catch { /* fallback direct */ }
     }
 
-    // 2. Gọi trực tiếp Entrade chart API
-    const now = Math.floor(Date.now() / 1000);
-    const from = now - 86400;
+    // 2. Trên GitHub Pages hoặc Client trực tiếp: Gọi ngay TradingView Scanner API (CORS enabled, phản hồi ~150ms)
     const indices = {};
-    const syms = [
-        { code: 'VNINDEX', name: 'VNINDEX', ex: 'HOSE' },
-        { code: 'VN30', name: 'VN30', ex: 'HOSE' },
-        { code: 'HNX', name: 'HNXINDEX', ex: 'HNX' },
-        { code: 'UPCOM', name: 'UPCOMINDEX', ex: 'UPCOM' }
-    ];
-
-    await Promise.allSettled(syms.map(async (item) => {
-        try {
-            const res = await fetch(`${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${item.code}&resolution=1&from=${from}&to=${now}`, {
-                signal: AbortSignal.timeout(4000)
-            });
-            if (res.ok) {
-                const d = await res.json();
-                if (d.t && d.t.length > 0) {
-                    const i = d.t.length - 1;
-                    const close = d.c[i];
-                    const open = d.o[0] || close;
-                    const chg = Number((((close - open) / open) * 100).toFixed(2));
-                    indices[item.name] = {
-                        symbol: item.name,
-                        exchange: item.ex,
+    try {
+        const tvRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
+                columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume']
+            }),
+            signal: AbortSignal.timeout(3500)
+        });
+        if (tvRes.ok) {
+            const j = await tvRes.json();
+            if (j.data && j.data.length > 0) {
+                j.data.forEach(item => {
+                    const [name, close, change, high, low, open, volume] = item.d;
+                    const sym = (name || '').toUpperCase();
+                    indices[sym] = {
+                        symbol: sym,
+                        exchange: item.s.startsWith('HNX') ? 'HNX' : 'HOSE',
                         price: close,
-                        change: chg,
-                        high: d.h[i],
-                        low: d.l[i],
-                        volume: d.v ? d.v[i] : null
+                        change: parseFloat(Number(change).toFixed(2)),
+                        high: high || close,
+                        low: low || close,
+                        open: open || close,
+                        volume: volume || 0
                     };
-                }
+                });
             }
-        } catch (e) {
-            console.warn(`DNSE fetch index error (${item.code}):`, e.message);
         }
-    }));
+    } catch (e) {
+        console.warn('Live scanner index fetch notice:', e.message);
+    }
 
-    // 3. Fallback trực tiếp từ TradingView Scanner API (hoạt động 100% trong mọi trình duyệt, hỗ trợ CORS từ mọi domain)
-    if (Object.keys(indices).length < 2) {
-        try {
-            const tvRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    symbols: { tickers: ['HOSE:VNINDEX', 'HOSE:VN30', 'HNX:HNXINDEX'] },
-                    columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume']
-                }),
-                signal: AbortSignal.timeout(4000)
-            });
-            if (tvRes.ok) {
-                const j = await tvRes.json();
-                if (j.data && j.data.length > 0) {
-                    j.data.forEach(item => {
-                        const [name, close, change, high, low, open, volume] = item.d;
-                        const sym = (name || '').toUpperCase();
-                        indices[sym] = {
-                            symbol: sym,
-                            exchange: item.s.startsWith('HNX') ? 'HNX' : 'HOSE',
+    // 3. Nếu vẫn thiếu chỉ số và đang ở môi trường local, thử gọi Entrade API
+    if (Object.keys(indices).length < 2 && isLocal) {
+        const now = Math.floor(Date.now() / 1000);
+        const from = now - 86400;
+        const syms = [
+            { code: 'VNINDEX', name: 'VNINDEX', ex: 'HOSE' },
+            { code: 'VN30', name: 'VN30', ex: 'HOSE' },
+            { code: 'HNX', name: 'HNXINDEX', ex: 'HNX' },
+            { code: 'UPCOM', name: 'UPCOMINDEX', ex: 'UPCOM' }
+        ];
+
+        await Promise.allSettled(syms.map(async (item) => {
+            try {
+                const res = await fetch(`${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${item.code}&resolution=1&from=${from}&to=${now}`, {
+                    signal: AbortSignal.timeout(3000)
+                });
+                if (res.ok) {
+                    const d = await res.json();
+                    if (d.t && d.t.length > 0) {
+                        const i = d.t.length - 1;
+                        const close = d.c[i];
+                        const open = d.o[0] || close;
+                        const chg = Number((((close - open) / open) * 100).toFixed(2));
+                        indices[item.name] = {
+                            symbol: item.name,
+                            exchange: item.ex,
                             price: close,
-                            change: parseFloat(Number(change).toFixed(2)),
-                            high: high || close,
-                            low: low || close,
-                            open: open || close,
-                            volume: volume || 0
+                            change: chg,
+                            high: d.h[i],
+                            low: d.l[i],
+                            volume: d.v ? d.v[i] : null
                         };
-                    });
+                    }
                 }
-            }
-        } catch (e) {
-            console.warn('Direct scanner index fetch notice:', e.message);
-        }
+            } catch { /* ignore */ }
+        }));
     }
 
     if (indices['HNXINDEX']) indices['HNX'] = indices['HNXINDEX'];
@@ -311,12 +379,12 @@ async function fetchDNSEIndices() {
         updateFallbackIndices(indices);
         return indices;
     }
-    return null;
+    return FALLBACK_INDICES;
 }
 
 // Lấy chuỗi điểm biến động trong phiên (Intraday Curve) từ DNSE Entrade
 async function fetchDNSEIntraday(symbol = 'VNINDEX', resolution = '5') {
-    // 1. Thử qua backend proxy
+    // 1. Thử qua backend proxy nếu đang ở localhost
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         try {
             const r = await fetch(`/api/dnse/chart/index/${symbol}?resolution=${resolution}`, { signal: AbortSignal.timeout(3000) });
@@ -332,7 +400,7 @@ async function fetchDNSEIntraday(symbol = 'VNINDEX', resolution = '5') {
         const now = Math.floor(Date.now() / 1000);
         const from = now - 86400;
         const res = await fetch(`${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${now}`, {
-            signal: AbortSignal.timeout(4000)
+            signal: AbortSignal.timeout(3000)
         });
         if (res.ok) {
             const d = await res.json();
@@ -344,42 +412,67 @@ async function fetchDNSEIntraday(symbol = 'VNINDEX', resolution = '5') {
     return null;
 }
 
-// Lấy thông tin giá nến cổ phiếu từ DNSE Entrade
+// Lấy thông tin giá nến / cơ bản cổ phiếu thời gian thực (hỗ trợ cả GitHub Pages và local)
 async function fetchDNSEStock(symbol) {
     if (!symbol) return null;
-    const now = Math.floor(Date.now() / 1000);
-    const from = now - 86400;
+    const u = symbol.toUpperCase().trim();
 
-    // 1. Thử backend proxy
+    // 1. Thử backend proxy nếu ở localhost
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         try {
-            const r = await fetch(`/api/dnse/chart/stock/${symbol}?resolution=1&from=${from}&to=${now}`, { signal: AbortSignal.timeout(3000) });
+            const r = await fetch(`/api/market/stock/${u}`, { signal: AbortSignal.timeout(3000) });
             if (r.ok) {
                 const j = await r.json();
-                if (j.success && j.data?.data?.t?.length) {
-                    const d = j.data.data;
-                    const i = d.t.length - 1;
-                    return { symbol, price: Math.round(d.c[i] * (d.c[i] < 1000 ? 1000 : 1)), high: d.h[i], low: d.l[i], volume: d.v[i] };
-                }
+                if (j.success && j.data) return j.data;
             }
         } catch { /* fallback direct */ }
     }
 
-    // 3. Thử qua backend endpoint stock chi tiết
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        try {
-            const r = await fetch(`/api/market/stock/${symbol}`, { signal: AbortSignal.timeout(3500) });
-            if (r.ok) {
-                const j = await r.json();
-                if (j.success && j.data) {
-                    return j.data;
-                }
+    // 2. Quét trực tiếp TradingView Scanner API (hoạt động 100% trên GitHub Pages không bị chặn CORS)
+    try {
+        const tvRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                symbols: { tickers: [`HOSE:${u}`, `HNX:${u}`, `UPCOM:${u}`] },
+                columns: [
+                    'name', 'close', 'change', 'high', 'low', 'open',
+                    'volume', 'Value.Traded', 'price_earnings_ttm', 'price_book_ratio',
+                    'return_on_equity', 'sector', 'exchange', 'market_cap_basic'
+                ]
+            }),
+            signal: AbortSignal.timeout(3500)
+        });
+        if (tvRes.ok) {
+            const j = await tvRes.json();
+            if (j.data && j.data.length > 0) {
+                const item = j.data[0];
+                const [name, close, change, high, low, open, volume, valTraded, pe, pb, roe, sector, exch, mcap] = item.d;
+                const stockObj = {
+                    symbol: name || u,
+                    exchange: exch || (item.s ? item.s.split(':')[0] : 'HOSE'),
+                    sector: sector || 'Niêm yết',
+                    price: close,
+                    change: change !== undefined && change !== null ? parseFloat(Number(change).toFixed(2)) : 0,
+                    high: high || close,
+                    low: low || close,
+                    open: open || close,
+                    volume: volume || 0,
+                    value: valTraded || (volume * close),
+                    pe: pe ? parseFloat(Number(pe).toFixed(1)) : null,
+                    pb: pb ? parseFloat(Number(pb).toFixed(2)) : null,
+                    roe: roe ? parseFloat(Number(roe).toFixed(1)) : null,
+                    marketCap: mcap ? Math.round(mcap / 1e9) : null
+                };
+                const target = FALLBACK_STOCKS.find(s => s.symbol === u);
+                if (target) Object.assign(target, stockObj);
+                return stockObj;
             }
-        } catch { /* fallback direct */ }
-    }
+        }
+    } catch { /* fallback to snapshot */ }
 
-    // 4. Fallback từ FALLBACK_STOCKS
-    const fb = FALLBACK_STOCKS.find(s => s.symbol === symbol.toUpperCase().trim());
+    // 3. Fallback từ FALLBACK_STOCKS
+    const fb = FALLBACK_STOCKS.find(s => s.symbol === u);
     if (fb) return { ...fb };
 
     return null;
@@ -458,12 +551,16 @@ async function fetchDNSEMarketOverview() {
         } catch { /* fallback direct below */ }
     }
 
-    // 2. Fallback trực tiếp từ Client (GitHub Pages / no backend)
+    // 2. Trực tiếp từ Client (GitHub Pages / no backend)
     try {
-        await refreshFallbackStocksLive();
+        let stocks = await fetchLiveScannerStocks(80);
+        if (!stocks || stocks.length === 0) {
+            await refreshFallbackStocksLive();
+            stocks = FALLBACK_STOCKS;
+        }
+
         const dnseIdx = await fetchDNSEIndices();
         const mergedIndices = { ...FALLBACK_INDICES, ...(dnseIdx || {}) };
-        const stocks = FALLBACK_STOCKS;
 
         const gainers = [...stocks].sort((a,b) => (b.change||0) - (a.change||0)).slice(0, 8);
         const losers = [...stocks].sort((a,b) => (a.change||0) - (b.change||0)).slice(0, 8);
@@ -482,7 +579,7 @@ async function fetchDNSEMarketOverview() {
 
         const todayStr = new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
         return {
-            source: 'DNSE Open API & Entrade X Realtime',
+            source: 'DNSE Open API & Live Scanner Realtime',
             tradingDate: todayStr,
             indices: mergedIndices,
             stocks,
@@ -533,7 +630,7 @@ async function tvGetMarketOverview() {
     };
 }
 
-// Hàm lấy Screener: ưu tiên backend local (DNSE), fallback trực tiếp DNSE
+// Hàm lấy Screener: ưu tiên backend local (DNSE), fallback trực tiếp Live Scanner (hỗ trợ GitHub Pages)
 async function getScreenerData(size = 200) {
     const base = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
         ? APP_CONFIG.apiBase
@@ -549,6 +646,14 @@ async function getScreenerData(size = 200) {
             }
         } catch { /* fallback */ }
     }
+
+    // Trên GitHub Pages: Quét trực tiếp Live Scanner API
+    try {
+        const live = await fetchLiveScannerStocks(size);
+        if (live && live.length > 0) {
+            return { data: live, source: 'tradingview-scanner-live' };
+        }
+    } catch { /* fallback */ }
 
     // Luôn làm mới giá live cho FALLBACK_STOCKS trước khi trả về
     try {

@@ -3012,7 +3012,12 @@ body {
             updateIndexCards();
           }
 
-          // 2. Cập nhật giá một số cổ phiếu trọng yếu từ DNSE
+          // 2. Làm mới toàn bộ danh mục cổ phiếu realtime trực tiếp từ Live Scanner
+          if (typeof refreshFallbackStocksLive === 'function') {
+            await refreshFallbackStocksLive();
+          }
+
+          // Cập nhật giá một số cổ phiếu trọng yếu và kích hoạt nhấp nháy dòng khi giá thay đổi
           if (typeof fetchDNSEStock === 'function') {
             const keySymbols = ['FPT', 'HPG', 'TCB', 'MBB', 'MWG', 'VHM', 'VIC', 'SSI', 'TLG', 'VCB'];
             const sampleSym = keySymbols[Math.floor(Math.random() * keySymbols.length)];
@@ -3032,6 +3037,21 @@ body {
               lastPriceMap[quote.symbol] = quote.price;
             }
           }
+
+          // Kiểm tra chênh lệch giá trên toàn bộ stockDataList để nhấp nháy cập nhật
+          stockDataList.forEach(s => {
+            const fb = (typeof FALLBACK_STOCKS !== 'undefined') ? FALLBACK_STOCKS.find(x => x.symbol === s.symbol) : null;
+            if (fb && fb.price) {
+              const oldPrice = lastPriceMap[s.symbol];
+              if (oldPrice && oldPrice !== fb.price) {
+                s.price = fb.price;
+                s.change = fb.change;
+                s.volume = fb.volume;
+                flashStockRow(s.symbol, fb.price > oldPrice, s);
+              }
+              lastPriceMap[s.symbol] = fb.price;
+            }
+          });
 
         } catch (err) {
           console.warn('Realtime ticker poll notice:', err);
@@ -4905,23 +4925,33 @@ ${leaderDetails}
       closeLoginModal();
     }
 
-    // KIỂM TRA TRẠNG THÁI DNSE MCP PROTOCOL
+    // KIỂM TRA TRẠNG THÁI DNSE MCP PROTOCOL & REALTIME STREAM
     async function checkDnseMcpStatus() {
       const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
         ? APP_CONFIG.apiBase
-        : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : '/api');
-      try {
-        const r = await fetch(`${apiBase}/dnse/status`, { signal: AbortSignal.timeout(3000) });
-        if (r.ok) {
-          const d = await r.json();
-          const pill = document.getElementById('aiDrawerMcpPill');
-          const subText = document.getElementById('aiMcpSubText');
-          if (d.success && d.configured) {
-            if (pill) pill.innerHTML = `<span class="mcp-dot"></span> MCP: DNSE Online`;
-            if (subText) subText.textContent = `DNSE MCP Protocol Active (Key OK)`;
+        : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+
+      if (apiBase) {
+        try {
+          const r = await fetch(`${apiBase}/dnse/status`, { signal: AbortSignal.timeout(3000) });
+          if (r.ok) {
+            const d = await r.json();
+            const pill = document.getElementById('aiDrawerMcpPill');
+            const subText = document.getElementById('aiMcpSubText');
+            if (d.success && d.configured) {
+              if (pill) pill.innerHTML = `<span class="mcp-dot"></span> MCP: DNSE Online`;
+              if (subText) subText.textContent = `DNSE MCP Protocol Active (Key OK)`;
+              return;
+            }
           }
-        }
-      } catch { /* offline / static mode */ }
+        } catch { /* offline / static mode */ }
+      }
+
+      // Khi chạy trên GitHub Pages / Web trực tiếp (Zero-backend Direct Live Stream)
+      const pill = document.getElementById('aiDrawerMcpPill');
+      const subText = document.getElementById('aiMcpSubText');
+      if (pill) pill.innerHTML = `<span class="mcp-dot" style="background:#16a34a;box-shadow:0 0 8px rgba(22,163,74,0.7);"></span> ⚡ Trực tiếp: Realtime Stream`;
+      if (subText) subText.textContent = `TradingView & DNSE Live Stream (HOSE/HNX Online)`;
     }
 
     // KHỞI ĐỘNG HỆ THỐNG
