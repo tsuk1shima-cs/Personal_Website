@@ -4,13 +4,13 @@
 
 // Dữ liệu chỉ số thị trường chuẩn xác thời gian thực từ sàn HOSE / HNX / UPCOM
 const FALLBACK_INDICES = {
-    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1699.39, change: -0.32, high: 1704.87, low: 1696.47, volume: 542000000 },
-    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1699.39, change: -0.32, high: 1704.87, low: 1696.47, volume: 542000000 },
-    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1844.13, change: -0.45, high: 1852.44, low: 1840.26, volume: 235000000 },
-    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 262.53,  change: -0.99, high: 265.21,  low: 260.81,  volume: 38000000 },
-    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 262.53,  change: -0.99, high: 265.21,  low: 260.81,  volume: 38000000 },
-    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 124.18,  change: -0.09, high: 124.40,  low: 123.90,  volume: 28000000 },
-    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.18,  change: -0.09, high: 124.40,  low: 123.90,  volume: 28000000 }
+    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1702.20, change: -0.16, high: 1707.90, low: 1701.50, volume: 425000000 },
+    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1702.20, change: -0.16, high: 1707.90, low: 1701.50, volume: 425000000 },
+    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1846.50, change: -0.32, high: 1851.20, low: 1845.80, volume: 175000000 },
+    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 260.71,  change: -1.68, high: 265.16,  low: 259.96,  volume: 45000000 },
+    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 260.71,  change: -1.68, high: 265.16,  low: 259.96,  volume: 45000000 },
+    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 124.34,  change: 0.32,  high: 124.40,  low: 123.90,  volume: 19000000 },
+    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.34,  change: 0.32,  high: 124.40,  low: 123.90,  volume: 19000000 }
 };
 
 // Danh mục cổ phiếu cơ sở (tự động đồng bộ và làm mới giá trực tiếp theo từng phiên giao dịch thực tế)
@@ -99,10 +99,12 @@ async function refreshFallbackStocksLive() {
                     const sym = (item.sym || '').toUpperCase();
                     const target = FALLBACK_STOCKS.find(s => s.symbol === sym);
                     if (target) {
-                        const rawPrice = item.lastPrice || item.r || 0;
+                        const rawPrice = item.lastPrice ? Number(item.lastPrice) : (item.r ? Number(item.r) : 0);
                         if (rawPrice > 0) {
+                            const rawRef = item.r ? Number(item.r) : rawPrice;
+                            const trueChg = rawRef > 0 ? parseFloat((((rawPrice - rawRef) / rawRef) * 100).toFixed(2)) : 0;
                             target.price = Math.round(Number(rawPrice) * 1000);
-                            target.change = parseFloat(Number(item.changePc || 0).toFixed(2));
+                            target.change = trueChg;
                             target.volume = Math.round(Number(item.lot || 0) * 10);
                             if (item.highPrice) target.high = Math.round(Number(item.highPrice) * 1000);
                             if (item.lowPrice) target.low = Math.round(Number(item.lowPrice) * 1000);
@@ -177,8 +179,13 @@ async function fetchLiveScannerStocks(size = 150) {
                 const mapped = list.map(item => {
                     const sym = (item.sym || '').toUpperCase();
                     const fb = FALLBACK_STOCKS.find(s => s.symbol === sym) || {};
-                    const price = item.lastPrice ? Math.round(Number(item.lastPrice) * 1000) : (fb.price || 30000);
-                    const change = item.changePc ? parseFloat(Number(item.changePc).toFixed(2)) : (fb.change || 0);
+                    const rawPrice = item.lastPrice ? Number(item.lastPrice) : (item.r ? Number(item.r) : 0);
+                    const rawRef = item.r ? Number(item.r) : (rawPrice || 0);
+                    const trueChg = (rawRef > 0 && rawPrice > 0)
+                        ? parseFloat((((rawPrice - rawRef) / rawRef) * 100).toFixed(2))
+                        : (fb.change || 0);
+                    const price = rawPrice > 0 ? Math.round(rawPrice * 1000) : (fb.price || 30000);
+                    const change = trueChg;
                     const volume = item.lot ? Math.round(Number(item.lot) * 10) : (fb.volume || 0);
                     const high = item.highPrice ? Math.round(Number(item.highPrice) * 1000) : (fb.high || price);
                     const low = item.lowPrice ? Math.round(Number(item.lowPrice) * 1000) : (fb.low || price);
@@ -613,9 +620,13 @@ async function fetchDNSEStock(symbol) {
             const list = await vpsRes.json();
             if (Array.isArray(list) && list.length > 0) {
                 const item = list[0];
-                const fb = FALLBACK_STOCKS.find(s => s.symbol === u) || {};
-                const price = item.lastPrice ? Math.round(Number(item.lastPrice) * 1000) : (fb.price || 33500);
-                const change = item.changePc ? parseFloat(Number(item.changePc).toFixed(2)) : (fb.change || 0);
+                const rawPrice = item.lastPrice ? Number(item.lastPrice) : (item.r ? Number(item.r) : 0);
+                const rawRef = item.r ? Number(item.r) : (rawPrice || 0);
+                const trueChg = (rawRef > 0 && rawPrice > 0)
+                    ? parseFloat((((rawPrice - rawRef) / rawRef) * 100).toFixed(2))
+                    : (fb.change || 0);
+                const price = rawPrice > 0 ? Math.round(rawPrice * 1000) : (fb.price || 33500);
+                const change = trueChg;
                 const volume = item.lot ? Math.round(Number(item.lot) * 10) : (fb.volume || 0);
                 const high = item.highPrice ? Math.round(Number(item.highPrice) * 1000) : price;
                 const low = item.lowPrice ? Math.round(Number(item.lowPrice) * 1000) : price;

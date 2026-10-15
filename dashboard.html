@@ -1703,33 +1703,33 @@ body {
           <div class="actual-frame-card active" id="card_VNINDEX" onclick="selectIndexCard('VNINDEX')">
             <div class="frame-card-head">
               <span class="frame-card-symbol">VN-INDEX</span>
-              <span class="frame-card-price text-down" id="miniPrice_VNINDEX">1.704,87</span>
+              <span class="frame-card-price text-down" id="miniPrice_VNINDEX">1.702,20</span>
             </div>
-            <div class="frame-card-chg text-down" id="miniChg_VNINDEX">▼ -14,54 (-0,85%)</div>
+            <div class="frame-card-chg text-down" id="miniChg_VNINDEX">▼ -2,67 (-0,16%)</div>
           </div>
 
           <div class="actual-frame-card" id="card_VN30" onclick="selectIndexCard('VN30')">
             <div class="frame-card-head">
               <span class="frame-card-symbol">VN30</span>
-              <span class="frame-card-price text-down" id="miniPrice_VN30">1.852,44</span>
+              <span class="frame-card-price text-down" id="miniPrice_VN30">1.846,50</span>
             </div>
-            <div class="frame-card-chg text-down" id="miniChg_VN30">▼ -8,56 (-0,46%)</div>
+            <div class="frame-card-chg text-down" id="miniChg_VN30">▼ -5,94 (-0,32%)</div>
           </div>
 
           <div class="actual-frame-card" id="card_HNXINDEX" onclick="selectIndexCard('HNXINDEX')">
             <div class="frame-card-head">
               <span class="frame-card-symbol">HNX</span>
-              <span class="frame-card-price text-up" id="miniPrice_HNXINDEX">265,16</span>
+              <span class="frame-card-price text-down" id="miniPrice_HNXINDEX">260,71</span>
             </div>
-            <div class="frame-card-chg text-up" id="miniChg_HNXINDEX">▲ +0,91 (+0,34%)</div>
+            <div class="frame-card-chg text-down" id="miniChg_HNXINDEX">▼ -4,45 (-1,68%)</div>
           </div>
 
           <div class="actual-frame-card" id="card_UPCOMINDEX" onclick="selectIndexCard('UPCOMINDEX')">
             <div class="frame-card-head">
               <span class="frame-card-symbol">UPCOM</span>
-              <span class="frame-card-price text-up" id="miniPrice_UPCOMINDEX">98,75</span>
+              <span class="frame-card-price text-up" id="miniPrice_UPCOMINDEX">124,34</span>
             </div>
-            <div class="frame-card-chg text-up" id="miniChg_UPCOMINDEX">▲ +0,22 (+0,22%)</div>
+            <div class="frame-card-chg text-up" id="miniChg_UPCOMINDEX">▲ +0,40 (+0,32%)</div>
           </div>
         </div>
 
@@ -3202,10 +3202,10 @@ body {
       if (!track) return;
 
       const indices = [
-        { name: 'VN-INDEX', key: 'VNINDEX', fallback: 1699.39, chg: -0.32 },
-        { name: 'VN30', key: 'VN30', fallback: 1844.13, chg: -0.45 },
-        { name: 'HNX', key: 'HNXINDEX', fallback: 262.53, chg: -0.99 },
-        { name: 'UPCOM', key: 'UPCOMINDEX', fallback: 124.18, chg: -0.09 }
+        { name: 'VN-INDEX', key: 'VNINDEX', fallback: 1702.20, chg: -0.16 },
+        { name: 'VN30', key: 'VN30', fallback: 1846.50, chg: -0.32 },
+        { name: 'HNX', key: 'HNXINDEX', fallback: 260.71, chg: -1.68 },
+        { name: 'UPCOM', key: 'UPCOMINDEX', fallback: 124.34, chg: 0.32 }
       ];
 
       // Ưu tiên danh mục thực tế từ Live Scanner, sắp xếp theo thanh khoản cao nhất
@@ -3213,26 +3213,31 @@ body {
       if (!stocks.length && typeof FALLBACK_STOCKS !== 'undefined') {
         stocks = [...FALLBACK_STOCKS];
       }
-      stocks.sort((a, b) => (b.value || b.volume || 0) - (a.value || a.volume || 0));
+      stocks.sort((a, b) => {
+        const valA = (a.value && a.value > 0) ? a.value : ((a.volume || 0) * (a.price || 0));
+        const valB = (b.value && b.value > 0) ? b.value : ((b.volume || 0) * (b.price || 0));
+        return valB - valA;
+      });
       const displayStocks = stocks.slice(0, 24);
 
       let html = '';
 
       // 1. Chỉ số thị trường thời gian thực
       indices.forEach(idx => {
-        const d = (marketIndices && marketIndices[idx.key]) || {};
+        const d = (marketIndices && (marketIndices[idx.key] || marketIndices[idx.name])) || {};
         const p = d.price || idx.fallback;
         const c = (d.change !== undefined && d.change !== null)
           ? d.change
           : (d.open ? parseFloat((((p - d.open) / d.open) * 100).toFixed(2)) : idx.chg);
-        const colorCls = c > 0 ? 'text-up' : (c < 0 ? 'text-down' : 'text-ref');
+        const colorCls = c >= 6.8 ? 'text-ceil' : (c <= -6.8 ? 'text-floor' : (c > 0 ? 'text-up' : (c < 0 ? 'text-down' : 'text-ref')));
         const arrow = c > 0 ? '▲' : (c < 0 ? '▼' : '■');
         const sign = c > 0 ? '+' : '';
+        const priceStr = typeof p === 'number' ? p.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : p;
 
         html += `
-          <div class="ticker-chip-item" onclick="selectMarketItem('${idx.key}', '${idx.name}')">
+          <div class="ticker-chip-item" onclick="selectMarketItem('${idx.key}', '${idx.name}')" style="cursor:pointer;" title="Nhấp xem chỉ số ${idx.name}">
             <span class="tc-sym">${idx.name}</span>
-            <span class="tc-price ${colorCls}">${p ? p.toLocaleString('vi-VN') : '—'}</span>
+            <span class="tc-price ${colorCls}">${priceStr}</span>
             <span class="tc-chg ${colorCls}">${arrow} ${sign}${c.toFixed(2)}%</span>
           </div>
         `;
@@ -3249,7 +3254,7 @@ body {
         else if (c < 0) { colorCls = 'text-down'; arrow = '▼'; }
 
         html += `
-          <div class="ticker-chip-item" onclick="openQuickModal('${s.symbol}')">
+          <div class="ticker-chip-item" onclick="openQuickModal('${s.symbol}')" style="cursor:pointer;" title="Nhấp xem chi tiết ${s.symbol}">
             <span class="tc-sym">${s.symbol}</span>
             <span class="tc-price ${colorCls}">${s.price ? s.price.toLocaleString('vi-VN') : '—'}</span>
             <span class="tc-chg ${colorCls}">${arrow} ${c >= 0 ? '+' : ''}${c.toFixed(2)}%</span>
