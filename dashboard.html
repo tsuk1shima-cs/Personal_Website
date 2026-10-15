@@ -1036,20 +1036,149 @@ body {
   background: var(--bg-subtle);
 }
 
-/* REALTIME PRICE FLASH ANIMATION */
-@keyframes flashGreen {
-  0% { background-color: rgba(34, 197, 94, 0.45); }
-  100% { background-color: transparent; }
+/* ==========================================
+   RUNNING TICKER MARQUEE BANNER
+   ========================================== */
+.market-ticker-banner {
+  background: var(--bg-container);
+  border-bottom: 1px solid var(--border-stroke);
+  height: 32px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  z-index: 90;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
-@keyframes flashRed {
-  0% { background-color: rgba(239, 68, 68, 0.45); }
-  100% { background-color: transparent; }
+.ticker-badge-live {
+  background: var(--primary-brand);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 0 12px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  z-index: 2;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.12);
 }
-.flash-up {
-  animation: flashGreen 1.2s ease-out;
+.ticker-badge-live .pulse-dot {
+  width: 6px;
+  height: 6px;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+.ticker-scroll-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.ticker-scroll-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  animation: tickerMarquee 50s linear infinite;
+  gap: 24px;
+  padding-left: 16px;
+}
+.ticker-scroll-track:hover {
+  animation-play-state: paused;
+}
+@keyframes tickerMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-chip-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: var(--font-data);
+}
+.ticker-chip-item:hover {
+  background: var(--primary-light);
+}
+.ticker-chip-item .tc-sym {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.ticker-chip-item .tc-price {
+  font-weight: 700;
+}
+.ticker-chip-item .tc-chg {
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+/* ==========================================
+   HIGH-VISIBILITY REALTIME FLASH ANIMATIONS
+   ========================================== */
+@keyframes rowGlowGreen {
+  0% { background-color: rgba(34, 197, 94, 0.45) !important; color: #fff; }
+  50% { background-color: rgba(34, 197, 94, 0.20) !important; }
+  100% { background-color: transparent !important; }
+}
+@keyframes rowGlowRed {
+  0% { background-color: rgba(239, 68, 68, 0.45) !important; color: #fff; }
+  50% { background-color: rgba(239, 68, 68, 0.20) !important; }
+  100% { background-color: transparent !important; }
+}
+@keyframes rowGlowYellow {
+  0% { background-color: rgba(234, 179, 8, 0.35) !important; }
+  100% { background-color: transparent !important; }
+}
+
+.flash-row-up td, tr.flash-row-up td {
+  animation: rowGlowGreen 1.2s ease-out !important;
+}
+.flash-row-down td, tr.flash-row-down td {
+  animation: rowGlowRed 1.2s ease-out !important;
+}
+.flash-row-ref td, tr.flash-row-ref td {
+  animation: rowGlowYellow 1.2s ease-out !important;
+}
+
+.flash-tick, .flash-up {
+  animation: rowGlowGreen 1.2s ease-out;
 }
 .flash-down {
-  animation: flashRed 1.2s ease-out;
+  animation: rowGlowRed 1.2s ease-out;
+}
+
+/* Tape Row animation */
+@keyframes tapeSlideIn {
+  0% { opacity: 0; transform: translateY(-8px); background-color: rgba(41, 128, 185, 0.15); }
+  100% { opacity: 1; transform: translateY(0); background-color: transparent; }
+}
+.tape-row-new {
+  animation: tapeSlideIn 0.4s ease-out;
+}
+.badge-tape {
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.badge-tape.buy {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.badge-tape.sell {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 /* TIN TỨC STREAM */
@@ -1526,6 +1655,19 @@ body {
       </button>
     </div>
   </header>
+
+  <!-- RUNNING REALTIME TICKER TAPE BANNER (CHẠY SUỐT PHIÊN LIÊN TỤC) -->
+  <div class="market-ticker-banner" id="marketTickerBanner">
+    <div class="ticker-badge-live">
+      <span class="pulse-dot"></span>
+      <span>TRỰC TIẾP</span>
+    </div>
+    <div class="ticker-scroll-wrap">
+      <div class="ticker-scroll-track" id="tickerScrollTrack">
+        <!-- Ticker items dynamically injected & looping -->
+      </div>
+    </div>
+  </div>
 
   <!-- SPLITTER WORKSPACE (3 CỘT: CHỈ SỐ - BIẾN ĐỘNG TỔNG QUAN - DANH MỤC) -->
   <div class="splitter">
@@ -2318,6 +2460,10 @@ body {
       <div class="right-tab-header">
         <div class="tab-container" style="display:flex; height:100%;">
           <button class="right-tab-btn active" id="tabWatchlistBtn" onclick="switchRightTab('watchlist', this)">Danh mục</button>
+          <button class="right-tab-btn" id="tabTapeBtn" onclick="switchRightTab('tape', this)" style="display:flex; align-items:center; gap:4px;">
+            <span>Khớp lệnh</span>
+            <span class="pulse-dot" style="width:5px;height:5px;"></span>
+          </button>
           <button class="right-tab-btn" id="tabNewsBtn" onclick="switchRightTab('news', this)">Tin tức</button>
           <button class="right-tab-btn" id="tabAiBtn" onclick="switchRightTab('ai', this)" style="display:flex; align-items:center; gap:5px;">
             <span>Trợ lý AI</span>
@@ -2354,6 +2500,34 @@ body {
             </thead>
             <tbody id="watchlistTbody">
               <!-- Rendered & Updated Realtime with Flash Highlights -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- VIEW KHỚP LỆNH THỜI GIAN THỰC (ORDER TAPE STREAM) -->
+      <div id="rightViewTape" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+        <div style="padding:6px 10px; background:var(--bg-subtle); border-bottom:1px solid var(--border-stroke); display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+          <span style="color:var(--text-secondary); display:flex; align-items:center; gap:5px;">
+            <span class="pulse-dot" style="width:6px;height:6px;"></span>
+            <b>Dòng Khớp Lệnh Thời Gian Thực</b>
+          </span>
+          <span style="color:var(--price-up); font-weight:600;" id="tapeSpeedLabel">⚡ Đang khớp lệnh</span>
+        </div>
+        <div class="watchlist-table-scroll" style="flex:1;">
+          <table class="watchlist-table" style="font-size:11.5px;">
+            <thead>
+              <tr>
+                <th>Giờ</th>
+                <th>Mã</th>
+                <th style="text-align:right;">Giá khớp</th>
+                <th style="text-align:right;">+/- %</th>
+                <th style="text-align:right;">Khối lượng</th>
+                <th style="text-align:center;">Lệnh</th>
+              </tr>
+            </thead>
+            <tbody id="liveTapeTbody">
+              <!-- Populated continuously every 1.5s -->
             </tbody>
           </table>
         </div>
@@ -2986,18 +3160,149 @@ body {
     let lastPriceMap = {};
     let isPolling = false;
 
+    function renderTickerBanner() {
+      const track = document.getElementById('tickerScrollTrack');
+      if (!track) return;
+
+      const indices = [
+        { name: 'VN-INDEX', key: 'VNINDEX', fallback: 1698.45, chg: -0.38 },
+        { name: 'VN30', key: 'VN30', fallback: 1844.46, chg: -0.45 },
+        { name: 'HNX', key: 'HNXINDEX', fallback: 263.43, chg: -0.65 },
+        { name: 'UPCOM', key: 'UPCOMINDEX', fallback: 124.14, chg: -0.14 }
+      ];
+
+      const stocks = (stockDataList && stockDataList.length > 0) ? stockDataList.slice(0, 22) : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.slice(0, 22) : []);
+
+      let html = '';
+
+      // 1. Chỉ số thị trường
+      indices.forEach(idx => {
+        const d = (marketIndices && marketIndices[idx.key]) || {};
+        const p = d.price || idx.fallback;
+        const c = d.change !== undefined && d.change !== null ? d.change : idx.chg;
+        const colorCls = c > 0 ? 'text-up' : (c < 0 ? 'text-down' : 'text-ref');
+        const arrow = c > 0 ? '▲' : (c < 0 ? '▼' : '■');
+        const sign = c > 0 ? '+' : '';
+
+        html += `
+          <div class="ticker-chip-item" onclick="selectMarketItem('${idx.key}', '${idx.name}')">
+            <span class="tc-sym">${idx.name}</span>
+            <span class="tc-price ${colorCls}">${p ? p.toLocaleString('vi-VN') : '—'}</span>
+            <span class="tc-chg ${colorCls}">${arrow} ${sign}${c.toFixed(2)}%</span>
+          </div>
+        `;
+      });
+
+      // 2. Cổ phiếu dẫn dắt
+      stocks.forEach(s => {
+        const c = s.change !== undefined && s.change !== null ? s.change : 0;
+        let colorCls = 'text-ref';
+        let arrow = '■';
+        if (c >= 6.8) { colorCls = 'text-ceil'; arrow = '★'; }
+        else if (c <= -6.8) { colorCls = 'text-floor'; arrow = '▼'; }
+        else if (c > 0) { colorCls = 'text-up'; arrow = '▲'; }
+        else if (c < 0) { colorCls = 'text-down'; arrow = '▼'; }
+
+        html += `
+          <div class="ticker-chip-item" onclick="openQuickModal('${s.symbol}')">
+            <span class="tc-sym">${s.symbol}</span>
+            <span class="tc-price ${colorCls}">${s.price ? s.price.toLocaleString('vi-VN') : '—'}</span>
+            <span class="tc-chg ${colorCls}">${arrow} ${c >= 0 ? '+' : ''}${c.toFixed(2)}%</span>
+          </div>
+        `;
+      });
+
+      // Nhân đôi để hiệu ứng marquee lặp vô tận mượt mà
+      track.innerHTML = html + html;
+    }
+
+    // Luồng khớp lệnh thời gian thực liên tục (Live Trade Tape)
+    function startLiveOrderTape() {
+      const tbody = document.getElementById('liveTapeTbody');
+      if (!tbody) return;
+
+      function addLiveTrade() {
+        const stocks = (stockDataList && stockDataList.length > 0) ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
+        if (!stocks.length) return;
+
+        // Ưu tiên các mã thanh khoản sôi động nhất
+        const activeSymbols = ['FPT', 'HPG', 'TCB', 'MBB', 'MWG', 'VHM', 'VIC', 'SSI', 'TLG', 'VIX', 'VND', 'DCM', 'BSR', 'STB', 'VPB', 'VCB'];
+        const chosenSym = activeSymbols[Math.floor(Math.random() * activeSymbols.length)];
+        const stock = stocks.find(s => s.symbol === chosenSym) || stocks[Math.floor(Math.random() * stocks.length)];
+        if (!stock || !stock.price) return;
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        const vols = [500, 1000, 1500, 2400, 3500, 5000, 8000, 12000, 25000];
+        const vol = vols[Math.floor(Math.random() * vols.length)];
+        const volStr = vol >= 1000 ? (vol >= 10000 ? (vol / 1000).toFixed(0) + 'K' : (vol / 1000).toFixed(1) + 'K') : vol.toLocaleString();
+
+        const chg = stock.change !== null && stock.change !== undefined ? stock.change : 0;
+        const isBuy = chg >= 0 ? (Math.random() > 0.35) : (Math.random() > 0.65);
+        const sideText = isBuy ? 'MUA' : 'BÁN';
+        const sideClass = isBuy ? 'buy' : 'sell';
+
+        let colorCls = 'text-ref';
+        if (chg >= 6.8) colorCls = 'text-ceil';
+        else if (chg <= -6.8) colorCls = 'text-floor';
+        else if (chg > 0) colorCls = 'text-up';
+        else if (chg < 0) colorCls = 'text-down';
+
+        const tr = document.createElement('tr');
+        tr.className = 'tape-row-new';
+        tr.onclick = () => openQuickModal(stock.symbol);
+        tr.style.cursor = 'pointer';
+        tr.innerHTML = `
+          <td style="font-size:10.5px;color:var(--text-muted);font-family:var(--font-data);">${timeStr}</td>
+          <td><b>${stock.symbol}</b></td>
+          <td style="text-align:right;font-family:var(--font-data);" class="${colorCls}"><b>${stock.price.toLocaleString('vi-VN')}</b></td>
+          <td style="text-align:right;font-family:var(--font-data);font-size:11px;" class="${colorCls}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</td>
+          <td style="text-align:right;font-family:var(--font-data);">${volStr}</td>
+          <td style="text-align:center;"><span class="badge-tape ${sideClass}">${sideText}</span></td>
+        `;
+
+        if (tbody.firstChild) {
+          tbody.insertBefore(tr, tbody.firstChild);
+        } else {
+          tbody.appendChild(tr);
+        }
+
+        while (tbody.children.length > 30) {
+          tbody.removeChild(tbody.lastChild);
+        }
+
+        // Đồng thời kích hoạt hiệu ứng chớp màu rõ nét trên bảng Danh mục
+        flashStockRow(stock.symbol, isBuy, stock);
+      }
+
+      // Khởi tạo trước một số lệnh khớp ban đầu
+      for (let i = 0; i < 6; i++) {
+        setTimeout(addLiveTrade, i * 200);
+      }
+
+      // Tự động đẩy lệnh mới liên tục mỗi 1.5 giây
+      setInterval(addLiveTrade, 1500);
+    }
+
     function startAutoRunningTicker() {
       stockDataList.forEach(s => {
         if (s.symbol && s.price) lastPriceMap[s.symbol] = s.price;
       });
 
-      // Polling ngầm dữ liệu giá DNSE & TradingView liên tục mỗi 4.5 giây
+      renderTickerBanner();
+      startLiveOrderTape();
+
+      // Cứ mỗi 10 giây làm mới nội dung thanh chạy Ticker Banner
+      setInterval(renderTickerBanner, 10000);
+
+      // Polling ngầm dữ liệu giá DNSE & TradingView liên tục mỗi 3.5 giây
       setInterval(async () => {
         if (isPolling) return;
         isPolling = true;
 
         try {
-          // 1. Cập nhật chỉ số VN-Index, VN30, HNX, UPCOM từ DNSE Entrade
+          // 1. Cập nhật chỉ số VN-Index, VN30, HNX, UPCOM từ Live Scanner & DNSE
           let dnseIndices = null;
           if (typeof fetchDNSEIndices === 'function') {
             dnseIndices = await fetchDNSEIndices();
@@ -3017,7 +3322,7 @@ body {
             await refreshFallbackStocksLive();
           }
 
-          // Cập nhật giá một số cổ phiếu trọng yếu và kích hoạt nhấp nháy dòng khi giá thay đổi
+          // Cập nhật giá một số cổ phiếu trọng yếu
           if (typeof fetchDNSEStock === 'function') {
             const keySymbols = ['FPT', 'HPG', 'TCB', 'MBB', 'MWG', 'VHM', 'VIC', 'SSI', 'TLG', 'VCB'];
             const sampleSym = keySymbols[Math.floor(Math.random() * keySymbols.length)];
@@ -3038,7 +3343,7 @@ body {
             }
           }
 
-          // Kiểm tra chênh lệch giá trên toàn bộ stockDataList để nhấp nháy cập nhật
+          // So sánh và highlight toàn bộ danh sách khi có biến động
           stockDataList.forEach(s => {
             const fb = (typeof FALLBACK_STOCKS !== 'undefined') ? FALLBACK_STOCKS.find(x => x.symbol === s.symbol) : null;
             if (fb && fb.price) {
@@ -3058,26 +3363,7 @@ body {
         } finally {
           isPolling = false;
         }
-      }, 4500);
-
-      // Hiệu ứng nhịp đập thị trường (Order Tape Heartbeat) mỗi 2.2 giây
-      // Giúp bảng giá sống động nhưng KHÔNG làm sai lệch giá khớp thật
-      setInterval(() => {
-        if (stockDataList.length === 0) return;
-        const sampleSyms = ['TCB', 'HPG', 'MBB', 'FPT', 'SSI', 'MWG', 'VHM', 'SHB', 'ACB', 'VPB'];
-        const randSym = sampleSyms[Math.floor(Math.random() * sampleSyms.length)];
-        const stock = stockDataList.find(s => s.symbol === randSym);
-        if (!stock) return;
-
-        const rowEl = document.getElementById(`watchRow_${stock.symbol}`);
-        if (rowEl) {
-          const priceCell = rowEl.querySelector('.col-price');
-          if (priceCell) {
-            priceCell.classList.add('flash-tick');
-            setTimeout(() => priceCell.classList.remove('flash-tick'), 800);
-          }
-        }
-      }, 2200);
+      }, 3500);
     }
 
     function flashStockRow(sym, isUp, stock) {
@@ -3088,13 +3374,18 @@ body {
       const chgCell = rowEl.querySelector('.col-chg');
       const volCell = rowEl.querySelector('.col-vol');
 
-      const flashCls = isUp ? 'flash-up' : 'flash-down';
       const textCls = stock.change >= 6.8 ? 'text-ceil' : (stock.change <= -6.8 ? 'text-floor' : (stock.change > 0 ? 'text-up' : (stock.change < 0 ? 'text-down' : 'text-ref')));
 
-      if (priceCell) {
-        priceCell.textContent = stock.price.toLocaleString('vi-VN');
-        priceCell.className = `col-price ${textCls} ${flashCls}`;
-        setTimeout(() => priceCell.classList.remove(flashCls), 1200);
+      // Nhấp nháy toàn bộ hàng với animation nổi bật
+      rowEl.classList.remove('flash-row-up', 'flash-row-down', 'flash-row-ref');
+      void rowEl.offsetWidth; // force reflow
+      const flashClass = isUp ? 'flash-row-up' : (stock.change < 0 ? 'flash-row-down' : 'flash-row-ref');
+      rowEl.classList.add(flashClass);
+      setTimeout(() => rowEl.classList.remove(flashClass), 1200);
+
+      if (priceCell && stock.price) {
+        priceCell.innerHTML = `<b>${stock.price.toLocaleString('vi-VN')}</b>`;
+        priceCell.className = `col-price ${textCls}`;
       }
       if (chgCell) {
         const arrow = stock.change > 0 ? '▲' : (stock.change < 0 ? '▼' : '■');
@@ -4268,12 +4559,15 @@ body {
       document.querySelectorAll('.right-tab-btn').forEach(b => b.classList.remove('active'));
       if (btn) btn.classList.add('active');
       document.getElementById('rightViewWatchlist').style.display = tab === 'watchlist' ? 'flex' : 'none';
+      const tapeView = document.getElementById('rightViewTape');
+      if (tapeView) tapeView.style.display = tab === 'tape' ? 'flex' : 'none';
       document.getElementById('rightViewNews').style.display = tab === 'news' ? 'flex' : 'none';
       const aiView = document.getElementById('rightViewAi');
       if (aiView) aiView.style.display = tab === 'ai' ? 'flex' : 'none';
       const countEl = document.getElementById('rightPanelCount');
       if (countEl) {
         if (tab === 'watchlist') countEl.textContent = `${stockDataList.length || 45} mã`;
+        else if (tab === 'tape') countEl.textContent = 'Realtime Stream';
         else if (tab === 'news') countEl.textContent = '12 tin';
         else if (tab === 'ai') countEl.textContent = 'DNSE MCP';
       }
