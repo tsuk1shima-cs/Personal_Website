@@ -16,7 +16,7 @@ const FALLBACK_INDICES = {
 // Danh mục cổ phiếu cơ sở (tự động đồng bộ và làm mới giá trực tiếp theo từng phiên giao dịch thực tế)
 const FALLBACK_STOCKS = [
     { symbol: 'VCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 56600, change: 0.53, pe: 14.2, pb: 2.11, roe: 21.4, marketCap: 312000, volume: 1112500, value: 62972311000, buyForeignValue: 9398130000, sellForeignValue: 19451746700 },
-    { symbol: 'BID', exchange: 'HOSE', sector: 'Ngân hàng', price: 33200, change: 0.30, pe: 11.8, pb: 1.48, roe: 18.2, marketCap: 188000, volume: 1373900, value: 45614907600, buyForeignValue: 17243506200, sellForeignValue: 33808098100 },
+    { symbol: 'BID', exchange: 'HOSE', sector: 'Ngân hàng', price: 33500, change: 1.21, pe: 11.8, pb: 1.48, roe: 18.2, marketCap: 188000, volume: 2422300, value: 81147050000, buyForeignValue: 11109898500, sellForeignValue: 40845730000 },
     { symbol: 'CTG', exchange: 'HOSE', sector: 'Ngân hàng', price: 29750, change: 0.68, pe: 9.4, pb: 1.29, roe: 17.5, marketCap: 156000, volume: 1798300, value: 53499544000, buyForeignValue: 21759703000, sellForeignValue: 42023706850 },
     { symbol: 'TCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 32700, change: -0.91, pe: 8.8, pb: 1.36, roe: 16.1, marketCap: 232000, volume: 4729600, value: 154658802900, buyForeignValue: 32392023650, sellForeignValue: 95600210000 },
     { symbol: 'MBB', exchange: 'HOSE', sector: 'Ngân hàng', price: 19700, change: 1.81, pe: 6.5, pb: 1.40, roe: 22.4, marketCap: 102000, volume: 10672300, value: 210244310000, buyForeignValue: 117554429150, sellForeignValue: 17239670000 },
@@ -87,35 +87,69 @@ async function refreshFallbackStocksLive() {
     if (isRefreshingStocks) return;
     isRefreshingStocks = true;
     try {
-        const tickers = FALLBACK_STOCKS.map(s => `${s.exchange || 'HOSE'}:${s.symbol}`);
-        const res = await fetch('https://scanner.tradingview.com/vietnam/scan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                symbols: { tickers },
-                columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume', 'Value.Traded', 'price_book_ratio']
-            }),
+        const poolSymbols = FALLBACK_STOCKS.map(s => s.symbol).join(',');
+        const res = await fetch(`https://bgapidatafeed.vps.com.vn/getliststockdata/${poolSymbols}`, {
+            headers: { 'Accept': 'application/json' },
             signal: AbortSignal.timeout(4500)
         });
         if (res.ok) {
-            const j = await res.json();
-            if (j.data && j.data.length > 0) {
-                j.data.forEach(item => {
-                    const [name, close, change, high, low, open, volume, valTraded, pb] = item.d;
-                    const sym = (name || item.s?.split(':')[1] || '').toUpperCase();
+            const list = await res.json();
+            if (Array.isArray(list) && list.length > 0) {
+                list.forEach(item => {
+                    const sym = (item.sym || '').toUpperCase();
                     const target = FALLBACK_STOCKS.find(s => s.symbol === sym);
-                    if (target && close) {
-                        target.price = close;
-                        if (change !== undefined && change !== null) target.change = parseFloat(Number(change).toFixed(2));
-                        if (volume) target.volume = volume;
-                        if (valTraded) target.value = valTraded;
-                        if (pb) target.pb = parseFloat(Number(pb).toFixed(2));
+                    if (target) {
+                        const rawPrice = item.lastPrice || item.r || 0;
+                        if (rawPrice > 0) {
+                            target.price = Math.round(Number(rawPrice) * 1000);
+                            target.change = parseFloat(Number(item.changePc || 0).toFixed(2));
+                            target.volume = Math.round(Number(item.lot || 0) * 10);
+                            if (item.highPrice) target.high = Math.round(Number(item.highPrice) * 1000);
+                            if (item.lowPrice) target.low = Math.round(Number(item.lowPrice) * 1000);
+                            if (item.openPrice) target.open = Math.round(Number(item.openPrice) * 1000);
+                            if (item.r) target.refPrice = Math.round(Number(item.r) * 1000);
+                            if (item.c) target.ceilPrice = Math.round(Number(item.c) * 1000);
+                            if (item.f) target.floorPrice = Math.round(Number(item.f) * 1000);
+                            if (item.fBValue) target.buyForeignValue = Math.round(parseFloat(item.fBValue) * 1000);
+                            if (item.fSValue) target.sellForeignValue = Math.round(parseFloat(item.fSValue) * 1000);
+                        }
                     }
                 });
+                return;
             }
         }
-    } catch { /* ignore */ }
-    finally {
+    } catch {
+        // Fallback to TradingView scanner if on localhost or proxy
+        try {
+            const tickers = FALLBACK_STOCKS.map(s => `${s.exchange || 'HOSE'}:${s.symbol}`);
+            const res = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    symbols: { tickers },
+                    columns: ['name', 'close', 'change', 'high', 'low', 'open', 'volume', 'Value.Traded', 'price_book_ratio']
+                }),
+                signal: AbortSignal.timeout(3500)
+            });
+            if (res.ok) {
+                const j = await res.json();
+                if (j.data && j.data.length > 0) {
+                    j.data.forEach(item => {
+                        const [name, close, change, high, low, open, volume, valTraded, pb] = item.d;
+                        const sym = (name || item.s?.split(':')[1] || '').toUpperCase();
+                        const target = FALLBACK_STOCKS.find(s => s.symbol === sym);
+                        if (target && close) {
+                            target.price = close;
+                            if (change !== undefined && change !== null) target.change = parseFloat(Number(change).toFixed(2));
+                            if (volume) target.volume = volume;
+                            if (valTraded) target.value = valTraded;
+                            if (pb) target.pb = parseFloat(Number(pb).toFixed(2));
+                        }
+                    });
+                }
+            }
+        } catch { /* ignore */ }
+    } finally {
         isRefreshingStocks = false;
     }
 }
@@ -129,8 +163,66 @@ function updateFallbackIndices(fresh) {
     }
 }
 
-// Quét trực tiếp danh sách cổ phiếu thời gian thực từ Live Scanner (hỗ trợ CORS cho mọi môi trường, đặc biệt GitHub Pages)
+// Quét trực tiếp danh sách cổ phiếu thời gian thực từ VPS & Live Scanner (100% CORS-friendly cho mọi môi trường, đặc biệt GitHub Pages)
 async function fetchLiveScannerStocks(size = 150) {
+    // 1. Quét trực tiếp qua Live Data Feed (hỗ trợ CORS * trực tiếp từ sàn)
+    try {
+        const poolSymbols = FALLBACK_STOCKS.map(s => s.symbol).join(',');
+        const vpsRes = await fetch(`https://bgapidatafeed.vps.com.vn/getliststockdata/${poolSymbols}`, {
+            signal: AbortSignal.timeout(4500)
+        });
+        if (vpsRes.ok) {
+            const list = await vpsRes.json();
+            if (Array.isArray(list) && list.length > 0) {
+                const mapped = list.map(item => {
+                    const sym = (item.sym || '').toUpperCase();
+                    const fb = FALLBACK_STOCKS.find(s => s.symbol === sym) || {};
+                    const price = item.lastPrice ? Math.round(Number(item.lastPrice) * 1000) : (fb.price || 30000);
+                    const change = item.changePc ? parseFloat(Number(item.changePc).toFixed(2)) : (fb.change || 0);
+                    const volume = item.lot ? Math.round(Number(item.lot) * 10) : (fb.volume || 0);
+                    const high = item.highPrice ? Math.round(Number(item.highPrice) * 1000) : (fb.high || price);
+                    const low = item.lowPrice ? Math.round(Number(item.lowPrice) * 1000) : (fb.low || price);
+                    const open = item.openPrice ? Math.round(Number(item.openPrice) * 1000) : (fb.open || price);
+                    const ref = item.r ? Math.round(Number(item.r) * 1000) : (fb.open || price);
+                    const ceil = item.c ? Math.round(Number(item.c) * 1000) : Math.round(ref * 1.07);
+                    const floor = item.f ? Math.round(Number(item.f) * 1000) : Math.round(ref * 0.93);
+                    const buyForeign = item.fBValue ? Math.round(Number(item.fBValue) * 1000) : (fb.buyForeignValue || 0);
+                    const sellForeign = item.fSValue ? Math.round(Number(item.fSValue) * 1000) : (fb.sellForeignValue || 0);
+
+                    const sObj = {
+                        symbol: sym,
+                        exchange: fb.exchange || 'HOSE',
+                        sector: fb.sector || 'Tài chính',
+                        price: price,
+                        change: change,
+                        volume: volume,
+                        value: (fb.value && fb.value > 0) ? fb.value : (volume * price),
+                        pe: fb.pe || 11.5,
+                        pb: fb.pb || 1.45,
+                        roe: fb.roe || 18.2,
+                        marketCap: fb.marketCap || 150000,
+                        high: high,
+                        low: low,
+                        open: open,
+                        refPrice: ref,
+                        ceilPrice: ceil,
+                        floorPrice: floor,
+                        buyForeignValue: buyForeign,
+                        sellForeignValue: sellForeign,
+                        companyName: fb.companyName || null
+                    };
+                    if (fb.symbol) Object.assign(fb, sObj);
+                    return sObj;
+                }).filter(s => s.symbol && s.price);
+
+                if (mapped.length > 0) return mapped;
+            }
+        }
+    } catch (err) {
+        console.warn('VPS live stock feed notice:', err.message);
+    }
+
+    // 2. Dự phòng: Quét qua TradingView Scanner API
     try {
         const res = await fetch('https://scanner.tradingview.com/vietnam/scan', {
             method: 'POST',
@@ -298,8 +390,47 @@ async function fetchDNSEIndices() {
         } catch { /* fallback direct */ }
     }
 
-    // 2. Trên GitHub Pages hoặc Client trực tiếp: Gọi ngay TradingView Scanner API (CORS enabled, phản hồi ~150ms)
+    // 2. Trên GitHub Pages hoặc Client trực tiếp: Gọi ngay Live Index Feed từ VPS (100% CORS-friendly cho mọi môi trường)
     const indices = {};
+    try {
+        const vpsRes = await fetch('https://bgapidatafeed.vps.com.vn/getlistindexdetail/10,11,02,03', {
+            signal: AbortSignal.timeout(3500)
+        });
+        if (vpsRes.ok) {
+            const list = await vpsRes.json();
+            if (Array.isArray(list) && list.length > 0) {
+                const mapCode = { '10': 'VNINDEX', '11': 'VN30', '02': 'HNXINDEX', '03': 'UPCOMINDEX' };
+                const mapEx = { '10': 'HOSE', '11': 'HOSE', '02': 'HNX', '03': 'UPCOM' };
+                list.forEach(item => {
+                    const sym = mapCode[item.hashValue];
+                    if (!sym) return;
+                    const curPrice = item.cIndex || 0;
+                    const refPrice = item.oIndex || curPrice;
+                    const chg = refPrice > 0 ? parseFloat((((curPrice - refPrice) / refPrice) * 100).toFixed(2)) : 0;
+                    indices[sym] = {
+                        symbol: sym,
+                        exchange: mapEx[item.hashValue] || 'HOSE',
+                        price: curPrice,
+                        change: chg,
+                        open: refPrice,
+                        high: curPrice,
+                        low: refPrice,
+                        volume: item.vol || 0,
+                        value: item.value ? Math.round(Number(item.value) * 1e6) : 0,
+                        time: item.time
+                    };
+                });
+                if (indices['VNINDEX']) {
+                    updateFallbackIndices(indices);
+                    return indices;
+                }
+            }
+        }
+    } catch (err) {
+        console.warn('VPS live indices notice:', err.message);
+    }
+
+    // 2.1 Dự phòng: Gọi TradingView Scanner API nếu VPS không khả dụng
     try {
         const tvRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
             method: 'POST',
@@ -473,7 +604,59 @@ async function fetchDNSEStock(symbol) {
         } catch { /* fallback direct */ }
     }
 
-    // 2. Quét trực tiếp TradingView Scanner API (hoạt động 100% trên GitHub Pages không bị chặn CORS)
+    // 2. Quét trực tiếp qua Live Data Feed (100% CORS-friendly cho GitHub Pages)
+    try {
+        const vpsRes = await fetch(`https://bgapidatafeed.vps.com.vn/getliststockdata/${u}`, {
+            signal: AbortSignal.timeout(3500)
+        });
+        if (vpsRes.ok) {
+            const list = await vpsRes.json();
+            if (Array.isArray(list) && list.length > 0) {
+                const item = list[0];
+                const fb = FALLBACK_STOCKS.find(s => s.symbol === u) || {};
+                const price = item.lastPrice ? Math.round(Number(item.lastPrice) * 1000) : (fb.price || 33500);
+                const change = item.changePc ? parseFloat(Number(item.changePc).toFixed(2)) : (fb.change || 0);
+                const volume = item.lot ? Math.round(Number(item.lot) * 10) : (fb.volume || 0);
+                const high = item.highPrice ? Math.round(Number(item.highPrice) * 1000) : price;
+                const low = item.lowPrice ? Math.round(Number(item.lowPrice) * 1000) : price;
+                const open = item.openPrice ? Math.round(Number(item.openPrice) * 1000) : (item.r ? Math.round(Number(item.r) * 1000) : price);
+                const ref = item.r ? Math.round(Number(item.r) * 1000) : price;
+                const ceil = item.c ? Math.round(Number(item.c) * 1000) : Math.round(ref * 1.07);
+                const floor = item.f ? Math.round(Number(item.f) * 1000) : Math.round(ref * 0.93);
+                const buyForeign = item.fBValue ? Math.round(Number(item.fBValue) * 1000) : (fb.buyForeignValue || 0);
+                const sellForeign = item.fSValue ? Math.round(Number(item.fSValue) * 1000) : (fb.sellForeignValue || 0);
+
+                const stockObj = {
+                    symbol: u,
+                    exchange: fb.exchange || 'HOSE',
+                    sector: fb.sector || 'Tài chính',
+                    price: price,
+                    change: change,
+                    high: high,
+                    low: low,
+                    open: open,
+                    refPrice: ref,
+                    ceilPrice: ceil,
+                    floorPrice: floor,
+                    volume: volume,
+                    value: (fb.value && fb.value > 0) ? fb.value : (volume * price),
+                    pe: fb.pe || 11.5,
+                    pb: fb.pb || 1.45,
+                    roe: fb.roe || 18.2,
+                    marketCap: fb.marketCap || 190000,
+                    buyForeignValue: buyForeign,
+                    sellForeignValue: sellForeign,
+                    companyName: fb.companyName || null
+                };
+                if (fb.symbol) Object.assign(fb, stockObj);
+                return stockObj;
+            }
+        }
+    } catch (err) {
+        console.warn('fetchDNSEStock VPS notice:', err.message);
+    }
+
+    // 2.1 Dự phòng: Quét qua TradingView Scanner API
     try {
         const tvRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
             method: 'POST',

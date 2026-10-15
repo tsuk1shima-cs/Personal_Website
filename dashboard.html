@@ -3476,6 +3476,25 @@ body {
       // Cứ mỗi 7 giây làm mới nội dung thanh chạy Ticker Banner
       setInterval(renderTickerBanner, 7000);
 
+      // Luôn làm mới dữ liệu sàn trực tiếp cho mã đang xem chi tiết Toàn màn hình
+      setInterval(async () => {
+        if (!currentStockDetailSymbol) return;
+        try {
+          if (typeof fetchDNSEStock === 'function') {
+            const fresh = await fetchDNSEStock(currentStockDetailSymbol);
+            if (fresh && currentStockDetailSymbol === fresh.symbol) {
+              const cur = stockDataList.find(s => s.symbol === fresh.symbol);
+              if (cur) Object.assign(cur, fresh);
+              const isUp = (fresh.change || 0) >= 0;
+              const tickVol = fresh.volume ? Math.max(100, Math.round(fresh.volume * 0.001)) : 1500;
+              updateLiveStockDetailTick(fresh, isUp, fresh.price, fresh.change, tickVol, new Date());
+            }
+          }
+        } catch (err) {
+          console.warn('Realtime detail poll notice:', err);
+        }
+      }, 2500);
+
       // Polling ngầm dữ liệu giá TradingView & DNSE trực tiếp mỗi 7 giây
       setInterval(async () => {
         if (isPolling) return;
@@ -4963,22 +4982,22 @@ body {
         || { 
           symbol: sym, 
           exchange: 'HOSE',
-          price: sym === 'TLG' ? 55500 : 33250, 
-          change: sym === 'TLG' ? 0.54 : 0.45, 
+          price: sym === 'TLG' ? 54900 : (sym === 'BID' ? 33500 : 30000), 
+          change: sym === 'TLG' ? -1.08 : (sym === 'BID' ? 1.21 : 0.5), 
           pe: sym === 'TLG' ? 11.2 : 11.8, 
           pb: sym === 'TLG' ? 1.88 : 1.48, 
           roe: sym === 'TLG' ? 19.2 : 18.2, 
           marketCap: sym === 'TLG' ? 5357 : 188000, 
-          volume: sym === 'TLG' ? 384300 : 1374900,
+          volume: sym === 'TLG' ? 114000 : (sym === 'BID' ? 2422300 : 1500000),
           sector: sym === 'TLG' ? 'Hàng tiêu dùng' : 'Ngân hàng',
-          companyName: sym === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)' : 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam'
+          companyName: sym === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)' : (sym === 'BID' ? 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam' : 'Công ty Cổ phần niêm yết')
         };
 
       document.getElementById('qModalSymbol').textContent = stock.symbol;
       document.getElementById('qModalEx').textContent = stock.exchange || 'HOSE';
       const compName = stock.companyName || (stock.symbol === 'TLG' ? 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)' : (stock.sector ? `Ngành: ${stock.sector}` : 'Công ty Cổ phần niêm yết'));
       document.getElementById('qModalName').textContent = compName;
-      document.getElementById('qModalPrice').textContent = (stock.price || 33250).toLocaleString('vi-VN') + ' đ';
+      document.getElementById('qModalPrice').textContent = (stock.price || 33500).toLocaleString('vi-VN') + ' đ';
 
       const chg = stock.change !== undefined && stock.change !== null ? stock.change : 0;
       const chgEl = document.getElementById('qModalChg');
@@ -4989,10 +5008,27 @@ body {
       document.getElementById('qModalPb').textContent = stock.pb ? stock.pb.toFixed(2) + 'x' : '1.48x';
       document.getElementById('qModalRoe').textContent = stock.roe ? stock.roe.toFixed(1) + '%' : '18.2%';
       document.getElementById('qModalMcap').textContent = stock.marketCap ? stock.marketCap.toLocaleString('vi-VN') + ' tỷ' : '188.000 tỷ';
-      document.getElementById('qModalVol').textContent = stock.volume ? stock.volume.toLocaleString('vi-VN') : '1.374.900';
+      document.getElementById('qModalVol').textContent = stock.volume ? stock.volume.toLocaleString('vi-VN') : '2.422.300';
       document.getElementById('qModalRsi').textContent = (50 + (chg * 4)).toFixed(1) + ' (Tích lũy)';
 
       document.getElementById('stockQuickModal').style.display = 'flex';
+
+      // Lấy ngay dữ liệu trực tiếp từ sàn qua VPS CORS API để cập nhật tức thì
+      if (typeof fetchDNSEStock === 'function') {
+        fetchDNSEStock(sym).then(fresh => {
+          if (fresh && currentSelectedStock === sym) {
+            document.getElementById('qModalPrice').textContent = (fresh.price || stock.price).toLocaleString('vi-VN') + ' đ';
+            const fChg = fresh.change !== undefined && fresh.change !== null ? fresh.change : chg;
+            chgEl.textContent = (fChg >= 0 ? '+' : '') + fChg.toFixed(2) + '%';
+            chgEl.className = fChg >= 0 ? 'text-up' : 'text-down';
+            if (fresh.volume) document.getElementById('qModalVol').textContent = fresh.volume.toLocaleString('vi-VN');
+            if (fresh.pe) document.getElementById('qModalPe').textContent = fresh.pe.toFixed(1) + 'x';
+            if (fresh.pb) document.getElementById('qModalPb').textContent = fresh.pb.toFixed(2) + 'x';
+            if (fresh.roe) document.getElementById('qModalRoe').textContent = fresh.roe.toFixed(1) + '%';
+            if (fresh.marketCap) document.getElementById('qModalMcap').textContent = fresh.marketCap.toLocaleString('vi-VN') + ' tỷ';
+          }
+        }).catch(() => {});
+      }
     }
 
     function openStockDetailFromModal() {
@@ -5016,19 +5052,19 @@ body {
       lastStockDetailTickTime = Date.now();
       detailChartMode = 'intraday';
 
-      const stock = stockDataList.find(s => s.symbol === sym)
+      let stock = stockDataList.find(s => s.symbol === sym)
         || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null)
         || {
           symbol: sym,
           exchange: 'HOSE',
-          price: 33250,
-          change: 0.45,
+          price: sym === 'BID' ? 33500 : (sym === 'TLG' ? 54900 : 30000),
+          change: sym === 'BID' ? 1.21 : (sym === 'TLG' ? -1.08 : 0.5),
           pe: 11.8,
           pb: 1.48,
           roe: 18.2,
           marketCap: 188000,
-          volume: 1374900,
-          value: 45614907600,
+          volume: sym === 'BID' ? 2422300 : (sym === 'TLG' ? 114000 : 1500000),
+          value: 81147050000,
           sector: 'Ngân hàng',
           companyName: 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam'
         };
@@ -5038,10 +5074,10 @@ body {
       if (badge) badge.textContent = stock.symbol;
       if (detailTabBtn) detailTabBtn.style.display = 'inline-flex';
 
-      const p = stock.price || 33250;
+      const p = stock.price || 33500;
       const chg = stock.change || 0;
       const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(p) : 50;
-      const ref = stock.open || Math.round((p / (1 + chg / 100)) / delta) * delta || p;
+      const ref = stock.refPrice || stock.open || Math.round((p / (1 + chg / 100)) / delta) * delta || p;
 
       detailIntradayPoints = [];
       const len = 25;
@@ -5056,13 +5092,31 @@ body {
       renderStockDetailContent(stock);
       seedStockDetailTape(stock);
       switchSubTab('chitiet_ma', detailTabBtn);
+
+      // Ngay lập tức gọi API sàn trực tiếp (VPS CORS) để lấy số liệu thực tế khớp lệnh phiên hôm nay
+      if (typeof fetchDNSEStock === 'function') {
+        fetchDNSEStock(sym).then(fresh => {
+          if (fresh && currentStockDetailSymbol === sym) {
+            const exIdx = stockDataList.findIndex(s => s.symbol === sym);
+            if (exIdx >= 0) stockDataList[exIdx] = { ...stockDataList[exIdx], ...fresh };
+            else stockDataList.push(fresh);
+
+            renderStockDetailContent(fresh);
+            seedStockDetailTape(fresh);
+            if (detailIntradayPoints && detailIntradayPoints.length > 0) {
+              detailIntradayPoints[detailIntradayPoints.length - 1] = fresh.price;
+              renderStockDetailIntradaySvg(fresh);
+            }
+          }
+        }).catch(() => {});
+      }
     }
 
     function renderStockDetailContent(stock) {
       const container = document.getElementById('subview_chitiet_ma');
       if (!container) return;
 
-      const p = stock.price || 33250;
+      const p = stock.price || 33500;
       const chg = stock.change !== null && stock.change !== undefined ? stock.change : 0;
       const isUp = chg >= 0;
       const colorCls = chg >= 6.8 ? 'text-ceil' : (chg <= -6.8 ? 'text-floor' : (isUp ? 'text-up' : 'text-down'));
@@ -5070,15 +5124,15 @@ body {
       const sign = isUp ? '+' : '';
 
       const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(p) : (p < 10000 ? 10 : (p < 50000 ? 50 : 100));
-      const refPrice = stock.open || Math.round((p / (1 + chg / 100)) / delta) * delta || p;
+      const refPrice = stock.refPrice || stock.open || Math.round((p / (1 + chg / 100)) / delta) * delta || p;
       const pointChg = Math.abs(p - refPrice).toLocaleString('vi-VN');
 
       const exch = stock.exchange || 'HOSE';
       const bandLimit = exch === 'UPCOM' ? 0.15 : (exch === 'HNX' ? 0.10 : 0.07);
-      const ceilPrice = Math.floor((refPrice * (1 + bandLimit)) / delta) * delta;
-      const floorPrice = Math.ceil((refPrice * (1 - bandLimit)) / delta) * delta;
+      const ceilPrice = stock.ceilPrice || Math.floor((refPrice * (1 + bandLimit)) / delta) * delta;
+      const floorPrice = stock.floorPrice || Math.ceil((refPrice * (1 - bandLimit)) / delta) * delta;
 
-      const vol = stock.volume || 1374900;
+      const vol = stock.volume || 2422300;
       const volStr = vol >= 1e6 ? (vol / 1e6).toFixed(2) + 'M' : vol.toLocaleString('vi-VN');
       const val = stock.value || (vol * p);
       const valTy = Math.round(val / 1e9);
@@ -5598,18 +5652,18 @@ body {
       const tbody = document.getElementById('detailStockTapeTbody');
       if (!tbody) return;
       tbody.innerHTML = '';
-      const p = stock.price || 33250;
+      const p = stock.price || 33500;
       const chg = stock.change || 0;
       const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(p) : 50;
       const nowMs = Date.now();
       const vols = [1000, 2500, 800, 3200, 1500, 4800, 5000, 10000];
 
-      for (let i = 7; i >= 0; i--) {
+      for (let i = 0; i <= 7; i++) {
         const pastMs = nowMs - (i * 11000 + Math.floor(Math.random() * 4000));
         const timeStr = new Date(pastMs).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         const tickOff = [-1, 0, 0, 1, 0, 1, -1, 0][i % 8];
         const tradeP = p + (tickOff * delta);
-        const refP = stock.open || p;
+        const refP = stock.refPrice || stock.open || p;
         const tradeC = refP > 0 ? parseFloat((((tradeP - refP) / refP) * 100).toFixed(2)) : chg;
         const isUp = tradeC >= 0;
         const colorCls = tradeC >= 6.8 ? 'text-ceil' : (tradeC <= -6.8 ? 'text-floor' : (isUp ? 'text-up' : 'text-down'));
