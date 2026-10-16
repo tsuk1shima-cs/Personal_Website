@@ -321,7 +321,8 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-top: 8px;
+  margin: 0 !important;
+  box-sizing: border-box;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
@@ -2085,7 +2086,7 @@ body {
 /* DASHBOARD SPLIT TOP: 2 COLUMNS ĐỐI XỨNG BẰNG NHAU (DIỄN BIẾN KỸ THUẬT BÊN TRÁI - TỔNG QUAN BÊN PHẢI) */
 .dashboard-split-top {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr);
   gap: 8px;
   align-items: stretch;
   margin-bottom: 6px;
@@ -2105,6 +2106,14 @@ body {
   overflow: hidden;
   min-width: 0;
   height: 100%;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+
+#dashboardSplitTop #first {
+  margin: 0 !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .split-panel-header {
@@ -2121,8 +2130,13 @@ body {
   box-sizing: border-box;
 }
 
+.split-panel-header b,
+.split-panel-header span {
+  white-space: nowrap;
+}
+
 .overview-split-body {
-  padding: 8px 10px;
+  padding: 6px 8px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -2148,7 +2162,7 @@ body {
   display: grid;
   grid-template-columns: 1.15fr 1fr 1fr;
   gap: 6px;
-  padding: 8px 10px;
+  padding: 6px 8px;
   flex: 1;
   min-height: 0;
   align-items: stretch;
@@ -2157,6 +2171,12 @@ body {
   .tech-grid-3col {
     grid-template-columns: 1fr;
   }
+}
+
+.intraday-header button,
+.rsi-section-title button {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 /* COMPACT TUNING: LOẠI BỎ KHOẢNG TRỐNG THỪA ("CHO NHỎ MẤY Ô LẠI") */
@@ -2515,57 +2535,57 @@ body {
                 </div>
 
                 <!-- CỘT B: BIỂU ĐỒ INTRADAY DIỄN BIẾN TRONG PHIÊN -->
-                <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
-                  <div class="intraday-header" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                      <span style="font-size:12px; font-weight:700;">DIỄN BIẾN TRONG PHIÊN</span>
-                      <span id="heroRefText" style="color:var(--price-ref); font-size:11px; margin-left:8px;">Tham chiếu: 1.704,87</span>
+                <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; display:flex; flex-direction:column; justify-content:space-between; min-width:0; overflow:hidden;">
+                  <div class="intraday-header" style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                    <div style="display:flex; align-items:center; gap:6px; min-width:0; overflow:hidden;">
+                      <span style="font-size:11.5px; font-weight:700; white-space:nowrap;">DIỄN BIẾN TRONG PHIÊN</span>
+                      <span id="heroRefText" style="color:var(--price-ref); font-size:10.5px; white-space:nowrap;">TC: 1.704,87</span>
                     </div>
-                    <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật Robostock">Biểu đồ Kỹ thuật</button>
+                    <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="font-size:10px; padding:2px 7px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật Robostock">Biểu đồ Kỹ thuật</button>
                   </div>
-                  <div style="flex:1; display:flex; align-items:center;">
-                    <svg id="intradaySvg" viewBox="0 0 280 120" style="width:100%; height:130px; display:block;"></svg>
+                  <div style="flex:1; width:100%; display:flex; align-items:center; justify-content:center; min-height:150px;">
+                    <svg id="intradaySvg" viewBox="0 0 280 135" preserveAspectRatio="none" style="width:100%; height:100%; min-height:145px; display:block;"></svg>
                   </div>
-                  <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-muted); margin-top:6px; border-top:1px dashed var(--border-stroke); padding-top:4px;">
+                  <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:4px; border-top:1px dashed var(--border-stroke); padding-top:3px; white-space:nowrap;">
                     <span>09:00 (ATO)</span>
-                    <span>11:30 (Nghỉ trưa)</span>
+                    <span>11:30 (Trưa)</span>
                     <span>13:00 (Chiều)</span>
                     <span>14:45 (ATC)</span>
                   </div>
                 </div>
 
                 <!-- CỘT C: PHÂN TÍCH KỸ THUẬT (RSI GAUGE & TIMEFRAME STATS) -->
-                <div class="rsi-section" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
-                  <div class="rsi-section-title" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; align-items:center; gap:6px;">
+                <div class="rsi-section" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; display:flex; flex-direction:column; justify-content:space-between; min-width:0; overflow:hidden;">
+                  <div class="rsi-section-title" style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                    <div style="display:flex; align-items:center; gap:5px; min-width:0; overflow:hidden;">
                       <span class="blue-accent-bar"></span>
-                      <span style="font-size:12px; font-weight:700;">Phân tích kỹ thuật (RSI Đa khung)</span>
+                      <span style="font-size:11.5px; font-weight:700; white-space:nowrap;">Phân tích Kỹ thuật (RSI)</span>
                     </div>
-                    <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
+                    <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="font-size:10px; padding:2px 7px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
                   </div>
 
-                  <div class="stats-cards-grid" style="margin-bottom:8px;">
-                    <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)" title="RSI khung 15 phút">
-                      <div class="stats-card-label">15 Phút</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_15m">44.8 (Yếu)</div>
+                  <div class="stats-cards-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:5px; margin-bottom:5px;">
+                    <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)" style="padding:4px 6px;">
+                      <div class="stats-card-label" style="font-size:9.5px;">15 Phút</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_15m" style="font-size:10.5px;">44.8 (Yếu)</div>
                     </div>
-                    <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)" title="RSI khung 1 giờ">
-                      <div class="stats-card-label">Hàng giờ</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_1h">40.8 (Yếu)</div>
+                    <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)" style="padding:4px 6px;">
+                      <div class="stats-card-label" style="font-size:9.5px;">Hàng giờ</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_1h" style="font-size:10.5px;">40.8 (Yếu)</div>
                     </div>
-                    <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)" title="RSI khung 1 ngày">
-                      <div class="stats-card-label">Hàng ngày</div>
-                      <div class="stats-card-value text-down" id="rsiVal_1d">29.4 (Quá bán)</div>
+                    <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)" style="padding:4px 6px;">
+                      <div class="stats-card-label" style="font-size:9.5px;">Hàng ngày</div>
+                      <div class="stats-card-value text-down" id="rsiVal_1d" style="font-size:10.5px;">29.4 (Quá bán)</div>
                     </div>
-                    <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)" title="RSI khung 1 tuần">
-                      <div class="stats-card-label">Hàng tuần</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_1w">42.4 (Yếu)</div>
+                    <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)" style="padding:4px 6px;">
+                      <div class="stats-card-label" style="font-size:9.5px;">Hàng tuần</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_1w" style="font-size:10.5px;">42.4 (Yếu)</div>
                     </div>
                   </div>
 
                   <!-- GAUGE CHART (RSI) -->
-                  <div class="gauge-panel" style="background:var(--bg-container); border:1px solid var(--border-stroke);">
-                    <div class="gauge-svg-wrap">
+                  <div class="gauge-panel" style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:6px 8px; display:flex; align-items:center; gap:8px; flex:1; min-height:55px;">
+                    <div class="gauge-svg-wrap" style="width:78px; height:44px; flex-shrink:0;">
                       <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
                         <path id="heroGaugeRsiArc" d="M 10 50 A 40 40 0 0 1 25.9 18.1" fill="none" stroke="var(--price-down)" stroke-width="8" stroke-linecap="round" style="transition: all 0.4s ease;"/>
@@ -2573,11 +2593,16 @@ body {
                         <line id="heroGaugeRsiNeedle" x1="50" y1="50" x2="30.7" y2="24.5" stroke="var(--price-down)" stroke-width="2.5" stroke-linecap="round" style="transition: all 0.4s ease;"/>
                       </svg>
                     </div>
-                    <div class="gauge-info">
-                      <div class="gauge-info-title" id="gaugeRsiTitle">Chỉ báo RSI (14) • Hàng ngày</div>
-                      <div class="gauge-info-score text-down" id="gaugeRsiScore">29.4</div>
-                      <div class="gauge-info-desc text-down" id="gaugeRsiDesc">Tín hiệu: Quá bán (RSI < 30)</div>
+                    <div class="gauge-info" style="display:flex; flex-direction:column; justify-content:center; gap:1px; min-width:0; overflow:hidden;">
+                      <div class="gauge-info-title" id="gaugeRsiTitle" style="font-size:9.5px; color:var(--text-muted); white-space:nowrap;">Chỉ báo RSI (14) • Hàng ngày</div>
+                      <div class="gauge-info-score text-down" id="gaugeRsiScore" style="font-size:16px; font-weight:700; font-family:var(--font-data);">29.4</div>
+                      <div class="gauge-info-desc text-down" id="gaugeRsiDesc" style="font-size:9.5px; font-weight:600; white-space:nowrap;">Tín hiệu: Quá bán (Vùng đáy)</div>
                     </div>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:3px 7px; font-size:9.5px; margin-top:4px;">
+                    <span style="color:var(--text-muted);">Xu hướng:</span>
+                    <span style="font-weight:600; color:var(--price-down);">▼ Giảm ngắn hạn / Vùng đáy</span>
                   </div>
                 </div>
 
@@ -2684,7 +2709,7 @@ body {
                         <span class="blue-accent-bar"></span>
                         Cổ phiếu theo quy mô vốn hóa
                       </div>
-                      <span class="tongquan-card-subtitle">Large / Mid / Small</span>
+                      <span class="tongquan-card-subtitle" style="white-space:nowrap;">Large / Mid / Small</span>
                     </div>
                     <div class="cap-boxes-grid">
                       <div class="cap-stat-box">
@@ -2703,8 +2728,8 @@ body {
                         <div class="cap-stat-sub">Penny (9%)</div>
                       </div>
                     </div>
-                    <div style="font-size:10.5px; color:var(--text-secondary); line-height:1.35; margin-top:2px;">
-                      Dòng tiền luân chuyển qua <b>Ngân hàng & Công nghệ</b>.
+                    <div style="font-size:10px; color:var(--text-secondary); line-height:1.3; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="Dòng tiền luân chuyển qua Ngân hàng & Công nghệ">
+                      Dòng tiền: <b>Ngân hàng & Công nghệ</b>
                     </div>
                   </div>
 
@@ -3975,6 +4000,8 @@ body {
     function renderIntradaySvg() {
       const svg = document.getElementById('intradaySvg');
       if (!svg || !intradayPoints || intradayPoints.length < 2) return;
+      svg.setAttribute('viewBox', '0 0 280 135');
+      svg.setAttribute('preserveAspectRatio', 'none');
 
       const curIdx = (typeof marketIndices !== 'undefined' && marketIndices[activeMarket]) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket]) || (typeof marketIndices !== 'undefined' && marketIndices['VNINDEX']) || { price: 1702.20, open: 1704.87 };
       const ref = curIdx.open || (curIdx.change !== undefined ? (curIdx.price / (1 + (curIdx.change / 100))) : curIdx.price) || 1704.87;
@@ -3984,8 +4011,8 @@ body {
       const maxVal = Math.max(...allVals) * 1.001;
       const range = maxVal - minVal || 1;
       const w = 280;
-      const h = 120;
-      const padding = 10;
+      const h = 135;
+      const padding = 8;
 
       const coords = intradayPoints.map((val, idx) => {
         const x = (idx / (intradayPoints.length - 1)) * w;
@@ -5196,18 +5223,18 @@ body {
       // Lọc các mã đóng góp TĂNG điểm (chỉ lấy mã có chg > 0 hoặc impact > 0)
       let gainers = scored.filter(s => (s.change || 0) > 0)
         .sort((a, b) => (b.impact || b.change) - (a.impact || a.change))
-        .slice(0, 5);
+        .slice(0, 6);
 
       // Lọc các mã kéo GIẢM điểm (chỉ lấy mã có chg < 0 hoặc impact < 0)
       let losers = scored.filter(s => (s.change || 0) < 0)
         .sort((a, b) => (a.impact || a.change) - (b.impact || b.change))
-        .slice(0, 5);
+        .slice(0, 6);
 
       if (gainers.length === 0) {
-        gainers = scored.sort((a, b) => (b.change || 0) - (a.change || 0)).slice(0, 5);
+        gainers = scored.sort((a, b) => (b.change || 0) - (a.change || 0)).slice(0, 6);
       }
       if (losers.length === 0) {
-        losers = scored.sort((a, b) => (a.change || 0) - (b.change || 0)).slice(0, 5);
+        losers = scored.sort((a, b) => (a.change || 0) - (b.change || 0)).slice(0, 6);
       }
 
       posWrap.innerHTML = gainers.map(s => {
@@ -5257,7 +5284,9 @@ body {
       sectorResults.sort((a, b) => b.chg - a.chg);
       SECTOR_DATA = sectorResults;
 
-      list.innerHTML = sectorResults.map(sec => {
+      const visibleSectors = sectorResults.slice(0, 8);
+
+      list.innerHTML = visibleSectors.map(sec => {
         const isUp = sec.chg >= 0;
         const color = isUp ? 'var(--price-up)' : 'var(--price-down)';
         const width = Math.min(48, Math.max(4, Math.abs(sec.chg) * (activePeriod === '20D' ? 7 : (activePeriod === '5D' ? 12 : 20))));
@@ -5397,8 +5426,8 @@ body {
           netLabel.className = `tongquan-card-subtitle ${isNetBuy ? 'text-up' : 'text-down'}`;
         }
 
-        const topNetBuy = (globalForeignSummary.topBuy || []).slice(0, 4);
-        const topNetSell = (globalForeignSummary.topSell || []).slice(0, 4);
+        const topNetBuy = (globalForeignSummary.topBuy || []).slice(0, 3);
+        const topNetSell = (globalForeignSummary.topSell || []).slice(0, 3);
 
         buyWrap.innerHTML = topNetBuy.length > 0 ? topNetBuy.map(item => `
           <div class="foreign-stock-item" onclick="openQuickModal('${item.symbol}')" style="cursor:pointer;" title="Nhấp xem chi tiết ${item.symbol}">
@@ -5431,8 +5460,8 @@ body {
         };
       });
 
-      const topNetBuy = netList.filter(item => item.net > 0).sort((a, b) => b.net - a.net).slice(0, 4);
-      const topNetSell = netList.filter(item => item.net < 0).sort((a, b) => a.net - b.net).slice(0, 4);
+      const topNetBuy = netList.filter(item => item.net > 0).sort((a, b) => b.net - a.net).slice(0, 3);
+      const topNetSell = netList.filter(item => item.net < 0).sort((a, b) => a.net - b.net).slice(0, 3);
       const totalNetVal = netList.reduce((acc, item) => acc + item.net, 0);
       const totalNetTy = (totalNetVal / 1e9).toFixed(1);
 
