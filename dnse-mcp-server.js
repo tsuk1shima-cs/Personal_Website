@@ -111,20 +111,65 @@ async function getStockQuote(symbol) {
     const cached = getCached(cacheKey);
     if (cached) return cached;
 
-    const from = Math.floor(Date.now() / 1000 - 86400);
+    // Ưu tiên 1: Nguồn dữ liệu bảng giá VPS trực tiếp sàn HOSE/HNX/UPCOM (chính xác 100% giá tham chiếu, giá khớp, bước giá)
+    try {
+        const vpsRes = await axios.get(`https://bgapidatafeed.vps.com.vn/getliststockdata/${encodeURIComponent(sym)}`, {
+            headers: { 'User-Agent': 'Mozilla/5.0' },
+            timeout: 3500
+        });
+        if (vpsRes.data && Array.isArray(vpsRes.data) && vpsRes.data.length > 0) {
+            const item = vpsRes.data[0];
+            const rawP = Number(item.lastPrice || item.r || 0);
+            const rawRef = Number(item.r || rawP || 0);
+            const mult = rawP < 1000 ? 1000 : 1;
+            const price = Math.round(rawP * mult);
+            const refPrice = Math.round(rawRef * mult);
+            const open = item.openPrice ? Math.round(Number(item.openPrice) * mult) : price;
+            const high = item.highPrice ? Math.round(Number(item.highPrice) * mult) : Math.max(open, price);
+            const low = item.lowPrice ? Math.round(Number(item.lowPrice) * mult) : Math.min(open, price);
+            const chgPct = parseFloat(Number(item.changePc !== undefined && item.changePc !== null ? item.changePc : (refPrice ? ((price - refPrice) / refPrice * 100) : 0)).toFixed(2));
+            const chgVal = item.ot !== undefined && item.ot !== null ? Math.round(Number(item.ot) * mult) : (price - refPrice);
+            const vol = item.lot ? Math.round(Number(item.lot) * 10) : 0;
+
+            const quote = {
+                symbol: sym,
+                price,
+                change: chgPct,
+                changeValue: chgVal,
+                open,
+                high,
+                low,
+                refPrice,
+                ceilPrice: item.c ? Math.round(Number(item.c) * mult) : Math.round(refPrice * 1.07),
+                floorPrice: item.f ? Math.round(Number(item.f) * mult) : Math.round(refPrice * 0.93),
+                volume: vol,
+                buyForeignValue: item.fBValue ? Math.round(Number(item.fBValue) * mult) : 0,
+                sellForeignValue: item.fSValue ? Math.round(Number(item.fSValue) * mult) : 0,
+                lastCandleTime: Math.floor(Date.now() / 1000),
+                source: 'VPS / DNSE Realtime Feed'
+            };
+            setCached(cacheKey, quote);
+            return quote;
+        }
+    } catch {
+        // Fallback sang Entrade X bên dưới
+    }
+
+    const from = Math.floor(Date.now() / 1000 - 86400 * 5);
     const to = Math.floor(Date.now() / 1000);
 
     try {
-        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/stock?symbol=${encodeURIComponent(sym)}&resolution=1&from=${from}&to=${to}`;
+        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/stock?symbol=${encodeURIComponent(sym)}&resolution=1D&from=${from}&to=${to}`;
         const res = await axios.get(url, { headers: getHeaders(), timeout: 4000 });
         const d = res.data;
         if (d && d.t && d.t.length) {
             const i = d.t.length - 1;
             const price = d.c[i] * (d.c[i] < 1000 ? 1000 : 1);
-            const open = d.o[0] * (d.o[0] < 1000 ? 1000 : 1);
-            const high = Math.max(...d.h) * (Math.max(...d.h) < 1000 ? 1000 : 1);
-            const low = Math.min(...d.l) * (Math.min(...d.l) < 1000 ? 1000 : 1);
-            const ref = open;
+            const prevClose = d.t.length >= 2 ? d.c[i - 1] * (d.c[i - 1] < 1000 ? 1000 : 1) : price;
+            const open = d.o[i] * (d.o[i] < 1000 ? 1000 : 1);
+            const high = d.h[i] * (d.h[i] < 1000 ? 1000 : 1);
+            const low = d.l[i] * (d.l[i] < 1000 ? 1000 : 1);
+            const ref = prevClose;
             const chgVal = price - ref;
             const chgPct = ref ? (chgVal / ref) * 100 : 0;
 
@@ -136,7 +181,8 @@ async function getStockQuote(symbol) {
                 open,
                 high,
                 low,
-                volume: d.v ? d.v.reduce((a, b) => a + b, 0) : 0,
+                refPrice: ref,
+                volume: d.v ? d.v[i] : 0,
                 lastCandleTime: d.t[i],
                 source: 'DNSE Entrade Realtime API'
             };

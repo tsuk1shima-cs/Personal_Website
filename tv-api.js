@@ -587,10 +587,12 @@ async function fetchDNSEStock(symbol) {
     if (!symbol) return null;
     const u = symbol.toUpperCase().trim();
 
-    // 1. Thử backend proxy nếu ở localhost
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    // 1. Thử backend proxy nếu ở localhost hoặc file protocol
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+    const apiHost = (window.location.port === '3000') ? '' : 'http://localhost:3000';
+    if (isLocal) {
         try {
-            const r = await fetch(`/api/market/stock/${u}`, { signal: AbortSignal.timeout(3000) });
+            const r = await fetch(`${apiHost}/api/market/stock/${u}`, { signal: AbortSignal.timeout(3000) });
             if (r.ok) {
                 const j = await r.json();
                 if (j.success && j.data) return j.data;
