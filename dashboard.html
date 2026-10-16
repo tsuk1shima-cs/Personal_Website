@@ -4406,13 +4406,13 @@ body {
       let tapeTickCount = 0;
       if (liveTapeIntervalId) clearInterval(liveTapeIntervalId);
       liveTapeIntervalId = setInterval(() => {
-        // Khi người dùng đang mở xem chi tiết kỹ thuật của mã, duy trì nhảy nến mượt mà
+        // NẾU NGOÀI GIỜ GIAO DỊCH (SAU 15H HOẶC CUỐI TUẦN): DỪNG TOÀN BỘ ĐẨY LỆNH, NHẢY GIÁ VÀ CỐ ĐỊNH 100%
+        if (!isMarketTradingNow()) return;
+
+        // Khi người dùng đang mở xem chi tiết kỹ thuật của mã, duy trì nhảy nến mượt mà trong phiên
         if (currentStockDetailSymbol && (Date.now() - lastStockDetailTickTime > 1800) && typeof triggerDetailStockMicroTick === 'function') {
           triggerDetailStockMicroTick();
         }
-
-        // NẾU NGOÀI GIỜ GIAO DỊCH (SAU 15H HOẶC CUỐI TUẦN): DỪNG ĐẨY LỆNH BẢNG ĐIỆN VÀ CỐ ĐỊNH GIÁ
-        if (!isMarketTradingNow()) return;
 
         addLiveTrade();
         tapeTickCount++;
@@ -4811,7 +4811,7 @@ body {
           { symbol: 'VRE', price: 22.90, change: 1.33, volume: 1200000 },
           { symbol: 'SSB', price: 16.10, change: 1.26, volume: 911800 },
           { symbol: 'VNM', price: 57.90, change: 1.22, volume: 775300 },
-          { symbol: 'CTG', price: 30.15, change: 1.17, volume: 3700000 },
+          { symbol: 'CTG', price: 30.60, change: 2.68, volume: 10200000 },
           { symbol: 'SSI', price: 19.45, change: 1.04, volume: 6000000 },
           { symbol: 'FPT', price: 58.60, change: 1.03, volume: 1600000 },
           { symbol: 'BSR', price: 28.45, change: 0.89, volume: 4200000 },
@@ -4889,7 +4889,7 @@ body {
           { symbol: 'TPB', price: 12.00, change: 2.13, volume: 16700000 },
           { symbol: 'BID', price: 33.65, change: 1.36, volume: 2000000 },
           { symbol: 'SSB', price: 16.10, change: 1.26, volume: 911800 },
-          { symbol: 'CTG', price: 30.15, change: 1.17, volume: 3700000 },
+          { symbol: 'CTG', price: 30.60, change: 2.68, volume: 10200000 },
           { symbol: 'BVB', price: 10.40, change: 0.97, volume: 1900000 },
           { symbol: 'KLB', price: 11.05, change: 0.91, volume: 47400 },
           { symbol: 'VCB', price: 57.00, change: 0.88, volume: 1500000 },
@@ -6980,7 +6980,11 @@ body {
       let buyRatio = 50;
       let buyVol = Math.round(vol * 0.5);
       let sellVol = vol - buyVol;
-      if (sym === 'STB' && (vol >= 1700000 && vol <= 1900000)) {
+      if (sym === 'CTG' && (vol >= 9000000 && vol <= 12000000)) {
+        buyVol = 6786950;
+        sellVol = 3413050;
+        buyRatio = 66.5;
+      } else if (sym === 'STB' && (vol >= 1700000 && vol <= 1900000)) {
         buyVol = 865050;
         sellVol = 924950;
         buyRatio = 48.3;
@@ -7805,6 +7809,42 @@ body {
       updateDetailRSIGauge(curScore, curSig.text || `Tín hiệu: ${curSig.label}`);
     }
 
+    function aggregateVndToWeekly(d) {
+      if (!d || !d.t || !d.t.length) return d;
+      function getWeekKey(tsSec) {
+        const dt = new Date(tsSec * 1000);
+        dt.setHours(0, 0, 0, 0);
+        dt.setDate(dt.getDate() + 3 - (dt.getDay() + 6) % 7);
+        const w1 = new Date(dt.getFullYear(), 0, 4);
+        const wk = 1 + Math.round(((dt.getTime() - w1.getTime()) / 86400000 - 3 + (w1.getDay() + 6) % 7) / 7);
+        return `${dt.getFullYear()}-W${wk < 10 ? '0' + wk : wk}`;
+      }
+
+      const res = { t: [], o: [], h: [], l: [], c: [], v: [] };
+      let curKey = null;
+      let curIdx = -1;
+
+      for (let i = 0; i < d.t.length; i++) {
+        const wk = getWeekKey(d.t[i]);
+        if (wk !== curKey) {
+          curKey = wk;
+          res.t.push(d.t[i]);
+          res.o.push(d.o[i]);
+          res.h.push(d.h[i]);
+          res.l.push(d.l[i]);
+          res.c.push(d.c[i]);
+          res.v.push(d.v[i] || 0);
+          curIdx++;
+        } else {
+          if (d.h[i] > res.h[curIdx]) res.h[curIdx] = d.h[i];
+          if (d.l[i] < res.l[curIdx]) res.l[curIdx] = d.l[i];
+          res.c[curIdx] = d.c[i];
+          res.v[curIdx] += (d.v[i] || 0);
+        }
+      }
+      return res;
+    }
+
     async function fetchDnseStockCandles(symbol, resolution = '1D') {
       let rawSym = (symbol || currentStockDetailSymbol || 'BID').toUpperCase().trim();
       let cleanSym = rawSym.replace(/[^A-Z0-9]/g, '');
@@ -7823,27 +7863,73 @@ body {
       }
 
       const legend = document.getElementById('candleOhlcLegend');
-      if (legend) legend.innerHTML = `<span>Đang tải nến DNSE Entrade X (${cleanSym} • ${resolution})...</span>`;
+      if (legend) legend.innerHTML = `<span>Đang tải nến biểu đồ (${cleanSym} • ${resolution})...</span>`;
 
       let d = null;
       const isFile = (window.location.protocol === 'file:');
       const isOtherPort = (window.location.port && window.location.port !== '3000');
       const apiHost = (isFile || isOtherPort) ? 'http://localhost:3000' : '';
 
-      // Tầng 1: Lấy từ Local Backend Proxy
-      try {
-        const resp = await fetch(`${apiHost}/api/dnse/chart/stock/${encodeURIComponent(cleanSym)}?resolution=${resolution}`);
-        if (resp.ok) {
-          const json = await resp.json();
-          if (json && json.success && json.data && Array.isArray(json.data.t) && json.data.t.length > 0) {
-            d = json.data;
+      // Tầng 1: Lấy từ Local Backend Proxy (nếu đang chạy trên local node server)
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || isFile) {
+        try {
+          const resp = await fetch(`${apiHost}/api/dnse/chart/stock/${encodeURIComponent(cleanSym)}?resolution=${resolution}`, {
+            signal: AbortSignal.timeout(3500)
+          });
+          if (resp.ok) {
+            const json = await resp.json();
+            if (json && json.success && json.data && Array.isArray(json.data.t) && json.data.t.length > 0) {
+              d = json.data;
+            }
           }
+        } catch (err) {
+          console.warn('Local proxy chart notice:', err.message);
         }
-      } catch (err) {
-        console.warn('Local proxy chart notice:', err.message);
       }
 
-      // Tầng 2: Lấy trực tiếp từ DNSE Entrade X API (CORS mở, cứu cánh khi mở file:/// hoặc cổng khác)
+      // Tầng 2: Lấy từ VNDIRECT DChart TradingView API (CORS mở hoàn toàn cho GitHub Pages, hỗ trợ nến 15m, 1H, 1D, 1W chuẩn xác)
+      if (!d || !Array.isArray(d.t) || d.t.length === 0) {
+        try {
+          let vndSym = cleanSym;
+          if (cleanSym === 'HNXINDEX') vndSym = 'HNX';
+          if (cleanSym === 'UPCOMINDEX') vndSym = 'UPCOM';
+
+          let vndRes = 'D';
+          const nowSec = Math.floor(now / 1000);
+          let spanSec = 400 * 86400;
+          if (resolution === '15') {
+            vndRes = '15';
+            spanSec = 30 * 86400;
+          } else if (resolution === '1H') {
+            vndRes = '60';
+            spanSec = 100 * 86400;
+          } else if (resolution === '1W') {
+            vndRes = 'D';
+            spanSec = 800 * 86400;
+          }
+
+          const fromSec = nowSec - spanSec;
+          const vndUrl = `https://dchart-api.vndirect.com.vn/dchart/history?symbol=${encodeURIComponent(vndSym)}&resolution=${vndRes}&from=${fromSec}&to=${nowSec}`;
+          const vndResp = await fetch(vndUrl, {
+            headers: { 'Accept': 'application/json' },
+            signal: AbortSignal.timeout(6000)
+          });
+          if (vndResp.ok) {
+            const vndJson = await vndResp.json();
+            if (vndJson && Array.isArray(vndJson.t) && vndJson.t.length > 0) {
+              if (resolution === '1W') {
+                d = aggregateVndToWeekly(vndJson);
+              } else {
+                d = vndJson;
+              }
+            }
+          }
+        } catch (vndErr) {
+          console.warn('VNDirect DChart fetch notice:', vndErr.message);
+        }
+      }
+
+      // Tầng 3: Lấy trực tiếp từ DNSE Entrade X API
       if (!d || !Array.isArray(d.t) || d.t.length === 0) {
         try {
           const targetType = isIdx ? 'index' : 'stock';
@@ -7855,7 +7941,7 @@ body {
           else if (resolution === '1W') spanSec = 800 * 86400;
           const fromSec = nowSec - spanSec;
           const directUrl = `https://services.entrade.com.vn/chart-api/v2/ohlcs/${targetType}?symbol=${encodeURIComponent(dnseSym)}&resolution=${resolution}&from=${fromSec}&to=${nowSec}`;
-          const directResp = await fetch(directUrl);
+          const directResp = await fetch(directUrl, { signal: AbortSignal.timeout(4000) });
           if (directResp.ok) {
             const directJson = await directResp.json();
             if (directJson && Array.isArray(directJson.t) && directJson.t.length > 0) {
@@ -7885,8 +7971,8 @@ body {
         const lastBar = bars[bars.length - 1];
         const prevBar = bars.length >= 2 ? bars[bars.length - 2] : lastBar;
 
-        // ĐỒNG BỘ NGUYÊN BẢN GIÁ NẾN THỰC TẾ DNSE VÀO MODAL HEADER & THỐNG KÊ
-        if (lastBar && (!currentStockDetailSymbol || currentStockDetailSymbol === cleanSym || currentStockDetailSymbol === rawSym)) {
+        // ĐỒNG BỘ NGUYÊN BẢN GIÁ NẾN THỰC TẾ VÀO MODAL HEADER & THỐNG KÊ (CHỈ KHI Ở KHUNG NGÀY 1D)
+        if (resolution === '1D' && lastBar && (!currentStockDetailSymbol || currentStockDetailSymbol === cleanSym || currentStockDetailSymbol === rawSym)) {
           const mult = (!isIdx && lastBar.close < 1000) ? 1000 : 1;
           const trueClose = isIdx ? lastBar.close : Math.round(lastBar.close * mult);
           const trueOpen = isIdx ? lastBar.open : Math.round(lastBar.open * mult);
@@ -8611,9 +8697,16 @@ body {
       const colorCls = isRef ? 'text-ref' : (isUp ? 'text-up' : 'text-down');
       const sign = isUp ? '+' : '';
       const d = new Date(b.time * 1000);
-      const dateStr = (currentDetailCandleRes === '15' || currentDetailCandleRes === '1H')
-        ? `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} ${d.getDate()}/${d.getMonth() + 1}`
-        : `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+      let dateStr = '';
+      if (currentDetailCandleRes === '15') {
+        dateStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} ${d.getDate()}/${d.getMonth() + 1}`;
+      } else if (currentDetailCandleRes === '1H') {
+        dateStr = `${String(d.getHours()).padStart(2, '0')}:00 ${d.getDate()}/${d.getMonth() + 1}`;
+      } else if (currentDetailCandleRes === '1W') {
+        dateStr = `Tuần ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+      } else {
+        dateStr = `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+      }
       const volStr = b.volume >= 1e6 ? (b.volume / 1e6).toFixed(2) + 'M' : (b.volume || 0).toLocaleString('vi-VN');
 
       let indHtml = '';
@@ -9334,9 +9427,14 @@ body {
       for (let i = 0; i < n; i += labelInterval) {
         const b = visible[i];
         const d = new Date(b.time * 1000);
-        const str = (currentDetailCandleRes === '15' || currentDetailCandleRes === '1H')
-          ? `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-          : `${d.getDate()}/${d.getMonth() + 1}`;
+        let str = '';
+        if (currentDetailCandleRes === '15') {
+          str = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        } else if (currentDetailCandleRes === '1H') {
+          str = `${d.getDate()}/${d.getMonth() + 1} ${String(d.getHours()).padStart(2, '0')}h`;
+        } else {
+          str = `${d.getDate()}/${d.getMonth() + 1}`;
+        }
         ctx.fillText(str, getX(i), height - pad.bottom + 4);
       }
 
@@ -9669,6 +9767,7 @@ body {
     }
 
     function triggerDetailStockMicroTick() {
+      if (!isMarketTradingNow()) return;
       if (!currentStockDetailSymbol) return;
       const sym = currentStockDetailSymbol.toUpperCase();
       const isIdx = ['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI'].includes(sym);

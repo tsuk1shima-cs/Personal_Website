@@ -17,7 +17,7 @@ const FALLBACK_INDICES = {
 const FALLBACK_STOCKS = [
     { symbol: 'VCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 56600, change: 0.53, pe: 14.2, pb: 2.11, roe: 21.4, marketCap: 312000, volume: 1112500, value: 62972311000, buyForeignValue: 9398130000, sellForeignValue: 19451746700 },
     { symbol: 'BID', exchange: 'HOSE', sector: 'Ngân hàng', price: 33500, change: 1.21, pe: 11.8, pb: 1.48, roe: 18.2, marketCap: 188000, volume: 2422300, value: 81147050000, buyForeignValue: 11109898500, sellForeignValue: 40845730000 },
-    { symbol: 'CTG', exchange: 'HOSE', sector: 'Ngân hàng', price: 29750, change: 0.68, pe: 9.4, pb: 1.29, roe: 17.5, marketCap: 156000, volume: 1798300, value: 53499544000, buyForeignValue: 21759703000, sellForeignValue: 42023706850 },
+    { symbol: 'CTG', exchange: 'HOSE', sector: 'Ngân hàng', price: 30600, change: 2.68, pe: 9.6, pb: 1.32, roe: 17.5, marketCap: 164000, volume: 10200000, value: 312120000000, buyForeignValue: 21759703000, sellForeignValue: 42023706850 },
     { symbol: 'TCB', exchange: 'HOSE', sector: 'Ngân hàng', price: 32700, change: -0.91, pe: 8.8, pb: 1.36, roe: 16.1, marketCap: 232000, volume: 4729600, value: 154658802900, buyForeignValue: 32392023650, sellForeignValue: 95600210000 },
     { symbol: 'MBB', exchange: 'HOSE', sector: 'Ngân hàng', price: 19700, change: 1.81, pe: 6.5, pb: 1.40, roe: 22.4, marketCap: 102000, volume: 10672300, value: 210244310000, buyForeignValue: 117554429150, sellForeignValue: 17239670000 },
     { symbol: 'VPB', exchange: 'HOSE', sector: 'Ngân hàng', price: 24600, change: 1.03, pe: 10.2, pb: 1.47, roe: 13.2, marketCap: 193000, volume: 7224300, value: 177719329800, buyForeignValue: 25000000000, sellForeignValue: 38000000000 },
