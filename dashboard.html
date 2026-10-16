@@ -910,16 +910,17 @@ body {
 .foreign-stock-item:last-child { border: none; }
 .foreign-stock-val { font-weight: 600; font-variant-numeric: tabular-nums; }
 
-/* PANEL PHẢI (#third - DANH MỤC / TIN TỨC) */
+/* BẢNG ĐIỆN & DANH MỤC THỜI GIAN THỰC (#third - ĐẨY XUỐNG DƯỚI TỔNG QUAN) */
 #third {
-  width: 320px;
-  flex-shrink: 0;
+  width: 100%;
   background: var(--bg-container);
   border: 1px solid var(--border-stroke);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin-top: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .right-tab-header {
@@ -928,19 +929,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
-  background: var(--bg-container);
+  padding: 0 12px;
+  background: var(--bg-subtle);
   flex-shrink: 0;
 }
 .right-tab-btn {
   background: none;
   border: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
   border-bottom: 2px solid transparent;
   cursor: pointer;
-  padding: 0 12px;
+  padding: 0 14px;
   height: 100%;
   display: flex;
   align-items: center;
@@ -952,16 +953,19 @@ body {
 }
 
 .watchlist-controls {
-  padding: 8px 10px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--border-stroke);
   background: var(--bg-subtle);
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 .watchlist-input-search {
-  width: 100%;
-  padding: 6px 10px;
+  width: 250px;
+  padding: 6px 12px;
   border: 1px solid var(--border-stroke-2);
   border-radius: var(--radius-sm);
   background: var(--bg-container);
@@ -974,17 +978,18 @@ body {
 }
 .watchlist-chip-list {
   display: flex;
-  gap: 4px;
+  gap: 6px;
   overflow-x: auto;
   scrollbar-width: none;
+  align-items: center;
 }
 .watchlist-chip-list::-webkit-scrollbar { display: none; }
 .watchlist-chip-btn {
   background: var(--bg-container);
   border: 1px solid var(--border-stroke);
-  padding: 2px 8px;
+  padding: 3px 10px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
@@ -999,13 +1004,15 @@ body {
 }
 
 .watchlist-table-scroll {
-  flex: 1;
+  max-height: 520px;
   overflow-y: auto;
+  overflow-x: auto;
 }
 .watchlist-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
+  min-width: 860px;
 }
 .watchlist-table th {
   position: sticky;
@@ -1013,24 +1020,34 @@ body {
   background: var(--bg-subtle);
   color: var(--text-secondary);
   font-weight: 600;
-  font-size: 11px;
-  padding: 6px 8px;
+  font-size: 11.5px;
+  padding: 7px 10px;
   border-bottom: 1px solid var(--border-stroke);
   text-align: right;
   z-index: 5;
+  white-space: nowrap;
 }
-.watchlist-table th:first-child { text-align: left; }
+.watchlist-table th:first-child,
+.watchlist-table th:nth-child(2) { text-align: left; }
+.watchlist-table th:last-child { text-align: center; }
 .watchlist-table td {
-  padding: 6px 8px;
+  padding: 7px 10px;
   border-bottom: 1px solid var(--border-stroke);
   text-align: right;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition: background-color 0.4s ease;
+  white-space: nowrap;
+}
+.watchlist-table td:first-child,
+.watchlist-table td:nth-child(2) {
+  text-align: left;
 }
 .watchlist-table td:first-child {
-  text-align: left;
   font-weight: 700;
+}
+.watchlist-table td:last-child {
+  text-align: center;
 }
 .watchlist-table tr:hover td {
   background: var(--bg-subtle);
@@ -1673,7 +1690,6 @@ body {
 
 /* RESPONSIVE */
 @media (max-width: 1180px) {
-  #third { display: none; }
   .grid-row-3col { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 820px) {
@@ -1914,6 +1930,7 @@ body {
       <div class="center-tab-container">
         <div class="center-tab-nav">
           <button class="center-subtab-btn active" id="btnSubTab_tongquan" onclick="switchSubTab('tongquan', this)">Tổng quan</button>
+          <button class="center-subtab-btn" id="btnSubTab_bangdien" onclick="scrollToBangDien(this)">Bảng điện</button>
           <button class="center-subtab-btn" id="btnSubTab_bando" onclick="switchSubTab('bando', this)">Bản đồ</button>
           <button class="center-subtab-btn" id="btnSubTab_cungcau" onclick="switchSubTab('cungcau', this)">Cung cầu</button>
           <button class="center-subtab-btn" id="btnSubTab_khoingoai" onclick="switchSubTab('khoingoai', this)">Khối ngoại</button>
@@ -2069,6 +2086,151 @@ body {
               </div>
             </div>
 
+          </div>
+
+          <!-- HÀNG 3: BẢNG ĐIỆN THỜI GIAN THỰC & DÒNG LỆNH (CHUYỂN TỪ PANEL PHẢI XUỐNG DƯỚI TỔNG QUAN) -->
+          <div id="third" class="tongquan-card" style="padding:0; overflow:hidden; display:flex; flex-direction:column; margin-top:4px;">
+            <div class="right-tab-header">
+              <div class="tab-container" style="display:flex; height:100%; align-items:center; gap:2px;">
+                <button class="right-tab-btn active" id="tabWatchlistBtn" onclick="switchRightTab('watchlist', this)">Bảng điện / Danh mục</button>
+                <button class="right-tab-btn" id="tabTapeBtn" onclick="switchRightTab('tape', this)" style="display:flex; align-items:center; gap:5px;">
+                  <span>Dòng khớp lệnh</span>
+                  <span class="pulse-dot" style="width:5px;height:5px;"></span>
+                </button>
+                <button class="right-tab-btn" id="tabNewsBtn" onclick="switchRightTab('news', this)">Tin tức thị trường</button>
+                <button class="right-tab-btn" id="tabAiBtn" onclick="switchRightTab('ai', this)" style="display:flex; align-items:center; gap:5px;">
+                  <span>Trợ lý AI Phân tích</span>
+                  <span class="mcp-dot" style="width:6px;height:6px;background:var(--price-up);border-radius:50%;display:inline-block;"></span>
+                </button>
+              </div>
+              <div style="display:flex; align-items:center; gap:12px;">
+                <span style="font-size:11.5px; font-weight:600; color:var(--text-secondary);" id="rightPanelCount">45 mã</span>
+                <button type="button" class="btn-theme-toggle" onclick="toggleOverviewCharts()" id="btnToggleOverview" style="width:auto; padding:3px 10px; font-size:11px; cursor:pointer;" title="Thu gọn / Mở rộng 5 biểu đồ thị trường phía trên">Thu gọn biểu đồ</button>
+              </div>
+            </div>
+
+            <!-- VIEW WATCHLIST -->
+            <div id="rightViewWatchlist" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+              <div class="watchlist-controls">
+                <input type="text" class="watchlist-input-search" id="watchSearchInput" placeholder="Tìm nhanh mã (FPT, TCB, VHM...)" oninput="filterWatchlist()">
+                <div class="watchlist-chip-list">
+                  <button class="watchlist-chip-btn active" onclick="selectChip('ALL', this)">Tất cả</button>
+                  <button class="watchlist-chip-btn" onclick="selectChip('VN30', this)">VN30</button>
+                  <button class="watchlist-chip-btn" onclick="selectChip('BANK', this)">Ngân hàng</button>
+                  <button class="watchlist-chip-btn" onclick="selectChip('TECH', this)">Công nghệ</button>
+                  <button class="watchlist-chip-btn" onclick="selectChip('STEEL', this)">Thép</button>
+                  <button class="watchlist-chip-btn" onclick="selectChip('RE', this)">Bất động sản</button>
+                  <button class="watchlist-chip-btn" onclick="selectChip('SEC', this)">Chứng khoán</button>
+                </div>
+              </div>
+
+              <div class="watchlist-table-scroll">
+                <table class="watchlist-table">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left; width:80px;">Mã CP</th>
+                      <th style="text-align:left; width:140px;">Ngành / Nhóm</th>
+                      <th style="text-align:right; width:90px;">Giá khớp</th>
+                      <th style="text-align:right; width:75px;">+/-</th>
+                      <th style="text-align:right; width:80px;">+/- %</th>
+                      <th style="text-align:right; width:95px;">Tổng KL</th>
+                      <th style="text-align:right; width:95px;">Giá trị (Tỷ)</th>
+                      <th style="text-align:right; width:90px;">Khối ngoại</th>
+                      <th style="text-align:right; width:65px;">P/E</th>
+                      <th style="text-align:right; width:65px;">ROE</th>
+                      <th style="text-align:center; width:90px;">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="watchlistTbody">
+                    <!-- Rendered & Updated Realtime with Flash Highlights -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- VIEW KHỚP LỆNH THỜI GIAN THỰC (ORDER TAPE STREAM) -->
+            <div id="rightViewTape" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+              <div style="padding:6px 12px; background:var(--bg-subtle); border-bottom:1px solid var(--border-stroke); display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+                <span style="color:var(--text-secondary); display:flex; align-items:center; gap:5px;">
+                  <span class="pulse-dot" style="width:6px;height:6px;"></span>
+                  <b>Dòng Khớp Lệnh Thời Gian Thực Toàn Thị Trường</b>
+                </span>
+                <span style="color:var(--price-up); font-weight:600;" id="tapeSpeedLabel">Khớp liên tục (~1.1s/lệnh)</span>
+              </div>
+              <div class="watchlist-table-scroll">
+                <table class="watchlist-table" style="font-size:11.5px; width:100%;">
+                  <thead>
+                    <tr>
+                      <th style="text-align:left; width:120px;">Thời gian</th>
+                      <th style="text-align:left; width:100px;">Mã CP</th>
+                      <th style="text-align:right; width:120px;">Giá khớp</th>
+                      <th style="text-align:right; width:110px;">+/- %</th>
+                      <th style="text-align:right; width:140px;">Khối lượng</th>
+                      <th style="text-align:center; width:110px;">Lệnh</th>
+                    </tr>
+                  </thead>
+                  <tbody id="liveTapeTbody">
+                    <!-- Populated continuously every 1.1s with live ticks -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- VIEW NEWS -->
+            <div id="rightViewNews" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+              <div class="news-list-scroll" id="newsListContainer" style="max-height:500px; padding:10px;">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+
+            <!-- VIEW AI CHATBOT (EMBEDDED INSIDE RIGHT PANEL - CHỐNG CHỒNG CHÉO) -->
+            <div id="rightViewAi" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+              <div class="ai-embedded-head" style="padding:8px 12px; background:var(--bg-subtle); border-bottom:1px solid var(--border-stroke); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="ai-avatar-badge" style="width:24px; height:24px; font-size:10px; font-weight:700;">AI</div>
+                  <div>
+                    <div style="font-size:12.5px; font-weight:700;">Trợ lý AI Phân tích Realtime</div>
+                    <div style="font-size:10.5px; color:var(--price-up); display:flex; align-items:center; gap:3px;">
+                      <span class="pulse-dot" style="width:4px;height:4px;"></span>
+                      <span>Dữ liệu trực tiếp sàn HOSE/HNX</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <button onclick="clearDashboardAiChat()" class="ai-head-btn" title="Xóa lịch sử" style="padding:2px 8px; font-size:11px; cursor:pointer;">Xóa</button>
+                  <a href="chatbot.html" target="_blank" class="ai-head-btn" title="Mở trang đầy đủ" style="padding:2px 8px; font-size:11px; text-decoration:none;">↗</a>
+                </div>
+              </div>
+
+              <div class="ai-messages-scroll" id="aiChatMessages" style="height:360px; max-height:420px; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px;">
+                <div class="ai-msg-item bot">
+                  <div class="ai-bubble" style="font-size:12px; line-height:1.45;">
+                    <p><strong>Xin chào! Tôi là Trợ lý AI phân tích thị trường chứng khoán Realtime.</strong></p>
+                    <p>Dữ liệu VN-Index, độ rộng thị trường và giá các mã (FPT, TCB, HPG, SSI...) được cập nhật realtime từ sàn giao dịch.</p>
+                    <p>Bạn có thể hỏi tôi:</p>
+                    <ul style="padding-left:16px; margin:4px 0;">
+                      <li>Xu hướng <b>VN-Index</b> hôm nay?</li>
+                      <li>Phân tích chi tiết mã (<b>FPT, TCB, HPG, VCB...</b>)</li>
+                      <li>Định giá P/E, P/B và điểm mua bán tối ưu</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="ai-quick-chips-row" style="padding:6px 12px; border-top:1px solid var(--border-stroke); background:var(--bg-subtle); display:flex; gap:6px; overflow-x:auto; flex-shrink:0;">
+                <button class="ai-chip-pill" onclick="quickAiPrompt('Nhận định xu hướng VN-Index hôm nay')">VN-Index</button>
+                <button class="ai-chip-pill" onclick="quickAiPrompt('Phân tích chi tiết cổ phiếu FPT')">FPT</button>
+                <button class="ai-chip-pill" onclick="quickAiPrompt('Cổ phiếu Ngân hàng nào dẫn dắt?')">Ngân hàng</button>
+                <button class="ai-chip-pill" onclick="quickAiPrompt('Top cổ phiếu có định giá hấp dẫn nhất?')">Định giá</button>
+              </div>
+
+              <form class="ai-input-form" onsubmit="handleAiFormSubmit(event)" style="padding:8px 12px; border-top:1px solid var(--border-stroke); display:flex; gap:8px; flex-shrink:0; background:var(--bg-container);">
+                <input type="text" class="ai-input-field" id="aiChatInput" placeholder="Hỏi AI về cổ phiếu, VN-Index..." autocomplete="off" style="font-size:12px; flex:1;">
+                <button type="submit" class="ai-send-btn" id="aiSendBtn" title="Gửi" style="padding:0 14px; cursor:pointer;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </button>
+              </form>
+            </div>
           </div>
 
         </div>
@@ -2546,143 +2708,7 @@ body {
       </div>
     </main>
 
-    <div class="splitter-sash"></div>
 
-    <!-- CỘT 3: PANEL DANH MỤC / TIN TỨC BÊN PHẢI (#third) -->
-    <aside id="third">
-      <div class="right-tab-header">
-        <div class="tab-container" style="display:flex; height:100%;">
-          <button class="right-tab-btn active" id="tabWatchlistBtn" onclick="switchRightTab('watchlist', this)">Danh mục</button>
-          <button class="right-tab-btn" id="tabTapeBtn" onclick="switchRightTab('tape', this)" style="display:flex; align-items:center; gap:4px;">
-            <span>Khớp lệnh</span>
-            <span class="pulse-dot" style="width:5px;height:5px;"></span>
-          </button>
-          <button class="right-tab-btn" id="tabNewsBtn" onclick="switchRightTab('news', this)">Tin tức</button>
-          <button class="right-tab-btn" id="tabAiBtn" onclick="switchRightTab('ai', this)" style="display:flex; align-items:center; gap:5px;">
-            <span>Trợ lý AI</span>
-            <span class="mcp-dot" style="width:6px;height:6px;background:var(--price-up);border-radius:50%;display:inline-block;"></span>
-          </button>
-        </div>
-        <span style="font-size:11px;color:var(--text-muted);" id="rightPanelCount">45 mã</span>
-      </div>
-
-      <!-- VIEW WATCHLIST -->
-      <div id="rightViewWatchlist" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
-        <div class="watchlist-controls">
-          <input type="text" class="watchlist-input-search" id="watchSearchInput" placeholder="Tìm nhanh mã (FPT, TCB, VHM...)" oninput="filterWatchlist()">
-          <div class="watchlist-chip-list">
-            <button class="watchlist-chip-btn active" onclick="selectChip('ALL', this)">Tất cả</button>
-            <button class="watchlist-chip-btn" onclick="selectChip('VN30', this)">VN30</button>
-            <button class="watchlist-chip-btn" onclick="selectChip('BANK', this)">Ngân hàng</button>
-            <button class="watchlist-chip-btn" onclick="selectChip('TECH', this)">Công nghệ</button>
-            <button class="watchlist-chip-btn" onclick="selectChip('STEEL', this)">Thép</button>
-            <button class="watchlist-chip-btn" onclick="selectChip('RE', this)">BĐS</button>
-            <button class="watchlist-chip-btn" onclick="selectChip('SEC', this)">Chứng khoán</button>
-          </div>
-        </div>
-
-        <div class="watchlist-table-scroll">
-          <table class="watchlist-table">
-            <thead>
-              <tr>
-                <th>Mã</th>
-                <th>Giá</th>
-                <th>+/- %</th>
-                <th>Khối lượng</th>
-              </tr>
-            </thead>
-            <tbody id="watchlistTbody">
-              <!-- Rendered & Updated Realtime with Flash Highlights -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- VIEW KHỚP LỆNH THỜI GIAN THỰC (ORDER TAPE STREAM) -->
-      <div id="rightViewTape" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
-        <div style="padding:6px 10px; background:var(--bg-subtle); border-bottom:1px solid var(--border-stroke); display:flex; justify-content:space-between; align-items:center; font-size:11px;">
-          <span style="color:var(--text-secondary); display:flex; align-items:center; gap:5px;">
-            <span class="pulse-dot" style="width:6px;height:6px;"></span>
-            <b>Dòng Khớp Lệnh Thời Gian Thực</b>
-          </span>
-          <span style="color:var(--price-up); font-weight:600;" id="tapeSpeedLabel">Khớp liên tục (~1.1s/lệnh)</span>
-        </div>
-        <div class="watchlist-table-scroll" style="flex:1;">
-          <table class="watchlist-table" style="font-size:11.5px;">
-            <thead>
-              <tr>
-                <th>Giờ</th>
-                <th>Mã</th>
-                <th style="text-align:right;">Giá khớp</th>
-                <th style="text-align:right;">+/- %</th>
-                <th style="text-align:right;">Khối lượng</th>
-                <th style="text-align:center;">Lệnh</th>
-              </tr>
-            </thead>
-            <tbody id="liveTapeTbody">
-              <!-- Populated continuously every 1.1s with live ticks -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- VIEW NEWS -->
-      <div id="rightViewNews" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
-        <div class="news-list-scroll" id="newsListContainer">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-
-      <!-- VIEW AI CHATBOT (EMBEDDED INSIDE RIGHT PANEL - CHỐNG CHỒNG CHÉO) -->
-      <div id="rightViewAi" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
-        <div class="ai-embedded-head" style="padding:8px 10px; background:var(--bg-subtle); border-bottom:1px solid var(--border-stroke); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <div class="ai-avatar-badge" style="width:24px; height:24px; font-size:10px; font-weight:700;">AI</div>
-            <div>
-              <div style="font-size:12px; font-weight:700;">Trợ lý AI Phân tích Realtime</div>
-              <div style="font-size:10px; color:var(--price-up); display:flex; align-items:center; gap:3px;">
-                <span class="pulse-dot" style="width:4px;height:4px;"></span>
-                <span>Dữ liệu trực tiếp sàn HOSE/HNX</span>
-              </div>
-            </div>
-          </div>
-          <div style="display:flex; gap:6px;">
-            <button onclick="clearDashboardAiChat()" class="ai-head-btn" title="Xóa lịch sử" style="padding:2px 6px; font-size:11px; cursor:pointer;">Xóa</button>
-            <a href="chatbot.html" target="_blank" class="ai-head-btn" title="Mở trang đầy đủ" style="padding:2px 6px; font-size:11px; text-decoration:none;">↗</a>
-          </div>
-        </div>
-
-        <div class="ai-messages-scroll" id="aiChatMessages" style="flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px;">
-          <div class="ai-msg-item bot">
-            <div class="ai-bubble" style="font-size:12px; line-height:1.45;">
-              <p><strong>Xin chào! Tôi là Trợ lý AI phân tích thị trường chứng khoán Realtime.</strong></p>
-              <p>Dữ liệu VN-Index, độ rộng thị trường và giá các mã (FPT, TCB, HPG, SSI...) được cập nhật realtime từ sàn giao dịch.</p>
-              <p>Bạn có thể hỏi tôi:</p>
-              <ul style="padding-left:16px; margin:4px 0;">
-                <li>Xu hướng <b>VN-Index</b> hôm nay?</li>
-                <li>Phân tích chi tiết mã (<b>FPT, TCB, HPG, VCB...</b>)</li>
-                <li>Định giá P/E, P/B và điểm mua bán tối ưu</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="ai-quick-chips-row" style="padding:6px 8px; border-top:1px solid var(--border-stroke); background:var(--bg-subtle); display:flex; gap:4px; overflow-x:auto; flex-shrink:0;">
-          <button class="ai-chip-pill" onclick="quickAiPrompt('Nhận định xu hướng VN-Index hôm nay')">VN-Index</button>
-          <button class="ai-chip-pill" onclick="quickAiPrompt('Phân tích chi tiết cổ phiếu FPT')">FPT</button>
-          <button class="ai-chip-pill" onclick="quickAiPrompt('Cổ phiếu Ngân hàng nào dẫn dắt?')">Ngân hàng</button>
-          <button class="ai-chip-pill" onclick="quickAiPrompt('Top cổ phiếu có định giá hấp dẫn nhất?')">Định giá</button>
-        </div>
-
-        <form class="ai-input-form" onsubmit="handleAiFormSubmit(event)" style="padding:8px; border-top:1px solid var(--border-stroke); display:flex; gap:6px; flex-shrink:0; background:var(--bg-container);">
-          <input type="text" class="ai-input-field" id="aiChatInput" placeholder="Hỏi AI về cổ phiếu, VN-Index..." autocomplete="off" style="font-size:12px; flex:1;">
-          <button type="submit" class="ai-send-btn" id="aiSendBtn" title="Gửi" style="padding:0 12px; cursor:pointer;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          </button>
-        </form>
-      </div>
-
-    </aside>
 
   </div>
 
@@ -3726,8 +3752,10 @@ body {
       if (!rowEl) return;
 
       const priceCell = rowEl.querySelector('.col-price');
+      const diffCell = rowEl.querySelector('.col-diff');
       const chgCell = rowEl.querySelector('.col-chg');
       const volCell = rowEl.querySelector('.col-vol');
+      const valCell = rowEl.querySelector('.col-val');
 
       const textCls = stock.change >= 6.8 ? 'text-ceil' : (stock.change <= -6.8 ? 'text-floor' : (stock.change > 0 ? 'text-up' : (stock.change < 0 ? 'text-down' : 'text-ref')));
 
@@ -3744,12 +3772,20 @@ body {
       }
       if (chgCell) {
         const arrow = stock.change > 0 ? '▲' : (stock.change < 0 ? '▼' : '■');
-        chgCell.textContent = `${arrow} ${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%`;
+        chgCell.textContent = `${stock.change >= 0 ? '+' : ''}${stock.change.toFixed(2)}%`;
         chgCell.className = `col-chg ${textCls}`;
+        if (diffCell && stock.price) {
+          const diffPt = ((stock.price * (stock.change / 100)) / 1000).toFixed(2);
+          diffCell.textContent = `${arrow} ${stock.change >= 0 ? '+' : ''}${diffPt}`;
+          diffCell.className = `col-diff ${textCls}`;
+        }
       }
       if (volCell && stock.volume) {
         const volStr = stock.volume >= 1e6 ? (stock.volume / 1e6).toFixed(1) + 'M' : (stock.volume / 1e3).toFixed(0) + 'K';
         volCell.textContent = volStr;
+      }
+      if (valCell && stock.price && stock.volume) {
+        valCell.textContent = ((stock.price * stock.volume) / 1e9).toFixed(1) + ' tỷ';
       }
     }
 
@@ -3983,7 +4019,7 @@ body {
       document.getElementById('rightPanelCount').textContent = `${list.length} mã`;
 
       tbody.innerHTML = list.slice(0, 45).map(s => {
-        const chg = s.change !== null ? s.change : 0;
+        const chg = s.change !== null && s.change !== undefined ? s.change : 0;
         let colorCls = 'text-ref';
         let arrow = '■';
         if (chg >= 6.8) { colorCls = 'text-ceil'; arrow = '▲'; }
@@ -3991,14 +4027,33 @@ body {
         else if (chg > 0) { colorCls = 'text-up'; arrow = '▲'; }
         else if (chg < 0) { colorCls = 'text-down'; arrow = '▼'; }
 
+        const p = s.price || 0;
+        const diffPt = p && chg !== 0 ? ((p * (chg / 100)) / 1000).toFixed(2) : '0.00';
         const volStr = s.volume ? (s.volume >= 1e6 ? (s.volume / 1e6).toFixed(1) + 'M' : (s.volume / 1e3).toFixed(0) + 'K') : '—';
+        const valTy = s.value ? (s.value / 1e9).toFixed(1) : (p && s.volume ? ((p * s.volume) / 1e9).toFixed(1) : '—');
+
+        let foreignStr = '—';
+        if (s.buyForeignValue !== undefined && s.sellForeignValue !== undefined) {
+          const fNet = (s.buyForeignValue - s.sellForeignValue) / 1e9;
+          const fCls = fNet > 0 ? 'text-up' : (fNet < 0 ? 'text-down' : 'text-ref');
+          foreignStr = `<span class="${fCls}">${fNet > 0 ? '+' : ''}${fNet.toFixed(1)} tỷ</span>`;
+        }
 
         return `
           <tr id="watchRow_${s.symbol}" onclick="openQuickModal('${s.symbol}')">
-            <td><span class="${colorCls}">${s.symbol}</span></td>
-            <td class="col-price ${colorCls}"><b>${s.price ? s.price.toLocaleString('vi-VN') : '—'}</b></td>
-            <td class="col-chg ${colorCls}">${arrow} ${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</td>
+            <td><span class="${colorCls}"><b>${s.symbol}</b></span></td>
+            <td><span style="color:var(--text-secondary);font-size:11px;">${s.sector || (s.exchange || 'HOSE')}</span></td>
+            <td class="col-price ${colorCls}"><b>${p ? p.toLocaleString('vi-VN') : '—'}</b></td>
+            <td class="col-diff ${colorCls}">${arrow} ${chg >= 0 ? '+' : ''}${diffPt}</td>
+            <td class="col-chg ${colorCls}">${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%</td>
             <td class="col-vol" style="color:var(--text-secondary);">${volStr}</td>
+            <td class="col-val" style="color:var(--text-secondary);">${valTy !== '—' ? valTy + ' tỷ' : '—'}</td>
+            <td class="col-foreign">${foreignStr}</td>
+            <td class="col-pe" style="color:var(--text-secondary);">${s.pe ? s.pe.toFixed(1) + 'x' : '—'}</td>
+            <td class="col-roe" style="color:var(--text-secondary);">${s.roe ? s.roe.toFixed(1) + '%' : '—'}</td>
+            <td style="text-align:center;">
+              <button onclick="event.stopPropagation();openQuickModal('${s.symbol}')" class="btn-theme-toggle" style="width:auto;padding:2px 8px;font-size:10.5px;cursor:pointer;">Chi tiết</button>
+            </td>
           </tr>
         `;
       }).join('');
@@ -6946,11 +7001,39 @@ body {
     // ==========================================
     // 8. TÍCH HỢP TRỢ LÝ AI CHATBOT REALTIME TRÊN DASHBOARD
     // ==========================================
+    // Thu gọn / Mở rộng 5 biểu đồ Tổng quan phía trên để tối đa hóa không gian Bảng điện
+    let overviewChartsVisible = true;
+    function toggleOverviewCharts() {
+      overviewChartsVisible = !overviewChartsVisible;
+      const row1 = document.querySelector('#subview_tongquan .grid-row-2col');
+      const row2 = document.querySelector('#subview_tongquan .grid-row-3col');
+      const btn = document.getElementById('btnToggleOverview');
+      if (row1) row1.style.display = overviewChartsVisible ? 'grid' : 'none';
+      if (row2) row2.style.display = overviewChartsVisible ? 'grid' : 'none';
+      if (btn) btn.textContent = overviewChartsVisible ? 'Thu gọn biểu đồ' : 'Mở rộng biểu đồ';
+    }
+
+    // Cuộn mượt đến Bảng điện thông minh khi nhấp tab Bảng điện ở thanh menu
+    function scrollToBangDien(btn) {
+      switchSubTab('tongquan', document.getElementById('btnSubTab_tongquan'));
+      if (btn) {
+        document.querySelectorAll('.center-subtab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      const board = document.getElementById('third');
+      if (board) {
+        board.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
     function toggleDashboardAi(forceOpen = null) {
+      switchSubTab('tongquan', document.getElementById('btnSubTab_tongquan'));
       const tabAiBtn = document.getElementById('tabAiBtn');
       const curAiVisible = document.getElementById('rightViewAi')?.style.display === 'flex';
       if (forceOpen === true || (!curAiVisible && forceOpen !== false)) {
         if (tabAiBtn) switchRightTab('ai', tabAiBtn);
+        const board = document.getElementById('third');
+        if (board) board.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         setTimeout(() => document.getElementById('aiChatInput')?.focus(), 150);
       } else {
         const tabWatchlistBtn = document.getElementById('tabWatchlistBtn');
