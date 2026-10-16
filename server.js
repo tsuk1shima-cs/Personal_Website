@@ -1,4 +1,4 @@
-// Backend API Server cho AI va TCBS integration
+// Backend API Server cho AI va DNSE integration
 // Chay: node server.js
 
 const express = require('express');
@@ -23,10 +23,7 @@ app.use(express.static('.')); // Serve static files
 const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY;
 const DEEPSEEK_KEY   = process.env.DEEPSEEK_API_KEY;
 const GEMINI_KEY     = process.env.GEMINI_API_KEY;
-const TCBS_API_KEY   = process.env.TCBS_API_KEY;
-const TCBS_API_BASE  = process.env.TCBS_API_BASE || 'https://openapi.tcbs.com.vn';
-const TCBS_WS_URL    = process.env.TCBS_WS_URL   || 'wss://openapi.tcbs.com.vn/ws/thesis/v1/stream/normal';
-const DNSE_API_KEY      = process.env.DNSE_API_KEY;
+const DNSE_API_KEY      = process.env.DNSE_API_KEY || 'eyJvcmciOiJkbnNlIiwiaWQiOiIxZDFkOGRjY2RlYTQ0NTQ0YTAxNTA4M2Q2NjEzNjdiYSIsImgiOiJtdXJtdXIxMjgifQ==';
 const DNSE_API_BASE     = process.env.DNSE_API_BASE || 'https://api.dnse.com.vn';
 const DNSE_ENTRADE_BASE = process.env.DNSE_ENTRADE_BASE || 'https://services.entrade.com.vn';
 const DNSE_WS_URL       = process.env.DNSE_WS_URL || 'wss://datafeed-lts.dnse.com.vn/wss';
@@ -164,10 +161,7 @@ async function callGeminiDirect(messages, maxTokens = 1200) {
     return { message: text };
 }
 
-// Luu JWT token TCBS theo session (reset khi restart server)
-let tcbsJwtToken = null;
-
-// ==================== TCBS MCP DATA CONTEXT INJECTION ====================
+// ==================== DNSE MCP DATA CONTEXT INJECTION ====================
 
 // Danh sach tu pho bien can loai tru de tranh nhan nham thanh ma co phieu
 const VIETNAMESE_STOPWORDS = new Set([
@@ -655,8 +649,7 @@ ${stockContext.text ? `\n--- DỮ LIỆU THỰC TẾ THỊ TRƯỜNG REALTIME --
 
         res.status(500).json({
             success: false,
-            error: errorMsg,
-            tcbsAuthenticated: !!tcbsJwtToken
+            error: errorMsg
         });
     }
 });
@@ -1031,16 +1024,35 @@ app.get('/api/dnse/indices', async (req, res) => {
     }
 });
 
-// Lay chart OHLC index tu DNSE Entrade (ho tro resolution: 1, 5, 15, 30, 1D)
+// In-memory cache cho chart du lieu DNSE (TTL: 15s)
+const dnseChartCache = new Map();
+
+// Lay chart OHLC index tu DNSE Entrade (ho tro resolution: 1, 5, 15, 1H, 1D, 1W)
 app.get('/api/dnse/chart/index/:symbol', async (req, res) => {
     let { symbol } = req.params;
     let sym = (symbol || '').toUpperCase().trim();
     if (sym === 'HNXINDEX') sym = 'HNX';
     if (sym === 'UPCOMINDEX') sym = 'UPCOM';
     if (sym === 'VNI') sym = 'VNINDEX';
-    const { resolution = '1', from, to } = req.query;
+    let { resolution = '1', from, to } = req.query;
+    if (resolution === 'D') resolution = '1D';
+    if (resolution === 'W') resolution = '1W';
+    if (resolution === '60') resolution = '1H';
+
+    const cacheKey = `idx_${sym}_${resolution}`;
     const now = Math.floor(Date.now() / 1000);
-    const fromTime = from || (now - 2 * 86400);
+    const cached = dnseChartCache.get(cacheKey);
+    if (!from && !to && cached && (Date.now() - cached.timestamp < 15000)) {
+        return res.json({ success: true, data: cached.data, provider: 'DNSE', cached: true });
+    }
+
+    let defaultSpan = 2 * 86400;
+    if (resolution === '15') defaultSpan = 5 * 86400;
+    else if (resolution === '1H') defaultSpan = 25 * 86400;
+    else if (resolution === '1D') defaultSpan = 180 * 86400;
+    else if (resolution === '1W') defaultSpan = 500 * 86400;
+
+    const fromTime = from || (now - defaultSpan);
     const toTime = to || now;
 
     try {
@@ -1048,36 +1060,68 @@ app.get('/api/dnse/chart/index/:symbol', async (req, res) => {
         const response = await axios.get(url, {
             headers: {
                 'Accept': 'application/json',
+                'User-Agent': 'DNSE-MCP-Server/1.0',
                 ...(DNSE_API_KEY ? { 'Authorization': `Bearer ${DNSE_API_KEY}` } : {})
             },
-            timeout: 6000
+            timeout: 8000
         });
+        if (response.data && response.data.t) {
+            dnseChartCache.set(cacheKey, { timestamp: Date.now(), data: response.data });
+        }
         res.json({ success: true, data: response.data, provider: 'DNSE' });
     } catch (err) {
+        if (cached && cached.data) {
+            return res.json({ success: true, data: cached.data, provider: 'DNSE', stale: true });
+        }
         console.error(`DNSE chart index error (${symbol}):`, err.message);
         res.status(500).json({ success: false, error: err.message });
     }
 });
 
-// Lay chart OHLC co phieu tu DNSE Entrade
+// Lay chart OHLC co phieu tu DNSE Entrade (ho tro resolution: 1, 5, 15, 1H, 1D, 1W)
 app.get('/api/dnse/chart/stock/:symbol', async (req, res) => {
     const { symbol } = req.params;
-    const { resolution = '1', from, to } = req.query;
+    const sym = (symbol || '').toUpperCase().trim();
+    let { resolution = '1D', from, to } = req.query;
+    if (resolution === 'D') resolution = '1D';
+    if (resolution === 'W') resolution = '1W';
+    if (resolution === '60') resolution = '1H';
+
+    const cacheKey = `stk_${sym}_${resolution}`;
     const now = Math.floor(Date.now() / 1000);
-    const fromTime = from || (now - 2 * 86400);
+    const cached = dnseChartCache.get(cacheKey);
+    if (!from && !to && cached && (Date.now() - cached.timestamp < 15000)) {
+        return res.json({ success: true, data: cached.data, provider: 'DNSE', cached: true });
+    }
+
+    let defaultSpan = 180 * 86400;
+    if (resolution === '1' || resolution === '5') defaultSpan = 2 * 86400;
+    else if (resolution === '15') defaultSpan = 5 * 86400;
+    else if (resolution === '1H') defaultSpan = 25 * 86400;
+    else if (resolution === '1D') defaultSpan = 180 * 86400;
+    else if (resolution === '1W') defaultSpan = 500 * 86400;
+
+    const fromTime = from || (now - defaultSpan);
     const toTime = to || now;
 
     try {
-        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/stock?symbol=${encodeURIComponent(symbol.toUpperCase())}&resolution=${resolution}&from=${fromTime}&to=${toTime}`;
+        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/stock?symbol=${encodeURIComponent(sym)}&resolution=${resolution}&from=${fromTime}&to=${toTime}`;
         const response = await axios.get(url, {
             headers: {
                 'Accept': 'application/json',
+                'User-Agent': 'DNSE-MCP-Server/1.0',
                 ...(DNSE_API_KEY ? { 'Authorization': `Bearer ${DNSE_API_KEY}` } : {})
             },
-            timeout: 6000
+            timeout: 8000
         });
+        if (response.data && response.data.t) {
+            dnseChartCache.set(cacheKey, { timestamp: Date.now(), data: response.data });
+        }
         res.json({ success: true, data: response.data, provider: 'DNSE' });
     } catch (err) {
+        if (cached && cached.data) {
+            return res.json({ success: true, data: cached.data, provider: 'DNSE', stale: true });
+        }
         console.error(`DNSE chart stock error (${symbol}):`, err.message);
         res.status(500).json({ success: false, error: err.message });
     }
@@ -1470,346 +1514,32 @@ app.get('/api/news/rss', async (req, res) => {
         res.status(500).json({ success: false, error: 'Không thể lấy tin tức', items: [] });
     }
 });
+// ==================== DNSE ACTIVE SERVICES ====================
 
+// ==================== WEBSOCKET SERVER ====================
 
-
-// Lay JWT token tu TCBS (can API key + OTP tu app TCInvest)
-app.post('/api/tcbs/token', async (req, res) => {
-    try {
-        const { otp } = req.body;
-        const apiKey = TCBS_API_KEY;
-
-        if (!apiKey || apiKey === 'your-tcbs-api-key-here') {
-            return res.status(400).json({
-                success: false,
-                error: 'TCBS_API_KEY chua duoc cau hinh trong file .env'
-            });
-        }
-
-        if (!otp) {
-            return res.status(400).json({
-                success: false,
-                error: 'Thieu OTP (lay tu app TCInvest -> iFlash -> Smart OTP)'
-            });
-        }
-
-        const response = await axios.post(
-            `${TCBS_API_BASE}/gaia/v1/oauth2/openapi/token`,
-            { apiKey, otp },
-            { headers: { 'Content-Type': 'application/json' } }
-        );
-
-        tcbsJwtToken = response.data.token;
-
-        res.json({
-            success: true,
-            message: 'Xac thuc TCBS thanh cong',
-            hasToken: true
-        });
-
-    } catch (error) {
-        console.error('TCBS Token Error:', error.response?.data || error.message);
-        res.status(500).json({
-            success: false,
-            error: error.response?.data?.message || 'Khong the lay TCBS token'
-        });
-    }
-});
-
-// Kiem tra trang thai xac thuc TCBS
-app.get('/api/tcbs/status', (req, res) => {
-    res.json({
-        success: true,
-        hasToken: !!tcbsJwtToken,
-        apiKeyConfigured: !!(TCBS_API_KEY && TCBS_API_KEY !== 'your-tcbs-api-key-here')
-    });
-});
-
-// Lay thong tin ma chung khoan tu TCBS
-app.get('/api/tcbs/stock/:symbol', async (req, res) => {
-    try {
-        const { symbol } = req.params;
-
-        if (!tcbsJwtToken) {
-            return res.status(401).json({
-                success: false,
-                error: 'Chua xac thuc TCBS. Goi POST /api/tcbs/token truoc.',
-                needAuth: true
-            });
-        }
-
-        const response = await axios.get(
-            `${TCBS_API_BASE}/stock-insight/v1/stock/one?ticker=${symbol}`,
-            {
-                headers: {
-                    'Authorization': `Bearer ${tcbsJwtToken}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
-
-        res.json({
-            success: true,
-            symbol: symbol,
-            data: response.data
-        });
-
-    } catch (error) {
-        // Token het han
-        if (error.response?.status === 401) {
-            tcbsJwtToken = null;
-        }
-        console.error('TCBS Stock Error:', error.response?.data || error.message);
-        res.status(error.response?.status || 500).json({
-            success: false,
-            error: error.response?.data?.message || 'Khong the lay du lieu co phieu',
-            tokenExpired: error.response?.status === 401
-        });
-    }
-});
-
-// WebSocket config cho frontend (tra ve WS URL de frontend tu ket noi)
-app.get('/api/tcbs/ws-config', (req, res) => {
-    res.json({
-        success: true,
-        wsUrl: TCBS_WS_URL,
-        hasToken: !!tcbsJwtToken,
-        // Khong tra ve token truc tiep - frontend phai xac thuc qua /api/tcbs/token
-    });
-});
-
-// ==================== TCBS MCP PROXY ====================
-// Proxy MCP calls toi mcp.tcbs.com.vn dung JWT token hien co
-const TCBS_MCP_URL = 'https://mcp.tcbs.com.vn/mcp/tcinvest/';
-
-// Lay danh sach tools tu MCP server
-app.get('/api/tcbs/mcp/tools', async (req, res) => {
-    if (!tcbsJwtToken) {
-        return res.status(401).json({ success: false, error: 'Chua xac thuc TCBS. Goi POST /api/tcbs/token truoc.' });
-    }
-    try {
-        const response = await axios.post(
-            TCBS_MCP_URL,
-            { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} },
-            { headers: { 'Authorization': `Bearer ${tcbsJwtToken}`, 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' } }
-        );
-        res.json({ success: true, data: response.data });
-    } catch (error) {
-        if (error.response?.status === 401) tcbsJwtToken = null;
-        res.status(error.response?.status || 500).json({ success: false, error: error.response?.data || error.message });
-    }
-});
-
-// Goi mot MCP tool cu the
-app.post('/api/tcbs/mcp/call', async (req, res) => {
-    if (!tcbsJwtToken) {
-        return res.status(401).json({ success: false, error: 'Chua xac thuc TCBS. Goi POST /api/tcbs/token truoc.' });
-    }
-    const { tool, params = {} } = req.body;
-    if (!tool) return res.status(400).json({ success: false, error: 'Thieu ten tool' });
-
-    try {
-        const response = await axios.post(
-            TCBS_MCP_URL,
-            { jsonrpc: '2.0', id: Date.now(), method: 'tools/call', params: { name: tool, arguments: params } },
-            { headers: { 'Authorization': `Bearer ${tcbsJwtToken}`, 'Content-Type': 'application/json', 'Accept': 'application/json, text/event-stream' } }
-        );
-        res.json({ success: true, data: response.data });
-    } catch (error) {
-        if (error.response?.status === 401) tcbsJwtToken = null;
-        res.status(error.response?.status || 500).json({
-            success: false,
-            error: error.response?.data || error.message,
-            tokenExpired: error.response?.status === 401
-        });
-    }
-});
-
-// ==================== WEBSOCKET PROXY CHO TCBS ====================
-
+// WebSocket server đơn giản cho frontend client
 const wss = new WebSocket.Server({ noServer: true });
-
-// Map luu cac client dang ket noi va TCBS WS cua ho
-const clientConnections = new Map();
-
 wss.on('connection', (clientWs) => {
-    console.log('Browser client connected to WS proxy');
-
-    // Gui trang thai ban dau
     clientWs.send(JSON.stringify({
         type: 'status',
-        connected: false,
-        message: tcbsJwtToken ? 'Ready to connect TCBS' : 'No TCBS token - authenticate first'
+        connected: true,
+        message: 'Ket noi WebSocket server thanh cong (DNSE Active)'
     }));
-
-    clientWs.on('message', (message) => {
-        try {
-            const data = JSON.parse(message.toString());
-
-            // Client yeu cau ket noi toi TCBS
-            if (data.action === 'connect') {
-                if (!tcbsJwtToken) {
-                    clientWs.send(JSON.stringify({
-                        type: 'error',
-                        message: 'Chua co TCBS token. Vui long xac thuc truoc.'
-                    }));
-                    return;
-                }
-                connectToTCBS(clientWs);
-            }
-
-            // Client subscribe ma chung khoan
-            if (data.action === 'subscribe' && data.symbols) {
-                const tcbsWs = clientConnections.get(clientWs);
-                if (tcbsWs && tcbsWs.readyState === WebSocket.OPEN) {
-                    const symbols = Array.isArray(data.symbols) ? data.symbols.join(',') : data.symbols;
-                    tcbsWs.send(`d|s|tk|bp+bi+tm+mp+op+fe|${symbols}`);
-                }
-            }
-
-            // Client unsubscribe
-            if (data.action === 'unsubscribe' && data.symbols) {
-                const tcbsWs = clientConnections.get(clientWs);
-                if (tcbsWs && tcbsWs.readyState === WebSocket.OPEN) {
-                    const symbols = Array.isArray(data.symbols) ? data.symbols.join(',') : data.symbols;
-                    tcbsWs.send(`d|u|tk|bp+bi+tm+mp+op+fe|${symbols}`);
-                }
-            }
-
-        } catch (error) {
-            console.error('WS proxy message error:', error);
-        }
-    });
-
-    clientWs.on('close', () => {
-        // Dong TCBS WS khi client ngat
-        const tcbsWs = clientConnections.get(clientWs);
-        if (tcbsWs) {
-            tcbsWs.close();
-            clientConnections.delete(clientWs);
-        }
-        console.log('Browser client disconnected');
-    });
 });
-
-function connectToTCBS(clientWs) {
-    const tcbsWs = new WebSocket(TCBS_WS_URL);
-    let authDone = false;
-    let heartbeatInterval = null;
-
-    tcbsWs.on('open', () => {
-        console.log('Connected to TCBS WebSocket');
-
-        // Xac thuc: base64 encode token
-        const encoded = Buffer.from(tcbsJwtToken).toString('base64');
-        tcbsWs.send(`d|a|||${encoded}`);
-
-        // Heartbeat moi 2 giay (bat buoc theo TCBS docs)
-        heartbeatInterval = setInterval(() => {
-            if (tcbsWs.readyState === WebSocket.OPEN) {
-                tcbsWs.send('d|p|||');
-            }
-        }, 2000);
-    });
-
-    tcbsWs.on('message', (raw) => {
-        const msg = raw.toString();
-
-        // Xu ly auth response
-        if (msg.startsWith('d|0|')) {
-            try {
-                const payload = JSON.parse(msg.slice(4));
-                if (payload.success) {
-                    authDone = true;
-                    clientConnections.set(clientWs, tcbsWs);
-                    clientWs.send(JSON.stringify({
-                        type: 'status',
-                        connected: true,
-                        message: 'Ket noi TCBS thanh cong'
-                    }));
-                } else {
-                    tcbsJwtToken = null;
-                    clientWs.send(JSON.stringify({
-                        type: 'error',
-                        message: 'TCBS token het han, vui long xac thuc lai'
-                    }));
-                    tcbsWs.close();
-                }
-            } catch (e) { /* ignore parse error */ }
-            return;
-        }
-
-        // Bo qua control messages (heartbeat, timeout config, subscribe ack)
-        if (msg.startsWith('d|')) return;
-
-        // Forward data messages toi browser client
-        // Format: s|[channel]|[json]
-        if (msg.startsWith('s|') && authDone) {
-            const parts = msg.split('|', 3);
-            if (parts.length === 3) {
-                try {
-                    const channelId = parseInt(parts[1]);
-                    const payload = JSON.parse(parts[2]);
-
-                    // Map channel ID sang ten ro rang hon
-                    const channelMap = {
-                        1: 'bid',       // So lenh mua top 3
-                        2: 'offer',     // So lenh ban top 3
-                        3: 'foreign',   // Khoi ngoai
-                        4: 'base',      // Gia tran/san/tham chieu
-                        5: 'session',   // Thong tin phien
-                        6: 'match',     // Giao dich khop
-                        8: 'index',     // Chi so VN-INDEX...
-                        22: 'history'   // Lich su khop trong ngay
-                    };
-
-                    clientWs.send(JSON.stringify({
-                        type: 'data',
-                        channel: channelMap[channelId] || `ch${channelId}`,
-                        channelId: channelId,
-                        data: payload
-                    }));
-                } catch (e) { /* ignore malformed */ }
-            }
-        }
-    });
-
-    tcbsWs.on('error', (err) => {
-        console.error('TCBS WS Error:', err.message);
-        clientWs.send(JSON.stringify({
-            type: 'error',
-            message: 'TCBS WebSocket loi: ' + err.message
-        }));
-    });
-
-    tcbsWs.on('close', (code) => {
-        clearInterval(heartbeatInterval);
-        clientConnections.delete(clientWs);
-        console.log('TCBS WebSocket closed, code:', code);
-
-        if (clientWs.readyState === WebSocket.OPEN) {
-            // Token het han (code 1000 + error truoc do)
-            if (code === 1006) tcbsJwtToken = null;
-            clientWs.send(JSON.stringify({
-                type: 'status',
-                connected: false,
-                message: 'Mat ket noi TCBS'
-            }));
-        }
-    });
-}
 
 // ==================== HEALTH CHECK ====================
 
 app.get('/api/health', (req, res) => {
-    const tcbsApiKeyOk = !!(TCBS_API_KEY && TCBS_API_KEY !== 'your-tcbs-api-key-here');
     res.json({
         status: 'ok',
         timestamp: new Date().toISOString(),
         apis: {
-            openrouter:         !!OPENROUTER_KEY,
-            tcbs_configured:    tcbsApiKeyOk,
-            tcbs_authenticated: !!tcbsJwtToken
+            openrouter:       !!OPENROUTER_KEY,
+            deepseek:         !!DEEPSEEK_KEY,
+            gemini:           !!GEMINI_KEY,
+            dnse_configured:  Boolean(DNSE_API_KEY),
+            mcp_protocol:     'Active (DNSE)'
         }
     });
 });
@@ -1817,31 +1547,32 @@ app.get('/api/health', (req, res) => {
 // ==================== START SERVER ====================
 
 const server = app.listen(PORT, () => {
-    const tcbsApiKeyOk = !!(TCBS_API_KEY && TCBS_API_KEY !== 'your-tcbs-api-key-here');
     console.log(`
 Server dang chay tai port ${PORT}
 
-API Endpoints:
-   - POST /api/chat              : Chatbot AI tích hợp TCBS MCP (Nemotron 3 Super Free)
+API Endpoints (DNSE Open API & Realtime Market):
+   - POST /api/chat              : Chatbot AI tích hợp DNSE MCP (Nemotron 3 Super Free)
    - POST /api/news/generate     : Tong hop tin tuc
    - GET  /api/news/rss          : Lay tin tuc RSS
-   - GET  /api/market/screener   : FA screener (TradingView, 200+ co phieu)
+   - GET  /api/market/screener   : FA screener (DNSE / TradingView, 200+ co phieu)
    - POST /api/market/prices     : Gia nhieu ma cung luc
-   - POST /api/tcbs/token        : Lay JWT token TCBS (can otp)
-   - GET  /api/tcbs/status       : Kiem tra trang thai xac thuc TCBS
-   - GET  /api/tcbs/stock/:sym   : Du lieu co phieu TCBS
-   - GET  /api/tcbs/mcp/tools    : Lay danh sach MCP tools
-   - POST /api/tcbs/mcp/call     : Goi MCP tool
+   - GET  /api/market/foreign-summary : Giao dich khoi ngoai toan thi truong (SSI HOSE/HNX)
+   - GET  /api/market/technical/:sym  : Chi bao ky thuat RSI da khung gio tu DNSE
+   - GET  /api/dnse/chart/stock/:sym  : Bieu do nen OHLC DNSE Entrade X
+   - GET  /api/dnse/chart/index/:sym  : Bieu do intraday index DNSE Entrade X
+   - GET  /api/dnse/status       : Kiem tra trang thai DNSE API
+   - GET  /api/mcp/tools         : Danh sach tools DNSE MCP
+   - POST /api/mcp/call          : Goi tool DNSE MCP
    - GET  /api/health            : Health check
 
 Website: http://localhost:${PORT}
-WebSocket proxy: ws://localhost:${PORT}
+WebSocket: ws://localhost:${PORT}
 
 API Status:
    ${OPENROUTER_KEY ? 'Co key' : 'Thieu key'} - OpenRouter (Nemotron 3 Super Free)
    ${DEEPSEEK_KEY   ? 'Co key' : 'Chua cau hinh'} - DeepSeek Direct (api.deepseek.com)
    ${GEMINI_KEY     ? 'Co key' : 'Chua cau hinh'} - Google Gemini (Fallback)
-   ${tcbsApiKeyOk   ? 'Co key (chua xac thuc)' : 'Thieu key'} - TCBS iFlash & MCP
+   ${DNSE_API_KEY   ? 'Co key' : 'Chua cau hinh (dung che do Open Datafeed)'} - DNSE Open API & Entrade X
     `);
 
     // Tu dong dong bo danh muc co phieu live ngay khi khoi dong va dinh ky moi 7 giay
