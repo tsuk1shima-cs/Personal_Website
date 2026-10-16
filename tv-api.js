@@ -548,13 +548,19 @@ async function fetchDNSEIndices() {
 
 // Lấy chuỗi điểm biến động trong phiên (Intraday Curve) từ DNSE Entrade
 async function fetchDNSEIntraday(symbol = 'VNINDEX', resolution = '5') {
+    let sym = (symbol || 'VNINDEX').toUpperCase().trim();
+    if (sym === 'HNXINDEX') sym = 'HNX';
+    if (sym === 'UPCOMINDEX') sym = 'UPCOM';
+    if (sym === 'VNI') sym = 'VNINDEX';
+
     // 1. Thử qua backend proxy nếu đang ở localhost
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         try {
-            const r = await fetch(`/api/dnse/chart/index/${symbol}?resolution=${resolution}`, { signal: AbortSignal.timeout(3000) });
+            const r = await fetch(`/api/dnse/chart/index/${sym}?resolution=${resolution}`, { signal: AbortSignal.timeout(3500) });
             if (r.ok) {
                 const j = await r.json();
-                if (j.success && j.data?.data?.c?.length) return j.data.data.c;
+                const pts = j.data?.c || j.data?.data?.c;
+                if (j.success && Array.isArray(pts) && pts.length > 0) return pts;
             }
         } catch { /* fallback direct */ }
     }
@@ -563,8 +569,8 @@ async function fetchDNSEIntraday(symbol = 'VNINDEX', resolution = '5') {
     try {
         const now = Math.floor(Date.now() / 1000);
         const from = now - 86400;
-        const res = await fetch(`${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${symbol}&resolution=${resolution}&from=${from}&to=${now}`, {
-            signal: AbortSignal.timeout(3000)
+        const res = await fetch(`${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/index?symbol=${encodeURIComponent(sym)}&resolution=${resolution}&from=${from}&to=${now}`, {
+            signal: AbortSignal.timeout(3500)
         });
         if (res.ok) {
             const d = await res.json();

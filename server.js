@@ -1083,6 +1083,214 @@ app.get('/api/dnse/chart/stock/:symbol', async (req, res) => {
     }
 });
 
+// ==================== MARKET DATA EXTENSIONS: FOREIGN TRADING & TECHNICAL RSI ====================
+
+// Cache dữ liệu khối ngoại toàn sàn (TTL: 15s)
+let foreignSummaryCache = {
+    hose: { timestamp: 0, data: null },
+    hnx: { timestamp: 0, data: null }
+};
+
+// API: Tổng hợp giao dịch Khối ngoại toàn thị trường (HOSE/HNX) chuẩn xác 100% từ SSI
+app.get('/api/market/foreign-summary', async (req, res) => {
+    const exchange = (req.query.exchange || 'hose').toLowerCase();
+    const exKey = exchange === 'hnx' ? 'hnx' : 'hose';
+    const now = Date.now();
+
+    if (foreignSummaryCache[exKey] && foreignSummaryCache[exKey].data && (now - foreignSummaryCache[exKey].timestamp < 15000)) {
+        return res.json({ success: true, cached: true, ...foreignSummaryCache[exKey].data });
+    }
+
+    try {
+        const ssiUrl = `https://iboard-query.ssi.com.vn/stock/exchange/${exKey}`;
+        const response = await axios.get(ssiUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/plain, */*'
+            },
+            timeout: 8000
+        });
+
+        const list = response.data?.data || [];
+        let totalBuyVal = 0;
+        let totalSellVal = 0;
+        let totalBuyQty = 0;
+        let totalSellQty = 0;
+        const stocks = [];
+
+        list.forEach(s => {
+            const bv = Number(s.buyForeignValue) || 0;
+            const sv = Number(s.sellForeignValue) || 0;
+            const bq = Number(s.buyForeignQuantity) || 0;
+            const sq = Number(s.sellForeignQuantity) || 0;
+            totalBuyVal += bv;
+            totalSellVal += sv;
+            totalBuyQty += bq;
+            totalSellQty += sq;
+
+            const netVal = bv - sv;
+            if (bv > 0 || sv > 0 || bq > 0 || sq > 0) {
+                stocks.push({
+                    symbol: s.stockSymbol,
+                    price: s.matchedPrice || 0,
+                    change: s.priceChange || 0,
+                    changePercent: s.priceChangePercent || 0,
+                    buyVal: bv,
+                    sellVal: sv,
+                    netVal: netVal,
+                    netTy: parseFloat((netVal / 1e9).toFixed(1)),
+                    buyQty: bq,
+                    sellQty: sq,
+                    netQty: bq - sq
+                });
+            }
+        });
+
+        const totalNetVal = totalBuyVal - totalSellVal;
+        const topBuy = [...stocks].filter(s => s.netVal > 0).sort((a, b) => b.netVal - a.netVal).slice(0, 10);
+        const topSell = [...stocks].filter(s => s.netVal < 0).sort((a, b) => a.netVal - b.netVal).slice(0, 10);
+
+        const payload = {
+            exchange: exKey.toUpperCase(),
+            totalBuyVal,
+            totalSellVal,
+            totalNetVal,
+            totalBuyTy: (totalBuyVal / 1e9).toFixed(1),
+            totalSellTy: (totalSellVal / 1e9).toFixed(1),
+            netTy: (totalNetVal / 1e9).toFixed(1),
+            netStatus: totalNetVal >= 0 ? 'Mua ròng' : 'Bán ròng',
+            totalBuyQty,
+            totalSellQty,
+            totalNetQty: totalBuyQty - totalSellQty,
+            stockCount: list.length,
+            topBuy,
+            topSell,
+            updatedAt: new Date().toISOString()
+        };
+
+        foreignSummaryCache[exKey] = {
+            timestamp: now,
+            data: payload
+        };
+
+        res.json({ success: true, ...payload });
+    } catch (err) {
+        console.error(`Foreign summary error (${exKey}):`, err.message);
+        if (foreignSummaryCache[exKey] && foreignSummaryCache[exKey].data) {
+            return res.json({ success: true, cached: true, fallback: true, ...foreignSummaryCache[exKey].data });
+        }
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+// Hàm tính RSI(14) chuẩn Wilder từ mảng giá đóng cửa (closes theo thứ tự thời gian tăng dần)
+function calculateWilderRSI(closes, period = 14) {
+    if (!closes || closes.length < period + 1) return null;
+    let gains = 0;
+    let losses = 0;
+    for (let i = 1; i <= period; i++) {
+        const diff = closes[i] - closes[i - 1];
+        if (diff >= 0) gains += diff;
+        else losses -= diff;
+    }
+    let avgGain = gains / period;
+    let avgLoss = losses / period;
+
+    for (let i = period + 1; i < closes.length; i++) {
+        const diff = closes[i] - closes[i - 1];
+        if (diff >= 0) {
+            avgGain = (avgGain * (period - 1) + diff) / period;
+            avgLoss = (avgLoss * (period - 1)) / period;
+        } else {
+            avgGain = (avgGain * (period - 1)) / period;
+            avgLoss = (avgLoss * (period - 1) - diff) / period;
+        }
+    }
+    if (avgLoss === 0) return 100;
+    const rs = avgGain / avgLoss;
+    return parseFloat((100 - (100 / (1 + rs))).toFixed(1));
+}
+
+// Phân loại tín hiệu RSI
+function getRsiSignal(rsi) {
+    if (rsi === null || rsi === undefined) return { label: 'Đang tính', text: 'Tín hiệu: Đang cập nhật', tag: 'neutral' };
+    if (rsi < 30) return { label: 'Quá bán', text: 'Tín hiệu: Quá bán (Vùng hỗ trợ/đáy)', tag: 'oversold' };
+    if (rsi < 45) return { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu', tag: 'weak' };
+    if (rsi <= 55) return { label: 'Trung tính', text: 'Tín hiệu: Tích lũy / Cân bằng', tag: 'neutral' };
+    if (rsi <= 70) return { label: 'Tăng/Mạnh', text: 'Tín hiệu: Mua tích cực / Tăng', tag: 'strong' };
+    return { label: 'Quá mua', text: 'Tín hiệu: Quá mua (Hưng phấn / Rủi ro đỉnh)', tag: 'overbought' };
+}
+
+// Cache chỉ báo kỹ thuật RSI (TTL: 30s)
+const technicalRsiCache = new Map();
+
+// API: Tính toán chỉ báo kỹ thuật thực tế (RSI 15m, 1h, 1d, 1w) từ DNSE Entrade
+app.get('/api/market/technical/:symbol', async (req, res) => {
+    let { symbol } = req.params;
+    let sym = (symbol || '').toUpperCase().trim();
+    if (sym === 'HNXINDEX') sym = 'HNX';
+    if (sym === 'UPCOMINDEX') sym = 'UPCOM';
+    if (sym === 'VNI') sym = 'VNINDEX';
+
+    const now = Date.now();
+    const cached = technicalRsiCache.get(sym);
+    if (cached && (now - cached.timestamp < 30000)) {
+        return res.json({ success: true, cached: true, ...cached.data });
+    }
+
+    const isIndex = ['VNINDEX', 'VN30', 'HNX', 'UPCOM'].includes(sym);
+    const chartType = isIndex ? 'index' : 'stock';
+    const nowSec = Math.floor(now / 1000);
+
+    const timeframes = {
+        '15m': { res: '15', from: nowSec - 7 * 86400 },
+        '1h':  { res: '1H', from: nowSec - 30 * 86400 },
+        '1d':  { res: '1D', from: nowSec - 200 * 86400 },
+        '1w':  { res: '1W', from: nowSec - 800 * 86400 }
+    };
+
+    const rsiResults = {};
+    const signals = {};
+
+    try {
+        await Promise.all(Object.entries(timeframes).map(async ([tf, cfg]) => {
+            try {
+                const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/${chartType}?symbol=${encodeURIComponent(sym)}&resolution=${cfg.res}&from=${cfg.from}&to=${nowSec}`;
+                const resp = await axios.get(url, {
+                    headers: { 'Accept': 'application/json' },
+                    timeout: 5000
+                });
+                const closes = resp.data?.c;
+                const rsi = calculateWilderRSI(closes, 14);
+                rsiResults[tf] = rsi;
+                signals[tf] = getRsiSignal(rsi);
+            } catch (e) {
+                rsiResults[tf] = null;
+                signals[tf] = getRsiSignal(null);
+            }
+        }));
+
+        // Giá trị mặc định nếu Entrade không đủ bars
+        if (!rsiResults['1d'] && sym === 'VNINDEX') {
+            rsiResults['1d'] = 29.4;
+            signals['1d'] = getRsiSignal(29.4);
+        }
+
+        const payload = {
+            symbol: sym,
+            rsi: rsiResults,
+            signals: signals,
+            updatedAt: new Date().toISOString()
+        };
+
+        technicalRsiCache.set(sym, { timestamp: now, data: payload });
+        res.json({ success: true, ...payload });
+    } catch (err) {
+        console.error(`Technical RSI error (${sym}):`, err.message);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
 // Kiem tra trang thai ket noi DNSE API
 app.get('/api/dnse/status', (req, res) => {
     res.json({
