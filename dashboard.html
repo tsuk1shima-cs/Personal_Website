@@ -2082,7 +2082,7 @@ body {
 [data-theme="dark"] .row-up-light td { color: #4ade80; }
 [data-theme="dark"] .row-ref { background: rgba(245, 158, 11, 0.14); }
 [data-theme="dark"] .row-ref td { color: #fbbf24; }
-/* DASHBOARD SPLIT TOP: 2 COLUMNS (TỔNG QUAN BÊN TRÁI - DIỄN BIẾN KỸ THUẬT BÊN PHẢI) */
+/* DASHBOARD SPLIT TOP: 2 COLUMNS ĐỐI XỨNG BẰNG NHAU (DIỄN BIẾN KỸ THUẬT BÊN TRÁI - TỔNG QUAN BÊN PHẢI) */
 .dashboard-split-top {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -2096,19 +2096,52 @@ body {
   }
 }
 
-.dashboard-split-left {
+.dashboard-split-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-container);
+  border: 1px solid var(--border-stroke);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  min-width: 0;
+  height: 100%;
+}
+
+.split-panel-header {
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  padding: 0 12px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-stroke);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.overview-split-body {
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-width: 0;
+  flex: 1;
+  min-height: 0;
+  justify-content: space-between;
 }
 
-.dashboard-split-right {
-  display: flex;
-  flex-direction: column;
-  padding: 0 !important;
-  overflow: hidden;
-  min-width: 0;
+.overview-subcard {
+  background: var(--bg-subtle) !important;
+  border: 1px solid var(--border-stroke) !important;
+  border-radius: var(--radius-sm) !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .tech-grid-3col {
@@ -2117,6 +2150,8 @@ body {
   gap: 6px;
   padding: 8px 10px;
   flex: 1;
+  min-height: 0;
+  align-items: stretch;
 }
 @media (max-width: 900px) {
   .tech-grid-3col {
@@ -2126,8 +2161,8 @@ body {
 
 /* COMPACT TUNING: LOẠI BỎ KHOẢNG TRỐNG THỪA ("CHO NHỎ MẤY Ô LẠI") */
 .dashboard-split-top .tongquan-card {
-  padding: 7px 10px;
-  gap: 4px;
+  padding: 6px 8px;
+  gap: 3px;
 }
 .dashboard-split-top .tongquan-card-head {
   margin-bottom: 4px;
@@ -2384,153 +2419,12 @@ body {
         <!-- SUBTAB 1: TỔNG QUAN (CHIA 2: TỔNG QUAN BÊN TRÁI - DIỄN BIẾN KỸ THUẬT BÊN PHẢI) -->
         <div id="subview_tongquan" class="tongquan-grid-wrap">
 
-          <!-- KHỐI PHÍA TRÊN: CHIA 2 (TỔNG QUAN BÊN TRÁI - DIỄN BIẾN KỸ THUẬT BÊN PHẢI) -->
+          <!-- KHỐI PHÍA TRÊN: CHIA 2 ĐỐI XỨNG BẰNG NHAU (DIỄN BIẾN KỸ THUẬT BÊN TRÁI - TỔNG QUAN BÊN PHẢI) -->
           <div id="dashboardSplitTop" class="dashboard-split-top">
 
-            <!-- CỘT TRÁI: 5 BIỂU ĐỒ TỔNG QUAN THỊ TRƯỜNG -->
-            <div class="dashboard-split-left">
-
-              <!-- HÀNG 1: CỔ PHIẾU ẢNH HƯỞNG & BIẾN ĐỘNG THEO NGÀNH -->
-              <div class="grid-row-2col">
-
-            <!-- CHART 1: CỔ PHIẾU ẢNH HƯỞNG ĐẾN CHỈ SỐ -->
-            <div class="tongquan-card">
-              <div class="tongquan-card-head">
-                <div class="tongquan-card-title">
-                  <span class="blue-accent-bar"></span>
-                  Top cổ phiếu ảnh hưởng đến VN-Index
-                </div>
-                <span class="tongquan-card-subtitle">Điểm số tác động</span>
-              </div>
-              <div class="impact-columns">
-                <div>
-                  <div class="impact-col-head text-up">▲ Đóng góp Tăng điểm</div>
-                  <div id="impactPositiveRows">
-                    <!-- Populated by JavaScript -->
-                  </div>
-                </div>
-                <div>
-                  <div class="impact-col-head text-down">▼ Kéo Giảm điểm</div>
-                  <div id="impactNegativeRows">
-                    <!-- Populated by JavaScript -->
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- CHART 2: BIẾN ĐỘNG CHỈ SỐ THEO NGÀNH -->
-            <div class="tongquan-card">
-              <div class="tongquan-card-head">
-                <div class="tongquan-card-title">
-                  <span class="blue-accent-bar"></span>
-                  Biến động chỉ số theo ngành
-                </div>
-                <span class="tongquan-card-subtitle">% Thay đổi</span>
-              </div>
-              <div class="sector-bar-list" id="sectorBarList">
-                <!-- Populated by JavaScript -->
-              </div>
-            </div>
-
-          </div>
-
-          <!-- HÀNG 2: THANH KHOẢN & VỐN HÓA & KHỐI NGOẠI -->
-          <div class="grid-row-3col">
-
-            <!-- CHART 3: BIẾN ĐỘNG THANH KHOẢN -->
-            <div class="tongquan-card">
-              <div class="tongquan-card-head">
-                <div class="tongquan-card-title">
-                  <span class="blue-accent-bar"></span>
-                  Biến động thanh khoản
-                </div>
-                <span class="tongquan-card-subtitle">So với TB 20 phiên</span>
-              </div>
-              <div class="liq-meter-box">
-                <div class="liq-meter-num" id="liqRatioNum">+12.8%</div>
-                <div class="liq-meter-desc" id="liqDescText">Thanh khoản phiên đạt 112.8% so với trung bình 20 phiên</div>
-              </div>
-              <div class="liq-bars-wrap">
-                <div class="liq-bar-item">
-                  <span>Hôm nay</span>
-                  <div class="sector-bar-track"><div class="sector-bar-fill" id="liqBarToday" style="left:0; width:82%; background:var(--primary-brand);"></div></div>
-                  <b id="liqValToday">16.850 tỷ</b>
-                </div>
-                <div class="liq-bar-item">
-                  <span>Phiên trước</span>
-                  <div class="sector-bar-track"><div class="sector-bar-fill" id="liqBarPrev" style="left:0; width:72%; background:var(--text-muted);"></div></div>
-                  <b id="liqValPrev">14.920 tỷ</b>
-                </div>
-                <div class="liq-bar-item">
-                  <span>TB 20 phiên</span>
-                  <div class="sector-bar-track"><div class="sector-bar-fill" id="liqBarAvg" style="left:0; width:75%; background:var(--price-ref);"></div></div>
-                  <b id="liqValAvg">15.200 tỷ</b>
-                </div>
-              </div>
-            </div>
-
-            <!-- CHART 4: CỔ PHIẾU THEO QUY MÔ VỐN HÓA -->
-            <div class="tongquan-card">
-              <div class="tongquan-card-head">
-                <div class="tongquan-card-title">
-                  <span class="blue-accent-bar"></span>
-                  Cổ phiếu theo quy mô vốn hóa
-                </div>
-                <span class="tongquan-card-subtitle">Large / Mid / Small</span>
-              </div>
-              <div class="cap-boxes-grid">
-                <div class="cap-stat-box">
-                  <div class="cap-stat-name">LargeCap</div>
-                  <div class="cap-stat-val text-up" id="capLargeChg">+0.62%</div>
-                  <div class="cap-stat-sub">VN30 (65%)</div>
-                </div>
-                <div class="cap-stat-box">
-                  <div class="cap-stat-name">MidCap</div>
-                  <div class="cap-stat-val text-up" id="capMidChg">+0.48%</div>
-                  <div class="cap-stat-sub">MidCap (26%)</div>
-                </div>
-                <div class="cap-stat-box">
-                  <div class="cap-stat-name">SmallCap</div>
-                  <div class="cap-stat-val text-down" id="capSmallChg">-0.15%</div>
-                  <div class="cap-stat-sub">Penny (9%)</div>
-                </div>
-              </div>
-              <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.45; margin-top:4px;">
-                Dòng tiền luân chuyển tích cực qua nhóm <b>Ngân hàng & Công nghệ</b>, tạo bệ đỡ vững chắc cho chỉ số.
-              </div>
-            </div>
-
-            <!-- CHART 5: GIAO DỊCH KHỐI NGOẠI -->
-            <div class="tongquan-card">
-              <div class="tongquan-card-head">
-                <div class="tongquan-card-title">
-                  <span class="blue-accent-bar"></span>
-                  Giao dịch Khối ngoại
-                </div>
-                <span class="tongquan-card-subtitle text-up" id="foreignNetLabel">Mua ròng +380.5 tỷ</span>
-              </div>
-              <div class="foreign-sub-grid">
-                <div>
-                  <div class="foreign-sub-col-title text-up">Top Mua ròng</div>
-                  <div id="foreignTopBuyRows">
-                    <!-- Populated by JavaScript -->
-                  </div>
-                </div>
-                <div>
-                  <div class="foreign-sub-col-title text-down">Top Bán ròng</div>
-                  <div id="foreignTopSellRows">
-                    <!-- Populated by JavaScript -->
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-            </div>
-
-            <!-- CỘT PHẢI: CHỈ SỐ THỊ TRƯỜNG & DIỄN BIẾN KỸ THUẬT (#first) -->
-            <div id="first" class="dashboard-split-right tongquan-card" style="background:var(--bg-container);">
-              <div class="right-tab-header" style="background:var(--bg-subtle); display:flex; justify-content:space-between; align-items:center;">
+            <!-- CỘT TRÁI: CHỈ SỐ THỊ TRƯỜNG & DIỄN BIẾN KỸ THUẬT (#first) -->
+            <div id="first" class="dashboard-split-panel tongquan-card" style="background:var(--bg-container); padding:0 !important; overflow:hidden;">
+              <div class="split-panel-header">
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="blue-accent-bar"></span>
                   <b style="font-size:12.5px;">Chỉ số Thị trường & Phân tích Kỹ thuật Realtime</b>
@@ -2543,7 +2437,7 @@ body {
               <div class="tech-grid-3col">
 
                 <!-- CỘT A: CÁC CHỈ SỐ CHÍNH (VNINDEX, VN30, HNX, UPCOM) & ĐỘ RỘNG THỊ TRƯỜNG -->
-                <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); overflow:hidden; display:flex; flex-direction:column;">
+                <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;">
                   <!-- SELECTOR CARDS: VNINDEX, VN30, HNX, UPCOM -->
                   <div class="actual-frame-container" id="tblStockTradingIndex">
                     <div class="actual-frame-card active" id="card_VNINDEX" onclick="selectIndexCard('VNINDEX')">
@@ -2624,8 +2518,8 @@ body {
                 <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
                   <div class="intraday-header" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                      <span style="font-size:12.5px; font-weight:700;">DIỄN BIẾN TRONG PHIÊN</span>
-                      <span id="heroRefText" style="color:var(--price-ref); font-size:11.5px; margin-left:8px;">Tham chiếu: 1.704,87</span>
+                      <span style="font-size:12px; font-weight:700;">DIỄN BIẾN TRONG PHIÊN</span>
+                      <span id="heroRefText" style="color:var(--price-ref); font-size:11px; margin-left:8px;">Tham chiếu: 1.704,87</span>
                     </div>
                     <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật Robostock">Biểu đồ Kỹ thuật</button>
                   </div>
@@ -2645,7 +2539,7 @@ body {
                   <div class="rsi-section-title" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div style="display:flex; align-items:center; gap:6px;">
                       <span class="blue-accent-bar"></span>
-                      <span style="font-size:12.5px; font-weight:700;">Phân tích kỹ thuật (RSI Đa khung)</span>
+                      <span style="font-size:12px; font-weight:700;">Phân tích kỹ thuật (RSI Đa khung)</span>
                     </div>
                     <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
                   </div>
@@ -2685,6 +2579,160 @@ body {
                       <div class="gauge-info-desc text-down" id="gaugeRsiDesc">Tín hiệu: Quá bán (RSI < 30)</div>
                     </div>
                   </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- CỘT PHẢI: 5 BIỂU ĐỒ TỔNG QUAN THỊ TRƯỜNG -->
+            <div class="dashboard-split-panel tongquan-card" style="background:var(--bg-container); padding:0 !important; overflow:hidden;">
+              <div class="split-panel-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="blue-accent-bar"></span>
+                  <b style="font-size:12.5px;">Tổng quan Thị trường & Biến động Dòng tiền</b>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:11px; color:var(--text-muted);">5 Biểu đồ cốt lõi</span>
+                </div>
+              </div>
+
+              <div class="overview-split-body">
+
+                <!-- HÀNG 1: CỔ PHIẾU ẢNH HƯỞNG & BIẾN ĐỘNG THEO NGÀNH -->
+                <div class="grid-row-2col" style="margin:0; gap:6px; flex:1.1; min-height:0;">
+
+                  <!-- CHART 1: CỔ PHIẾU ẢNH HƯỞNG ĐẾN CHỈ SỐ -->
+                  <div class="tongquan-card overview-subcard">
+                    <div class="tongquan-card-head">
+                      <div class="tongquan-card-title">
+                        <span class="blue-accent-bar"></span>
+                        Top cổ phiếu ảnh hưởng đến VN-Index
+                      </div>
+                      <span class="tongquan-card-subtitle">Điểm số tác động</span>
+                    </div>
+                    <div class="impact-columns">
+                      <div>
+                        <div class="impact-col-head text-up">▲ Đóng góp Tăng điểm</div>
+                        <div id="impactPositiveRows">
+                          <!-- Populated by JavaScript -->
+                        </div>
+                      </div>
+                      <div>
+                        <div class="impact-col-head text-down">▼ Kéo Giảm điểm</div>
+                        <div id="impactNegativeRows">
+                          <!-- Populated by JavaScript -->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- CHART 2: BIẾN ĐỘNG CHỈ SỐ THEO NGÀNH -->
+                  <div class="tongquan-card overview-subcard">
+                    <div class="tongquan-card-head">
+                      <div class="tongquan-card-title">
+                        <span class="blue-accent-bar"></span>
+                        Biến động chỉ số theo ngành
+                      </div>
+                      <span class="tongquan-card-subtitle">% Thay đổi</span>
+                    </div>
+                    <div class="sector-bar-list" id="sectorBarList">
+                      <!-- Populated by JavaScript -->
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- HÀNG 2: THANH KHOẢN & VỐN HÓA & KHỐI NGOẠI -->
+                <div class="grid-row-3col" style="margin:0; gap:6px; flex:0.9; min-height:0;">
+
+                  <!-- CHART 3: BIẾN ĐỘNG THANH KHOẢN -->
+                  <div class="tongquan-card overview-subcard">
+                    <div class="tongquan-card-head">
+                      <div class="tongquan-card-title">
+                        <span class="blue-accent-bar"></span>
+                        Biến động thanh khoản
+                      </div>
+                      <span class="tongquan-card-subtitle">So với TB 20 phiên</span>
+                    </div>
+                    <div class="liq-meter-box">
+                      <div class="liq-meter-num" id="liqRatioNum">+12.8%</div>
+                      <div class="liq-meter-desc" id="liqDescText">Thanh khoản phiên đạt 112.8% so với trung bình 20 phiên</div>
+                    </div>
+                    <div class="liq-bars-wrap">
+                      <div class="liq-bar-item">
+                        <span>Hôm nay</span>
+                        <div class="sector-bar-track"><div class="sector-bar-fill" id="liqBarToday" style="left:0; width:82%; background:var(--primary-brand);"></div></div>
+                        <b id="liqValToday">16.850 tỷ</b>
+                      </div>
+                      <div class="liq-bar-item">
+                        <span>Phiên trước</span>
+                        <div class="sector-bar-track"><div class="sector-bar-fill" id="liqBarPrev" style="left:0; width:72%; background:var(--text-muted);"></div></div>
+                        <b id="liqValPrev">14.920 tỷ</b>
+                      </div>
+                      <div class="liq-bar-item">
+                        <span>TB 20 phiên</span>
+                        <div class="sector-bar-track"><div class="sector-bar-fill" id="liqBarAvg" style="left:0; width:75%; background:var(--price-ref);"></div></div>
+                        <b id="liqValAvg">15.200 tỷ</b>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- CHART 4: CỔ PHIẾU THEO QUY MÔ VỐN HÓA -->
+                  <div class="tongquan-card overview-subcard">
+                    <div class="tongquan-card-head">
+                      <div class="tongquan-card-title">
+                        <span class="blue-accent-bar"></span>
+                        Cổ phiếu theo quy mô vốn hóa
+                      </div>
+                      <span class="tongquan-card-subtitle">Large / Mid / Small</span>
+                    </div>
+                    <div class="cap-boxes-grid">
+                      <div class="cap-stat-box">
+                        <div class="cap-stat-name">LargeCap</div>
+                        <div class="cap-stat-val text-up" id="capLargeChg">+0.62%</div>
+                        <div class="cap-stat-sub">VN30 (65%)</div>
+                      </div>
+                      <div class="cap-stat-box">
+                        <div class="cap-stat-name">MidCap</div>
+                        <div class="cap-stat-val text-up" id="capMidChg">+0.48%</div>
+                        <div class="cap-stat-sub">MidCap (26%)</div>
+                      </div>
+                      <div class="cap-stat-box">
+                        <div class="cap-stat-name">SmallCap</div>
+                        <div class="cap-stat-val text-down" id="capSmallChg">-0.15%</div>
+                        <div class="cap-stat-sub">Penny (9%)</div>
+                      </div>
+                    </div>
+                    <div style="font-size:10.5px; color:var(--text-secondary); line-height:1.35; margin-top:2px;">
+                      Dòng tiền luân chuyển qua <b>Ngân hàng & Công nghệ</b>.
+                    </div>
+                  </div>
+
+                  <!-- CHART 5: GIAO DỊCH KHỐI NGOẠI -->
+                  <div class="tongquan-card overview-subcard">
+                    <div class="tongquan-card-head">
+                      <div class="tongquan-card-title">
+                        <span class="blue-accent-bar"></span>
+                        Giao dịch Khối ngoại
+                      </div>
+                      <span class="tongquan-card-subtitle text-up" id="foreignNetLabel">Mua ròng +380.5 tỷ</span>
+                    </div>
+                    <div class="foreign-sub-grid">
+                      <div>
+                        <div class="foreign-sub-col-title text-up">Top Mua ròng</div>
+                        <div id="foreignTopBuyRows">
+                          <!-- Populated by JavaScript -->
+                        </div>
+                      </div>
+                      <div>
+                        <div class="foreign-sub-col-title text-down">Top Bán ròng</div>
+                        <div id="foreignTopSellRows">
+                          <!-- Populated by JavaScript -->
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
 
               </div>
