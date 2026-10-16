@@ -2379,11 +2379,11 @@ body {
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:8px; border-top:1px solid var(--border-stroke);">
               <div style="display:flex; gap:6px; flex-wrap:wrap;" id="taFilterControls">
                 <button class="period-tab-btn active" onclick="switchTAFilter('all', this)">Tất cả</button>
-                <button class="period-tab-btn" onclick="switchTAFilter('vol_breakout', this)">⚡ Volume Breakout</button>
-                <button class="period-tab-btn" onclick="switchTAFilter('sideway_breakout', this)">🔥 Vượt đỉnh / MA20</button>
-                <button class="period-tab-btn" onclick="switchTAFilter('oversold', this)">💡 Quá bán RSI &lt; 35</button>
-                <button class="period-tab-btn" onclick="switchTAFilter('overbought', this)">⚠️ Quá mua RSI &gt; 68</button>
-                <button class="period-tab-btn" onclick="switchTAFilter('golden_cross', this)">✨ Golden Cross</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('vol_breakout', this)">Volume Breakout</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('sideway_breakout', this)">Vượt đỉnh / MA20</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('oversold', this)">Quá bán RSI &lt; 35</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('overbought', this)">Quá mua RSI &gt; 68</button>
+                <button class="period-tab-btn" onclick="switchTAFilter('golden_cross', this)">Golden Cross</button>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <input type="text" id="taSearchInput" placeholder="Lọc mã TA (FPT, TCB...)" oninput="renderTASignals()" style="padding:4px 8px; font-size:12px; border:1px solid var(--border-stroke); border-radius:4px; background:var(--bg-subtle); color:var(--text-primary); outline:none; width:150px;">
@@ -2437,11 +2437,11 @@ body {
             <!-- Preset Filters (Chiến lược mẫu 1-click) -->
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-stroke);">
               <span style="font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-right:4px;">Chiến lược mẫu:</span>
-              <button class="period-tab-btn" onclick="applyFAPreset('growth', this)">⚡ Tăng trưởng cao (Canslim)</button>
-              <button class="period-tab-btn" onclick="applyFAPreset('value', this)">💎 Định giá rẻ (Value)</button>
-              <button class="period-tab-btn" onclick="applyFAPreset('bluechips', this)">👑 Bluechips VN30</button>
-              <button class="period-tab-btn" onclick="applyFAPreset('high_roe', this)">📈 Siêu hiệu quả (ROE &gt; 20%)</button>
-              <button class="period-tab-btn" onclick="resetFAFilters(this)" style="color:var(--text-muted);">🔄 Đặt lại</button>
+              <button class="period-tab-btn" onclick="applyFAPreset('growth', this)">Tăng trưởng cao (Canslim)</button>
+              <button class="period-tab-btn" onclick="applyFAPreset('value', this)">Định giá rẻ (Value)</button>
+              <button class="period-tab-btn" onclick="applyFAPreset('bluechips', this)">Bluechips VN30</button>
+              <button class="period-tab-btn" onclick="applyFAPreset('high_roe', this)">Siêu hiệu quả (ROE &gt; 20%)</button>
+              <button class="period-tab-btn" onclick="resetFAFilters(this)" style="color:var(--text-muted);">Đặt lại</button>
             </div>
 
             <!-- Grid Controls Filter -->
@@ -2605,7 +2605,7 @@ body {
             <span class="pulse-dot" style="width:6px;height:6px;"></span>
             <b>Dòng Khớp Lệnh Thời Gian Thực</b>
           </span>
-          <span style="color:var(--price-up); font-weight:600;" id="tapeSpeedLabel">⚡ Khớp liên tục (~1.1s/lệnh)</span>
+          <span style="color:var(--price-up); font-weight:600;" id="tapeSpeedLabel">Khớp liên tục (~1.1s/lệnh)</span>
         </div>
         <div class="watchlist-table-scroll" style="flex:1;">
           <table class="watchlist-table" style="font-size:11.5px;">
@@ -2637,7 +2637,7 @@ body {
       <div id="rightViewAi" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
         <div class="ai-embedded-head" style="padding:8px 10px; background:var(--bg-subtle); border-bottom:1px solid var(--border-stroke); display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
           <div style="display:flex; align-items:center; gap:6px;">
-            <div class="ai-avatar-badge" style="width:24px; height:24px; font-size:12px;">⚡</div>
+            <div class="ai-avatar-badge" style="width:24px; height:24px; font-size:10px; font-weight:700;">AI</div>
             <div>
               <div style="font-size:12px; font-weight:700;">Trợ lý AI Phân tích Realtime</div>
               <div style="font-size:10px; color:var(--price-up); display:flex; align-items:center; gap:3px;">
@@ -2647,7 +2647,7 @@ body {
             </div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button onclick="clearDashboardAiChat()" class="ai-head-btn" title="Xóa lịch sử" style="padding:2px 6px; font-size:11px; cursor:pointer;">🗑</button>
+            <button onclick="clearDashboardAiChat()" class="ai-head-btn" title="Xóa lịch sử" style="padding:2px 6px; font-size:11px; cursor:pointer;">Xóa</button>
             <a href="chatbot.html" target="_blank" class="ai-head-btn" title="Mở trang đầy đủ" style="padding:2px 6px; font-size:11px; text-decoration:none;">↗</a>
           </div>
         </div>
@@ -2668,10 +2668,10 @@ body {
         </div>
 
         <div class="ai-quick-chips-row" style="padding:6px 8px; border-top:1px solid var(--border-stroke); background:var(--bg-subtle); display:flex; gap:4px; overflow-x:auto; flex-shrink:0;">
-          <button class="ai-chip-pill" onclick="quickAiPrompt('Nhận định xu hướng VN-Index hôm nay')">📊 VN-Index</button>
-          <button class="ai-chip-pill" onclick="quickAiPrompt('Phân tích chi tiết cổ phiếu FPT')">⚡ FPT</button>
-          <button class="ai-chip-pill" onclick="quickAiPrompt('Cổ phiếu Ngân hàng nào dẫn dắt?')">🏦 Ngân hàng</button>
-          <button class="ai-chip-pill" onclick="quickAiPrompt('Top cổ phiếu có định giá hấp dẫn nhất?')">🎯 Định giá</button>
+          <button class="ai-chip-pill" onclick="quickAiPrompt('Nhận định xu hướng VN-Index hôm nay')">VN-Index</button>
+          <button class="ai-chip-pill" onclick="quickAiPrompt('Phân tích chi tiết cổ phiếu FPT')">FPT</button>
+          <button class="ai-chip-pill" onclick="quickAiPrompt('Cổ phiếu Ngân hàng nào dẫn dắt?')">Ngân hàng</button>
+          <button class="ai-chip-pill" onclick="quickAiPrompt('Top cổ phiếu có định giá hấp dẫn nhất?')">Định giá</button>
         </div>
 
         <form class="ai-input-form" onsubmit="handleAiFormSubmit(event)" style="padding:8px; border-top:1px solid var(--border-stroke); display:flex; gap:6px; flex-shrink:0; background:var(--bg-container);">
@@ -2712,10 +2712,10 @@ body {
           <span style="font-size:12px; font-weight:700; color:var(--text-secondary); font-family:var(--font-data);" id="stockDetailRealtimeClock"></span>
           <div style="width:1px; height:18px; background:var(--border-stroke);"></div>
           <button onclick="toggleStockDetailChartMode(currentStockDetailSymbol)" id="btnToggleDetailChart" class="btn-theme-toggle" style="width:auto; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer;" title="Chuyển đổi đồ thị nến DNSE">
-            🕯️ Biểu đồ Nến DNSE
+            Biểu đồ Nến DNSE
           </button>
           <button onclick="askAiStockDetail(currentStockDetailSymbol)" class="btn-login-main" style="height:32px; font-size:12px; gap:6px; border:none; cursor:pointer; padding:0 14px;">
-            <span>⚡ Hỏi AI Chatbot</span>
+            <span>Hỏi AI Chatbot</span>
           </button>
           <div style="width:1px; height:18px; background:var(--border-stroke);"></div>
           <button onclick="closeStockDetailModal()" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); font-size:20px; cursor:pointer; color:var(--text-secondary); width:32px; height:32px; display:flex; align-items:center; justify-content:center; transition:all 0.15s;" onmouseover="this.style.color='var(--text-primary)';this.style.borderColor='var(--primary-brand)'" onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-stroke)'" title="Đóng popup (Esc)">&times;</button>
@@ -3031,7 +3031,7 @@ body {
             <input type="password" id="loginPassword" placeholder="••••••••" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" value="phucdch2026">
           </div>
           <button type="submit" class="btn-login-main" style="width:100%;padding:9px;border:none;cursor:pointer;margin-top:4px;">Đăng nhập ngay</button>
-          <button type="button" onclick="handleDemoQuickLogin()" class="btn-theme-toggle" style="width:100%;padding:8px;font-weight:600;border:1px dashed var(--primary-brand);color:var(--primary-brand);cursor:pointer;">⚡ Đăng nhập nhanh tài khoản Pro Demo</button>
+          <button type="button" onclick="handleDemoQuickLogin()" class="btn-theme-toggle" style="width:100%;padding:8px;font-weight:600;border:1px dashed var(--primary-brand);color:var(--primary-brand);cursor:pointer;">Đăng nhập nhanh tài khoản Pro Demo</button>
         </form>
         <div style="font-size:10.5px;color:var(--text-muted);text-align:center;margin-top:2px;">
           Tài khoản Pro được mở toàn bộ dữ liệu Realtime, Chatbot AI và Tín hiệu TA
@@ -3336,7 +3336,7 @@ body {
         const c = s.change !== undefined && s.change !== null ? s.change : 0;
         let colorCls = 'text-ref';
         let arrow = '■';
-        if (c >= 6.8) { colorCls = 'text-ceil'; arrow = '★'; }
+        if (c >= 6.8) { colorCls = 'text-ceil'; arrow = '▲'; }
         else if (c <= -6.8) { colorCls = 'text-floor'; arrow = '▼'; }
         else if (c > 0) { colorCls = 'text-up'; arrow = '▲'; }
         else if (c < 0) { colorCls = 'text-down'; arrow = '▼'; }
@@ -3986,7 +3986,7 @@ body {
         const chg = s.change !== null ? s.change : 0;
         let colorCls = 'text-ref';
         let arrow = '■';
-        if (chg >= 6.8) { colorCls = 'text-ceil'; arrow = '★'; }
+        if (chg >= 6.8) { colorCls = 'text-ceil'; arrow = '▲'; }
         else if (chg <= -6.8) { colorCls = 'text-floor'; arrow = '▼'; }
         else if (chg > 0) { colorCls = 'text-up'; arrow = '▲'; }
         else if (chg < 0) { colorCls = 'text-down'; arrow = '▼'; }
@@ -4962,27 +4962,27 @@ body {
 
         if (volRatio >= 1.5 && chg >= 1.2) {
           signalType = 'vol_breakout';
-          signalBadge = '<span style="background:rgba(34,197,94,0.15);color:var(--price-up);padding:3px 8px;border-radius:10px;font-weight:700;">⚡ BREAKOUT VOL</span>';
+          signalBadge = '<span style="background:rgba(34,197,94,0.15);color:var(--price-up);padding:3px 8px;border-radius:10px;font-weight:700;">BREAKOUT VOL</span>';
           pattern = 'Nến Marubozu vượt cản ngắn';
           action = `Mở vị thế Mua gia tăng quanh ${(s.price * 0.99).toFixed(0)} đ. Target: +12%`;
         } else if (chg >= 2.0) {
           signalType = 'sideway_breakout';
-          signalBadge = '<span style="background:rgba(168,85,247,0.15);color:var(--price-ceil);padding:3px 8px;border-radius:10px;font-weight:700;">🔥 VƯỢT ĐỈNH NỀN</span>';
+          signalBadge = '<span style="background:rgba(168,85,247,0.15);color:var(--price-ceil);padding:3px 8px;border-radius:10px;font-weight:700;">VƯỢT ĐỈNH NỀN</span>';
           pattern = 'Breakout nền tích lũy 3 tuần';
           action = `Canh mua khi retest đỉnh. Cắt lỗ: ${(s.price * 0.93).toFixed(0)} đ (-7%)`;
         } else if (rsi <= 35) {
           signalType = 'oversold';
-          signalBadge = '<span style="background:rgba(59,130,246,0.15);color:#3b82f6;padding:3px 8px;border-radius:10px;font-weight:700;">💡 QUÁ BÁN RSI</span>';
+          signalBadge = '<span style="background:rgba(59,130,246,0.15);color:#3b82f6;padding:3px 8px;border-radius:10px;font-weight:700;">QUÁ BÁN RSI</span>';
           pattern = 'Nến búa rút chân tại hỗ trợ';
           action = `Canh gom dò đáy từng phần. Kỳ vọng hồi phục kỹ thuật +8%`;
         } else if (rsi >= 68) {
           signalType = 'overbought';
-          signalBadge = '<span style="background:rgba(239,68,68,0.15);color:var(--price-down);padding:3px 8px;border-radius:10px;font-weight:700;">⚠️ QUÁ MUA CHỐT LỜI</span>';
+          signalBadge = '<span style="background:rgba(239,68,68,0.15);color:var(--price-down);padding:3px 8px;border-radius:10px;font-weight:700;">QUÁ MUA CHỐT LỜI</span>';
           pattern = 'Phân kỳ ngắn hạn vùng cản';
           action = `Canh chốt lời từng phần 50% vị thế, không mua đuổi`;
         } else if (chg > 0.4 && (s.roe || 15) >= 18) {
           signalType = 'golden_cross';
-          signalBadge = '<span style="background:rgba(16,185,129,0.15);color:var(--price-up);padding:3px 8px;border-radius:10px;font-weight:700;">✨ GOLDEN CROSS</span>';
+          signalBadge = '<span style="background:rgba(16,185,129,0.15);color:var(--price-up);padding:3px 8px;border-radius:10px;font-weight:700;">GOLDEN CROSS</span>';
           pattern = 'Đường MA20 cắt lên MA50';
           action = `Vào sóng tăng trung hạn. Vùng mua quanh ${(s.price * 0.99).toFixed(0)} đ`;
         } else {
@@ -5710,7 +5710,7 @@ body {
       if (modal) modal.style.display = 'flex';
 
       const btnTv = document.getElementById('btnToggleDetailChart');
-      if (btnTv) btnTv.innerHTML = '🕯️ Biểu đồ Nến DNSE';
+      if (btnTv) btnTv.innerHTML = 'Biểu đồ Nến DNSE';
 
       // Tải và đồng bộ chỉ số kỹ thuật RSI thực tế đa khung thời gian cho modal
       if (typeof fetchStockDetailTechnicalRSI === 'function') {
@@ -6054,7 +6054,7 @@ body {
             </div>
 
             <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.45; margin-top:8px; padding-top:6px; border-top:1px dashed var(--border-stroke);">
-              💡 <b>Nhận định FA</b>: Mã <b>${stock.symbol}</b> có định giá P/E ở mức ${stock.pe || 11.8}x, thấp hơn trung bình ngành, ROE đạt ${stock.roe || 18.2}% thể hiện sức sinh lời vượt trội và cơ hội đầu tư bền vững.
+              <b>Nhận định FA</b>: Mã <b>${stock.symbol}</b> có định giá P/E ở mức ${stock.pe || 11.8}x, thấp hơn trung bình ngành, ROE đạt ${stock.roe || 18.2}% thể hiện sức sinh lời vượt trội và cơ hội đầu tư bền vững.
             </div>
           </div>
 
@@ -6070,7 +6070,7 @@ body {
                 ${isMarketTradingNow() ? '<span class="pulse-dot" style="width:6px;height:6px;"></span>' : ''}
                 <span>Nhật ký Khớp lệnh ${isMarketTradingNow() ? 'Realtime' : 'Chốt phiên'} • ${stock.symbol}</span>
               </div>
-              ${isMarketTradingNow() ? '<span class="badge-tape buy" style="font-size:10px;">⚡ Khớp liên tục</span>' : '<span class="badge-tape" style="font-size:10px; background:var(--bg-subtle); color:var(--text-muted); border:1px solid var(--border-stroke);">⏸️ Đóng cửa phiên</span>'}
+              ${isMarketTradingNow() ? '<span class="badge-tape buy" style="font-size:10px;">Khớp liên tục</span>' : '<span class="badge-tape" style="font-size:10px; background:var(--bg-subtle); color:var(--text-muted); border:1px solid var(--border-stroke);">Đóng cửa phiên</span>'}
             </div>
             <div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-stroke); border-radius:var(--radius-sm);">
               <table class="market-table" style="width:100%; font-size:11.5px; border-collapse:collapse;">
@@ -6094,7 +6094,7 @@ body {
           <div class="tongquan-card" style="margin:0; background:linear-gradient(180deg, var(--bg-container) 0%, var(--bg-subtle) 100%);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <div style="display:flex; align-items:center; gap:8px;">
-                <div class="ai-avatar-badge" style="width:26px; height:26px; font-size:13px;">⚡</div>
+                <div class="ai-avatar-badge" style="width:26px; height:26px; font-size:11px; font-weight:700;">AI</div>
                 <div>
                   <div style="font-size:13px; font-weight:700;">Trợ lý AI Phân tích Cổ phiếu ${stock.symbol} Realtime</div>
                   <div style="font-size:11px; color:var(--text-muted);">Phân tích định giá, kỹ thuật và điểm mua/bán tối ưu trực tiếp trong Dashboard</div>
@@ -6106,13 +6106,13 @@ body {
             <!-- PROMPT QUICK PILLS -->
             <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
               <button onclick="askAiStockDetail('Đánh giá định giá P/E, P/B và tiềm năng tăng trưởng của ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
-                📊 Định giá P/E, P/B
+                Định giá P/E, P/B
               </button>
               <button onclick="askAiStockDetail('Phân tích kỹ thuật, xu hướng dòng tiền và điểm mua/bán tối ưu cho ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
-                📈 Điểm Mua / Bán
+                Điểm Mua / Bán
               </button>
               <button onclick="askAiStockDetail('Phân tích cung cầu, lực mua chủ động và khối ngoại của ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
-                🛡️ Cung cầu & Rủi ro
+                Cung cầu & Rủi ro
               </button>
             </div>
 
@@ -6330,7 +6330,7 @@ body {
       }
 
       const legend = document.getElementById('candleOhlcLegend');
-      if (legend) legend.innerHTML = `<span>⏳ Đang tải nến DNSE Entrade X (${sym} • ${resolution})...</span>`;
+      if (legend) legend.innerHTML = `<span>Đang tải nến DNSE Entrade X (${sym} • ${resolution})...</span>`;
 
       try {
         const resp = await fetch(`/api/dnse/chart/stock/${encodeURIComponent(sym)}?resolution=${resolution}`);
@@ -6701,7 +6701,7 @@ body {
         if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN NHẬT BẢN • ${targetSym}`;
         if (chartBadge) chartBadge.textContent = 'DNSE Entrade X';
         if (refLabel) refLabel.style.display = 'none';
-        btn.innerHTML = '📈 Biểu đồ Intraday';
+        btn.innerHTML = 'Biểu đồ Intraday';
 
         drawDnseStockCandleChart(targetSym, currentDetailCandleRes);
       } else {
@@ -6712,7 +6712,7 @@ body {
         if (chartTitle) chartTitle.textContent = `DIỄN BIẾN TRONG PHIÊN • ${targetSym}`;
         if (chartBadge) chartBadge.textContent = 'DNSE Realtime';
         if (refLabel) refLabel.style.display = 'inline';
-        btn.innerHTML = '🕯️ Biểu đồ Nến DNSE';
+        btn.innerHTML = 'Biểu đồ Nến DNSE';
 
         const stock = (stockDataList && stockDataList.find(s => s.symbol === targetSym)) || { price: 33500 };
         renderStockDetailIntradaySvg(stock);
@@ -6922,7 +6922,7 @@ body {
         const res = await generateLiveAiResponse(query);
         box.innerHTML = `
           <div style="color:var(--primary-brand);font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
-            <span>⚡ Kết quả Phân tích AI • ${currentStockDetailSymbol}</span>
+            <span>Kết quả Phân tích AI • ${currentStockDetailSymbol}</span>
             <span style="font-size:10.5px;color:var(--text-muted);">${res.source || 'AI Market Engine'}</span>
           </div>
           <div style="color:var(--text-primary);line-height:1.65;">
@@ -7031,7 +7031,7 @@ body {
         botDiv.innerHTML = `
           <div class="ai-bubble">
             ${formatAiMarkdown(responseData.message)}
-            ${responseData.source ? `<div class="ai-data-badge">⚡ ${responseData.source}</div>` : ''}
+            ${responseData.source ? `<div class="ai-data-badge">${responseData.source}</div>` : ''}
           </div>
         `;
         container.appendChild(botDiv);
@@ -7078,7 +7078,7 @@ body {
                 : 'Hệ thống Phân tích AI Realtime';
               return {
                 message: resJson.message,
-                source: `⚡ ${mcpLabel}`
+                source: mcpLabel
               };
             }
           }
@@ -7156,7 +7156,7 @@ body {
           advice = `Cổ phiếu đang tích lũy ổn định quanh nền giá. Nhà đầu tư có thể giải ngân gom thăm dò theo từng phần, cắt lỗ dứt khoát nếu giá đóng cửa thủng **${Number(stopPrice).toLocaleString('vi-VN')} đ** (-7%).`;
         }
 
-        const msg = `### ⚡ Phân tích Realtime: ${stock.symbol} (${stock.exchange || 'HOSE'})
+        const msg = `### Phân tích Realtime: ${stock.symbol} (${stock.exchange || 'HOSE'})
 • **Giá khớp lệnh hiện tại**: **${p.toLocaleString('vi-VN')} đ** (${arrow} ${sign}${c.toFixed(2)}% hôm nay)
 • **Khối lượng giao dịch**: **${volStr} CP** | Ngành: **${stock.sector || 'Tài chính'}**
 • **Chỉ số cơ bản (FA)**: P/E: **${stock.pe ? stock.pe.toFixed(1) + 'x' : '12.5x'}** | P/B: **${stock.pb ? stock.pb.toFixed(2) + 'x' : '1.45x'}** | ROE: **${stock.roe ? stock.roe.toFixed(1) + '%' : '18.2%'}**
@@ -7185,7 +7185,7 @@ body {
 
         const topGainers = stockDataList.filter(s => (s.change||0) > 0).slice(0, 4).map(s => `**${s.symbol}** (+${s.change}%)`).join(', ');
 
-        const msg = `### 📊 Nhận định Toàn cảnh Thị trường (Realtime)
+        const msg = `### Nhận định Toàn cảnh Thị trường (Realtime)
 • **Chỉ số ${names[activeMarket] || 'VN-INDEX'}**: **${val.toLocaleString('vi-VN')} điểm** (${isUp ? '▲ +' : '▼ '}${pt} điểm, ${isUp ? '+' : ''}${chg.toFixed(2)}%)
 • **Biên độ trong ngày**: Thấp nhất **${idx.low ? idx.low.toLocaleString('vi-VN') : '1.696,47'}** – Cao nhất **${idx.high ? idx.high.toLocaleString('vi-VN') : '1.709,54'}** điểm
 • **Độ rộng thị trường**: **${adv} mã tăng** (Trần ${ceil}) so với **${dec} mã giảm** (Sàn ${floor})
@@ -7212,7 +7212,7 @@ body {
           return `- **${s.symbol}**: **${(s.price||0).toLocaleString('vi-VN')} đ** (${(s.change||0) >= 0 ? '+' : ''}${(s.change||0).toFixed(2)}%), KL: ${(s.volume ? (s.volume/1e6).toFixed(1) + 'M' : '—')}`;
         }).join('\n');
 
-        const msg = `### 🏢 Đánh giá Nhóm ngành: ${secName}
+        const msg = `### Đánh giá Nhóm ngành: ${secName}
 Nhóm ngành **${secName}** đang có biến động theo sát nhịp vận động của chỉ số chung:
 ${leaderDetails}
 
@@ -7397,7 +7397,7 @@ ${leaderDetails}
       marketNotifications = [
         {
           id: 'n_init_1',
-          icon: '🔥',
+          tag: 'DÒNG TIỀN',
           title: 'Dòng tiền gom mạnh nhóm Công nghệ & Ngân hàng',
           titleColor: 'var(--primary-brand)',
           time: formatTimeAgo(3),
@@ -7405,7 +7405,7 @@ ${leaderDetails}
         },
         {
           id: 'n_init_2',
-          icon: '🌐',
+          tag: 'KHỐI NGOẠI',
           title: 'Khối ngoại thu hẹp đà bán ròng',
           titleColor: 'var(--price-up)',
           time: formatTimeAgo(14),
@@ -7413,7 +7413,7 @@ ${leaderDetails}
         },
         {
           id: 'n_init_3',
-          icon: '⚡',
+          tag: 'PHÁI SINH',
           title: 'Cảnh báo kỹ thuật VN30 Futures & Basis',
           titleColor: 'var(--primary-brand)',
           time: formatTimeAgo(35),
@@ -7421,7 +7421,7 @@ ${leaderDetails}
         },
         {
           id: 'n_init_4',
-          icon: '⚠️',
+          tag: 'CẢNH BÁO',
           title: 'Cảnh báo phân hóa nhóm Bất động sản',
           titleColor: 'var(--price-down)',
           time: formatTimeAgo(62),
@@ -7443,10 +7443,12 @@ ${leaderDetails}
 
       container.innerHTML = marketNotifications.map(item => `
         <div class="notice-card-item" style="display:flex;gap:10px;padding:10px 12px;background:var(--bg-subtle);border-radius:var(--radius-sm);border:1px solid var(--border-stroke);margin-bottom:6px;">
-          <span style="font-size:18px;line-height:1.2;">${item.icon}</span>
           <div style="flex:1;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
-              <b style="font-size:12.5px;color:${item.titleColor || 'var(--text-primary)'};">${item.title}</b>
+              <div style="display:flex;align-items:center;gap:6px;">
+                ${item.tag ? `<span style="font-size:9.5px;padding:1px 6px;border-radius:3px;font-weight:700;background:var(--bg-container);border:1px solid var(--border-stroke);color:${item.titleColor || 'var(--text-primary)'};">${item.tag}</span>` : ''}
+                <b style="font-size:12.5px;color:${item.titleColor || 'var(--text-primary)'};">${item.title}</b>
+              </div>
               <span style="font-size:10.5px;color:var(--text-muted);font-weight:600;">${item.time}</span>
             </div>
             <div style="font-size:11.5px;color:var(--text-primary);line-height:1.45;">
@@ -7487,10 +7489,12 @@ ${leaderDetails}
       const toast = document.createElement('div');
       toast.className = 'market-toast';
       toast.innerHTML = `
-        <span style="font-size:20px;line-height:1;">${item.icon}</span>
         <div style="flex:1;">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
-            <strong style="font-size:12px;color:${item.titleColor || 'var(--primary-brand)'};">${item.title}</strong>
+            <div style="display:flex;align-items:center;gap:6px;">
+              ${item.tag ? `<span style="font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;background:var(--bg-subtle);border:1px solid var(--border-stroke);color:${item.titleColor || 'var(--primary-brand)'};">${item.tag}</span>` : ''}
+              <strong style="font-size:12px;color:${item.titleColor || 'var(--primary-brand)'};">${item.title}</strong>
+            </div>
             <span style="font-size:10px;color:var(--text-muted);">${item.time}</span>
           </div>
           <div style="font-size:11px;color:var(--text-primary);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">
@@ -7531,25 +7535,25 @@ ${leaderDetails}
 
         const templates = [
           {
-            icon: '⚡',
+            tag: 'LỆNH LỚN',
             title: `Biến động lệnh lớn: ${candidateStock.symbol}`,
             titleColor: (candidateStock.change || 0) >= 0 ? 'var(--price-up)' : 'var(--price-down)',
             content: `Cổ phiếu ${candidateStock.symbol} ghi nhận khớp lệnh chủ động tại mức giá ${(candidateStock.price || 30000).toLocaleString('vi-VN')} đ (${(candidateStock.change || 0) >= 0 ? '+' : ''}${(candidateStock.change || 0).toFixed(2)}%), tổng KL đạt ${(candidateStock.volume ? (candidateStock.volume/1e6).toFixed(1) + 'M' : '2.8M')} CP.`
           },
           {
-            icon: '📊',
+            tag: 'VN-INDEX',
             title: 'Chỉ số VN-Index kiểm định vùng cản',
             titleColor: 'var(--primary-brand)',
             content: `VN-Index đang giao dịch tại ${vniPrice} điểm (${vniSign}${vniChg}%). Độ rộng thị trường duy trì ổn định với thanh khoản khớp lệnh đạt ${vni.valueTy ? vni.valueTy.toLocaleString('vi-VN') + ' tỷ' : '11.072 tỷ'}.`
           },
           {
-            icon: '🌐',
+            tag: 'KHỐI NGOẠI',
             title: 'Dòng tiền Khối ngoại điều tiết',
             titleColor: 'var(--price-up)',
             content: `Khối ngoại tiếp tục đẩy mạnh gom các cổ phiếu trụ có nền tảng cơ bản cao: ${topStocks.slice(0, 3).map(s => s.symbol).join(', ')}.`
           },
           {
-            icon: '🔥',
+            tag: 'THANH KHOẢN',
             title: 'Bùng nổ thanh khoản nhóm Ngân hàng & Công nghệ',
             titleColor: 'var(--primary-brand)',
             content: `Lực cầu hấp thụ tốt lượng cung bán giá đỏ, thanh khoản nhóm Ngân hàng và Công nghệ chiếm tỷ trọng hơn 42% toàn thị trường.`
@@ -7559,7 +7563,7 @@ ${leaderDetails}
         const selectedTemplate = templates[alertRotationIndex % templates.length];
         pushMarketNotification({
           id: 'n_live_' + Date.now(),
-          icon: selectedTemplate.icon,
+          tag: selectedTemplate.tag,
           title: selectedTemplate.title,
           titleColor: selectedTemplate.titleColor,
           time: nowStr,
@@ -7635,7 +7639,7 @@ ${leaderDetails}
       // Khi chạy trên GitHub Pages / Web trực tiếp (Zero-backend Direct Live Stream)
       const pill = document.getElementById('aiDrawerMcpPill');
       const subText = document.getElementById('aiMcpSubText');
-      if (pill) pill.innerHTML = `<span class="mcp-dot" style="background:#16a34a;box-shadow:0 0 8px rgba(22,163,74,0.7);"></span> ⚡ Trực tiếp: Realtime Stream`;
+      if (pill) pill.innerHTML = `<span class="mcp-dot" style="background:#16a34a;box-shadow:0 0 8px rgba(22,163,74,0.7);"></span> Trực tiếp: Realtime Stream`;
       if (subText) subText.textContent = `Realtime Live Stream (HOSE/HNX Online)`;
     }
 
