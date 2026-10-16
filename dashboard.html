@@ -1699,6 +1699,155 @@ body {
   .grid-row-2col, .grid-row-3col { grid-template-columns: 1fr; }
   .ai-drawer-card { width: calc(100vw - 20px); right: 10px; bottom: 10px; height: 500px; }
 }
+
+/* ROBOSTOCK INDICATOR TOOLBAR & LIBRARY STYLES */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 5px 8px;
+  border: 1px solid var(--border-stroke);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.toolbar::-webkit-scrollbar { height: 4px; }
+.toolbar::-webkit-scrollbar-thumb { background: var(--border-stroke); border-radius: 2px; }
+
+.indicator-library-button {
+  flex: 0 0 auto;
+  height: 26px;
+  padding: 0 9px;
+  border: 1px solid var(--border-stroke);
+  border-radius: 4px;
+  background: var(--bg-container);
+  color: var(--primary-brand);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.indicator-library-button:hover {
+  border-color: var(--primary-brand);
+  background: var(--primary-light);
+}
+
+.quick-indicator-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 0 4px;
+  border-right: 1px solid var(--border-stroke);
+}
+.quick-indicator-group:last-child {
+  border-right: none;
+}
+.quick-indicator-group[hidden] {
+  display: none !important;
+}
+
+.indicator-toggle {
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 7px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.indicator-toggle:hover {
+  color: var(--text-primary);
+  background: var(--bg-container);
+}
+.indicator-toggle.active {
+  color: var(--text-primary);
+  border-color: var(--border-stroke);
+  background: var(--bg-container);
+  box-shadow: var(--shadow-sm);
+}
+.indicator-toggle:not(.active) .dot {
+  opacity: 0.3;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.sma20-dot { background: #f1c75b; }
+.sma60-dot { background: #38bdf8; }
+.sma250-dot { background: #ec4899; }
+.volume-dot { background: #22c55e; }
+.hvp-dot { background: #8b5cf6; }
+.quiet-dot { background: #94a3b8; }
+.bollinger-dot { background: #60a5fa; }
+.rsi-dot { background: #f59e0b; }
+.macd-dot { background: #06b6d4; }
+.stochastic-dot { background: #38bdf8; }
+.ichimoku-dot { background: #a855f7; }
+.fibotd-dot { background: #ffd54f; }
+.fiboma-dot { background: #d946ef; }
+.foreign-dot { background: #f1c75b; }
+.active-trade-dot { background: #2dd4bf; }
+
+.parameter-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-size: 10px;
+}
+.parameter-input {
+  width: 36px;
+  height: 22px;
+  padding: 1px 2px;
+  border: 1px solid var(--border-stroke);
+  border-radius: 3px;
+  background: var(--bg-container);
+  color: var(--text-primary);
+  font: 600 10.5px var(--font-data, monospace);
+  text-align: center;
+  outline: none;
+}
+.parameter-input.wide { width: 44px; }
+.parameter-input:focus { border-color: var(--primary-brand); }
+
+.candle-settings-backdrop {
+  position: fixed;
+  z-index: 1500;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+}
+.candle-settings-backdrop[hidden] {
+  display: none !important;
+}
+.candle-settings-dialog {
+  width: min(580px, 96vw);
+  overflow: hidden;
+  border: 1px solid var(--border-stroke);
+  border-radius: 10px;
+  background: var(--bg-container);
+  color: var(--text-primary);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
 </style>
 </head>
 <body>
@@ -2724,6 +2873,57 @@ body {
 
 
 
+  </div>
+
+  <!-- MODAL THƯ VIỆN CHỈ BÁO KỸ THUẬT (CHUẨN ROBOSTOCK.VIP) -->
+  <div class="candle-settings-backdrop" id="indicatorLibraryModal" hidden onclick="if(event.target===this)closeIndicatorLibraryModal()">
+    <section class="candle-settings-dialog indicator-library-dialog" role="dialog" aria-modal="true" aria-labelledby="indicatorLibraryTitle" onclick="event.stopPropagation()">
+      <div class="candle-settings-header" style="display:flex; justify-content:space-between; align-items:center; padding:12px 18px; border-bottom:1px solid var(--border-stroke); background:var(--bg-container);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-weight:700; font-size:15px; color:var(--text-primary);" id="indicatorLibraryTitle">Thư viện Chỉ báo Kỹ thuật</span>
+          <span style="font-size:11px; color:var(--text-muted); padding:2px 6px; background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:3px;">Robostock Engine</span>
+        </div>
+        <button class="candle-settings-close" onclick="closeIndicatorLibraryModal()" type="button" aria-label="Đóng" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-secondary); line-height:1;">&times;</button>
+      </div>
+      <div class="indicator-library-body" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-height:min(60vh, 520px); padding:16px 18px; overflow-y:auto; background:var(--bg-container);">
+        <!-- CỘT 1: TẤT CẢ CHỈ BÁO -->
+        <div class="indicator-library-section" style="display:grid; align-content:start; gap:6px; padding:12px; border:1px solid var(--border-stroke); border-radius:8px; background:var(--bg-subtle);">
+          <h3 style="margin:0 0 4px; color:var(--text-secondary); font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Tất cả chỉ báo</h3>
+          <p class="indicator-library-help" style="margin:0 0 6px; color:var(--text-muted); font-size:11px;">Đánh dấu để bật/tắt vẽ trên biểu đồ.</p>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="sma20" onchange="syncIndicatorLibrary(this)" /> Đường trung bình SMA 20</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="sma60" onchange="syncIndicatorLibrary(this)" /> Đường trung bình SMA 60</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="sma250" onchange="syncIndicatorLibrary(this)" /> Đường trung bình SMA 250</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="volume" onchange="syncIndicatorLibrary(this)" /> Khối lượng (Volume)</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="hvp" onchange="syncIndicatorLibrary(this)" /> High Value Percentile (HVP)</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="quiet" onchange="syncIndicatorLibrary(this)" /> Vùng cạn kiệt (Quiet)</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="bollinger" onchange="syncIndicatorLibrary(this)" /> Dải Bollinger Bands</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="rsi" onchange="syncIndicatorLibrary(this)" /> Chỉ báo Sức mạnh Tương đối (RSI)</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="macd" onchange="syncIndicatorLibrary(this)" /> Phân kỳ Hội tụ MACD</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="stochastic" onchange="syncIndicatorLibrary(this)" /> Dao động Stochastic (%K, %D)</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="ichimoku" onchange="syncIndicatorLibrary(this)" /> Mây Ichimoku Kinko Hyo</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="fiboTD" onchange="syncIndicatorLibrary(this)" /> Fibonacci Dòng Tiền (FiboTD)</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="fiboMA" onchange="syncIndicatorLibrary(this)" /> Fibonacci MA (FiboMA)</label>
+        </div>
+
+        <!-- CỘT 2: QUICK MENU · CHỌN NHANH TRÊN THANH TOOLBAR -->
+        <div class="indicator-library-section" style="display:grid; align-content:start; gap:6px; padding:12px; border:1px solid var(--border-stroke); border-radius:8px; background:var(--bg-subtle);">
+          <h3 style="margin:0 0 4px; color:var(--text-secondary); font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Quick Menu · Chọn nhanh</h3>
+          <p class="indicator-library-help" style="margin:0 0 6px; color:var(--text-muted); font-size:11px;">Đánh dấu để luôn hiện nút trên thanh công cụ.</p>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="sma" onchange="syncQuickGroupVisibility(this)" /> SMA</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="volume" onchange="syncQuickGroupVisibility(this)" /> Volume & HVP</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="bollinger" onchange="syncQuickGroupVisibility(this)" /> Bollinger Bands</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="rsi" onchange="syncQuickGroupVisibility(this)" /> RSI</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="macd" onchange="syncQuickGroupVisibility(this)" /> MACD</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="stochastic" onchange="syncQuickGroupVisibility(this)" /> Stochastic</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="ichimoku" onchange="syncQuickGroupVisibility(this)" /> Ichimoku Cloud</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="fiboTD" onchange="syncQuickGroupVisibility(this)" /> FiboTD</label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="fiboMA" onchange="syncQuickGroupVisibility(this)" /> FiboMA</label>
+        </div>
+      </div>
+      <div class="candle-settings-actions" style="display:flex; justify-content:flex-end; padding:10px 18px; border-top:1px solid var(--border-stroke); background:var(--bg-container); gap:8px;">
+        <button class="btn-login-main" id="indicatorLibraryDone" type="button" onclick="closeIndicatorLibraryModal()" style="border:none; cursor:pointer; font-size:12px; padding:6px 20px;">Xong</button>
+      </div>
+    </section>
   </div>
 
   <!-- MODAL POPUP CHI TIẾT CỔ PHIẾU TOÀN DIỆN (CHUYỂN TOÀN BỘ TÍNH NĂNG THÀNH POPUP) -->
@@ -5737,7 +5937,7 @@ body {
       currentSelectedStock = sym;
       currentStockDetailSymbol = sym;
       lastStockDetailTickTime = Date.now();
-      detailChartMode = 'intraday';
+      detailChartMode = 'candle';
 
       let stock = (stockDataList && stockDataList.find(s => s.symbol === sym))
         || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null)
@@ -5779,7 +5979,24 @@ body {
       if (modal) modal.style.display = 'flex';
 
       const btnTv = document.getElementById('btnToggleDetailChart');
-      if (btnTv) btnTv.innerHTML = 'Biểu đồ Nến DNSE';
+      if (btnTv) btnTv.innerHTML = 'Biểu đồ Intraday';
+
+      // Kích hoạt ngay chế độ biểu đồ nến với chỉ báo Robostock
+      const svgCont = document.getElementById('stockDetailSvgContainer');
+      const candleCont = document.getElementById('stockDetailCandleContainer');
+      const tfControls = document.getElementById('stockDetailCandleTfControls');
+      const chartTitle = document.getElementById('stockDetailChartTitle');
+      const chartBadge = document.getElementById('stockDetailChartBadge');
+      const refLabel = document.getElementById('stockDetailRefLabel');
+      if (svgCont && candleCont) {
+        svgCont.style.display = 'none';
+        candleCont.style.display = 'flex';
+        if (tfControls) tfControls.style.display = 'inline-flex';
+        if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN NHẬT BẢN • ${sym}`;
+        if (chartBadge) chartBadge.textContent = 'DNSE Entrade X';
+        if (refLabel) refLabel.style.display = 'none';
+        drawDnseStockCandleChart(sym, currentDetailCandleRes);
+      }
 
       // Tải và đồng bộ chỉ số kỹ thuật RSI thực tế đa khung thời gian cho modal
       if (typeof fetchStockDetailTechnicalRSI === 'function') {
@@ -5797,7 +6014,15 @@ body {
             updateDetailModalHeader(fresh);
             renderStockDetailContent(fresh);
             seedStockDetailTape(fresh);
-            if (detailIntradayPoints && detailIntradayPoints.length > 0) {
+
+            // Giữ nguyên giao diện biểu đồ nến
+            const curCandleCont = document.getElementById('stockDetailCandleContainer');
+            const curSvgCont = document.getElementById('stockDetailSvgContainer');
+            if (detailChartMode === 'candle' && curCandleCont && curSvgCont) {
+              curSvgCont.style.display = 'none';
+              curCandleCont.style.display = 'flex';
+              drawDnseStockCandleChart(sym, currentDetailCandleRes);
+            } else if (detailIntradayPoints && detailIntradayPoints.length > 0) {
               detailIntradayPoints[detailIntradayPoints.length - 1] = fresh.price;
               renderStockDetailIntradaySvg(fresh);
             }
@@ -6032,12 +6257,20 @@ body {
               </div>
             </div>
 
-            <!-- CHẾ ĐỘ 2: BIỂU ĐỒ NẾN NHẬT BẢN OHLC & KHỐI LƯỢNG TỪ DNSE ENTRADE X -->
-            <div id="stockDetailCandleContainer" style="display:none; flex-direction:column; width:100%; padding-top:4px;">
-              <div id="candleOhlcLegend" style="font-family:var(--font-data); font-size:11px; color:var(--text-secondary); min-height:18px; margin-bottom:4px; display:flex; align-items:center; gap:10px; overflow-x:auto;">
+            <!-- CHẾ ĐỘ 2: BIỂU ĐỒ NẾN NHẬT BẢN OHLC & KHỐI LƯỢNG TỪ DNSE ENTRADE X + TOOLBAR CHỈ BÁO ROBOSTOCK -->
+            <div id="stockDetailCandleContainer" style="display:none; flex-direction:column; width:100%; padding-top:4px; gap:6px;">
+              <!-- CONTAINER THANH CÔNG CỤ CHỈ BÁO ROBOSTOCK -->
+              <div id="indicatorToolbarContainer">
+                ${renderIndicatorToolbarHtml()}
+              </div>
+
+              <!-- THANH THÔNG TIN NẾN & CHỈ SỐ OHLC + GIÁ TRỊ CHỈ BÁO REALTIME -->
+              <div id="candleOhlcLegend" style="font-family:var(--font-data); font-size:11px; color:var(--text-secondary); min-height:22px; padding:3px 8px; background:var(--bg-subtle); border-radius:4px; border:1px solid var(--border-stroke); display:flex; align-items:center; gap:8px; overflow-x:auto; white-space:nowrap;">
                 <span>Đang tải nến DNSE...</span>
               </div>
-              <div style="position:relative; width:100%; height:210px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden;">
+
+              <!-- KHUNG CANVAS ĐỒ THỊ CHÍNH & CÁC CỬA SỔ PHỤ CHỈ BÁO -->
+              <div id="candleCanvasWrapper" style="position:relative; width:100%; height:320px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden; transition:height 0.2s ease;">
                 <canvas id="stockDetailCandleCanvas" style="width:100%; height:100%; display:block; cursor:crosshair;"></canvas>
               </div>
             </div>
@@ -6548,7 +6781,399 @@ body {
       renderCandleCanvas(canvas, currentDetailCandleBars, -1);
     }
 
-    function updateDetailCandleLegend(b, prevBar) {
+    // ===== ROBOSTOCK INDICATOR ENGINE & STATE =====
+    const robostockState = {
+      indicators: {
+        sma20: true,
+        sma60: true,
+        sma250: false,
+        volume: true,
+        hvp: true,
+        quiet: true,
+        bollinger: false,
+        rsi: false,
+        macd: false,
+        stochastic: false,
+        ichimoku: false,
+        fiboTD: false,
+        fiboMA: false,
+        valueLabels: true
+      },
+      quickGroups: {
+        sma: true,
+        volume: true,
+        bollinger: true,
+        rsi: true,
+        macd: true,
+        stochastic: true,
+        ichimoku: true,
+        fiboTD: true,
+        fiboMA: true
+      },
+      fiboTDMode: 'auto',
+      parameters: {
+        hvpPeriod: 999,
+        hvpPercentile: 95,
+        quietPercent: 80,
+        bollingerPeriod: 20,
+        bollingerDeviation: 2,
+        rsiPeriod: 14,
+        macdFastPeriod: 12,
+        macdSlowPeriod: 26,
+        macdSignalPeriod: 9,
+        stochPeriod: 9,
+        stochSmoothK: 3,
+        stochSmoothD: 3,
+        ichimokuTenkan: 9,
+        ichimokuKijun: 26,
+        ichimokuSpanB: 52,
+        fiboMAPeriod: 96
+      }
+    };
+
+    function renderIndicatorToolbarHtml() {
+      const ind = robostockState.indicators;
+      const qg = robostockState.quickGroups;
+      const p = robostockState.parameters;
+
+      return `
+        <section class="toolbar" aria-label="Chỉ báo" id="indicatorToolbar">
+          <button class="indicator-library-button" id="indicatorLibraryButton" type="button" onclick="openIndicatorLibraryModal()">＋ Chỉ báo</button>
+          
+          <span class="quick-indicator-group" data-indicator-group="sma" ${!qg.sma ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.sma20 ? 'active' : ''}" data-indicator="sma20" onclick="toggleIndicator('sma20', this)"><span class="dot sma20-dot"></span>SMA 20</button>
+            <button class="indicator-toggle ${ind.sma60 ? 'active' : ''}" data-indicator="sma60" onclick="toggleIndicator('sma60', this)"><span class="dot sma60-dot"></span>SMA 60</button>
+            <button class="indicator-toggle ${ind.sma250 ? 'active' : ''}" data-indicator="sma250" onclick="toggleIndicator('sma250', this)"><span class="dot sma250-dot"></span>SMA 250</button>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="volume" ${!qg.volume ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.volume ? 'active' : ''}" data-indicator="volume" onclick="toggleIndicator('volume', this)"><span class="dot volume-dot"></span>Volume</button>
+            <button class="indicator-toggle ${ind.hvp ? 'active' : ''}" data-indicator="hvp" onclick="toggleIndicator('hvp', this)"><span class="dot hvp-dot"></span>HVP</button>
+            <span class="parameter-group" title="Số nến / percentile của HVP">
+              <input class="parameter-input wide" id="hvpPeriod" type="number" min="20" max="5000" value="${p.hvpPeriod}" onchange="updateIndicatorParam('hvpPeriod', this.value)" title="Chu kỳ HVP" />
+              <span>/</span>
+              <input class="parameter-input" id="hvpPercentile" type="number" min="1" max="100" value="${p.hvpPercentile}" onchange="updateIndicatorParam('hvpPercentile', this.value)" title="Phần trăm HVP" /><span>%</span>
+            </span>
+            <button class="indicator-toggle ${ind.quiet ? 'active' : ''}" data-indicator="quiet" onclick="toggleIndicator('quiet', this)"><span class="dot quiet-dot"></span>Quiet</button>
+            <span class="parameter-group" title="QuietValue theo % HVP">
+              <input class="parameter-input" id="quietPercent" type="number" min="1" max="100" value="${p.quietPercent}" onchange="updateIndicatorParam('quietPercent', this.value)" title="Quiet %" /><span>% HVP</span>
+            </span>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="bollinger" ${!qg.bollinger ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.bollinger ? 'active' : ''}" data-indicator="bollinger" onclick="toggleIndicator('bollinger', this)"><span class="dot bollinger-dot"></span>BB</button>
+            <span class="parameter-group" title="Chu kỳ và độ lệch chuẩn BB">
+              <input class="parameter-input wide" id="bollingerPeriod" type="number" min="2" max="500" value="${p.bollingerPeriod}" onchange="updateIndicatorParam('bollingerPeriod', this.value)" title="Chu kỳ" />
+              <span>,</span>
+              <input class="parameter-input" id="bollingerDeviation" type="number" min="1" max="5" step="0.5" value="${p.bollingerDeviation}" onchange="updateIndicatorParam('bollingerDeviation', this.value)" title="Độ lệch chuẩn" />
+            </span>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="rsi" ${!qg.rsi ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.rsi ? 'active' : ''}" data-indicator="rsi" onclick="toggleIndicator('rsi', this)"><span class="dot rsi-dot"></span>RSI</button>
+            <span class="parameter-group" title="Chu kỳ RSI">
+              <input class="parameter-input wide" id="rsiPeriod" type="number" min="2" max="250" value="${p.rsiPeriod}" onchange="updateIndicatorParam('rsiPeriod', this.value)" title="Chu kỳ RSI" />
+            </span>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="macd" ${!qg.macd ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.macd ? 'active' : ''}" data-indicator="macd" onclick="toggleIndicator('macd', this)"><span class="dot macd-dot"></span>MACD</button>
+            <span class="parameter-group" title="Fast, Slow, Signal">
+              <input class="parameter-input" id="macdFastPeriod" type="number" min="2" max="250" value="${p.macdFastPeriod}" onchange="updateIndicatorParam('macdFastPeriod', this.value)" title="Fast EMA" />
+              <span>,</span>
+              <input class="parameter-input" id="macdSlowPeriod" type="number" min="3" max="500" value="${p.macdSlowPeriod}" onchange="updateIndicatorParam('macdSlowPeriod', this.value)" title="Slow EMA" />
+              <span>,</span>
+              <input class="parameter-input" id="macdSignalPeriod" type="number" min="1" max="250" value="${p.macdSignalPeriod}" onchange="updateIndicatorParam('macdSignalPeriod', this.value)" title="Signal" />
+            </span>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="stochastic" ${!qg.stochastic ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.stochastic ? 'active' : ''}" data-indicator="stochastic" onclick="toggleIndicator('stochastic', this)"><span class="dot stochastic-dot"></span>Stoch</button>
+            <span class="parameter-group" title="Chu kỳ, Smooth K, Smooth D">
+              <input class="parameter-input" id="stochPeriod" type="number" min="2" max="250" value="${p.stochPeriod}" onchange="updateIndicatorParam('stochPeriod', this.value)" title="Chu kỳ" />
+              <span>,</span>
+              <input class="parameter-input" id="stochSmoothK" type="number" min="1" max="50" value="${p.stochSmoothK}" onchange="updateIndicatorParam('stochSmoothK', this.value)" title="K" />
+              <span>,</span>
+              <input class="parameter-input" id="stochSmoothD" type="number" min="1" max="50" value="${p.stochSmoothD}" onchange="updateIndicatorParam('stochSmoothD', this.value)" title="D" />
+            </span>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="ichimoku" ${!qg.ichimoku ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.ichimoku ? 'active' : ''}" data-indicator="ichimoku" onclick="toggleIndicator('ichimoku', this)"><span class="dot ichimoku-dot"></span>Ichimoku</button>
+            <span class="parameter-group" title="Tenkan, Kijun, Span B">
+              <input class="parameter-input" id="ichimokuTenkan" type="number" min="2" max="250" value="${p.ichimokuTenkan}" onchange="updateIndicatorParam('ichimokuTenkan', this.value)" title="Tenkan" />
+              <span>,</span>
+              <input class="parameter-input" id="ichimokuKijun" type="number" min="2" max="500" value="${p.ichimokuKijun}" onchange="updateIndicatorParam('ichimokuKijun', this.value)" title="Kijun" />
+              <span>,</span>
+              <input class="parameter-input wide" id="ichimokuSpanB" type="number" min="2" max="1000" value="${p.ichimokuSpanB}" onchange="updateIndicatorParam('ichimokuSpanB', this.value)" title="Span B" />
+            </span>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="fiboTD" ${!qg.fiboTD ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.fiboTD ? 'active' : ''}" data-indicator="fiboTD" onclick="cycleFiboTDMode()"><span class="dot fibotd-dot"></span><span id="fiboTDModeLabel">${robostockState.fiboTDMode === 'off' ? 'FiboTD' : 'FiboTD ' + robostockState.fiboTDMode.toUpperCase()}</span></button>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="fiboMA" ${!qg.fiboMA ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.fiboMA ? 'active' : ''}" data-indicator="fiboMA" onclick="toggleIndicator('fiboMA', this)"><span class="dot fiboma-dot"></span>FiboMA</button>
+          </span>
+
+          <button class="indicator-toggle ${ind.valueLabels ? 'active' : ''}" id="indicatorValueLabels" type="button" onclick="toggleIndicatorValueLabels(this)" title="Hiện/ẩn giá trị mới nhất của các đường chỉ báo trên thang giá">Giá chỉ báo</button>
+          <span class="toolbar-spacer" style="margin-left:auto;"></span>
+          <button class="ghost-button" id="resetIndicatorBtn" type="button" onclick="resetIndicatorsToDefault()" title="Khôi phục mặc định" style="padding:3px 8px; font-size:11px; cursor:pointer; background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:4px; color:var(--text-secondary);">Đặt lại</button>
+        </section>
+      `;
+    }
+
+    // Indicator calculations
+    function calcSMA(data, period) {
+      const out = new Array(data.length).fill(null);
+      let sum = 0;
+      for (let i = 0; i < data.length; i++) {
+        sum += Number(data[i].close) || 0;
+        if (i >= period) sum -= Number(data[i - period].close) || 0;
+        if (i >= period - 1) out[i] = sum / period;
+      }
+      return out;
+    }
+
+    function calcEMA(values, period) {
+      const out = new Array(values.length).fill(null);
+      const alpha = 2 / (period + 1);
+      const seedValues = [];
+      let prev = null;
+      for (let i = 0; i < values.length; i++) {
+        const val = Number(values[i]);
+        if (!Number.isFinite(val)) continue;
+        if (prev === null) {
+          seedValues.push(val);
+          if (seedValues.length < period) continue;
+          prev = seedValues.slice(-period).reduce((a, b) => a + b, 0) / period;
+        } else {
+          prev = val * alpha + prev * (1 - alpha);
+        }
+        out[i] = prev;
+      }
+      return out;
+    }
+
+    function calcBollinger(data, period = 20, deviation = 2) {
+      const middle = calcSMA(data, period);
+      const upper = new Array(data.length).fill(null);
+      const lower = new Array(data.length).fill(null);
+      for (let i = period - 1; i < data.length; i++) {
+        const windowVals = data.slice(i - period + 1, i + 1).map(r => r.close);
+        const mean = middle[i];
+        if (mean === null) continue;
+        const variance = windowVals.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / period;
+        const width = Math.sqrt(variance) * deviation;
+        upper[i] = mean + width;
+        lower[i] = mean - width;
+      }
+      return { middle, upper, lower };
+    }
+
+    function calcRSI(data, period = 14) {
+      const values = new Array(data.length).fill(null);
+      if (data.length <= period) return values;
+      let gains = 0, losses = 0;
+      for (let i = 1; i <= period; i++) {
+        const change = data[i].close - data[i - 1].close;
+        gains += Math.max(change, 0);
+        losses += Math.max(-change, 0);
+      }
+      let avgGain = gains / period, avgLoss = losses / period;
+      values[period] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
+      for (let i = period + 1; i < data.length; i++) {
+        const change = data[i].close - data[i - 1].close;
+        avgGain = (avgGain * (period - 1) + Math.max(change, 0)) / period;
+        avgLoss = (avgLoss * (period - 1) + Math.max(-change, 0)) / period;
+        values[i] = avgLoss === 0 ? 100 : 100 - (100 / (1 + avgGain / avgLoss));
+      }
+      return values;
+    }
+
+    function calcMACD(data, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) {
+      const closes = data.map(r => r.close);
+      const fast = calcEMA(closes, fastPeriod);
+      const slow = calcEMA(closes, slowPeriod);
+      const macdLine = closes.map((_, i) => Number.isFinite(fast[i]) && Number.isFinite(slow[i]) ? fast[i] - slow[i] : null);
+      const signalLine = calcEMA(macdLine, signalPeriod);
+      const histogram = macdLine.map((val, i) => Number.isFinite(val) && Number.isFinite(signalLine[i]) ? val - signalLine[i] : null);
+      return { macdLine, signalLine, histogram };
+    }
+
+    function calcStochastic(data, period = 9, smoothK = 3, smoothD = 3) {
+      const raw = new Array(data.length).fill(null);
+      for (let i = period - 1; i < data.length; i++) {
+        const windowVals = data.slice(i - period + 1, i + 1);
+        const hh = Math.max(...windowVals.map(x => x.high));
+        const ll = Math.min(...windowVals.map(x => x.low));
+        raw[i] = hh === ll ? 50 : ((data[i].close - ll) / (hh - ll)) * 100;
+      }
+      const smooth = (arr, n) => arr.map((_, i) => {
+        const vals = arr.slice(Math.max(0, i - n + 1), i + 1).filter(v => v !== null);
+        return vals.length === n ? vals.reduce((a, b) => a + b, 0) / n : null;
+      });
+      const k = smooth(raw, smoothK);
+      const d = smooth(k, smoothD);
+      return { k, d };
+    }
+
+    function calcIchimoku(data, tenkanP = 9, kijunP = 26, spanBP = 52) {
+      const midpoint = (idx, period) => {
+        if (idx < period - 1) return null;
+        const windowVals = data.slice(idx - period + 1, idx + 1);
+        return (Math.max(...windowVals.map(r => r.high)) + Math.min(...windowVals.map(r => r.low))) / 2;
+      };
+      const tenkan = data.map((_, i) => midpoint(i, tenkanP));
+      const kijun = data.map((_, i) => midpoint(i, kijunP));
+      const spanA = data.map((_, i) => (tenkan[i] !== null && kijun[i] !== null) ? (tenkan[i] + kijun[i]) / 2 : null);
+      const spanB = data.map((_, i) => midpoint(i, spanBP));
+      return { tenkan, kijun, spanA, spanB };
+    }
+
+    function calcRollingHvp(data, period = 999, percentile = 95) {
+      const volumes = data.map(b => b.volume || 0);
+      const effPeriod = Math.min(period, volumes.length);
+      const recent = volumes.slice(-effPeriod).slice().sort((a, b) => a - b);
+      if (recent.length === 0) return 0;
+      const idx = Math.min(recent.length - 1, Math.floor((percentile / 100) * (recent.length - 1)));
+      return recent[idx];
+    }
+
+    function toggleIndicator(key, btn) {
+      if (robostockState.indicators[key] !== undefined) {
+        robostockState.indicators[key] = !robostockState.indicators[key];
+        if (btn) {
+          if (robostockState.indicators[key]) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+        const canvas = document.getElementById('stockDetailCandleCanvas');
+        if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+          renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
+        }
+      }
+    }
+
+    function updateIndicatorParam(key, val) {
+      const num = parseFloat(val);
+      if (!isNaN(num) && robostockState.parameters[key] !== undefined) {
+        robostockState.parameters[key] = num;
+        const canvas = document.getElementById('stockDetailCandleCanvas');
+        if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+          renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
+        }
+      }
+    }
+
+    function toggleIndicatorValueLabels(btn) {
+      robostockState.indicators.valueLabels = !robostockState.indicators.valueLabels;
+      if (btn) {
+        if (robostockState.indicators.valueLabels) btn.classList.add('active');
+        else btn.classList.remove('active');
+      }
+      const canvas = document.getElementById('stockDetailCandleCanvas');
+      if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+        renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
+      }
+    }
+
+    function cycleFiboTDMode() {
+      const modes = ['off', 'auto', 'T', 'D'];
+      const curIdx = modes.indexOf(robostockState.fiboTDMode);
+      const nextMode = modes[(curIdx + 1) % modes.length];
+      robostockState.fiboTDMode = nextMode;
+      robostockState.indicators.fiboTD = (nextMode !== 'off');
+      const label = document.getElementById('fiboTDModeLabel');
+      if (label) label.textContent = nextMode === 'off' ? 'FiboTD' : 'FiboTD ' + nextMode.toUpperCase();
+      const btn = document.querySelector('[data-indicator="fiboTD"]');
+      if (btn) {
+        if (nextMode !== 'off') btn.classList.add('active');
+        else btn.classList.remove('active');
+      }
+      const canvas = document.getElementById('stockDetailCandleCanvas');
+      if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+        renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
+      }
+    }
+
+    function resetIndicatorsToDefault() {
+      robostockState.indicators.sma20 = true;
+      robostockState.indicators.sma60 = true;
+      robostockState.indicators.sma250 = false;
+      robostockState.indicators.volume = true;
+      robostockState.indicators.hvp = true;
+      robostockState.indicators.quiet = true;
+      robostockState.indicators.bollinger = false;
+      robostockState.indicators.rsi = false;
+      robostockState.indicators.macd = false;
+      robostockState.indicators.stochastic = false;
+      robostockState.indicators.ichimoku = false;
+      robostockState.indicators.fiboTD = false;
+      robostockState.indicators.fiboMA = false;
+      robostockState.indicators.valueLabels = true;
+      robostockState.fiboTDMode = 'auto';
+
+      const toolbarContainer = document.getElementById('indicatorToolbarContainer');
+      if (toolbarContainer) {
+        toolbarContainer.innerHTML = renderIndicatorToolbarHtml();
+      }
+      const canvas = document.getElementById('stockDetailCandleCanvas');
+      if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+        renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
+      }
+    }
+
+    function openIndicatorLibraryModal() {
+      const modal = document.getElementById('indicatorLibraryModal');
+      if (!modal) return;
+      modal.querySelectorAll('[data-library-indicator]').forEach(cb => {
+        const key = cb.getAttribute('data-library-indicator');
+        cb.checked = Boolean(robostockState.indicators[key]);
+      });
+      modal.querySelectorAll('[data-quick-group]').forEach(cb => {
+        const grp = cb.getAttribute('data-quick-group');
+        cb.checked = Boolean(robostockState.quickGroups[grp]);
+      });
+      modal.removeAttribute('hidden');
+    }
+
+    function closeIndicatorLibraryModal() {
+      const modal = document.getElementById('indicatorLibraryModal');
+      if (modal) modal.setAttribute('hidden', '');
+      const toolbarContainer = document.getElementById('indicatorToolbarContainer');
+      if (toolbarContainer) {
+        toolbarContainer.innerHTML = renderIndicatorToolbarHtml();
+      }
+      const canvas = document.getElementById('stockDetailCandleCanvas');
+      if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+        renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
+      }
+    }
+
+    function syncIndicatorLibrary(checkbox) {
+      const key = checkbox.getAttribute('data-library-indicator');
+      if (robostockState.indicators[key] !== undefined) {
+        robostockState.indicators[key] = checkbox.checked;
+        if (key === 'fiboTD') {
+          robostockState.fiboTDMode = checkbox.checked ? 'auto' : 'off';
+        }
+      }
+    }
+
+    function syncQuickGroupVisibility(checkbox) {
+      const grp = checkbox.getAttribute('data-quick-group');
+      if (robostockState.quickGroups[grp] !== undefined) {
+        robostockState.quickGroups[grp] = checkbox.checked;
+        const groupEl = document.querySelector(`.quick-indicator-group[data-indicator-group="${grp}"]`);
+        if (groupEl) {
+          if (checkbox.checked) groupEl.removeAttribute('hidden');
+          else groupEl.setAttribute('hidden', '');
+        }
+      }
+    }
+
+    function updateDetailCandleLegend(b, prevBar, indVals = null) {
       const legend = document.getElementById('candleOhlcLegend');
       if (!legend || !b) return;
       const prevClose = prevBar ? prevBar.close : b.open;
@@ -6563,6 +7188,32 @@ body {
         : `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
       const volStr = b.volume >= 1e6 ? (b.volume / 1e6).toFixed(2) + 'M' : (b.volume || 0).toLocaleString('vi-VN');
 
+      let indHtml = '';
+      if (indVals) {
+        if (robostockState.indicators.sma20 && indVals.sma20 != null) {
+          indHtml += `<span style="color:#f1c75b; font-weight:600;">SMA20: <b>${Math.round(indVals.sma20).toLocaleString('vi-VN')}</b></span>`;
+        }
+        if (robostockState.indicators.sma60 && indVals.sma60 != null) {
+          indHtml += `<span style="color:#38bdf8; font-weight:600;">SMA60: <b>${Math.round(indVals.sma60).toLocaleString('vi-VN')}</b></span>`;
+        }
+        if (robostockState.indicators.sma250 && indVals.sma250 != null) {
+          indHtml += `<span style="color:#ec4899; font-weight:600;">SMA250: <b>${Math.round(indVals.sma250).toLocaleString('vi-VN')}</b></span>`;
+        }
+        if (robostockState.indicators.bollinger && indVals.bbUpper != null) {
+          indHtml += `<span style="color:#60a5fa; font-weight:600;">BB: <b>[${Math.round(indVals.bbLower).toLocaleString('vi-VN')} - ${Math.round(indVals.bbUpper).toLocaleString('vi-VN')}]</b></span>`;
+        }
+        if (robostockState.indicators.rsi && indVals.rsi != null) {
+          indHtml += `<span style="color:#f59e0b; font-weight:600;">RSI: <b>${indVals.rsi.toFixed(1)}</b></span>`;
+        }
+        if (robostockState.indicators.macd && indVals.macd != null) {
+          const mSign = indVals.macd >= 0 ? '+' : '';
+          indHtml += `<span style="color:#06b6d4; font-weight:600;">MACD: <b>${mSign}${indVals.macd.toFixed(2)}</b></span>`;
+        }
+        if (robostockState.indicators.stochastic && indVals.stochK != null) {
+          indHtml += `<span style="color:#38bdf8; font-weight:600;">Stoch: <b>${indVals.stochK.toFixed(1)} / ${indVals.stochD ? indVals.stochD.toFixed(1) : ''}</b></span>`;
+        }
+      }
+
       legend.innerHTML = `
         <span style="color:var(--text-muted); font-weight:600;">${dateStr}</span>
         <span>Mở: <b>${b.open.toLocaleString('vi-VN')}</b></span>
@@ -6570,7 +7221,8 @@ body {
         <span>Thấp: <b class="text-down">${b.low.toLocaleString('vi-VN')}</b></span>
         <span>Đóng: <b class="${colorCls}">${b.close.toLocaleString('vi-VN')}</b></span>
         <span class="${colorCls}">(${sign}${pct}%)</span>
-        <span style="color:var(--text-secondary); margin-left:auto;">KL: <b>${volStr}</b></span>
+        <span style="color:var(--text-secondary);">KL: <b>${volStr}</b></span>
+        ${indHtml}
       `;
     }
 
@@ -6579,8 +7231,24 @@ body {
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
       const width = rect.width || canvas.clientWidth || 450;
-      const height = rect.height || canvas.clientHeight || 210;
+      
+      // Calculate dynamic height based on active sub-indicators
+      const activeSubPanels = [];
+      if (robostockState.indicators.volume) activeSubPanels.push({ id: 'volume', h: 42, label: 'Vol & HVP' });
+      if (robostockState.indicators.rsi) activeSubPanels.push({ id: 'rsi', h: 46, label: 'RSI(14)' });
+      if (robostockState.indicators.macd) activeSubPanels.push({ id: 'macd', h: 50, label: 'MACD(12,26,9)' });
+      if (robostockState.indicators.stochastic) activeSubPanels.push({ id: 'stochastic', h: 46, label: 'Stoch(9,3,3)' });
 
+      const basePriceH = 175;
+      const totalSubH = activeSubPanels.reduce((acc, p) => acc + p.h + 8, 0);
+      const neededH = Math.max(260, Math.min(460, basePriceH + totalSubH + 36));
+      
+      const wrapper = document.getElementById('candleCanvasWrapper');
+      if (wrapper && Math.abs(wrapper.clientHeight - neededH) > 5) {
+        wrapper.style.height = neededH + 'px';
+      }
+
+      const height = neededH;
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       const ctx = canvas.getContext('2d');
@@ -6597,25 +7265,66 @@ body {
 
       const pad = { top: 12, right: 60, bottom: 22, left: 10 };
       const chartW = width - pad.left - pad.right;
-      const fullChartH = height - pad.top - pad.bottom;
-      const volH = Math.min(42, Math.floor(fullChartH * 0.22));
-      const priceH = fullChartH - volH - 10;
+      
+      const priceH = Math.max(130, height - pad.top - pad.bottom - totalSubH);
       const priceTop = pad.top;
       const priceBottom = priceTop + priceH;
-      const volTop = priceBottom + 10;
-      const volBottom = volTop + volH;
+
+      // Assign Y bounds for each sub-panel
+      let curSubY = priceBottom + 10;
+      for (const sp of activeSubPanels) {
+        sp.top = curSubY;
+        sp.bottom = curSubY + sp.h;
+        curSubY += sp.h + 8;
+      }
 
       const minBarW = 6;
       const maxVisibleBars = Math.max(15, Math.min(bars.length, Math.floor(chartW / minBarW)));
       const visible = bars.slice(-maxVisibleBars);
       const n = visible.length;
 
+      // Calculate indicators on full bars for accuracy, then slice
+      const sma20Full = robostockState.indicators.sma20 ? calcSMA(bars, 20).slice(-n) : null;
+      const sma60Full = robostockState.indicators.sma60 ? calcSMA(bars, 60).slice(-n) : null;
+      const sma250Full = robostockState.indicators.sma250 ? calcSMA(bars, 250).slice(-n) : null;
+      
+      const bbObj = robostockState.indicators.bollinger ? calcBollinger(bars, robostockState.parameters.bollingerPeriod, robostockState.parameters.bollingerDeviation) : null;
+      const bbUpper = bbObj ? bbObj.upper.slice(-n) : null;
+      const bbLower = bbObj ? bbObj.lower.slice(-n) : null;
+      const bbMiddle = bbObj ? bbObj.middle.slice(-n) : null;
+
+      const rsiFull = robostockState.indicators.rsi ? calcRSI(bars, robostockState.parameters.rsiPeriod).slice(-n) : null;
+      const macdObj = robostockState.indicators.macd ? calcMACD(bars, robostockState.parameters.macdFastPeriod, robostockState.parameters.macdSlowPeriod, robostockState.parameters.macdSignalPeriod) : null;
+      const macdLine = macdObj ? macdObj.macdLine.slice(-n) : null;
+      const macdSignal = macdObj ? macdObj.signalLine.slice(-n) : null;
+      const macdHist = macdObj ? macdObj.histogram.slice(-n) : null;
+
+      const stochObj = robostockState.indicators.stochastic ? calcStochastic(bars, robostockState.parameters.stochPeriod, robostockState.parameters.stochSmoothK, robostockState.parameters.stochSmoothD) : null;
+      const stochK = stochObj ? stochObj.k.slice(-n) : null;
+      const stochD = stochObj ? stochObj.d.slice(-n) : null;
+
+      const ichiObj = robostockState.indicators.ichimoku ? calcIchimoku(bars, robostockState.parameters.ichimokuTenkan, robostockState.parameters.ichimokuKijun, robostockState.parameters.ichimokuSpanB) : null;
+      const ichiTenkan = ichiObj ? ichiObj.tenkan.slice(-n) : null;
+      const ichiKijun = ichiObj ? ichiObj.kijun.slice(-n) : null;
+      const ichiSpanA = ichiObj ? ichiObj.spanA.slice(-n) : null;
+      const ichiSpanB = ichiObj ? ichiObj.spanB.slice(-n) : null;
+
+      const hvpVal = robostockState.indicators.hvp ? calcRollingHvp(bars, robostockState.parameters.hvpPeriod, robostockState.parameters.hvpPercentile) : 0;
+      const quietVal = robostockState.indicators.quiet ? hvpVal * (robostockState.parameters.quietPercent / 100) : 0;
+
+      // Price bounds
       let minP = Infinity, maxP = -Infinity, maxV = 1;
-      for (const b of visible) {
+      for (let i = 0; i < n; i++) {
+        const b = visible[i];
         if (b.low < minP) minP = b.low;
         if (b.high > maxP) maxP = b.high;
         if (b.volume > maxV) maxV = b.volume;
+        // Include Bollinger & SMA bounds if active
+        if (bbUpper && bbUpper[i] != null && bbUpper[i] > maxP) maxP = bbUpper[i];
+        if (bbLower && bbLower[i] != null && bbLower[i] < minP) minP = bbLower[i];
       }
+      if (hvpVal > maxV) maxV = hvpVal * 1.1;
+
       if (!isFinite(minP) || minP === maxP) {
         minP = (minP || 30000) * 0.98;
         maxP = (maxP || 30000) * 1.02;
@@ -6628,9 +7337,8 @@ body {
       const step = chartW / n;
       const getX = (i) => pad.left + (i + 0.5) * step;
       const getY = (p) => priceTop + (1 - (p - minP) / pRange) * priceH;
-      const getVolY = (v) => volBottom - (v / maxV) * volH;
 
-      // Draw Grid & Price labels
+      // Draw Main Price Grid & Price labels
       ctx.strokeStyle = gridColor;
       ctx.lineWidth = 1;
       ctx.setLineDash([3, 3]);
@@ -6652,19 +7360,96 @@ body {
       }
       ctx.setLineDash([]);
 
-      // Draw Volume histogram
-      const barW = Math.max(2, Math.floor(step * 0.65));
-      for (let i = 0; i < n; i++) {
-        const b = visible[i];
-        const isUp = b.close >= b.open;
-        const x = getX(i) - barW / 2;
-        const y = getVolY(b.volume);
-        const h = volBottom - y;
-        ctx.fillStyle = isUp ? volUpColor : volDownColor;
-        ctx.fillRect(x, y, barW, Math.max(1, h));
+      // Draw Fibonacci Retracement Levels if FiboTD or FiboMA is active
+      if (robostockState.indicators.fiboTD || robostockState.indicators.fiboMA) {
+        const fibLevels = [
+          { r: 0.0, l: 'Fibo 0%' },
+          { r: 0.236, l: '23.6%' },
+          { r: 0.382, l: '38.2%' },
+          { r: 0.500, l: '50.0%' },
+          { r: 0.618, l: '61.8%' },
+          { r: 0.786, l: '78.6%' },
+          { r: 1.0, l: '100%' }
+        ];
+        const fTop = maxP - pMargin;
+        const fBot = minP + pMargin;
+        const fDist = fTop - fBot;
+
+        ctx.save();
+        ctx.font = '9px monospace';
+        ctx.textAlign = 'left';
+        for (const fl of fibLevels) {
+          const fPrice = fTop - fDist * fl.r;
+          const fy = getY(fPrice);
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([2, 4]);
+          ctx.beginPath();
+          ctx.moveTo(pad.left, fy);
+          ctx.lineTo(pad.left + chartW, fy);
+          ctx.stroke();
+
+          ctx.fillStyle = 'rgba(245, 158, 11, 0.7)';
+          ctx.fillText(`${fl.l} (${Math.round(fPrice).toLocaleString('vi-VN')})`, pad.left + 4, fy - 3);
+        }
+        ctx.restore();
+      }
+
+      // Draw Ichimoku Cloud if active
+      if (robostockState.indicators.ichimoku && ichiSpanA && ichiSpanB) {
+        ctx.save();
+        for (let i = 0; i < n - 1; i++) {
+          if (ichiSpanA[i] != null && ichiSpanB[i] != null && ichiSpanA[i+1] != null && ichiSpanB[i+1] != null) {
+            const isGreen = ichiSpanA[i] >= ichiSpanB[i];
+            ctx.fillStyle = isGreen ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)';
+            ctx.beginPath();
+            ctx.moveTo(getX(i), getY(ichiSpanA[i]));
+            ctx.lineTo(getX(i+1), getY(ichiSpanA[i+1]));
+            ctx.lineTo(getX(i+1), getY(ichiSpanB[i+1]));
+            ctx.lineTo(getX(i), getY(ichiSpanB[i]));
+            ctx.closePath();
+            ctx.fill();
+          }
+        }
+        // Tenkan & Kijun lines
+        drawIndicatorLine(ctx, ichiTenkan, getX, getY, '#ef4444', 1.2);
+        drawIndicatorLine(ctx, ichiKijun, getX, getY, '#3b82f6', 1.2);
+        ctx.restore();
+      }
+
+      // Draw Bollinger Bands cloud & lines if active
+      if (robostockState.indicators.bollinger && bbUpper && bbLower) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(96, 165, 250, 0.08)';
+        ctx.beginPath();
+        let firstIdx = -1;
+        for (let i = 0; i < n; i++) {
+          if (bbUpper[i] != null && bbLower[i] != null) {
+            if (firstIdx === -1) {
+              ctx.moveTo(getX(i), getY(bbUpper[i]));
+              firstIdx = i;
+            } else {
+              ctx.lineTo(getX(i), getY(bbUpper[i]));
+            }
+          }
+        }
+        if (firstIdx !== -1) {
+          for (let i = n - 1; i >= firstIdx; i--) {
+            if (bbLower[i] != null) {
+              ctx.lineTo(getX(i), getY(bbLower[i]));
+            }
+          }
+          ctx.closePath();
+          ctx.fill();
+        }
+        drawIndicatorLine(ctx, bbUpper, getX, getY, '#60a5fa', 1.2);
+        drawIndicatorLine(ctx, bbLower, getX, getY, '#60a5fa', 1.2);
+        drawIndicatorLine(ctx, bbMiddle, getX, getY, '#93c5fd', 1.0, [2, 2]);
+        ctx.restore();
       }
 
       // Draw Candlesticks
+      const barW = Math.max(2, Math.floor(step * 0.65));
       for (let i = 0; i < n; i++) {
         const b = visible[i];
         const isUp = b.close >= b.open;
@@ -6690,6 +7475,182 @@ body {
         ctx.fillRect(cx - barW / 2, bodyTop, barW, bodyH);
       }
 
+      // Draw Moving Average lines
+      if (robostockState.indicators.sma20 && sma20Full) {
+        drawIndicatorLine(ctx, sma20Full, getX, getY, '#f1c75b', 1.5);
+      }
+      if (robostockState.indicators.sma60 && sma60Full) {
+        drawIndicatorLine(ctx, sma60Full, getX, getY, '#38bdf8', 1.5);
+      }
+      if (robostockState.indicators.sma250 && sma250Full) {
+        drawIndicatorLine(ctx, sma250Full, getX, getY, '#ec4899', 1.5);
+      }
+
+      // Draw Sub-Panels
+      for (const sp of activeSubPanels) {
+        // Separator Line & Label
+        ctx.strokeStyle = gridColor;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, sp.top - 4);
+        ctx.lineTo(pad.left + chartW, sp.top - 4);
+        ctx.stroke();
+
+        ctx.font = '9.5px monospace';
+        ctx.fillStyle = textColor;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(sp.label, pad.left + 4, sp.top - 3);
+
+        if (sp.id === 'volume') {
+          const getVolY = (v) => sp.bottom - (v / maxV) * sp.h;
+          // Volume histogram
+          for (let i = 0; i < n; i++) {
+            const b = visible[i];
+            const isUp = b.close >= b.open;
+            const x = getX(i) - barW / 2;
+            const y = getVolY(b.volume);
+            const h = sp.bottom - y;
+            ctx.fillStyle = isUp ? volUpColor : volDownColor;
+            ctx.fillRect(x, y, barW, Math.max(1, h));
+          }
+
+          // HVP line
+          if (robostockState.indicators.hvp && hvpVal > 0) {
+            const hvpY = getVolY(hvpVal);
+            if (hvpY >= sp.top && hvpY <= sp.bottom) {
+              ctx.save();
+              ctx.strokeStyle = '#8b5cf6';
+              ctx.lineWidth = 1.2;
+              ctx.setLineDash([3, 3]);
+              ctx.beginPath();
+              ctx.moveTo(pad.left, hvpY);
+              ctx.lineTo(pad.left + chartW, hvpY);
+              ctx.stroke();
+              ctx.fillStyle = '#8b5cf6';
+              ctx.font = '9px monospace';
+              ctx.textAlign = 'right';
+              ctx.fillText(`HVP ${robostockState.parameters.hvpPercentile}%`, pad.left + chartW - 2, hvpY - 11);
+              ctx.restore();
+            }
+          }
+
+          // Quiet line
+          if (robostockState.indicators.quiet && quietVal > 0) {
+            const quietY = getVolY(quietVal);
+            if (quietY >= sp.top && quietY <= sp.bottom) {
+              ctx.save();
+              ctx.strokeStyle = '#94a3b8';
+              ctx.lineWidth = 1;
+              ctx.setLineDash([2, 4]);
+              ctx.beginPath();
+              ctx.moveTo(pad.left, quietY);
+              ctx.lineTo(pad.left + chartW, quietY);
+              ctx.stroke();
+              ctx.fillStyle = '#94a3b8';
+              ctx.font = '9px monospace';
+              ctx.textAlign = 'right';
+              ctx.fillText(`Quiet ${robostockState.parameters.quietPercent}%`, pad.left + chartW - 2, quietY - 11);
+              ctx.restore();
+            }
+          }
+        } else if (sp.id === 'rsi' && rsiFull) {
+          const getRsiY = (v) => sp.bottom - (Math.max(0, Math.min(100, v)) / 100) * sp.h;
+          // Guide lines at 70 and 30
+          const y70 = getRsiY(70);
+          const y30 = getRsiY(30);
+
+          ctx.save();
+          // Shaded band between 30 and 70
+          ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.02)';
+          ctx.fillRect(pad.left, y70, chartW, y30 - y70);
+
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.3)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([2, 3]);
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y70);
+          ctx.lineTo(pad.left + chartW, y70);
+          ctx.moveTo(pad.left, y30);
+          ctx.lineTo(pad.left + chartW, y30);
+          ctx.stroke();
+
+          ctx.fillStyle = textColor;
+          ctx.font = '9px monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText('70', pad.left + chartW + 6, y70);
+          ctx.fillText('30', pad.left + chartW + 6, y30);
+
+          // RSI Line
+          drawIndicatorLine(ctx, rsiFull, getX, getRsiY, '#f59e0b', 1.4);
+          ctx.restore();
+        } else if (sp.id === 'macd' && macdLine && macdSignal && macdHist) {
+          let minM = -0.1, maxM = 0.1;
+          for (let i = 0; i < n; i++) {
+            if (macdLine[i] != null) { minM = Math.min(minM, macdLine[i]); maxM = Math.max(maxM, macdLine[i]); }
+            if (macdSignal[i] != null) { minM = Math.min(minM, macdSignal[i]); maxM = Math.max(maxM, macdSignal[i]); }
+            if (macdHist[i] != null) { minM = Math.min(minM, macdHist[i]); maxM = Math.max(maxM, macdHist[i]); }
+          }
+          const mRange = Math.max(0.1, maxM - minM);
+          const getMacdY = (v) => sp.bottom - ((v - minM) / mRange) * sp.h;
+          const zeroY = getMacdY(0);
+
+          ctx.save();
+          // Zero line
+          ctx.strokeStyle = gridColor;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(pad.left, zeroY);
+          ctx.lineTo(pad.left + chartW, zeroY);
+          ctx.stroke();
+
+          // Histogram bars
+          const mBarW = Math.max(1.5, Math.floor(step * 0.5));
+          for (let i = 0; i < n; i++) {
+            const hVal = macdHist[i];
+            if (hVal != null) {
+              const x = getX(i) - mBarW / 2;
+              const yVal = getMacdY(hVal);
+              const barH = Math.max(1, Math.abs(yVal - zeroY));
+              ctx.fillStyle = hVal >= 0 ? upColor : downColor;
+              ctx.fillRect(x, Math.min(zeroY, yVal), mBarW, barH);
+            }
+          }
+
+          // MACD & Signal lines
+          drawIndicatorLine(ctx, macdLine, getX, getMacdY, '#06b6d4', 1.3);
+          drawIndicatorLine(ctx, macdSignal, getX, getMacdY, '#f43f5e', 1.3);
+          ctx.restore();
+        } else if (sp.id === 'stochastic' && stochK && stochD) {
+          const getStochY = (v) => sp.bottom - (Math.max(0, Math.min(100, v)) / 100) * sp.h;
+          const y80 = getStochY(80);
+          const y20 = getStochY(20);
+
+          ctx.save();
+          // Guides at 80 and 20
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([2, 3]);
+          ctx.beginPath();
+          ctx.moveTo(pad.left, y80);
+          ctx.lineTo(pad.left + chartW, y80);
+          ctx.moveTo(pad.left, y20);
+          ctx.lineTo(pad.left + chartW, y20);
+          ctx.stroke();
+
+          ctx.fillStyle = textColor;
+          ctx.font = '9px monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText('80', pad.left + chartW + 6, y80);
+          ctx.fillText('20', pad.left + chartW + 6, y20);
+
+          // %K and %D lines
+          drawIndicatorLine(ctx, stochK, getX, getStochY, '#38bdf8', 1.3);
+          drawIndicatorLine(ctx, stochD, getX, getStochY, '#f59e0b', 1.3);
+          ctx.restore();
+        }
+      }
+
       // Time axis labels
       ctx.fillStyle = textColor;
       ctx.textAlign = 'center';
@@ -6704,10 +7665,46 @@ body {
         ctx.fillText(str, getX(i), height - pad.bottom + 4);
       }
 
+      // Price Axis Indicator Badges (if enabled)
+      if (robostockState.indicators.valueLabels) {
+        const lastIdx = n - 1;
+        const badges = [];
+        if (robostockState.indicators.sma20 && sma20Full && sma20Full[lastIdx] != null) {
+          badges.push({ val: sma20Full[lastIdx], color: '#f1c75b', textColor: '#000' });
+        }
+        if (robostockState.indicators.sma60 && sma60Full && sma60Full[lastIdx] != null) {
+          badges.push({ val: sma60Full[lastIdx], color: '#38bdf8', textColor: '#000' });
+        }
+        if (robostockState.indicators.sma250 && sma250Full && sma250Full[lastIdx] != null) {
+          badges.push({ val: sma250Full[lastIdx], color: '#ec4899', textColor: '#fff' });
+        }
+        if (robostockState.indicators.bollinger && bbUpper && bbUpper[lastIdx] != null) {
+          badges.push({ val: bbUpper[lastIdx], color: '#60a5fa', textColor: '#000' });
+          badges.push({ val: bbLower[lastIdx], color: '#60a5fa', textColor: '#000' });
+        }
+
+        ctx.save();
+        ctx.font = '9px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (const bd of badges) {
+          const by = getY(bd.val);
+          if (by >= priceTop && by <= priceBottom) {
+            ctx.fillStyle = bd.color;
+            ctx.fillRect(pad.left + chartW + 2, by - 7, 54, 14);
+            ctx.fillStyle = bd.textColor;
+            ctx.fillText(Math.round(bd.val).toLocaleString('vi-VN'), pad.left + chartW + 29, by);
+          }
+        }
+        ctx.restore();
+      }
+
       // Crosshair & Tooltip
       let activeBar = visible[n - 1];
       let prevBar = n >= 2 ? visible[n - 2] : null;
+      let targetHoverIdx = n - 1;
       if (hoverIdx >= 0 && hoverIdx < n) {
+        targetHoverIdx = hoverIdx;
         activeBar = visible[hoverIdx];
         prevBar = hoverIdx > 0 ? visible[hoverIdx - 1] : null;
         const hx = getX(hoverIdx);
@@ -6717,13 +7714,13 @@ body {
         ctx.lineWidth = 1;
         ctx.setLineDash([4, 4]);
 
-        // Crosshair vertical
+        // Crosshair vertical spanning across all panels
         ctx.beginPath();
         ctx.moveTo(hx, pad.top);
-        ctx.lineTo(hx, volBottom);
+        ctx.lineTo(hx, height - pad.bottom);
         ctx.stroke();
 
-        // Crosshair horizontal
+        // Crosshair horizontal on price chart
         ctx.beginPath();
         ctx.moveTo(pad.left, hy);
         ctx.lineTo(pad.left + chartW, hy);
@@ -6747,7 +7744,47 @@ body {
         ctx.fillText(Math.round(activeBar.close).toLocaleString('vi-VN'), pad.left + chartW + 2 + badgeW / 2, hy);
       }
 
-      updateDetailCandleLegend(activeBar, prevBar);
+      // Build indicator values for legend
+      const indVals = {
+        sma20: sma20Full ? sma20Full[targetHoverIdx] : null,
+        sma60: sma60Full ? sma60Full[targetHoverIdx] : null,
+        sma250: sma250Full ? sma250Full[targetHoverIdx] : null,
+        bbUpper: bbUpper ? bbUpper[targetHoverIdx] : null,
+        bbLower: bbLower ? bbLower[targetHoverIdx] : null,
+        rsi: rsiFull ? rsiFull[targetHoverIdx] : null,
+        macd: macdLine ? macdLine[targetHoverIdx] : null,
+        stochK: stochK ? stochK[targetHoverIdx] : null,
+        stochD: stochD ? stochD[targetHoverIdx] : null
+      };
+
+      updateDetailCandleLegend(activeBar, prevBar, indVals);
+      ctx.restore();
+    }
+
+    function drawIndicatorLine(ctx, series, getX, getY, strokeStyle, lineWidth = 1.2, lineDash = []) {
+      if (!series || series.length === 0) return;
+      ctx.save();
+      ctx.strokeStyle = strokeStyle;
+      ctx.lineWidth = lineWidth;
+      ctx.setLineDash(lineDash);
+      ctx.beginPath();
+      let started = false;
+      for (let i = 0; i < series.length; i++) {
+        const v = series[i];
+        if (v === null || !Number.isFinite(v)) {
+          started = false;
+          continue;
+        }
+        const x = getX(i);
+        const y = getY(v);
+        if (!started) {
+          ctx.moveTo(x, y);
+          started = true;
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
       ctx.restore();
     }
 
