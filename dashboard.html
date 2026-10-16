@@ -1843,11 +1843,236 @@ body {
   width: min(580px, 96vw);
   overflow: hidden;
   border: 1px solid var(--border-stroke);
-  border-radius: 10px;
-  background: var(--bg-container);
-  color: var(--text-primary);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
+
+/* SECTOR BOARD (MULTI-COLUMN WATCHLIST - SIEUCOPHIEU / ROBOSTOCK STYLE) */
+.sector-board-container {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 10px 12px;
+  background: var(--bg-subtle);
+  scrollbar-width: thin;
+  scroll-behavior: smooth;
+  min-height: 480px;
+}
+.sector-board-container::-webkit-scrollbar {
+  height: 6px;
+}
+.sector-board-container::-webkit-scrollbar-thumb {
+  background: var(--border-stroke);
+  border-radius: 3px;
+}
+.sector-board-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sector-board-card {
+  flex: 0 0 230px;
+  min-width: 215px;
+  max-width: 260px;
+  background: var(--bg-container);
+  border: 1px solid var(--border-stroke);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.sector-board-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.sector-board-header {
+  padding: 8px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-stroke);
+  background: var(--bg-container);
+}
+.sector-board-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.sector-board-chg {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sector-board-table-wrap {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 520px;
+  scrollbar-width: thin;
+}
+.sector-board-table-wrap::-webkit-scrollbar {
+  width: 4px;
+}
+.sector-board-table-wrap::-webkit-scrollbar-thumb {
+  background: var(--border-stroke);
+  border-radius: 2px;
+}
+
+.sector-board-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 2px;
+  font-size: 11.5px;
+  padding: 2px 4px;
+}
+
+.sector-board-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-container);
+  padding: 5px 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-stroke);
+  user-select: none;
+}
+.sector-board-table thead th.sortable {
+  cursor: pointer;
+}
+.sector-board-table thead th.sortable:hover {
+  color: var(--text-primary);
+}
+
+.sector-board-row {
+  cursor: pointer;
+  transition: background-color 0.12s ease, transform 0.08s ease;
+  border-radius: 4px;
+}
+.sector-board-row:hover {
+  filter: brightness(0.96);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+[data-theme="dark"] .sector-board-row:hover {
+  filter: brightness(1.15);
+}
+
+.sector-board-row td {
+  padding: 4px 6px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+
+/* SYMBOL PILL */
+.sector-symbol-pill {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 42px;
+  text-align: center;
+}
+
+/* CEIL ROW & PILL */
+.row-ceil {
+  background: rgba(168, 85, 247, 0.16);
+}
+.row-ceil td {
+  color: #9333ea;
+  font-weight: 600;
+}
+.pill-ceil {
+  background: #a855f7;
+  color: #ffffff !important;
+}
+
+/* STRONG UP (> 3%) */
+.row-up-strong {
+  background: rgba(34, 197, 94, 0.22);
+}
+.row-up-strong td {
+  color: #16a34a;
+  font-weight: 600;
+}
+.pill-up-strong {
+  background: #22c55e;
+  color: #ffffff !important;
+}
+
+/* MEDIUM UP (1% - 3%) */
+.row-up-medium {
+  background: rgba(34, 197, 94, 0.12);
+}
+.row-up-medium td {
+  color: #16a34a;
+}
+.pill-up-medium {
+  color: var(--text-primary);
+}
+
+/* LIGHT UP (0% - 1%) */
+.row-up-light {
+  background: rgba(34, 197, 94, 0.06);
+}
+.row-up-light td {
+  color: #16a34a;
+}
+.pill-up-light {
+  color: var(--text-primary);
+}
+
+/* REF (0%) */
+.row-ref {
+  background: rgba(245, 158, 11, 0.10);
+}
+.row-ref td {
+  color: #d97706;
+}
+.pill-ref {
+  color: var(--text-primary);
+}
+
+/* DOWN (< 0%) */
+.row-down {
+  background: rgba(239, 68, 68, 0.08);
+}
+.row-down td {
+  color: #dc2626;
+}
+.pill-down {
+  color: var(--text-primary);
+}
+
+/* FLOOR (<= -6.8%) */
+.row-floor {
+  background: rgba(2, 132, 199, 0.15);
+}
+.row-floor td {
+  color: #0284c7;
+  font-weight: 600;
+}
+.pill-floor {
+  background: #0284c7;
+  color: #ffffff !important;
+}
+
+/* DARK THEME CONTRAST ENHANCEMENTS FOR SECTOR BOARD */
+[data-theme="dark"] .row-ceil { background: rgba(168, 85, 247, 0.22); }
+[data-theme="dark"] .row-ceil td { color: #c084fc; }
+[data-theme="dark"] .row-up-strong { background: rgba(34, 197, 94, 0.25); }
+[data-theme="dark"] .row-up-strong td { color: #4ade80; }
+[data-theme="dark"] .row-up-medium { background: rgba(34, 197, 94, 0.16); }
+[data-theme="dark"] .row-up-medium td { color: #4ade80; }
+[data-theme="dark"] .row-up-light { background: rgba(34, 197, 94, 0.09); }
+[data-theme="dark"] .row-up-light td { color: #4ade80; }
+[data-theme="dark"] .row-ref { background: rgba(245, 158, 11, 0.14); }
+[data-theme="dark"] .row-ref td { color: #fbbf24; }
+[data-theme="dark"] .row-down { background: rgba(239, 68, 68, 0.14); }
+[data-theme="dark"] .row-down td { color: #f87171; }
+[data-theme="dark"] .row-floor { background: rgba(2, 132, 199, 0.22); }
+[data-theme="dark"] .row-floor td { color: #38bdf8; }
 </style>
 </head>
 <body>
@@ -2116,22 +2341,38 @@ body {
               </div>
             </div>
 
-            <!-- VIEW WATCHLIST -->
+            <!-- VIEW WATCHLIST (CHẾ ĐỘ BẢNG NGÀNH ĐA CỘT THEO HÌNH MẪU & CHẾ ĐỘ BẢNG CHI TIẾT) -->
             <div id="rightViewWatchlist" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
-              <div class="watchlist-controls">
-                <input type="text" class="watchlist-input-search" id="watchSearchInput" placeholder="Tìm nhanh mã (FPT, TCB, VHM...)" oninput="filterWatchlist()">
-                <div class="watchlist-chip-list">
-                  <button class="watchlist-chip-btn active" onclick="selectChip('ALL', this)">Tất cả</button>
-                  <button class="watchlist-chip-btn" onclick="selectChip('VN30', this)">VN30</button>
-                  <button class="watchlist-chip-btn" onclick="selectChip('BANK', this)">Ngân hàng</button>
-                  <button class="watchlist-chip-btn" onclick="selectChip('TECH', this)">Công nghệ</button>
-                  <button class="watchlist-chip-btn" onclick="selectChip('STEEL', this)">Thép</button>
-                  <button class="watchlist-chip-btn" onclick="selectChip('RE', this)">Bất động sản</button>
-                  <button class="watchlist-chip-btn" onclick="selectChip('SEC', this)">Chứng khoán</button>
+              <div class="watchlist-controls" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:280px;">
+                  <input type="text" class="watchlist-input-search" id="watchSearchInput" placeholder="Tìm nhanh mã (FPT, TCB, VHM...)" oninput="filterWatchlist()">
+                  <div class="watchlist-chip-list">
+                    <button class="watchlist-chip-btn active" onclick="selectChip('ALL', this)">Tất cả ngành</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('VN30', this)">VN30</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('RE', this)">Bất động sản</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('SEC', this)">Chứng khoán</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('BANK', this)">Ngân hàng</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('STEEL', this)">Thép</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('OIL', this)">Dầu khí</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('TECH', this)">Công nghệ</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('RETAIL', this)">Bán lẻ</button>
+                  </div>
+                </div>
+
+                <!-- NÚT CHUYỂN CHẾ ĐỘ XEM: BẢNG NGÀNH (CHUẨN HÌNH MẪU) / BẢNG CHI TIẾT TOÀN SÀN -->
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <button class="period-tab-btn active" id="btnViewModeSector" onclick="switchWatchlistViewMode('sector', this)" title="Bảng ngành đa cột chuẩn SieuCoPhieu / Robostock">Bảng Ngành Đa Cột</button>
+                  <button class="period-tab-btn" id="btnViewModeFlat" onclick="switchWatchlistViewMode('flat', this)" title="Bảng chi tiết toàn sàn">Bảng Chi Tiết</button>
                 </div>
               </div>
 
-              <div class="watchlist-table-scroll">
+              <!-- CHẾ ĐỘ 1: BẢNG NGÀNH ĐA CỘT (GIỐNG 100% HÌNH MẪU NGƯỜI DÙNG TẢI LÊN) -->
+              <div id="sectorBoardContainer" class="sector-board-container">
+                <!-- Rendered dynamically by renderSectorBoard() -->
+              </div>
+
+              <!-- CHẾ ĐỘ 2: BẢNG CHI TIẾT TOÀN SÀN (FLAT TABLE CÓ THÔNG SỐ FA & KHỐI NGOẠI) -->
+              <div id="flatTableContainer" class="watchlist-table-scroll" style="display:none;">
                 <table class="watchlist-table">
                   <thead>
                     <tr>
@@ -4203,8 +4444,397 @@ body {
       });
     }
 
+    // ==========================================
+    // MULTI-COLUMN SECTOR BOARD (BẢNG NGÀNH ĐA CỘT THEO HÌNH MẪU SIÊU CỔ PHIẾU / ROBOSTOCK)
+    // ==========================================
+    let currentWatchlistViewMode = 'sector';
+    const sectorSortState = {};
+
+    const SECTOR_DEFINITIONS = [
+      {
+        id: 'VN30',
+        title: 'VN30',
+        chip: 'VN30',
+        baselineChg: 0.62,
+        stocks: [
+          { symbol: 'SHB', price: 10.75, change: 3.37, volume: 32900000 },
+          { symbol: 'LPB', price: 38.15, change: 2.55, volume: 1100000 },
+          { symbol: 'VHM', price: 60.30, change: 2.38, volume: 4600000 },
+          { symbol: 'BID', price: 33.65, change: 1.36, volume: 2000000 },
+          { symbol: 'VRE', price: 22.90, change: 1.33, volume: 1200000 },
+          { symbol: 'SSB', price: 16.10, change: 1.26, volume: 911800 },
+          { symbol: 'VNM', price: 57.90, change: 1.22, volume: 775300 },
+          { symbol: 'CTG', price: 30.15, change: 1.17, volume: 3700000 },
+          { symbol: 'SSI', price: 19.45, change: 1.04, volume: 6000000 },
+          { symbol: 'FPT', price: 58.60, change: 1.03, volume: 1600000 },
+          { symbol: 'BSR', price: 28.45, change: 0.89, volume: 4200000 },
+          { symbol: 'VCB', price: 57.00, change: 0.88, volume: 1500000 },
+          { symbol: 'GVR', price: 31.15, change: 0.81, volume: 519200 },
+          { symbol: 'STB', price: 63.30, change: 0.80, volume: 1100000 },
+          { symbol: 'VIB', price: 13.90, change: 0.72, volume: 3900000 },
+          { symbol: 'MSB', price: 14.75, change: 0.68, volume: 9200000 },
+          { symbol: 'HPG', price: 20.80, change: 0.24, volume: 3200000 },
+          { symbol: 'TCB', price: 32.95, change: 0.15, volume: 4700000 },
+          { symbol: 'MWG', price: 58.20, change: 0.52, volume: 2800000 },
+          { symbol: 'MBB', price: 24.30, change: 0.41, volume: 5100000 }
+        ]
+      },
+      {
+        id: 'RE',
+        title: 'Bất động sản',
+        chip: 'RE',
+        baselineChg: 0.38,
+        stocks: [
+          { symbol: 'SJS', price: 57.40, change: 6.89, volume: 140000 },
+          { symbol: 'AGG', price: 9.23, change: 3.48, volume: 201400 },
+          { symbol: 'VHM', price: 60.30, change: 2.38, volume: 4600000 },
+          { symbol: 'KDH', price: 13.95, change: 2.20, volume: 5000000 },
+          { symbol: 'NLG', price: 21.75, change: 1.64, volume: 358800 },
+          { symbol: 'HQC', price: 2.01, change: 1.52, volume: 2000000 },
+          { symbol: 'HTN', price: 7.16, change: 1.42, volume: 194400 },
+          { symbol: 'NVL', price: 10.85, change: 1.40, volume: 4500000 },
+          { symbol: 'VRE', price: 22.90, change: 1.33, volume: 1200000 },
+          { symbol: 'HDC', price: 10.45, change: 0.97, volume: 608700 },
+          { symbol: 'CEO', price: 11.10, change: 0.91, volume: 2100000 },
+          { symbol: 'TCH', price: 11.20, change: 0.90, volume: 1200000 },
+          { symbol: 'DXS', price: 4.96, change: 0.81, volume: 693100 },
+          { symbol: 'HDG', price: 14.90, change: 0.68, volume: 521400 },
+          { symbol: 'BCM', price: 38.50, change: 0.65, volume: 194800 },
+          { symbol: 'PDR', price: 18.25, change: 0.55, volume: 2800000 },
+          { symbol: 'DIG', price: 19.10, change: 0.45, volume: 3100000 },
+          { symbol: 'DXG', price: 14.50, change: 0.35, volume: 2400000 }
+        ]
+      },
+      {
+        id: 'SEC',
+        title: 'Chứng khoán',
+        chip: 'SEC',
+        baselineChg: 0.47,
+        stocks: [
+          { symbol: 'DSC', price: 9.84, change: 2.71, volume: 200 },
+          { symbol: 'EVS', price: 5.60, change: 1.82, volume: 91300 },
+          { symbol: 'BSI', price: 25.85, change: 1.77, volume: 333000 },
+          { symbol: 'SHS', price: 12.40, change: 1.64, volume: 2800000 },
+          { symbol: 'APG', price: 4.09, change: 1.49, volume: 12500 },
+          { symbol: 'PSI', price: 7.80, change: 1.30, volume: 24500 },
+          { symbol: 'VIX', price: 11.90, change: 1.28, volume: 17300000 },
+          { symbol: 'CTS', price: 20.70, change: 1.22, volume: 982100 },
+          { symbol: 'SSI', price: 19.45, change: 1.04, volume: 6000000 },
+          { symbol: 'AAS', price: 10.20, change: 0.99, volume: 385100 },
+          { symbol: 'LPS', price: 17.45, change: 0.87, volume: 208200 },
+          { symbol: 'TCI', price: 9.90, change: 0.81, volume: 28400 },
+          { symbol: 'ORS', price: 13.55, change: 0.74, volume: 1500000 },
+          { symbol: 'MBS', price: 15.30, change: 0.66, volume: 1100000 },
+          { symbol: 'TVB', price: 6.20, change: 0.65, volume: 2600 },
+          { symbol: 'VND', price: 15.65, change: 0.64, volume: 4800000 },
+          { symbol: 'HCM', price: 26.20, change: 0.58, volume: 1900000 },
+          { symbol: 'VCI', price: 32.50, change: 0.46, volume: 1400000 }
+        ]
+      },
+      {
+        id: 'BANK',
+        title: 'Ngân hàng',
+        chip: 'BANK',
+        baselineChg: 0.51,
+        stocks: [
+          { symbol: 'SHB', price: 10.75, change: 3.37, volume: 32900000 },
+          { symbol: 'LPB', price: 38.15, change: 2.55, volume: 1100000 },
+          { symbol: 'TPB', price: 12.00, change: 2.13, volume: 16700000 },
+          { symbol: 'BID', price: 33.65, change: 1.36, volume: 2000000 },
+          { symbol: 'SSB', price: 16.10, change: 1.26, volume: 911800 },
+          { symbol: 'CTG', price: 30.15, change: 1.17, volume: 3700000 },
+          { symbol: 'BVB', price: 10.40, change: 0.97, volume: 1900000 },
+          { symbol: 'KLB', price: 11.05, change: 0.91, volume: 47400 },
+          { symbol: 'VCB', price: 57.00, change: 0.88, volume: 1500000 },
+          { symbol: 'STB', price: 63.30, change: 0.80, volume: 1100000 },
+          { symbol: 'VIB', price: 13.90, change: 0.72, volume: 3900000 },
+          { symbol: 'MSB', price: 14.75, change: 0.68, volume: 9200000 },
+          { symbol: 'OCB', price: 10.05, change: 0.50, volume: 355300 },
+          { symbol: 'ACB', price: 20.70, change: 0.49, volume: 2500000 },
+          { symbol: 'TCB', price: 32.95, change: 0.15, volume: 4700000 },
+          { symbol: 'MBB', price: 24.30, change: 0.41, volume: 5100000 },
+          { symbol: 'HDB', price: 22.40, change: 0.45, volume: 2200000 },
+          { symbol: 'VPB', price: 19.80, change: 0.25, volume: 4100000 }
+        ]
+      },
+      {
+        id: 'STEEL',
+        title: 'Thép',
+        chip: 'STEEL',
+        baselineChg: 0.19,
+        stocks: [
+          { symbol: 'POM', price: 3.20, change: 3.23, volume: 2500000 },
+          { symbol: 'TLH', price: 3.31, change: 0.61, volume: 57800 },
+          { symbol: 'HPG', price: 20.80, change: 0.24, volume: 3200000 },
+          { symbol: 'NKG', price: 10.50, change: 0.00, volume: 714400 },
+          { symbol: 'VGS', price: 16.80, change: 0.00, volume: 71600 },
+          { symbol: 'NSH', price: 4.00, change: 0.00, volume: 15200 },
+          { symbol: 'SHA', price: 4.05, change: 0.00, volume: 0 },
+          { symbol: 'VCA', price: 6.35, change: 0.00, volume: 0 },
+          { symbol: 'TVN', price: 9.60, change: 0.00, volume: 291200 },
+          { symbol: 'GDA', price: 11.90, change: 0.00, volume: 27300 },
+          { symbol: 'SHI', price: 13.95, change: -0.36, volume: 106500 },
+          { symbol: 'HSG', price: 10.40, change: -0.48, volume: 1100000 },
+          { symbol: 'SMC', price: 9.70, change: -0.72, volume: 17000 }
+        ]
+      },
+      {
+        id: 'OIL',
+        title: 'Dầu khí',
+        chip: 'OIL',
+        baselineChg: 0.47,
+        stocks: [
+          { symbol: 'PVP', price: 22.75, change: 3.41, volume: 549600 },
+          { symbol: 'BSR', price: 28.45, change: 0.89, volume: 4200000 },
+          { symbol: 'PVC', price: 11.50, change: 0.88, volume: 276900 },
+          { symbol: 'PVS', price: 31.80, change: 0.63, volume: 604500 },
+          { symbol: 'PVT', price: 23.80, change: 0.63, volume: 1900000 },
+          { symbol: 'PVD', price: 17.75, change: 0.28, volume: 649200 },
+          { symbol: 'CNG', price: 19.50, change: 0.26, volume: 1700 },
+          { symbol: 'PVB', price: 20.50, change: 0.00, volume: 52800 },
+          { symbol: 'GAS', price: 76.20, change: 0.00, volume: 213000 },
+          { symbol: 'OIL', price: 13.00, change: 0.00, volume: 534500 },
+          { symbol: 'PLC', price: 18.90, change: -0.53, volume: 38400 },
+          { symbol: 'PLX', price: 35.25, change: -0.84, volume: 2100000 }
+        ]
+      },
+      {
+        id: 'TECH',
+        title: 'Công nghệ',
+        chip: 'TECH',
+        baselineChg: 0.82,
+        stocks: [
+          { symbol: 'FPT', price: 58.60, change: 1.03, volume: 1600000 },
+          { symbol: 'CMG', price: 42.50, change: 1.19, volume: 450000 },
+          { symbol: 'CTR', price: 92.40, change: 0.87, volume: 380000 },
+          { symbol: 'ELC', price: 18.10, change: 0.56, volume: 210000 },
+          { symbol: 'VGI', price: 65.30, change: 0.46, volume: 520000 },
+          { symbol: 'FOX', price: 71.00, change: 0.00, volume: 15000 },
+          { symbol: 'ITD', price: 11.20, change: -0.44, volume: 48000 }
+        ]
+      },
+      {
+        id: 'RETAIL',
+        title: 'Bán lẻ & Tiêu dùng',
+        chip: 'RETAIL',
+        baselineChg: 0.54,
+        stocks: [
+          { symbol: 'FRT', price: 138.50, change: 1.47, volume: 520000 },
+          { symbol: 'PNJ', price: 89.50, change: 0.68, volume: 640000 },
+          { symbol: 'MWG', price: 58.20, change: 0.52, volume: 2800000 },
+          { symbol: 'DGW', price: 44.20, change: 0.45, volume: 890000 },
+          { symbol: 'MSN', price: 68.10, change: 0.15, volume: 1200000 },
+          { symbol: 'PET', price: 21.00, change: -0.47, volume: 310000 }
+        ]
+      }
+    ];
+
+    function formatSectorPrice(p) {
+      if (p === null || p === undefined || isNaN(p) || p === 0) return '—';
+      const num = p >= 1000 ? p / 1000 : p;
+      return parseFloat(Number(num).toFixed(2)).toString();
+    }
+
+    function formatSectorChg(chg) {
+      if (chg === null || chg === undefined || isNaN(chg)) return '0%';
+      const num = parseFloat(Number(chg).toFixed(2));
+      if (num === 0) return '0%';
+      return `${num}%`;
+    }
+
+    function formatSectorVolume(v) {
+      if (v === null || v === undefined || isNaN(v) || v === 0) return '0';
+      const num = Number(v);
+      if (num >= 1e6) {
+        return parseFloat((num / 1e6).toFixed(1)) + 'm';
+      } else if (num >= 1e3) {
+        return parseFloat((num / 1e3).toFixed(1)) + 'k';
+      }
+      return num.toString();
+    }
+
+    function getSectorRowMeta(chg) {
+      const c = Number(chg) || 0;
+      if (c >= 6.8) {
+        return { rowClass: 'row-ceil', pillClass: 'pill-ceil' };
+      } else if (c >= 3.0) {
+        return { rowClass: 'row-up-strong', pillClass: 'pill-up-strong' };
+      } else if (c >= 1.0) {
+        return { rowClass: 'row-up-medium', pillClass: 'pill-up-medium' };
+      } else if (c > 0) {
+        return { rowClass: 'row-up-light', pillClass: 'pill-up-light' };
+      } else if (c <= -6.8) {
+        return { rowClass: 'row-floor', pillClass: 'pill-floor' };
+      } else if (c < 0) {
+        return { rowClass: 'row-down', pillClass: 'pill-down' };
+      } else {
+        return { rowClass: 'row-ref', pillClass: 'pill-ref' };
+      }
+    }
+
+    function toggleSectorSort(sectorId, col) {
+      const curr = sectorSortState[sectorId] || { col: 'change', asc: false };
+      if (curr.col === col) {
+        sectorSortState[sectorId] = { col, asc: !curr.asc };
+      } else {
+        sectorSortState[sectorId] = { col, asc: false };
+      }
+      renderSectorBoard();
+    }
+
+    function switchWatchlistViewMode(mode, btn) {
+      currentWatchlistViewMode = mode;
+      const btnSector = document.getElementById('btnViewModeSector');
+      const btnFlat = document.getElementById('btnViewModeFlat');
+      if (btnSector && btnFlat) {
+        btnSector.classList.toggle('active', mode === 'sector');
+        btnFlat.classList.toggle('active', mode === 'flat');
+      }
+
+      const sectorContainer = document.getElementById('sectorBoardContainer');
+      const flatContainer = document.getElementById('flatTableContainer');
+
+      if (mode === 'sector') {
+        if (sectorContainer) sectorContainer.style.display = 'flex';
+        if (flatContainer) flatContainer.style.display = 'none';
+        renderSectorBoard();
+      } else {
+        if (sectorContainer) sectorContainer.style.display = 'none';
+        if (flatContainer) flatContainer.style.display = 'block';
+        renderWatchlistTable();
+      }
+    }
+
+    function renderSectorBoard() {
+      const container = document.getElementById('sectorBoardContainer');
+      if (!container) return;
+
+      const q = (document.getElementById('watchSearchInput')?.value || '').toUpperCase().trim();
+      let totalVisibleStocks = 0;
+
+      const cardsHtml = SECTOR_DEFINITIONS.map(sector => {
+        // Hợp nhất dữ liệu realtime từ stockDataList với dữ liệu mẫu baseline
+        let stocks = sector.stocks.map(baseStock => {
+          const live = stockDataList.find(s => s.symbol === baseStock.symbol);
+          return {
+            symbol: baseStock.symbol,
+            price: live && live.price ? (live.price >= 1000 ? live.price / 1000 : live.price) : baseStock.price,
+            change: live && live.change !== undefined && live.change !== null ? live.change : baseStock.change,
+            volume: live && live.volume !== undefined ? live.volume : baseStock.volume
+          };
+        });
+
+        // Bổ sung các mã mới thuộc ngành này từ stockDataList nếu chưa có
+        stockDataList.forEach(live => {
+          if (!stocks.some(s => s.symbol === live.symbol)) {
+            let matchesSector = false;
+            if (sector.id === 'VN30' && ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR'].includes(live.symbol)) matchesSector = true;
+            else if (sector.id === 'BANK' && (['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','TPB','SHB','VIB','SSB'].includes(live.symbol) || live.sector === 'Tài chính')) matchesSector = true;
+            else if (sector.id === 'TECH' && (['FPT','CMG','ELC','CTR','VGI','FOX'].includes(live.symbol) || live.sector === 'Công nghệ')) matchesSector = true;
+            else if (sector.id === 'STEEL' && ['HPG','HSG','NKG','VGS','SMC','POM','TLH'].includes(live.symbol)) matchesSector = true;
+            else if (sector.id === 'RE' && ['VHM','VIC','VRE','KDH','NLG','DIG','DXG','PDR','NVL','CEO','KBC','IDC','SJS','AGG'].includes(live.symbol)) matchesSector = true;
+            else if (sector.id === 'SEC' && ['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS'].includes(live.symbol)) matchesSector = true;
+            else if (sector.id === 'OIL' && ['GAS','PLX','PVD','PVS','BSR','PVT','PVC','PVP'].includes(live.symbol)) matchesSector = true;
+            else if (sector.id === 'RETAIL' && ['MWG','FRT','PNJ','DGW','MSN','PET'].includes(live.symbol)) matchesSector = true;
+
+            if (matchesSector) {
+              stocks.push({
+                symbol: live.symbol,
+                price: live.price ? (live.price >= 1000 ? live.price / 1000 : live.price) : 0,
+                change: live.change || 0,
+                volume: live.volume || 0
+              });
+            }
+          }
+        });
+
+        // Tính biến động trung bình toàn ngành
+        const avgChg = stocks.length
+          ? parseFloat((stocks.reduce((acc, s) => acc + (s.change || 0), 0) / stocks.length).toFixed(2))
+          : sector.baselineChg;
+        const isUp = avgChg >= 0;
+        const isDown = avgChg < 0;
+
+        // Lọc theo từ khóa tìm kiếm nếu có
+        if (q) {
+          stocks = stocks.filter(s => s.symbol.includes(q));
+        }
+        totalVisibleStocks += stocks.length;
+
+        // Áp dụng sắp xếp cột theo cấu hình (mặc định % thay đổi giảm dần như hình mẫu)
+        const sort = sectorSortState[sector.id] || { col: 'change', asc: false };
+        stocks.sort((a, b) => {
+          let va = a[sort.col];
+          let vb = b[sort.col];
+          if (typeof va === 'string') return sort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+          va = va || 0;
+          vb = vb || 0;
+          return sort.asc ? va - vb : vb - va;
+        });
+
+        const chgArrow = (sort.col === 'change') ? (sort.asc ? '▴' : '▾') : '▾';
+        const volArrow = (sort.col === 'volume') ? (sort.asc ? '▴' : '▾') : '⇅';
+
+        const rowsHtml = stocks.length > 0 ? stocks.map(s => {
+          const meta = getSectorRowMeta(s.change);
+          return `
+            <tr class="sector-board-row ${meta.rowClass}" onclick="openStockDetailModal('${s.symbol}')" title="${s.symbol} - Nhấp xem phân tích chi tiết">
+              <td style="text-align:left;"><span class="sector-symbol-pill ${meta.pillClass}">${s.symbol}</span></td>
+              <td style="text-align:right;">${formatSectorPrice(s.price)}</td>
+              <td style="text-align:right;">${formatSectorChg(s.change)}</td>
+              <td style="text-align:right;">${formatSectorVolume(s.volume)}</td>
+            </tr>
+          `;
+        }).join('') : `
+          <tr class="sector-board-row">
+            <td colspan="4" style="text-align:center; color:var(--text-muted); padding:16px 4px; font-size:11px;">
+              ${q ? 'Không có mã ' + q : 'Đang cập nhật'}
+            </td>
+          </tr>
+        `;
+
+        return `
+          <div class="sector-board-card" data-sector-id="${sector.id}" id="sectorCard_${sector.id}">
+            <div class="sector-board-header">
+              <span class="sector-board-title">${sector.title}</span>
+              <span class="sector-board-chg ${isUp ? 'text-up' : (isDown ? 'text-down' : 'text-ref')}">
+                ${isUp ? '+' : ''}${avgChg.toFixed(2)}%
+              </span>
+            </div>
+            <div class="sector-board-table-wrap">
+              <table class="sector-board-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left; width:44px;" class="sortable" onclick="toggleSectorSort('${sector.id}', 'symbol')">Mã</th>
+                    <th style="text-align:right; width:46px;" class="sortable" onclick="toggleSectorSort('${sector.id}', 'price')">Giá</th>
+                    <th style="text-align:right; width:52px;" class="sortable" onclick="toggleSectorSort('${sector.id}', 'change')">+/- ${chgArrow}</th>
+                    <th style="text-align:right; width:54px;" class="sortable" onclick="toggleSectorSort('${sector.id}', 'volume')">KL ${volArrow}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = cardsHtml;
+
+      if (currentWatchlistViewMode === 'sector') {
+        const countEl = document.getElementById('rightPanelCount');
+        if (countEl) countEl.textContent = `${totalVisibleStocks} mã (Đa cột)`;
+      }
+    }
+
     // RENDER WATCHLIST TABLE (BẢNG GIÁ REALTIME)
     function renderWatchlistTable() {
+      // Luôn đồng bộ dữ liệu sang Bảng Ngành Đa Cột
+      if (typeof renderSectorBoard === 'function') {
+        renderSectorBoard();
+      }
+
       const tbody = document.getElementById('watchlistTbody');
       if (!tbody) return;
 
@@ -4230,7 +4860,10 @@ body {
         list = list.filter(s => s.symbol.includes(q));
       }
 
-      document.getElementById('rightPanelCount').textContent = `${list.length} mã`;
+      if (currentWatchlistViewMode !== 'sector') {
+        const countEl = document.getElementById('rightPanelCount');
+        if (countEl) countEl.textContent = `${list.length} mã`;
+      }
 
       tbody.innerHTML = list.slice(0, 45).map(s => {
         const chg = s.change !== null && s.change !== undefined ? s.change : 0;
@@ -5594,8 +6227,24 @@ body {
     function selectChip(chip, btn) {
       activeChip = chip;
       document.querySelectorAll('.watchlist-chip-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderWatchlistTable();
+      if (btn) btn.classList.add('active');
+
+      if (currentWatchlistViewMode === 'sector') {
+        const container = document.getElementById('sectorBoardContainer');
+        if (chip === 'ALL') {
+          if (container) container.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          const card = document.getElementById(`sectorCard_${chip}`);
+          if (card && container) {
+            const cardLeft = card.offsetLeft - container.offsetLeft - 12;
+            container.scrollTo({ left: Math.max(0, cardLeft), behavior: 'smooth' });
+            card.style.boxShadow = '0 0 0 2px var(--primary-brand), 0 4px 16px rgba(41,128,185,0.3)';
+            setTimeout(() => { card.style.boxShadow = ''; }, 1400);
+          }
+        }
+      } else {
+        renderWatchlistTable();
+      }
     }
 
     function filterWatchlist() {
@@ -5626,6 +6275,7 @@ body {
               };
               if (!stockDataList.some(s => s.symbol === item.symbol)) {
                 stockDataList.unshift(item);
+                if (typeof renderSectorBoard === 'function') renderSectorBoard();
                 renderWatchlistTable();
                 renderTASignals();
                 renderFAScreener();
@@ -5634,6 +6284,7 @@ body {
           }).catch(() => {});
         }
       }
+      if (typeof renderSectorBoard === 'function') renderSectorBoard();
       renderWatchlistTable();
     }
 
@@ -8799,6 +9450,7 @@ ${leaderDetails}
       initIntradayCurve();
       initNotificationCenter();
       checkDnseMcpStatus();
+      if (typeof renderSectorBoard === 'function') renderSectorBoard();
       await syncMarketBaseline();
       startAutoRunningTicker();
 
