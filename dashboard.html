@@ -2069,10 +2069,198 @@ body {
 [data-theme="dark"] .row-up-light td { color: #4ade80; }
 [data-theme="dark"] .row-ref { background: rgba(245, 158, 11, 0.14); }
 [data-theme="dark"] .row-ref td { color: #fbbf24; }
-[data-theme="dark"] .row-down { background: rgba(239, 68, 68, 0.14); }
-[data-theme="dark"] .row-down td { color: #f87171; }
-[data-theme="dark"] .row-floor { background: rgba(2, 132, 199, 0.22); }
-[data-theme="dark"] .row-floor td { color: #38bdf8; }
+/* DASHBOARD SPLIT TOP: 2 COLUMNS (TỔNG QUAN BÊN TRÁI - DIỄN BIẾN KỸ THUẬT BÊN PHẢI) */
+.dashboard-split-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: stretch;
+  margin-bottom: 6px;
+}
+@media (max-width: 1240px) {
+  .dashboard-split-top {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-split-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.dashboard-split-right {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.tech-grid-3col {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 6px;
+  padding: 8px 10px;
+  flex: 1;
+}
+@media (max-width: 900px) {
+  .tech-grid-3col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* COMPACT TUNING: LOẠI BỎ KHOẢNG TRỐNG THỪA ("CHO NHỎ MẤY Ô LẠI") */
+.dashboard-split-top .tongquan-card {
+  padding: 7px 10px;
+  gap: 4px;
+}
+.dashboard-split-top .tongquan-card-head {
+  margin-bottom: 4px;
+}
+.dashboard-split-top .tongquan-card-title {
+  font-size: 12px;
+  gap: 5px;
+}
+.dashboard-split-top .tongquan-card-subtitle {
+  font-size: 10px;
+}
+.dashboard-split-top .impact-col-head {
+  font-size: 10.5px;
+  margin-bottom: 3px;
+  padding-bottom: 2px;
+}
+.dashboard-split-top .impact-row-item {
+  padding: 2.5px 5px;
+  margin-bottom: 2px;
+  font-size: 11px;
+}
+.dashboard-split-top .sector-bar-list {
+  gap: 2.5px;
+}
+.dashboard-split-top .sector-bar-row {
+  grid-template-columns: 88px 1fr 46px;
+  gap: 4px;
+  font-size: 10.5px;
+}
+.dashboard-split-top .sector-bar-track {
+  height: 6px;
+}
+.dashboard-split-top .liq-meter-box {
+  padding: 4px 6px;
+  margin-bottom: 4px;
+}
+.dashboard-split-top .liq-meter-num {
+  font-size: 16px;
+  font-weight: 700;
+}
+.dashboard-split-top .liq-meter-desc {
+  font-size: 9.5px;
+  line-height: 1.25;
+}
+.dashboard-split-top .liq-bars-wrap {
+  gap: 2.5px;
+}
+.dashboard-split-top .liq-bar-item {
+  grid-template-columns: 68px 1fr 50px;
+  font-size: 10px;
+}
+.dashboard-split-top .cap-boxes-grid {
+  gap: 4px;
+  margin-bottom: 4px;
+}
+.dashboard-split-top .cap-stat-box {
+  padding: 4px 2px;
+}
+.dashboard-split-top .cap-stat-name {
+  font-size: 10px;
+}
+.dashboard-split-top .cap-stat-val {
+  font-size: 13px;
+  margin: 1px 0;
+}
+.dashboard-split-top .cap-stat-sub {
+  font-size: 9px;
+}
+.dashboard-split-top .foreign-sub-grid {
+  gap: 6px;
+}
+.dashboard-split-top .foreign-sub-col-title {
+  font-size: 10px;
+  margin-bottom: 2px;
+  padding-bottom: 2px;
+}
+.dashboard-split-top .foreign-stock-item {
+  padding: 2px 0;
+  font-size: 10.5px;
+}
+.dashboard-split-top .actual-frame-card {
+  padding: 3px 6px;
+}
+.dashboard-split-top .actual-frame-container {
+  gap: 3px;
+  padding: 3px;
+}
+.dashboard-split-top .frame-card-symbol {
+  font-size: 10.5px;
+}
+.dashboard-split-top .frame-card-price {
+  font-size: 11px;
+}
+.dashboard-split-top .frame-card-chg {
+  font-size: 9.5px;
+}
+.dashboard-split-top .hero-index-section {
+  padding: 6px 8px;
+}
+.dashboard-split-top .hero-index-main-val {
+  font-size: 18px;
+}
+.dashboard-split-top .hero-index-sub-chg {
+  font-size: 11px;
+}
+.dashboard-split-top .hero-index-stats-grid {
+  font-size: 10px;
+  gap: 2px 6px;
+  margin-top: 3px;
+}
+.dashboard-split-top .market-summary-bar {
+  padding: 3px 6px;
+  font-size: 10px;
+}
+.dashboard-split-top .stats-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  margin-bottom: 5px;
+}
+.dashboard-split-top .stats-card {
+  padding: 3px 2px;
+}
+.dashboard-split-top .stats-card-label {
+  font-size: 9.5px;
+}
+.dashboard-split-top .stats-card-value {
+  font-size: 10px;
+}
+.dashboard-split-top .gauge-panel {
+  padding: 4px 6px;
+  gap: 6px;
+}
+.dashboard-split-top .gauge-svg-wrap {
+  width: 72px;
+  height: 40px;
+}
+.dashboard-split-top .gauge-info-title {
+  font-size: 10px;
+}
+.dashboard-split-top .gauge-info-score {
+  font-size: 15px;
+}
+.dashboard-split-top .gauge-info-desc {
+  font-size: 9.5px;
+}
 </style>
 </head>
 <body>
@@ -2180,11 +2368,17 @@ body {
       <!-- KHU VỰC HIỂN THỊ NỘI DUNG CHÍNH (SCROLLABLE) -->
       <div class="center-content-scroll">
 
-        <!-- SUBTAB 1: TỔNG QUAN (5 BIỂU ĐỒ CỐT LÕI CỦA CUNGDAUTU.VN) -->
+        <!-- SUBTAB 1: TỔNG QUAN (CHIA 2: TỔNG QUAN BÊN TRÁI - DIỄN BIẾN KỸ THUẬT BÊN PHẢI) -->
         <div id="subview_tongquan" class="tongquan-grid-wrap">
 
-          <!-- HÀNG 1: CỔ PHIẾU ẢNH HƯỞNG & BIẾN ĐỘNG THEO NGÀNH -->
-          <div class="grid-row-2col">
+          <!-- KHỐI PHÍA TRÊN: CHIA 2 (TỔNG QUAN BÊN TRÁI - DIỄN BIẾN KỸ THUẬT BÊN PHẢI) -->
+          <div id="dashboardSplitTop" class="dashboard-split-top">
+
+            <!-- CỘT TRÁI: 5 BIỂU ĐỒ TỔNG QUAN THỊ TRƯỜNG -->
+            <div class="dashboard-split-left">
+
+              <!-- HÀNG 1: CỔ PHIẾU ẢNH HƯỞNG & BIẾN ĐỘNG THEO NGÀNH -->
+              <div class="grid-row-2col">
 
             <!-- CHART 1: CỔ PHIẾU ẢNH HƯỞNG ĐẾN CHỈ SỐ -->
             <div class="tongquan-card">
@@ -2319,8 +2513,173 @@ body {
             </div>
 
           </div>
+            </div>
 
-          <!-- HÀNG 3: BẢNG ĐIỆN THỜI GIAN THỰC & DÒNG LỆNH (CHUYỂN TỪ PANEL PHẢI XUỐNG DƯỚI TỔNG QUAN) -->
+            <!-- CỘT PHẢI: CHỈ SỐ THỊ TRƯỜNG & DIỄN BIẾN KỸ THUẬT (#first) -->
+            <div id="first" class="dashboard-split-right tongquan-card" style="background:var(--bg-container);">
+              <div class="right-tab-header" style="background:var(--bg-subtle); display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="blue-accent-bar"></span>
+                  <b style="font-size:12.5px;">Chỉ số Thị trường & Phân tích Kỹ thuật Realtime</b>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:11px; color:var(--text-muted);" id="realtimeTickClock">14:30:15</span>
+                </div>
+              </div>
+
+              <div class="tech-grid-3col">
+
+                <!-- CỘT A: CÁC CHỈ SỐ CHÍNH (VNINDEX, VN30, HNX, UPCOM) & ĐỘ RỘNG THỊ TRƯỜNG -->
+                <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); overflow:hidden; display:flex; flex-direction:column;">
+                  <!-- SELECTOR CARDS: VNINDEX, VN30, HNX, UPCOM -->
+                  <div class="actual-frame-container" id="tblStockTradingIndex">
+                    <div class="actual-frame-card active" id="card_VNINDEX" onclick="selectIndexCard('VNINDEX')">
+                      <div class="frame-card-head">
+                        <span class="frame-card-symbol">VN-INDEX</span>
+                        <span class="frame-card-price text-down" id="miniPrice_VNINDEX">1.702,20</span>
+                      </div>
+                      <div class="frame-card-chg text-down" id="miniChg_VNINDEX">▼ -2,67 (-0,16%)</div>
+                    </div>
+
+                    <div class="actual-frame-card" id="card_VN30" onclick="selectIndexCard('VN30')">
+                      <div class="frame-card-head">
+                        <span class="frame-card-symbol">VN30</span>
+                        <span class="frame-card-price text-down" id="miniPrice_VN30">1.846,50</span>
+                      </div>
+                      <div class="frame-card-chg text-down" id="miniChg_VN30">▼ -5,94 (-0,32%)</div>
+                    </div>
+
+                    <div class="actual-frame-card" id="card_HNXINDEX" onclick="selectIndexCard('HNXINDEX')">
+                      <div class="frame-card-head">
+                        <span class="frame-card-symbol">HNX</span>
+                        <span class="frame-card-price text-down" id="miniPrice_HNXINDEX">260,71</span>
+                      </div>
+                      <div class="frame-card-chg text-down" id="miniChg_HNXINDEX">▼ -4,45 (-1,68%)</div>
+                    </div>
+
+                    <div class="actual-frame-card" id="card_UPCOMINDEX" onclick="selectIndexCard('UPCOMINDEX')">
+                      <div class="frame-card-head">
+                        <span class="frame-card-symbol">UPCOM</span>
+                        <span class="frame-card-price text-up" id="miniPrice_UPCOMINDEX">124,34</span>
+                      </div>
+                      <div class="frame-card-chg text-up" id="miniChg_UPCOMINDEX">▲ +0,40 (+0,32%)</div>
+                    </div>
+                  </div>
+
+                  <!-- HERO CARD HIỂN THỊ CHỈ SỐ ĐANG CHỌN -->
+                  <div class="hero-index-section" style="border-bottom:1px solid var(--border-stroke); flex:1;">
+                    <div class="hero-index-title-row">
+                      <span class="hero-index-name" id="heroIndexName">VN-INDEX (HOSE)</span>
+                      <span class="hero-index-clock" id="heroMarketState">Đang tải phiên...</span>
+                    </div>
+                    <div class="hero-index-main-val text-down" id="heroIndexVal">1.704,87</div>
+                    <div class="hero-index-sub-chg text-down" id="heroIndexChg">
+                      <span>▼ -14,54 (-0,85%)</span>
+                    </div>
+                    <div class="hero-index-stats-grid">
+                      <div>Cao nhất: <b id="heroStatHigh">1.709,54</b></div>
+                      <div>Thấp nhất: <b id="heroStatLow">1.696,47</b></div>
+                      <div>Khối lượng: <b id="heroStatVol">527.0M</b> CP</div>
+                      <div>Giá trị: <b id="heroStatVal">11.072 tỷ đ</b></div>
+                    </div>
+                  </div>
+
+                  <!-- MARKET SUMMARY BAR -->
+                  <div class="market-summary-bar">
+                    <div class="summary-top-row">
+                      <span>KL: <b id="sumVol">527.0M</b> CP</span>
+                      <span>| Khớp: <b id="sumMatchVal">11.072 tỷ</b></span>
+                      <span>| TT: <b id="sumPtVal">886 tỷ</b></span>
+                    </div>
+                    <div class="summary-breadth-row">
+                      <div class="breadth-stat-item text-up">
+                        ▲ <span id="breadthAdv">128</span>
+                        <span class="breadth-badge-sub text-ceil" id="breadthCeil">(9)</span>
+                      </div>
+                      <div class="breadth-stat-item text-ref">
+                        ■ <span id="breadthUnc">118</span>
+                      </div>
+                      <div class="breadth-stat-item text-down">
+                        ▼ <span id="breadthDec">163</span>
+                        <span class="breadth-badge-sub text-floor" id="breadthFloor">(5)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CỘT B: BIỂU ĐỒ INTRADAY DIỄN BIẾN TRONG PHIÊN -->
+                <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
+                  <div class="intraday-header" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                      <span style="font-size:12.5px; font-weight:700;">DIỄN BIẾN TRONG PHIÊN</span>
+                      <span id="heroRefText" style="color:var(--price-ref); font-size:11.5px; margin-left:8px;">Tham chiếu: 1.704,87</span>
+                    </div>
+                    <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật Robostock">Biểu đồ Kỹ thuật</button>
+                  </div>
+                  <div style="flex:1; display:flex; align-items:center;">
+                    <svg id="intradaySvg" viewBox="0 0 280 120" style="width:100%; height:130px; display:block;"></svg>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-muted); margin-top:6px; border-top:1px dashed var(--border-stroke); padding-top:4px;">
+                    <span>09:00 (ATO)</span>
+                    <span>11:30 (Nghỉ trưa)</span>
+                    <span>13:00 (Chiều)</span>
+                    <span>14:45 (ATC)</span>
+                  </div>
+                </div>
+
+                <!-- CỘT C: PHÂN TÍCH KỸ THUẬT (RSI GAUGE & TIMEFRAME STATS) -->
+                <div class="rsi-section" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
+                  <div class="rsi-section-title" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:6px;">
+                      <span class="blue-accent-bar"></span>
+                      <span style="font-size:12.5px; font-weight:700;">Phân tích kỹ thuật (RSI Đa khung)</span>
+                    </div>
+                    <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
+                  </div>
+
+                  <div class="stats-cards-grid" style="margin-bottom:8px;">
+                    <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)" title="RSI khung 15 phút">
+                      <div class="stats-card-label">15 Phút</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_15m">44.8 (Yếu)</div>
+                    </div>
+                    <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)" title="RSI khung 1 giờ">
+                      <div class="stats-card-label">Hàng giờ</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_1h">40.8 (Yếu)</div>
+                    </div>
+                    <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)" title="RSI khung 1 ngày">
+                      <div class="stats-card-label">Hàng ngày</div>
+                      <div class="stats-card-value text-down" id="rsiVal_1d">29.4 (Quá bán)</div>
+                    </div>
+                    <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)" title="RSI khung 1 tuần">
+                      <div class="stats-card-label">Hàng tuần</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_1w">42.4 (Yếu)</div>
+                    </div>
+                  </div>
+
+                  <!-- GAUGE CHART (RSI) -->
+                  <div class="gauge-panel" style="background:var(--bg-container); border:1px solid var(--border-stroke);">
+                    <div class="gauge-svg-wrap">
+                      <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
+                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
+                        <path id="heroGaugeRsiArc" d="M 10 50 A 40 40 0 0 1 25.9 18.1" fill="none" stroke="var(--price-down)" stroke-width="8" stroke-linecap="round" style="transition: all 0.4s ease;"/>
+                        <circle cx="50" cy="50" r="4" fill="var(--text-primary)"/>
+                        <line id="heroGaugeRsiNeedle" x1="50" y1="50" x2="30.7" y2="24.5" stroke="var(--price-down)" stroke-width="2.5" stroke-linecap="round" style="transition: all 0.4s ease;"/>
+                      </svg>
+                    </div>
+                    <div class="gauge-info">
+                      <div class="gauge-info-title" id="gaugeRsiTitle">Chỉ báo RSI (14) • Hàng ngày</div>
+                      <div class="gauge-info-score text-down" id="gaugeRsiScore">29.4</div>
+                      <div class="gauge-info-desc text-down" id="gaugeRsiDesc">Tín hiệu: Quá bán (RSI < 30)</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+          <!-- BÊN DƯỚI: BẢNG ĐIỆN THỜI GIAN THỰC & DÒNG LỆNH (#third - ĐỂ Y CŨ) -->
           <div id="third" class="tongquan-card" style="padding:0; overflow:hidden; display:flex; flex-direction:column; margin-top:4px;">
             <div class="right-tab-header">
               <div class="tab-container" style="display:flex; height:100%; align-items:center; gap:2px;">
@@ -2478,168 +2837,6 @@ body {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
                 </button>
               </form>
-            </div>
-          </div>
-
-          <!-- HÀNG 4: CHỈ SỐ THỊ TRƯỜNG, DIỄN BIẾN TRONG PHIÊN & PHÂN TÍCH KỸ THUẬT (#first - CHUYỂN TỪ CỘT TRÁI XUỐNG DƯỚI) -->
-          <div id="first" class="tongquan-card" style="margin-top:8px; padding:0; overflow:hidden; background:var(--bg-container);">
-            <div class="right-tab-header" style="background:var(--bg-subtle); display:flex; justify-content:space-between; align-items:center;">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span class="blue-accent-bar"></span>
-                <b style="font-size:13px;">Chỉ số Thị trường & Phân tích Kỹ thuật Realtime</b>
-              </div>
-              <div style="display:flex; align-items:center; gap:10px;">
-                <span style="font-size:11px; color:var(--text-muted);" id="realtimeTickClock">14:30:15</span>
-              </div>
-            </div>
-
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:12px; padding:12px;">
-
-              <!-- CỘT A: CÁC CHỈ SỐ CHÍNH (VNINDEX, VN30, HNX, UPCOM) & ĐỘ RỘNG THỊ TRƯỜNG -->
-              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); overflow:hidden; display:flex; flex-direction:column;">
-                <!-- SELECTOR CARDS: VNINDEX, VN30, HNX, UPCOM -->
-                <div class="actual-frame-container" id="tblStockTradingIndex">
-                  <div class="actual-frame-card active" id="card_VNINDEX" onclick="selectIndexCard('VNINDEX')">
-                    <div class="frame-card-head">
-                      <span class="frame-card-symbol">VN-INDEX</span>
-                      <span class="frame-card-price text-down" id="miniPrice_VNINDEX">1.702,20</span>
-                    </div>
-                    <div class="frame-card-chg text-down" id="miniChg_VNINDEX">▼ -2,67 (-0,16%)</div>
-                  </div>
-
-                  <div class="actual-frame-card" id="card_VN30" onclick="selectIndexCard('VN30')">
-                    <div class="frame-card-head">
-                      <span class="frame-card-symbol">VN30</span>
-                      <span class="frame-card-price text-down" id="miniPrice_VN30">1.846,50</span>
-                    </div>
-                    <div class="frame-card-chg text-down" id="miniChg_VN30">▼ -5,94 (-0,32%)</div>
-                  </div>
-
-                  <div class="actual-frame-card" id="card_HNXINDEX" onclick="selectIndexCard('HNXINDEX')">
-                    <div class="frame-card-head">
-                      <span class="frame-card-symbol">HNX</span>
-                      <span class="frame-card-price text-down" id="miniPrice_HNXINDEX">260,71</span>
-                    </div>
-                    <div class="frame-card-chg text-down" id="miniChg_HNXINDEX">▼ -4,45 (-1,68%)</div>
-                  </div>
-
-                  <div class="actual-frame-card" id="card_UPCOMINDEX" onclick="selectIndexCard('UPCOMINDEX')">
-                    <div class="frame-card-head">
-                      <span class="frame-card-symbol">UPCOM</span>
-                      <span class="frame-card-price text-up" id="miniPrice_UPCOMINDEX">124,34</span>
-                    </div>
-                    <div class="frame-card-chg text-up" id="miniChg_UPCOMINDEX">▲ +0,40 (+0,32%)</div>
-                  </div>
-                </div>
-
-                <!-- HERO CARD HIỂN THỊ CHỈ SỐ ĐANG CHỌN -->
-                <div class="hero-index-section" style="border-bottom:1px solid var(--border-stroke); flex:1;">
-                  <div class="hero-index-title-row">
-                    <span class="hero-index-name" id="heroIndexName">VN-INDEX (HOSE)</span>
-                    <span class="hero-index-clock" id="heroMarketState">Đang tải phiên...</span>
-                  </div>
-                  <div class="hero-index-main-val text-down" id="heroIndexVal">1.704,87</div>
-                  <div class="hero-index-sub-chg text-down" id="heroIndexChg">
-                    <span>▼ -14,54 (-0,85%)</span>
-                  </div>
-                  <div class="hero-index-stats-grid">
-                    <div>Cao nhất: <b id="heroStatHigh">1.709,54</b></div>
-                    <div>Thấp nhất: <b id="heroStatLow">1.696,47</b></div>
-                    <div>Khối lượng: <b id="heroStatVol">527.0M</b> CP</div>
-                    <div>Giá trị: <b id="heroStatVal">11.072 tỷ đ</b></div>
-                  </div>
-                </div>
-
-                <!-- MARKET SUMMARY BAR -->
-                <div class="market-summary-bar">
-                  <div class="summary-top-row">
-                    <span>KL: <b id="sumVol">527.0M</b> CP</span>
-                    <span>| Khớp: <b id="sumMatchVal">11.072 tỷ</b></span>
-                    <span>| TT: <b id="sumPtVal">886 tỷ</b></span>
-                  </div>
-                  <div class="summary-breadth-row">
-                    <div class="breadth-stat-item text-up">
-                      ▲ <span id="breadthAdv">128</span>
-                      <span class="breadth-badge-sub text-ceil" id="breadthCeil">(9)</span>
-                    </div>
-                    <div class="breadth-stat-item text-ref">
-                      ■ <span id="breadthUnc">118</span>
-                    </div>
-                    <div class="breadth-stat-item text-down">
-                      ▼ <span id="breadthDec">163</span>
-                      <span class="breadth-badge-sub text-floor" id="breadthFloor">(5)</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- CỘT B: BIỂU ĐỒ INTRADAY DIỄN BIẾN TRONG PHIÊN -->
-              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
-                <div class="intraday-header" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                  <div>
-                    <span style="font-size:12.5px; font-weight:700;">DIỄN BIẾN TRONG PHIÊN</span>
-                    <span id="heroRefText" style="color:var(--price-ref); font-size:11.5px; margin-left:8px;">Tham chiếu: 1.704,87</span>
-                  </div>
-                  <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật Robostock">Biểu đồ Kỹ thuật</button>
-                </div>
-                <div style="flex:1; display:flex; align-items:center;">
-                  <svg id="intradaySvg" viewBox="0 0 280 120" style="width:100%; height:150px; display:block;"></svg>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-muted); margin-top:6px; border-top:1px dashed var(--border-stroke); padding-top:4px;">
-                  <span>09:00 (ATO)</span>
-                  <span>11:30 (Nghỉ trưa)</span>
-                  <span>13:00 (Chiều)</span>
-                  <span>14:45 (ATC)</span>
-                </div>
-              </div>
-
-              <!-- CỘT C: PHÂN TÍCH KỸ THUẬT (RSI GAUGE & TIMEFRAME STATS) -->
-              <div class="rsi-section" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
-                <div class="rsi-section-title" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                  <div style="display:flex; align-items:center; gap:6px;">
-                    <span class="blue-accent-bar"></span>
-                    <span style="font-size:12.5px; font-weight:700;">Phân tích kỹ thuật (RSI Đa khung)</span>
-                  </div>
-                  <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
-                </div>
-
-                <div class="stats-cards-grid" style="margin-bottom:10px;">
-                  <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)" title="RSI khung 15 phút">
-                    <div class="stats-card-label">15 Phút</div>
-                    <div class="stats-card-value text-ref" id="rsiVal_15m">44.8 (Yếu)</div>
-                  </div>
-                  <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)" title="RSI khung 1 giờ">
-                    <div class="stats-card-label">Hàng giờ</div>
-                    <div class="stats-card-value text-ref" id="rsiVal_1h">40.8 (Yếu)</div>
-                  </div>
-                  <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)" title="RSI khung 1 ngày">
-                    <div class="stats-card-label">Hàng ngày</div>
-                    <div class="stats-card-value text-down" id="rsiVal_1d">29.4 (Quá bán)</div>
-                  </div>
-                  <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)" title="RSI khung 1 tuần">
-                    <div class="stats-card-label">Hàng tuần</div>
-                    <div class="stats-card-value text-ref" id="rsiVal_1w">42.4 (Yếu)</div>
-                  </div>
-                </div>
-
-                <!-- GAUGE CHART (RSI) -->
-                <div class="gauge-panel" style="background:var(--bg-container); border:1px solid var(--border-stroke);">
-                  <div class="gauge-svg-wrap">
-                    <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
-                      <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
-                      <path id="heroGaugeRsiArc" d="M 10 50 A 40 40 0 0 1 25.9 18.1" fill="none" stroke="var(--price-down)" stroke-width="8" stroke-linecap="round" style="transition: all 0.4s ease;"/>
-                      <circle cx="50" cy="50" r="4" fill="var(--text-primary)"/>
-                      <line id="heroGaugeRsiNeedle" x1="50" y1="50" x2="30.7" y2="24.5" stroke="var(--price-down)" stroke-width="2.5" stroke-linecap="round" style="transition: all 0.4s ease;"/>
-                    </svg>
-                  </div>
-                  <div class="gauge-info">
-                    <div class="gauge-info-title" id="gaugeRsiTitle">Chỉ báo RSI (14) • Hàng ngày</div>
-                    <div class="gauge-info-score text-down" id="gaugeRsiScore">29.4</div>
-                    <div class="gauge-info-desc text-down" id="gaugeRsiDesc">Tín hiệu: Quá bán (RSI < 30)</div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
 
@@ -8725,12 +8922,17 @@ body {
     let overviewChartsVisible = true;
     function toggleOverviewCharts() {
       overviewChartsVisible = !overviewChartsVisible;
+      const topSection = document.getElementById('dashboardSplitTop');
       const row1 = document.querySelector('#subview_tongquan .grid-row-2col');
       const row2 = document.querySelector('#subview_tongquan .grid-row-3col');
       const btn = document.getElementById('btnToggleOverview');
-      if (row1) row1.style.display = overviewChartsVisible ? 'grid' : 'none';
-      if (row2) row2.style.display = overviewChartsVisible ? 'grid' : 'none';
-      if (btn) btn.textContent = overviewChartsVisible ? 'Thu gọn biểu đồ' : 'Mở rộng biểu đồ';
+      if (topSection) {
+        topSection.style.display = overviewChartsVisible ? 'grid' : 'none';
+      } else {
+        if (row1) row1.style.display = overviewChartsVisible ? 'grid' : 'none';
+        if (row2) row2.style.display = overviewChartsVisible ? 'grid' : 'none';
+      }
+      if (btn) btn.textContent = overviewChartsVisible ? 'Thu gọn phần trên' : 'Mở rộng phần trên';
     }
 
     // Cuộn mượt đến Bảng điện thông minh khi nhấp tab Bảng điện ở thanh menu
