@@ -606,6 +606,7 @@ async function fetchDNSEStock(symbol) {
         if (vpsRes.ok) {
             const list = await vpsRes.json();
             if (Array.isArray(list) && list.length > 0) {
+                const fb = (typeof stockDataList !== 'undefined' && Array.isArray(stockDataList)) ? (stockDataList.find(s => s.symbol === u) || {}) : {};
                 const item = list[0];
                 const rawPrice = item.lastPrice ? Number(item.lastPrice) : (item.r ? Number(item.r) : 0);
                 const rawRef = item.r ? Number(item.r) : (rawPrice || 0);

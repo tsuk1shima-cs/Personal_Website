@@ -1046,11 +1046,11 @@ app.get('/api/dnse/chart/index/:symbol', async (req, res) => {
         return res.json({ success: true, data: cached.data, provider: 'DNSE', cached: true });
     }
 
-    let defaultSpan = 2 * 86400;
-    if (resolution === '15') defaultSpan = 5 * 86400;
-    else if (resolution === '1H') defaultSpan = 25 * 86400;
-    else if (resolution === '1D') defaultSpan = 180 * 86400;
-    else if (resolution === '1W') defaultSpan = 500 * 86400;
+    let defaultSpan = 3 * 86400;
+    if (resolution === '15') defaultSpan = 30 * 86400;
+    else if (resolution === '1H') defaultSpan = 120 * 86400;
+    else if (resolution === '1D') defaultSpan = 400 * 86400;
+    else if (resolution === '1W') defaultSpan = 800 * 86400;
 
     const fromTime = from || (now - defaultSpan);
     const toTime = to || now;
@@ -1079,33 +1079,48 @@ app.get('/api/dnse/chart/index/:symbol', async (req, res) => {
 });
 
 // Lay chart OHLC co phieu tu DNSE Entrade (ho tro resolution: 1, 5, 15, 1H, 1D, 1W)
+// Tu dong dinh tuyen index sang /index neu truyen chi so (VNINDEX, VN30, HNX, UPCOM)
 app.get('/api/dnse/chart/stock/:symbol', async (req, res) => {
     const { symbol } = req.params;
-    const sym = (symbol || '').toUpperCase().trim();
+    let sym = (symbol || '').toUpperCase().trim();
+    const INDEX_MAP = {
+        'VNINDEX': 'VNINDEX',
+        'VNI': 'VNINDEX',
+        'VN30': 'VN30',
+        'HNX': 'HNX',
+        'HNXINDEX': 'HNX',
+        'UPCOM': 'UPCOM',
+        'UPCOMINDEX': 'UPCOM',
+        'VNX50': 'VNX50'
+    };
+    const isIndex = !!INDEX_MAP[sym];
+    const targetType = isIndex ? 'index' : 'stock';
+    if (isIndex) sym = INDEX_MAP[sym];
+
     let { resolution = '1D', from, to } = req.query;
     if (resolution === 'D') resolution = '1D';
     if (resolution === 'W') resolution = '1W';
     if (resolution === '60') resolution = '1H';
 
-    const cacheKey = `stk_${sym}_${resolution}`;
+    const cacheKey = `${isIndex ? 'idx' : 'stk'}_${sym}_${resolution}`;
     const now = Math.floor(Date.now() / 1000);
     const cached = dnseChartCache.get(cacheKey);
     if (!from && !to && cached && (Date.now() - cached.timestamp < 15000)) {
         return res.json({ success: true, data: cached.data, provider: 'DNSE', cached: true });
     }
 
-    let defaultSpan = 180 * 86400;
-    if (resolution === '1' || resolution === '5') defaultSpan = 2 * 86400;
-    else if (resolution === '15') defaultSpan = 5 * 86400;
-    else if (resolution === '1H') defaultSpan = 25 * 86400;
-    else if (resolution === '1D') defaultSpan = 180 * 86400;
-    else if (resolution === '1W') defaultSpan = 500 * 86400;
+    let defaultSpan = 400 * 86400;
+    if (resolution === '1' || resolution === '5') defaultSpan = 3 * 86400;
+    else if (resolution === '15') defaultSpan = 30 * 86400;
+    else if (resolution === '1H') defaultSpan = 120 * 86400;
+    else if (resolution === '1D') defaultSpan = 400 * 86400;
+    else if (resolution === '1W') defaultSpan = 800 * 86400;
 
     const fromTime = from || (now - defaultSpan);
     const toTime = to || now;
 
     try {
-        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/stock?symbol=${encodeURIComponent(sym)}&resolution=${resolution}&from=${fromTime}&to=${toTime}`;
+        const url = `${DNSE_ENTRADE_BASE}/chart-api/v2/ohlcs/${targetType}?symbol=${encodeURIComponent(sym)}&resolution=${resolution}&from=${fromTime}&to=${toTime}`;
         const response = await axios.get(url, {
             headers: {
                 'Accept': 'application/json',
@@ -1122,7 +1137,7 @@ app.get('/api/dnse/chart/stock/:symbol', async (req, res) => {
         if (cached && cached.data) {
             return res.json({ success: true, data: cached.data, provider: 'DNSE', stale: true });
         }
-        console.error(`DNSE chart stock error (${symbol}):`, err.message);
+        console.error(`DNSE chart ${targetType} error (${symbol}):`, err.message);
         res.status(500).json({ success: false, error: err.message });
     }
 });

@@ -1320,6 +1320,19 @@ body {
     max-height: 96vh;
   }
 }
+.modal-card-detail .grid-row-2col {
+  display: grid;
+  grid-template-columns: minmax(290px, 1fr) minmax(0, 2.2fr);
+  gap: 12px;
+}
+.modal-card-detail .grid-row-2col > * {
+  min-width: 0;
+}
+@media (max-width: 960px) {
+  .modal-card-detail .grid-row-2col {
+    grid-template-columns: 1fr;
+  }
+}
 .expert-card-item {
   background: var(--bg-subtle);
   border: 1px solid var(--border-stroke);
@@ -4064,8 +4077,10 @@ body {
         ];
 
         let stock = null;
-        if (currentStockDetailSymbol && Math.random() < 0.40) {
-          stock = stocks.find(s => s.symbol === currentStockDetailSymbol) || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === currentStockDetailSymbol) : null);
+        if (currentStockDetailSymbol && !['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI'].includes(currentStockDetailSymbol) && Math.random() < 0.40) {
+          stock = (window.currentModalStock && window.currentModalStock.symbol === currentStockDetailSymbol ? window.currentModalStock : null)
+            || stocks.find(s => s.symbol === currentStockDetailSymbol)
+            || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === currentStockDetailSymbol) : null);
         }
         if (!stock && Math.random() < 0.75) {
           const chosenSym = prioritySymbols[Math.floor(Math.random() * prioritySymbols.length)];
@@ -4264,7 +4279,12 @@ body {
       let tapeTickCount = 0;
       if (liveTapeIntervalId) clearInterval(liveTapeIntervalId);
       liveTapeIntervalId = setInterval(() => {
-        // NẾU NGOÀI GIỜ GIAO DỊCH (SAU 15H HOẶC CUỐI TUẦN): DỪNG ĐẨY LỆNH VÀ CỐ ĐỊNH GIÁ
+        // Khi người dùng đang mở xem chi tiết kỹ thuật của mã, duy trì nhảy nến mượt mà
+        if (currentStockDetailSymbol && (Date.now() - lastStockDetailTickTime > 1800) && typeof triggerDetailStockMicroTick === 'function') {
+          triggerDetailStockMicroTick();
+        }
+
+        // NẾU NGOÀI GIỜ GIAO DỊCH (SAU 15H HOẶC CUỐI TUẦN): DỪNG ĐẨY LỆNH BẢNG ĐIỆN VÀ CỐ ĐỊNH GIÁ
         if (!isMarketTradingNow()) return;
 
         addLiveTrade();
@@ -4274,9 +4294,6 @@ body {
           if (tqView && tqView.style.display !== 'none') {
             renderOverviewCards();
           }
-        }
-        if (currentStockDetailSymbol && (Date.now() - lastStockDetailTickTime > 1800) && typeof triggerDetailStockMicroTick === 'function') {
-          triggerDetailStockMicroTick();
         }
       }, 1100);
     }
@@ -6799,33 +6816,79 @@ body {
     }
 
     function openStockDetailModal(sym) {
-      if (!sym) sym = 'BID';
-      currentSelectedStock = sym;
-      currentStockDetailSymbol = sym;
+      if (!sym) sym = activeMarket || 'VNINDEX';
+      const upperSym = sym.toUpperCase().trim();
+      currentSelectedStock = upperSym;
+      currentStockDetailSymbol = upperSym;
       lastStockDetailTickTime = Date.now();
       detailChartMode = 'candle';
 
-      let stock = (stockDataList && stockDataList.find(s => s.symbol === sym))
-        || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null)
-        || {
-          symbol: sym,
-          exchange: 'HOSE',
-          price: sym === 'BID' ? 33500 : (sym === 'TLG' ? 54900 : (sym === 'FPT' ? 135200 : 30000)),
-          change: sym === 'BID' ? 1.21 : (sym === 'TLG' ? -1.08 : (sym === 'FPT' ? 1.65 : 0.5)),
-          pe: sym === 'FPT' ? 24.2 : 11.8,
-          pb: sym === 'FPT' ? 5.20 : 1.48,
-          roe: sym === 'FPT' ? 28.5 : 18.2,
-          marketCap: sym === 'FPT' ? 198000 : 188000,
-          volume: sym === 'BID' ? 2422300 : (sym === 'TLG' ? 114000 : 1500000),
-          value: 81147050000,
-          sector: sym === 'FPT' ? 'Công nghệ' : (sym === 'TLG' ? 'Hàng tiêu dùng' : 'Ngân hàng'),
-          companyName: sym === 'FPT' ? 'Công ty Cổ phần FPT (FPT Corporation)' : 'Công ty Cổ phần niêm yết'
-        };
+      const isIndex = ['VNINDEX', 'VNI', 'VN30', 'HNX', 'HNXINDEX', 'UPCOM', 'UPCOMINDEX'].includes(upperSym);
 
+      let stock = null;
+      if (isIndex) {
+        const idx = marketIndices[upperSym] || marketIndices['VNINDEX'] || {};
+        const p = idx.price || 1702.20;
+        const chg = idx.change !== undefined && idx.change !== null ? idx.change : -0.16;
+        stock = {
+          symbol: upperSym,
+          isIndex: true,
+          exchange: upperSym.includes('HNX') ? 'HNX' : (upperSym.includes('UPCOM') ? 'UPCOM' : 'HOSE'),
+          price: p,
+          change: chg,
+          high: idx.high || p * 1.004,
+          low: idx.low || p * 0.996,
+          open: idx.open || p,
+          refPrice: idx.open || p,
+          volume: idx.volume || 526987695,
+          value: idx.value || 11072000000000,
+          sector: 'Chỉ số Thị trường',
+          companyName: upperSym.includes('30') ? 'Chỉ số VN30-Index (HOSE)' : (upperSym.includes('HNX') ? 'Chỉ số HNX-Index' : (upperSym.includes('UPCOM') ? 'Chỉ số UPCoM-Index' : 'Chỉ số VN-Index (Sàn HOSE)'))
+        };
+      } else {
+        stock = (stockDataList && stockDataList.find(s => s.symbol === upperSym));
+        if (!stock && typeof SECTOR_BOARD_DATA !== 'undefined') {
+          for (const sec of SECTOR_BOARD_DATA) {
+            const found = sec.stocks && sec.stocks.find(s => s.symbol === upperSym);
+            if (found) {
+              const p = found.price > 1000 ? found.price : Math.round(found.price * 1000);
+              stock = {
+                symbol: upperSym,
+                exchange: 'HOSE',
+                sector: sec.title || 'Tài chính',
+                price: p,
+                change: found.change || 0,
+                volume: found.volume || 250000,
+                value: (found.volume || 250000) * p,
+                companyName: `${upperSym} - ${sec.title || 'Công ty Cổ phần niêm yết'}`
+              };
+              break;
+            }
+          }
+        }
+        if (!stock) {
+          stock = {
+            symbol: upperSym,
+            exchange: 'HOSE',
+            price: upperSym === 'BID' ? 33500 : (upperSym === 'TLG' ? 54900 : (upperSym === 'FPT' ? 135200 : 30000)),
+            change: upperSym === 'BID' ? 1.21 : (upperSym === 'TLG' ? -1.08 : (upperSym === 'FPT' ? 1.65 : 0.5)),
+            pe: 12.5,
+            pb: 1.5,
+            roe: 18.2,
+            marketCap: 180000,
+            volume: 1500000,
+            value: 45000000000,
+            sector: 'Tài chính',
+            companyName: `${upperSym} - Công ty Cổ phần niêm yết`
+          };
+        }
+      }
+
+      window.currentModalStock = stock;
       const p = stock.price || 33500;
       const chg = stock.change || 0;
-      const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(p) : 50;
-      const ref = stock.refPrice || stock.open || Math.round((p / (1 + chg / 100)) / delta) * delta || p;
+      const delta = isIndex ? 0.2 : ((typeof getStockTickSize === 'function') ? getStockTickSize(p) : 50);
+      const ref = stock.refPrice || stock.open || (isIndex ? p - chg : Math.round((p / (1 + chg / 100)) / delta) * delta) || p;
 
       detailIntradayPoints = [];
       const len = 25;
@@ -6833,7 +6896,7 @@ body {
         const prog = i / (len - 1);
         const noise = (Math.sin(i * 1.5) * 0.4 + (i % 2 === 0 ? 0.2 : -0.2)) * (p * 0.005);
         const val = ref + (p - ref) * prog + noise;
-        detailIntradayPoints.push(Math.round(val / delta) * delta);
+        detailIntradayPoints.push(isIndex ? parseFloat(val.toFixed(2)) : Math.round(val / delta) * delta);
       }
       detailIntradayPoints[detailIntradayPoints.length - 1] = p;
 
@@ -6858,40 +6921,32 @@ body {
         svgCont.style.display = 'none';
         candleCont.style.display = 'flex';
         if (tfControls) tfControls.style.display = 'inline-flex';
-        if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN NHẬT BẢN • ${sym}`;
+        if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN NHẬT BẢN • ${upperSym}`;
         if (chartBadge) chartBadge.textContent = 'DNSE Entrade X';
         if (refLabel) refLabel.style.display = 'none';
-        drawDnseStockCandleChart(sym, currentDetailCandleRes);
       }
+
+      // Vẽ nến DNSE sau khi modal đã render xong layout
+      setTimeout(() => {
+        drawDnseStockCandleChart(upperSym, currentDetailCandleRes);
+      }, 60);
 
       // Tải và đồng bộ chỉ số kỹ thuật RSI thực tế đa khung thời gian cho modal
       if (typeof fetchStockDetailTechnicalRSI === 'function') {
-        fetchStockDetailTechnicalRSI(sym);
+        fetchStockDetailTechnicalRSI(upperSym);
       }
 
-      // Lấy ngay dữ liệu trực tiếp từ sàn qua VPS CORS API để cập nhật tức thì
-      if (typeof fetchDNSEStock === 'function') {
-        fetchDNSEStock(sym).then(fresh => {
-          if (fresh && currentStockDetailSymbol === sym) {
-            const exIdx = stockDataList.findIndex(s => s.symbol === sym);
+      // Lấy ngay dữ liệu trực tiếp từ sàn qua VPS CORS API để cập nhật tức thì (nếu là cổ phiếu)
+      if (typeof fetchDNSEStock === 'function' && !isIndex) {
+        fetchDNSEStock(upperSym).then(fresh => {
+          if (fresh && currentStockDetailSymbol === upperSym) {
+            window.currentModalStock = fresh;
+            const exIdx = stockDataList.findIndex(s => s.symbol === upperSym);
             if (exIdx >= 0) stockDataList[exIdx] = { ...stockDataList[exIdx], ...fresh };
             else stockDataList.push(fresh);
 
             updateDetailModalHeader(fresh);
-            renderStockDetailContent(fresh);
-            seedStockDetailTape(fresh);
-
-            // Giữ nguyên giao diện biểu đồ nến
-            const curCandleCont = document.getElementById('stockDetailCandleContainer');
-            const curSvgCont = document.getElementById('stockDetailSvgContainer');
-            if (detailChartMode === 'candle' && curCandleCont && curSvgCont) {
-              curSvgCont.style.display = 'none';
-              curCandleCont.style.display = 'flex';
-              drawDnseStockCandleChart(sym, currentDetailCandleRes);
-            } else if (detailIntradayPoints && detailIntradayPoints.length > 0) {
-              detailIntradayPoints[detailIntradayPoints.length - 1] = fresh.price;
-              renderStockDetailIntradaySvg(fresh);
-            }
+            updateLiveStockDetailTick(fresh, (fresh.change || 0) >= 0, fresh.price, fresh.change, fresh.volume || 1500);
           }
         }).catch(() => {});
       }
@@ -7093,18 +7148,18 @@ body {
           <div class="tongquan-card" style="margin:0; display:flex; flex-direction:column; position:relative;">
             <div class="intraday-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
               <div style="display:flex; align-items:center; gap:8px;">
-                <span id="stockDetailChartTitle" style="font-weight:700;">DIỄN BIẾN TRONG PHIÊN • ${stock.symbol}</span>
-                <span style="font-size:10.5px; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); color:var(--primary-brand); border:1px solid var(--border-stroke); font-weight:600;" id="stockDetailChartBadge">DNSE Realtime</span>
+                <span id="stockDetailChartTitle" style="font-weight:700;">${detailChartMode === 'candle' ? `BIỂU ĐỒ NẾN NHẬT BẢN • ${stock.symbol}` : `DIỄN BIẾN TRONG PHIÊN • ${stock.symbol}`}</span>
+                <span style="font-size:10.5px; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); color:var(--primary-brand); border:1px solid var(--border-stroke); font-weight:600;" id="stockDetailChartBadge">${detailChartMode === 'candle' ? 'DNSE Entrade X' : 'DNSE Realtime'}</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <!-- Bộ chọn khung giờ nến DNSE -->
-                <div id="stockDetailCandleTfControls" style="display:none; gap:4px; align-items:center;">
-                  <button class="period-tab-btn" onclick="switchDetailCandleResolution('15', this)">15m</button>
-                  <button class="period-tab-btn" onclick="switchDetailCandleResolution('1H', this)">1H</button>
-                  <button class="period-tab-btn active" onclick="switchDetailCandleResolution('1D', this)">1D</button>
-                  <button class="period-tab-btn" onclick="switchDetailCandleResolution('1W', this)">1W</button>
+                <div id="stockDetailCandleTfControls" style="display:${detailChartMode === 'candle' ? 'inline-flex' : 'none'}; gap:4px; align-items:center;">
+                  <button class="period-tab-btn ${currentDetailCandleRes === '15' ? 'active' : ''}" onclick="switchDetailCandleResolution('15', this)">15m</button>
+                  <button class="period-tab-btn ${currentDetailCandleRes === '1H' ? 'active' : ''}" onclick="switchDetailCandleResolution('1H', this)">1H</button>
+                  <button class="period-tab-btn ${currentDetailCandleRes === '1D' ? 'active' : ''}" onclick="switchDetailCandleResolution('1D', this)">1D</button>
+                  <button class="period-tab-btn ${currentDetailCandleRes === '1W' ? 'active' : ''}" onclick="switchDetailCandleResolution('1W', this)">1W</button>
                 </div>
-                <span style="color:var(--price-ref); font-size:11px;" id="stockDetailRefLabel">Tham chiếu: ${refPrice.toLocaleString('vi-VN')}</span>
+                <span style="color:var(--price-ref); font-size:11px; display:${detailChartMode === 'candle' ? 'none' : 'inline'};" id="stockDetailRefLabel">Tham chiếu: ${refPrice.toLocaleString('vi-VN')}</span>
                 <a id="stockDetailTvExternalLink" href="https://vn.tradingview.com/chart/?symbol=${(stock.exchange || 'HOSE').toUpperCase()}%3A${stock.symbol}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--text-secondary); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px;" title="Mở trang TradingView chuyên sâu trong tab mới">
                   TradingView ↗
                 </a>
@@ -7112,7 +7167,7 @@ body {
             </div>
 
             <!-- CHẾ ĐỘ 1: INTRADAY SVG -->
-            <div id="stockDetailSvgContainer" style="flex:1; min-height:140px; position:relative;">
+            <div id="stockDetailSvgContainer" style="flex:1; min-height:140px; position:relative; display:${detailChartMode === 'candle' ? 'none' : 'block'};">
               <svg id="stockDetailIntradaySvg" viewBox="0 0 450 140" style="width:100%; height:140px; display:block;"></svg>
               <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-muted); margin-top:4px;">
                 <span>09:15</span>
@@ -7124,7 +7179,7 @@ body {
             </div>
 
             <!-- CHẾ ĐỘ 2: BIỂU ĐỒ NẾN NHẬT BẢN OHLC & KHỐI LƯỢNG TỪ DNSE ENTRADE X + TOOLBAR CHỈ BÁO ROBOSTOCK -->
-            <div id="stockDetailCandleContainer" style="display:none; flex-direction:column; width:100%; padding-top:4px; gap:6px;">
+            <div id="stockDetailCandleContainer" style="display:${detailChartMode === 'candle' ? 'flex' : 'none'}; flex-direction:column; width:100%; padding-top:4px; gap:6px;">
               <!-- CONTAINER THANH CÔNG CỤ CHỈ BÁO ROBOSTOCK -->
               <div id="indicatorToolbarContainer">
                 ${renderIndicatorToolbarHtml()}
@@ -7507,24 +7562,27 @@ body {
           const d = json.data;
           const bars = [];
           const len = d.t.length;
+          const isIdx = ['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI'].includes(sym);
           for (let i = 0; i < len; i++) {
-            const mult = (d.c[i] < 1000) ? 1000 : 1;
+            const mult = (!isIdx && d.c[i] < 1000) ? 1000 : 1;
             bars.push({
               time: d.t[i],
-              open: Math.round(d.o[i] * mult),
-              high: Math.round(d.h[i] * mult),
-              low: Math.round(d.l[i] * mult),
-              close: Math.round(d.c[i] * mult),
+              open: isIdx ? parseFloat((d.o[i] * mult).toFixed(2)) : Math.round(d.o[i] * mult),
+              high: isIdx ? parseFloat((d.h[i] * mult).toFixed(2)) : Math.round(d.h[i] * mult),
+              low: isIdx ? parseFloat((d.l[i] * mult).toFixed(2)) : Math.round(d.l[i] * mult),
+              close: isIdx ? parseFloat((d.c[i] * mult).toFixed(2)) : Math.round(d.c[i] * mult),
               volume: d.v[i] || 0
             });
           }
 
           // ĐỒNG BỘ NẾN PHIÊN HÔM NAY THEO GIÁ REALTIME CỦA SÀN (LIVE SESSION SYNC)
-          const stock = (stockDataList && stockDataList.find(s => s.symbol === sym))
+          const stock = (window.currentModalStock && window.currentModalStock.symbol === sym ? window.currentModalStock : null)
+            || (stockDataList && stockDataList.find(s => s.symbol === sym))
+            || (typeof marketIndices !== 'undefined' ? marketIndices[sym] : null)
             || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null);
 
           if (stock && stock.price && bars.length > 0) {
-            const p = stock.price;
+            const p = isIdx ? parseFloat(Number(stock.price).toFixed(2)) : stock.price;
             const openP = stock.open || stock.refPrice || p;
             const highP = stock.high ? Math.max(stock.high, p) : Math.max(openP, p);
             const lowP = stock.low ? Math.min(stock.low, p) : Math.min(openP, p);
@@ -7573,21 +7631,26 @@ body {
       }
 
       // Fallback mượt mà dựa trên giá khớp thực tế nếu mạng chập chờn
-      const stock = (stockDataList && stockDataList.find(s => s.symbol === sym)) || { price: 33500 };
-      const curP = stock.price || 33500;
+      const isIdxFallback = ['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI'].includes(sym);
+      const stock = (window.currentModalStock && window.currentModalStock.symbol === sym ? window.currentModalStock : null)
+        || (stockDataList && stockDataList.find(s => s.symbol === sym))
+        || (typeof marketIndices !== 'undefined' ? marketIndices[sym] : null)
+        || { price: isIdxFallback ? 1702.20 : 33500 };
+      const curP = stock.price || (isIdxFallback ? 1702.20 : 33500);
       const refP = stock.refPrice || stock.open || curP;
-      const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(curP) : 50;
+      const delta = isIdxFallback ? 0.2 : ((typeof getStockTickSize === 'function') ? getStockTickSize(curP) : 50);
       const mockBars = [];
-      const count = 30;
+      const count = 120;
       const stepSec = (resolution === '15') ? 900 : ((resolution === '1H') ? 3600 : ((resolution === '1W') ? 7 * 86400 : 86400));
       const baseTime = Math.floor(now / 1000) - count * stepSec;
       let lastClose = refP;
       for (let i = 0; i < count; i++) {
         const isLast = (i === count - 1);
         const o = isLast ? (stock.open || refP) : lastClose;
-        const c = isLast ? curP : Math.round((o + (Math.sin(i * 0.7) * 0.012 * curP)) / delta) * delta;
-        const h = Math.round(Math.max(o, c) + Math.abs(Math.sin(i)) * (curP * 0.005));
-        const l = Math.round(Math.min(o, c) - Math.abs(Math.cos(i)) * (curP * 0.005));
+        const rawC = isLast ? curP : (o + (Math.sin(i * 0.7) * 0.008 * curP));
+        const c = isIdxFallback ? parseFloat(rawC.toFixed(2)) : Math.round(rawC / delta) * delta;
+        const h = isIdxFallback ? parseFloat((Math.max(o, c) + Math.abs(Math.sin(i)) * (curP * 0.003)).toFixed(2)) : Math.round(Math.max(o, c) + Math.abs(Math.sin(i)) * (curP * 0.005));
+        const l = isIdxFallback ? parseFloat((Math.min(o, c) - Math.abs(Math.cos(i)) * (curP * 0.003)).toFixed(2)) : Math.round(Math.min(o, c) - Math.abs(Math.cos(i)) * (curP * 0.005));
         const v = Math.round(500000 + Math.abs(Math.sin(i * 1.3)) * 1500000);
         mockBars.push({ time: baseTime + i * stepSec, open: o, high: h, low: l, close: c, volume: isLast ? (stock.volume || v) : v });
         lastClose = c;
@@ -8732,7 +8795,8 @@ body {
     }
 
     function updateLiveStockDetailTick(stock, isBuy, tradePrice, tradeChg, vol = 1500, tradeDate = null) {
-      if (!isMarketTradingNow()) return; // KHÔNG CẬP NHẬT HOẶC ĐẨY LỆNH NẾU NGOÀI GIỜ GIAO DỊCH
+      const sym = (stock.symbol || currentStockDetailSymbol || '').toUpperCase();
+      const isIdx = ['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI'].includes(sym);
       const pEl = document.getElementById('detailCardPriceVal');
       const cEl = document.getElementById('detailCardPriceChg');
       const heroP = document.getElementById('stockDetailHeroPrice');
@@ -8746,12 +8810,14 @@ body {
       const colorCls = tradeChg >= 6.8 ? 'text-ceil' : (tradeChg <= -6.8 ? 'text-floor' : (isUp ? 'text-up' : 'text-down'));
       const arrow = isUp ? '▲' : '▼';
       const sign = isUp ? '+' : '';
-      const delta = (typeof getStockTickSize === 'function') ? getStockTickSize(tradePrice) : (tradePrice < 10000 ? 10 : (tradePrice < 50000 ? 50 : 100));
-      const refPrice = stock.open || Math.round((tradePrice / (1 + tradeChg / 100)) / delta) * delta || tradePrice;
-      const pointChg = Math.abs(tradePrice - refPrice).toLocaleString('vi-VN');
+      const delta = isIdx ? 0.2 : ((typeof getStockTickSize === 'function') ? getStockTickSize(tradePrice) : (tradePrice < 10000 ? 10 : (tradePrice < 50000 ? 50 : 100)));
+      const refPrice = stock.open || stock.refPrice || (isIdx ? tradePrice - tradeChg : Math.round((tradePrice / (1 + tradeChg / 100)) / delta) * delta) || tradePrice;
+      const pointChg = isIdx ? Math.abs(tradePrice - refPrice).toFixed(2) : Math.abs(tradePrice - refPrice).toLocaleString('vi-VN');
+      const formattedPrice = isIdx ? tradePrice.toFixed(2) : tradePrice.toLocaleString('vi-VN');
+      const unitText = isIdx ? 'điểm' : 'đ';
 
       if (pEl) {
-        pEl.textContent = `${tradePrice.toLocaleString('vi-VN')} đ`;
+        pEl.textContent = `${formattedPrice} ${unitText}`;
         pEl.className = `frame-card-price ${colorCls}`;
       }
       if (cEl) {
@@ -8759,15 +8825,15 @@ body {
         cEl.className = `frame-card-chg ${colorCls}`;
       }
       if (heroP) {
-        heroP.innerHTML = `${tradePrice.toLocaleString('vi-VN')} <span style="font-size:16px;font-weight:500;">đ</span>`;
+        heroP.innerHTML = `${formattedPrice} <span style="font-size:16px;font-weight:500;">${unitText}</span>`;
         heroP.className = `hero-index-main-val ${colorCls}`;
       }
       if (heroC) {
         heroC.innerHTML = `<span>${arrow} ${sign}${pointChg} (${sign}${tradeChg.toFixed(2)}%)</span>`;
         heroC.className = `hero-index-sub-chg ${colorCls}`;
       }
-      if (heroHigh && stock.high) heroHigh.textContent = stock.high.toLocaleString('vi-VN');
-      if (heroLow && stock.low) heroLow.textContent = stock.low.toLocaleString('vi-VN');
+      if (heroHigh && stock.high) heroHigh.textContent = isIdx ? stock.high.toFixed(2) : stock.high.toLocaleString('vi-VN');
+      if (heroLow && stock.low) heroLow.textContent = isIdx ? stock.low.toFixed(2) : stock.low.toLocaleString('vi-VN');
       if (heroVol && stock.volume) {
         const v = stock.volume;
         heroVol.textContent = v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : v.toLocaleString('vi-VN');
@@ -8803,7 +8869,23 @@ body {
       if (detailIntradayPoints && detailIntradayPoints.length > 0) {
         detailIntradayPoints.push(tradePrice);
         if (detailIntradayPoints.length > 35) detailIntradayPoints.shift();
-        renderStockDetailIntradaySvg(stock);
+        if (detailChartMode === 'intraday') {
+          renderStockDetailIntradaySvg(stock);
+        }
+      }
+
+      // CẬP NHẬT NẾN KỸ THUẬT REALTIME (NHẢY NẾN & CHỈ BÁO REALTIME)
+      if (currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+        const lastBar = currentDetailCandleBars[currentDetailCandleBars.length - 1];
+        lastBar.close = tradePrice;
+        if (tradePrice > lastBar.high) lastBar.high = tradePrice;
+        if (tradePrice < lastBar.low) lastBar.low = tradePrice;
+        if (vol > 0) lastBar.volume = (lastBar.volume || 0) + vol;
+
+        const candleCanvas = document.getElementById('stockDetailCandleCanvas');
+        if (candleCanvas && detailChartMode === 'candle') {
+          renderCandleCanvas(candleCanvas, currentDetailCandleBars, currentDetailHoverIdx);
+        }
       }
 
       // Thêm dòng lệnh khớp vào bảng nhật ký khớp lệnh riêng của mã
@@ -8819,7 +8901,7 @@ body {
         tr.className = 'tape-row-new';
         tr.innerHTML = `
           <td style="font-size:10.5px;color:var(--text-muted);font-family:var(--font-data);padding:5px 8px;">${timeStr}</td>
-          <td style="text-align:right;font-family:var(--font-data);padding:5px 8px;" class="${colorCls}"><b>${tradePrice.toLocaleString('vi-VN')}</b></td>
+          <td style="text-align:right;font-family:var(--font-data);padding:5px 8px;" class="${colorCls}"><b>${formattedPrice}</b></td>
           <td style="text-align:right;font-family:var(--font-data);font-size:11px;padding:5px 8px;" class="${colorCls}">${tradeChg >= 0 ? '+' : ''}${tradeChg.toFixed(2)}%</td>
           <td style="text-align:right;font-family:var(--font-data);padding:5px 8px;">${volStr}</td>
           <td style="text-align:center;padding:5px 8px;"><span class="badge-tape ${sideClass}">${sideText}</span></td>
@@ -8836,29 +8918,32 @@ body {
     }
 
     function triggerDetailStockMicroTick() {
-      if (!isMarketTradingNow()) return;
       if (!currentStockDetailSymbol) return;
-      const stock = (stockDataList && stockDataList.find(s => s.symbol === currentStockDetailSymbol))
-        || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === currentStockDetailSymbol) : null);
+      const sym = currentStockDetailSymbol.toUpperCase();
+      const isIdx = ['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI'].includes(sym);
+      const stock = (window.currentModalStock && window.currentModalStock.symbol === sym ? window.currentModalStock : null)
+        || (stockDataList && stockDataList.find(s => s.symbol === sym))
+        || (typeof marketIndices !== 'undefined' ? marketIndices[sym] : null)
+        || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null);
       if (!stock || !stock.price) return;
 
       const pBase = stock.price;
-      const tick = getStockTickSize(pBase);
-      const refPrice = stock.open || Math.round((pBase / (1 + (stock.change || 0) / 100)) / tick) * tick || pBase;
-      const exch = stock.exchange || 'HOSE';
-      const bandLimit = exch === 'UPCOM' ? 0.15 : (exch === 'HNX' ? 0.10 : 0.07);
-      const ceilPrice = Math.floor((refPrice * (1 + bandLimit)) / tick) * tick;
-      const floorPrice = Math.ceil((refPrice * (1 - bandLimit)) / tick) * tick;
+      const tick = isIdx ? 0.2 : getStockTickSize(pBase);
+      const refPrice = stock.open || stock.refPrice || (isIdx ? pBase - (stock.change || 0) : Math.round((pBase / (1 + (stock.change || 0) / 100)) / tick) * tick) || pBase;
+      const exch = stock.exchange || (isIdx ? (sym.includes('HNX') ? 'HNX' : (sym.includes('UPCOM') ? 'UPCOM' : 'HOSE')) : 'HOSE');
+      const bandLimit = isIdx ? 0.07 : (exch === 'UPCOM' ? 0.15 : (exch === 'HNX' ? 0.10 : 0.07));
+      const ceilPrice = isIdx ? parseFloat((refPrice * (1 + bandLimit)).toFixed(2)) : Math.floor((refPrice * (1 + bandLimit)) / tick) * tick;
+      const floorPrice = isIdx ? parseFloat((refPrice * (1 - bandLimit)).toFixed(2)) : Math.ceil((refPrice * (1 - bandLimit)) / tick) * tick;
 
       const curChg = stock.change !== null && stock.change !== undefined ? stock.change : 0;
       const isBuy = Math.random() < (curChg > 0 ? 0.58 : 0.42);
-      const tickOffset = isBuy ? (Math.random() < 0.7 ? 0 : 1) : (Math.random() < 0.7 ? 0 : -1);
+      const tickOffset = isBuy ? (Math.random() < 0.65 ? 0 : 1) : (Math.random() < 0.65 ? 0 : -1);
       let tradePrice = pBase + (tickOffset * tick);
       tradePrice = Math.max(floorPrice, Math.min(ceilPrice, tradePrice));
-      tradePrice = Math.round(tradePrice / tick) * tick;
+      tradePrice = isIdx ? parseFloat(tradePrice.toFixed(2)) : Math.round(tradePrice / tick) * tick;
 
       const tradeChg = refPrice > 0 ? parseFloat((((tradePrice - refPrice) / refPrice) * 100).toFixed(2)) : curChg;
-      const volChoices = [500, 1000, 1500, 2400, 3500, 5000, 8000];
+      const volChoices = isIdx ? [120000, 250000, 480000, 650000] : [500, 1000, 1500, 2400, 3500, 5000, 8000];
       const vol = volChoices[Math.floor(Math.random() * volChoices.length)];
 
       stock.price = tradePrice;
@@ -8871,7 +8956,9 @@ body {
       lastStockDetailTickTime = Date.now();
 
       updateLiveStockDetailTick(stock, isBuy, tradePrice, tradeChg, vol, new Date());
-      flashStockRow(stock.symbol, isBuy, stock);
+      if (!isIdx) {
+        flashStockRow(stock.symbol, isBuy, stock);
+      }
     }
 
     async function askAiStockDetail(query) {
