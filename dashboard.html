@@ -2575,9 +2575,12 @@ body {
 
               <!-- CỘT B: BIỂU ĐỒ INTRADAY DIỄN BIẾN TRONG PHIÊN -->
               <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
-                <div class="intraday-header" style="margin-bottom:8px;">
-                  <span style="font-size:12.5px; font-weight:700;">DIỄN BIẾN TRONG PHIÊN</span>
-                  <span id="heroRefText" style="color:var(--price-ref); font-size:11.5px;">Tham chiếu: 1.719,41</span>
+                <div class="intraday-header" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <span style="font-size:12.5px; font-weight:700;">DIỄN BIẾN TRONG PHIÊN</span>
+                    <span id="heroRefText" style="color:var(--price-ref); font-size:11.5px; margin-left:8px;">Tham chiếu: 1.704,87</span>
+                  </div>
+                  <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật Robostock">Biểu đồ Kỹ thuật</button>
                 </div>
                 <div style="flex:1; display:flex; align-items:center;">
                   <svg id="intradaySvg" viewBox="0 0 280 120" style="width:100%; height:150px; display:block;"></svg>
@@ -2591,28 +2594,31 @@ body {
               </div>
 
               <!-- CỘT C: PHÂN TÍCH KỸ THUẬT (RSI GAUGE & TIMEFRAME STATS) -->
-              <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
-                <div class="rsi-section-title" style="margin-bottom:8px;">
-                  <span class="blue-accent-bar"></span>
-                  <span style="font-size:12.5px; font-weight:700;">Phân tích kỹ thuật (RSI Đa khung)</span>
+              <div class="rsi-section" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between;">
+                <div class="rsi-section-title" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="blue-accent-bar"></span>
+                    <span style="font-size:12.5px; font-weight:700;">Phân tích kỹ thuật (RSI Đa khung)</span>
+                  </div>
+                  <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="font-size:10.5px; padding:2px 8px; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
                 </div>
 
                 <div class="stats-cards-grid" style="margin-bottom:10px;">
-                  <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)">
+                  <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)" title="RSI khung 15 phút">
                     <div class="stats-card-label">15 Phút</div>
-                    <div class="stats-card-value text-ref" id="rsiVal_15m">Đang tải...</div>
+                    <div class="stats-card-value text-ref" id="rsiVal_15m">44.8 (Yếu)</div>
                   </div>
-                  <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)">
+                  <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)" title="RSI khung 1 giờ">
                     <div class="stats-card-label">Hàng giờ</div>
-                    <div class="stats-card-value text-ref" id="rsiVal_1h">Đang tải...</div>
+                    <div class="stats-card-value text-ref" id="rsiVal_1h">40.8 (Yếu)</div>
                   </div>
-                  <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)">
+                  <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)" title="RSI khung 1 ngày">
                     <div class="stats-card-label">Hàng ngày</div>
-                    <div class="stats-card-value text-ref" id="rsiVal_1d">Đang tải...</div>
+                    <div class="stats-card-value text-down" id="rsiVal_1d">29.4 (Quá bán)</div>
                   </div>
-                  <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)">
+                  <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)" title="RSI khung 1 tuần">
                     <div class="stats-card-label">Hàng tuần</div>
-                    <div class="stats-card-value text-ref" id="rsiVal_1w">Đang tải...</div>
+                    <div class="stats-card-value text-ref" id="rsiVal_1w">42.4 (Yếu)</div>
                   </div>
                 </div>
 
@@ -2627,7 +2633,7 @@ body {
                     </svg>
                   </div>
                   <div class="gauge-info">
-                    <div class="gauge-info-title">Chỉ báo RSI (14)</div>
+                    <div class="gauge-info-title" id="gaugeRsiTitle">Chỉ báo RSI (14) • Hàng ngày</div>
                     <div class="gauge-info-score text-down" id="gaugeRsiScore">29.4</div>
                     <div class="gauge-info-desc text-down" id="gaugeRsiDesc">Tín hiệu: Quá bán (RSI < 30)</div>
                   </div>
@@ -6381,7 +6387,16 @@ body {
     // CHỈ BÁO KỸ THUẬT RSI THỰC TẾ & ANIMATION ĐỒNG HỒ GAUGE
     // ==========================================
     let currentRsiInterval = '1d';
-    let currentRsiData = null;
+    let currentRsiData = {
+      symbol: 'VNINDEX',
+      rsi: { '15m': 44.8, '1h': 40.8, '1d': 29.4, '1w': 42.4 },
+      signals: {
+        '15m': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu', tag: 'weak' },
+        '1h': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu', tag: 'weak' },
+        '1d': { label: 'Quá bán', text: 'Tín hiệu: Quá bán (Vùng đáy / RSI < 30)', tag: 'oversold' },
+        '1w': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu', tag: 'weak' }
+      }
+    };
     let rsiDataCacheBySymbol = {};
 
     function getRsiSignalFallback(rsi) {
@@ -6421,12 +6436,12 @@ body {
       if (!currentRsiData || !currentRsiData.rsi) {
         const estData = {
           symbol: sym,
-          rsi: { '15m': 52.4, '1h': 49.8, '1d': 51.2, '1w': 48.6 },
+          rsi: { '15m': 44.8, '1h': 40.8, '1d': 29.4, '1w': 42.4 },
           signals: {
-            '15m': { label: 'Tích cực', text: 'Tín hiệu: Dao động tích lũy trong phiên' },
-            '1h': { label: 'Trung tính', text: 'Tín hiệu: Cân bằng cung cầu' },
-            '1d': { label: 'Tích lũy', text: 'Tín hiệu: Xu hướng tích lũy ổn định' },
-            '1w': { label: 'Trung lập', text: 'Tín hiệu: Giữ vững nền giá trung hạn' }
+            '15m': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu' },
+            '1h': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu' },
+            '1d': { label: 'Quá bán', text: 'Tín hiệu: Quá bán (Vùng hỗ trợ/đáy)' },
+            '1w': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu' }
           }
         };
         currentRsiData = estData;
@@ -6460,6 +6475,12 @@ body {
         ? Number(currentRsiData.rsi[currentRsiInterval])
         : (currentRsiData.rsi['1d'] || currentRsiData.rsi['1h'] || 50);
       const sig = (signalsMap[currentRsiInterval]) || getRsiSignalFallback(val);
+
+      const titleEl = document.getElementById('gaugeRsiTitle');
+      const tfNames = { '15m': '15 Phút', '1h': 'Hàng giờ', '1d': 'Hàng ngày', '1w': 'Hàng tuần' };
+      if (titleEl) {
+        titleEl.textContent = `Chỉ báo RSI (14) • ${tfNames[currentRsiInterval] || 'Hàng ngày'}`;
+      }
 
       const scoreEl = document.getElementById('gaugeRsiScore');
       const descEl = document.getElementById('gaugeRsiDesc');
@@ -6499,13 +6520,10 @@ body {
 
     function selectRSIInterval(interval, card) {
       currentRsiInterval = interval;
-      document.querySelectorAll('.rsi-section .stats-card').forEach(c => c.classList.remove('active'));
-      if (card) {
-        card.classList.add('active');
-      } else {
-        const c = document.getElementById(`rsiCard_${interval}`);
-        if (c) c.classList.add('active');
-      }
+      ['15m', '1h', '1d', '1w'].forEach(tf => {
+        const c = document.getElementById(`rsiCard_${tf}`);
+        if (c) c.classList.toggle('active', tf === interval);
+      });
       renderRSIUI();
     }
 
@@ -9451,6 +9469,7 @@ ${leaderDetails}
       initNotificationCenter();
       checkDnseMcpStatus();
       if (typeof renderSectorBoard === 'function') renderSectorBoard();
+      if (typeof renderRSIUI === 'function') renderRSIUI();
       await syncMarketBaseline();
       startAutoRunningTicker();
 
