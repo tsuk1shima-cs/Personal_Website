@@ -68,13 +68,24 @@ const FALLBACK_STOCKS = [
     { symbol: 'PC1', exchange: 'HOSE', sector: 'Điện & Tiện ích', price: 18300, change: 0.27, pe: 14.8, pb: 1.16, roe: 10.5, marketCap: 8800, volume: 125100, value: 2289476400, buyForeignValue: 3100000000, sellForeignValue: 2400000000 }
 ];
 
-// Kiểm tra backend server (chỉ gọi khi ở localhost)
-async function hasBackend() {
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        return false;
+// Helper lay dia chi backend API thong nhat
+function getBackendApiBase() {
+    if (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase) {
+        return APP_CONFIG.apiBase;
     }
+    if (typeof window !== 'undefined') {
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        return isLocal ? 'http://localhost:3000/api' : null;
+    }
+    return null;
+}
+
+// Kiểm tra backend server
+async function hasBackend() {
+    const base = getBackendApiBase();
+    if (!base) return false;
     try {
-        const r = await fetch('/api/health', { signal: AbortSignal.timeout(1500) });
+        const r = await fetch(`${base}/health`, { signal: AbortSignal.timeout(1500) });
         return r.ok;
     } catch {
         return false;
@@ -287,9 +298,10 @@ async function fetchLiveScannerStocks(size = 150) {
 
 // Lấy danh sách FA Screener từ DNSE (100% dữ liệu thực từ sàn và DNSE Entrade / Live Scanner)
 async function tvScreener(size = 200, exchange = null) {
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const apiBase = getBackendApiBase();
+    if (apiBase) {
         try {
-            const res = await fetch(`/api/market/screener?size=${size}`, { signal: AbortSignal.timeout(3500) });
+            const res = await fetch(`${apiBase}/market/screener?size=${size}`, { signal: AbortSignal.timeout(3500) });
             if (res.ok) {
                 const json = await res.json();
                 if (json.success && json.data?.length) {
@@ -322,9 +334,10 @@ async function tvPrices(symbols) {
     let prices = {};
 
     // 1. Thử gọi backend DNSE prices
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const apiBase = getBackendApiBase();
+    if (apiBase) {
         try {
-            const res = await fetch('/api/market/prices', {
+            const res = await fetch(`${apiBase}/market/prices`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ symbols }),
@@ -381,12 +394,12 @@ const DNSE_ENTRADE_BASE = 'https://services.entrade.com.vn';
 
 // Lấy chỉ số thời gian thực từ Live Scanner & DNSE Entrade (VNINDEX, VN30, HNX, UPCOM)
 async function fetchDNSEIndices() {
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiBase = getBackendApiBase();
 
-    // 1. Thử qua backend proxy nếu đang ở localhost
-    if (isLocal) {
+    // 1. Thử qua backend proxy nếu có backend
+    if (apiBase) {
         try {
-            const r = await fetch('/api/dnse/indices', { signal: AbortSignal.timeout(3000) });
+            const r = await fetch(`${apiBase}/dnse/indices`, { signal: AbortSignal.timeout(3000) });
             if (r.ok) {
                 const j = await r.json();
                 if (j.success && j.data) {
@@ -553,10 +566,11 @@ async function fetchDNSEIntraday(symbol = 'VNINDEX', resolution = '5') {
     if (sym === 'UPCOMINDEX') sym = 'UPCOM';
     if (sym === 'VNI') sym = 'VNINDEX';
 
-    // 1. Thử qua backend proxy nếu đang ở localhost
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    // 1. Thử qua backend proxy nếu có backend
+    const apiBase = getBackendApiBase();
+    if (apiBase) {
         try {
-            const r = await fetch(`/api/dnse/chart/index/${sym}?resolution=${resolution}`, { signal: AbortSignal.timeout(3500) });
+            const r = await fetch(`${apiBase}/dnse/chart/index/${sym}?resolution=${resolution}`, { signal: AbortSignal.timeout(3500) });
             if (r.ok) {
                 const j = await r.json();
                 const pts = j.data?.c || j.data?.data?.c;
@@ -587,12 +601,11 @@ async function fetchDNSEStock(symbol) {
     if (!symbol) return null;
     const u = symbol.toUpperCase().trim();
 
-    // 1. Thử backend proxy nếu ở localhost hoặc file protocol
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-    const apiHost = (window.location.port === '3000') ? '' : 'http://localhost:3000';
-    if (isLocal) {
+    // 1. Thử backend proxy nếu có backend
+    const apiBase = getBackendApiBase();
+    if (apiBase) {
         try {
-            const r = await fetch(`${apiHost}/api/market/stock/${u}`, { signal: AbortSignal.timeout(3000) });
+            const r = await fetch(`${apiBase}/market/stock/${u}`, { signal: AbortSignal.timeout(3000) });
             if (r.ok) {
                 const j = await r.json();
                 if (j.success && j.data) return j.data;
@@ -710,9 +723,10 @@ async function fetchDNSEStock(symbol) {
 // Tổng hợp dữ liệu thị trường trực tiếp 100% từ DNSE Open API & Live Scanner
 async function fetchDNSEMarketOverview() {
     // 1. Thử gọi backend /api/dashboard nếu có
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    const apiBase = getBackendApiBase();
+    if (apiBase) {
         try {
-            const res = await fetch('/api/dashboard', { signal: AbortSignal.timeout(4000) });
+            const res = await fetch(`${apiBase}/dashboard`, { signal: AbortSignal.timeout(4000) });
             if (res.ok) {
                 const j = await res.json();
                 if (j.success && j.stocks?.length) {
@@ -877,9 +891,7 @@ async function tvGetMarketOverview() {
 
 // Hàm lấy Screener: ưu tiên backend local (DNSE), fallback trực tiếp Live Scanner (hỗ trợ GitHub Pages)
 async function getScreenerData(size = 200) {
-    const base = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
-        ? APP_CONFIG.apiBase
-        : (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : null);
+    const base = getBackendApiBase();
 
     if (base) {
         try {
@@ -905,14 +917,13 @@ async function getScreenerData(size = 200) {
         await refreshFallbackStocksLive();
     } catch { /* ignore */ }
 
+    // Trả về danh mục đã được đồng bộ giá thời gian thực của phiên hôm nay
     return { data: FALLBACK_STOCKS.slice(0, size), source: 'dnse-direct' };
 }
 
 // Hàm lấy giá: ưu tiên backend local (DNSE), fallback trực tiếp DNSE Entrade
 async function getPricesData(symbols) {
-    const base = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
-        ? APP_CONFIG.apiBase
-        : (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : null);
+    const base = getBackendApiBase();
 
     if (base) {
         try {

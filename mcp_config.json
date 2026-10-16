@@ -2,7 +2,7 @@
   "mcpServers": {
     "dnse-market-data": {
       "command": "node",
-      "args": ["d:/project profile/dnse-mcp-server.js"],
+      "args": ["./dnse-mcp-server.js"],
       "env": {
         "DNSE_API_KEY": "eyJvcmciOiJkbnNlIiwiaWQiOiIxZDFkOGRjY2RlYTQ0NTQ0YTAxNTA4M2Q2NjEzNjdiYSIsImgiOiJtdXJtdXIxMjgifQ==",
         "DNSE_API_BASE": "https://api.dnse.com.vn",

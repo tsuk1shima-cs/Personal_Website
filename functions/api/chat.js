@@ -78,7 +78,7 @@ export async function onRequestPost(context) {
                     headers: {
                         'Authorization': `Bearer ${OPENROUTER_KEY}`,
                         'Content-Type': 'application/json',
-                        'HTTP-Referer': 'https://tsuk1shima-cs.github.io',
+                        'HTTP-Referer': context.request.headers.get('Origin') || context.request.headers.get('Referer') || 'https://tsuk1shima-cs.github.io',
                         'X-Title': 'Chuyen Gia Tai Chinh'
                     },
                     body: JSON.stringify({

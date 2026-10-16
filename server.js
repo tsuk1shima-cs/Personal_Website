@@ -11,8 +11,18 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
+    : ['*'];
+
 app.use(cors({
-    origin: '*',
+    origin: allowedOrigins.includes('*') ? '*' : (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -172,8 +182,6 @@ const VIETNAMESE_STOPWORDS = new Set([
     'NAY', 'HOM', 'CAI', 'BAI', 'KIA', 'GIO', 'PHU', 'HET', 'ROI', 'DAP', 'TAP', 'LAN'
 ]);
 
-// ==================== MARKET DATA & REALTIME DASHBOARD ====================
-
 // ==================== DNSE OPEN API & REALTIME DASHBOARD ====================
 
 const IND_MAP = {
@@ -269,13 +277,27 @@ function generateIntradaySeries(ref, close, high, low, length = 31) {
 // Cache du lieu dashboard trong 10 giay de phan hoi sieu toc
 const dashboardCache = { data: null, time: 0, TTL: 10 * 1000 };
 
+// Kiem tra gio giao dich chung khoan Viet Nam (UTC+7: 09:00 - 11:30 va 13:00 - 15:00, Thu 2 - Thu 6)
+function isVietnamMarketOpen() {
+    const now = new Date();
+    const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    const vnTime = new Date(utcMs + 7 * 3600000);
+    const day = vnTime.getDay();
+    if (day === 0 || day === 6) return false;
+    const min = vnTime.getHours() * 60 + vnTime.getMinutes();
+    return (min >= 540 && min <= 690) || (min >= 780 && min <= 900);
+}
+
 // Tu dong dong bo danh muc co phieu DNSE_MASTER_STOCKS tu Live Scanner
 let isSyncingDnseMaster = false;
 let lastDnseMasterSync = 0;
 
 async function syncDnseMasterStocksLive() {
     const now = Date.now();
-    if (now - lastDnseMasterSync < 5000) return;
+    const isOpen = isVietnamMarketOpen();
+    // Trong gio giao dich: dong bo toi thieu moi 5s; ngoai gio: toi thieu moi 5 phut
+    const minInterval = isOpen ? 5000 : 300000;
+    if (lastDnseMasterSync && (now - lastDnseMasterSync < minInterval)) return;
     if (isSyncingDnseMaster) return;
     isSyncingDnseMaster = true;
 
@@ -1267,7 +1289,9 @@ function calculateWilderRSI(closes, period = 14) {
             avgLoss = (avgLoss * (period - 1) - diff) / period;
         }
     }
+    if (avgGain === 0 && avgLoss === 0) return 50;
     if (avgLoss === 0) return 100;
+    if (avgGain === 0) return 0;
     const rs = avgGain / avgLoss;
     return parseFloat((100 - (100 / (1 + rs))).toFixed(1));
 }
@@ -1548,7 +1572,6 @@ app.get('/api/news/rss', async (req, res) => {
         res.status(500).json({ success: false, error: 'Không thể lấy tin tức', items: [] });
     }
 });
-// ==================== DNSE ACTIVE SERVICES ====================
 
 // ==================== WEBSOCKET SERVER ====================
 
@@ -1609,9 +1632,20 @@ API Status:
    ${DNSE_API_KEY   ? 'Co key' : 'Chua cau hinh (dung che do Open Datafeed)'} - DNSE Open API & Entrade X
     `);
 
-    // Tu dong dong bo danh muc co phieu live ngay khi khoi dong va dinh ky moi 7 giay
+    // Tu dong dong bo danh muc co phieu live ngay khi khoi dong
     syncDnseMasterStocksLive();
-    setInterval(syncDnseMasterStocksLive, 7000);
+
+    // Dinh ky dong bo trong gio giao dich (7 giay) va ngoai gio giao dich (5 phut)
+    setInterval(() => {
+        if (isVietnamMarketOpen()) {
+            syncDnseMasterStocksLive();
+        }
+    }, 7000);
+    setInterval(() => {
+        if (!isVietnamMarketOpen()) {
+            syncDnseMasterStocksLive();
+        }
+    }, 300000);
 });
 
 // Handle server errors (e.g. port already in use)
