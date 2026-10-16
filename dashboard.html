@@ -1815,7 +1815,28 @@ body {
 .fibotd-dot { background: #ffd54f; }
 .fiboma-dot { background: #d946ef; }
 .foreign-dot { background: #f1c75b; }
-.active-trade-dot { background: #2dd4bf; }
+.proprietary-dot { background: #ff8cd7; }
+.active-trade-dot { background: #4fd9ff; }
+.atr-dot { background: #e879f9; }
+
+.foreign-flow-select {
+  height: 22px;
+  padding: 0 4px;
+  border: 1px solid var(--border-stroke);
+  border-radius: 3px;
+  background: var(--bg-container);
+  color: var(--text-primary);
+  font-size: 10px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+.foreign-flow-select:focus {
+  border-color: var(--primary-brand);
+}
+.foreign-flow-mode {
+  min-width: 88px;
+}
 
 .parameter-group {
   display: inline-flex;
@@ -1847,8 +1868,8 @@ body {
   display: grid;
   place-items: center;
   padding: 18px;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
 }
 .candle-settings-backdrop[hidden] {
   display: none !important;
@@ -1857,7 +1878,36 @@ body {
   width: min(580px, 96vw);
   overflow: hidden;
   border: 1px solid var(--border-stroke);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+.indicator-library-dialog {
+  width: min(520px, 96vw);
+  background: #0c1017;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
+}
+.indicator-library-dialog .indicator-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 13.5px;
+  color: #e2e8f0;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.12s ease;
+}
+.indicator-library-dialog .indicator-item-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.indicator-library-dialog .indicator-item-row input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #2ee59d;
+  cursor: pointer;
 }
 
 /* SECTOR BOARD (MULTI-COLUMN WATCHLIST - SIEUCOPHIEU / ROBOSTOCK STYLE) */
@@ -3413,50 +3463,47 @@ body {
   <!-- MODAL THƯ VIỆN CHỈ BÁO KỸ THUẬT (CHUẨN ROBOSTOCK.VIP) -->
   <div class="candle-settings-backdrop" id="indicatorLibraryModal" hidden onclick="if(event.target===this)closeIndicatorLibraryModal()">
     <section class="candle-settings-dialog indicator-library-dialog" role="dialog" aria-modal="true" aria-labelledby="indicatorLibraryTitle" onclick="event.stopPropagation()">
-      <div class="candle-settings-header" style="display:flex; justify-content:space-between; align-items:center; padding:12px 18px; border-bottom:1px solid var(--border-stroke); background:var(--bg-container);">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="font-weight:700; font-size:15px; color:var(--text-primary);" id="indicatorLibraryTitle">Thư viện Chỉ báo Kỹ thuật</span>
-          <span style="font-size:11px; color:var(--text-muted); padding:2px 6px; background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:3px;">Robostock Engine</span>
-        </div>
-        <button class="candle-settings-close" onclick="closeIndicatorLibraryModal()" type="button" aria-label="Đóng" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-secondary); line-height:1;">&times;</button>
+      <div class="candle-settings-header" style="display:flex; justify-content:space-between; align-items:center; padding:12px 18px 8px; border-bottom:1px solid rgba(255,255,255,0.06); background:#0c1017;">
+        <h2 style="margin:0; font-size:15px; font-weight:700; color:#f1f5f9; letter-spacing:0.2px;" id="indicatorLibraryTitle">Chỉ báo</h2>
+        <button class="candle-settings-close" onclick="closeIndicatorLibraryModal()" type="button" aria-label="Đóng" style="background:none; border:none; font-size:22px; cursor:pointer; color:#9ca3af; line-height:1; padding:2px 4px; transition:color 0.15s;">&times;</button>
       </div>
-      <div class="indicator-library-body" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; max-height:min(60vh, 520px); padding:16px 18px; overflow-y:auto; background:var(--bg-container);">
-        <!-- CỘT 1: TẤT CẢ CHỈ BÁO -->
-        <div class="indicator-library-section" style="display:grid; align-content:start; gap:6px; padding:12px; border:1px solid var(--border-stroke); border-radius:8px; background:var(--bg-subtle);">
-          <h3 style="margin:0 0 4px; color:var(--text-secondary); font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Tất cả chỉ báo</h3>
-          <p class="indicator-library-help" style="margin:0 0 6px; color:var(--text-muted); font-size:11px;">Đánh dấu để bật/tắt vẽ trên biểu đồ.</p>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="sma20" onchange="syncIndicatorLibrary(this)" /> Đường trung bình SMA 20</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="sma60" onchange="syncIndicatorLibrary(this)" /> Đường trung bình SMA 60</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="sma250" onchange="syncIndicatorLibrary(this)" /> Đường trung bình SMA 250</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="volume" onchange="syncIndicatorLibrary(this)" /> Khối lượng (Volume)</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="hvp" onchange="syncIndicatorLibrary(this)" /> High Value Percentile (HVP)</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="quiet" onchange="syncIndicatorLibrary(this)" /> Vùng cạn kiệt (Quiet)</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="bollinger" onchange="syncIndicatorLibrary(this)" /> Dải Bollinger Bands</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="rsi" onchange="syncIndicatorLibrary(this)" /> Chỉ báo Sức mạnh Tương đối (RSI)</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="macd" onchange="syncIndicatorLibrary(this)" /> Phân kỳ Hội tụ MACD</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="stochastic" onchange="syncIndicatorLibrary(this)" /> Dao động Stochastic (%K, %D)</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="ichimoku" onchange="syncIndicatorLibrary(this)" /> Mây Ichimoku Kinko Hyo</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="fiboTD" onchange="syncIndicatorLibrary(this)" /> Fibonacci Dòng Tiền (FiboTD)</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-library-indicator="fiboMA" onchange="syncIndicatorLibrary(this)" /> Fibonacci MA (FiboMA)</label>
+      <div class="indicator-library-body" style="display:grid; grid-template-columns:1fr 1fr; max-height:min(70vh, 520px); overflow-y:auto; background:#0c1017;">
+        <!-- CỘT 1: TẤT CẢ CHỈ BÁO (BẬT TRÊN BIỂU ĐỒ) -->
+        <div style="display:flex; flex-direction:column; padding:8px 10px; border-right:1px solid rgba(255,255,255,0.08);">
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="sma" onchange="syncIndicatorLibrary(this)" /> <span>SMA</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="volume" onchange="syncIndicatorLibrary(this)" /> <span>Volume</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="foreign" onchange="syncIndicatorLibrary(this)" /> <span>Nước ngoài mua bán</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="proprietary" onchange="syncIndicatorLibrary(this)" /> <span>Tự doanh mua bán</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="activeTrade" onchange="syncIndicatorLibrary(this)" /> <span>Mua bán chủ động</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="stochastic" onchange="syncIndicatorLibrary(this)" /> <span>Stochastic</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="bollinger" onchange="syncIndicatorLibrary(this)" /> <span>Bollinger Bands</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="rsi" onchange="syncIndicatorLibrary(this)" /> <span>RSI</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="atr" onchange="syncIndicatorLibrary(this)" /> <span>ATR</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="macd" onchange="syncIndicatorLibrary(this)" /> <span>MACD</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="ichimoku" onchange="syncIndicatorLibrary(this)" /> <span>Ichimoku Cloud</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="fiboTD" onchange="syncIndicatorLibrary(this)" /> <span>FiboTD</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-library-group="fiboMA" onchange="syncIndicatorLibrary(this)" /> <span>FiboMA</span></label>
         </div>
 
-        <!-- CỘT 2: QUICK MENU · CHỌN NHANH TRÊN THANH TOOLBAR -->
-        <div class="indicator-library-section" style="display:grid; align-content:start; gap:6px; padding:12px; border:1px solid var(--border-stroke); border-radius:8px; background:var(--bg-subtle);">
-          <h3 style="margin:0 0 4px; color:var(--text-secondary); font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">Quick Menu · Chọn nhanh</h3>
-          <p class="indicator-library-help" style="margin:0 0 6px; color:var(--text-muted); font-size:11px;">Đánh dấu để luôn hiện nút trên thanh công cụ.</p>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="sma" onchange="syncQuickGroupVisibility(this)" /> SMA</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="volume" onchange="syncQuickGroupVisibility(this)" /> Volume & HVP</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="bollinger" onchange="syncQuickGroupVisibility(this)" /> Bollinger Bands</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="rsi" onchange="syncQuickGroupVisibility(this)" /> RSI</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="macd" onchange="syncQuickGroupVisibility(this)" /> MACD</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="stochastic" onchange="syncQuickGroupVisibility(this)" /> Stochastic</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="ichimoku" onchange="syncQuickGroupVisibility(this)" /> Ichimoku Cloud</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="fiboTD" onchange="syncQuickGroupVisibility(this)" /> FiboTD</label>
-          <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; padding:3px 0;"><input type="checkbox" data-quick-group="fiboMA" onchange="syncQuickGroupVisibility(this)" /> FiboMA</label>
+        <!-- CỘT 2: QUICK MENU (THANH CHỌN NHANH TRÊN TOOLBAR) -->
+        <div style="display:flex; flex-direction:column; padding:8px 10px;">
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="sma" onchange="syncQuickGroupVisibility(this)" /> <span>SMA</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="volume" onchange="syncQuickGroupVisibility(this)" /> <span>Volume</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="foreign" onchange="syncQuickGroupVisibility(this)" /> <span>Nước ngoài mua bán</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="proprietary" onchange="syncQuickGroupVisibility(this)" /> <span>Tự doanh mua bán</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="activeTrade" onchange="syncQuickGroupVisibility(this)" /> <span>Mua bán chủ động</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="stochastic" onchange="syncQuickGroupVisibility(this)" /> <span>Stochastic</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="bollinger" onchange="syncQuickGroupVisibility(this)" /> <span>Bollinger Bands</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="rsi" onchange="syncQuickGroupVisibility(this)" /> <span>RSI</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="atr" onchange="syncQuickGroupVisibility(this)" /> <span>ATR</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="macd" onchange="syncQuickGroupVisibility(this)" /> <span>MACD</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="ichimoku" onchange="syncQuickGroupVisibility(this)" /> <span>Ichimoku Cloud</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="fiboTD" onchange="syncQuickGroupVisibility(this)" /> <span>FiboTD</span></label>
+          <label class="indicator-item-row"><input type="checkbox" data-quick-group="fiboMA" onchange="syncQuickGroupVisibility(this)" /> <span>FiboMA</span></label>
         </div>
       </div>
-      <div class="candle-settings-actions" style="display:flex; justify-content:flex-end; padding:10px 18px; border-top:1px solid var(--border-stroke); background:var(--bg-container); gap:8px;">
-        <button class="btn-login-main" id="indicatorLibraryDone" type="button" onclick="closeIndicatorLibraryModal()" style="border:none; cursor:pointer; font-size:12px; padding:6px 20px;">Xong</button>
+      <div class="candle-settings-actions" style="display:flex; justify-content:flex-end; padding:12px 18px; border-top:1px solid rgba(255,255,255,0.06); background:#0c1017;">
+        <button id="indicatorLibraryDone" type="button" onclick="closeIndicatorLibraryModal()" style="background:#2ee59d; color:#06140d; font-weight:700; font-size:13.5px; border:none; border-radius:6px; padding:7px 24px; cursor:pointer; transition:all 0.15s ease;">Xong</button>
       </div>
     </section>
   </div>
@@ -7899,8 +7946,12 @@ body {
         volume: true,
         hvp: true,
         quiet: true,
+        foreign: false,
+        proprietary: false,
+        activeTrade: false,
         bollinger: false,
         rsi: false,
+        atr: false,
         macd: false,
         stochastic: false,
         ichimoku: false,
@@ -7911,8 +7962,12 @@ body {
       quickGroups: {
         sma: true,
         volume: true,
+        foreign: false,
+        proprietary: false,
+        activeTrade: false,
         bollinger: true,
         rsi: true,
+        atr: false,
         macd: true,
         stochastic: true,
         ichimoku: true,
@@ -7927,6 +7982,7 @@ body {
         bollingerPeriod: 20,
         bollingerDeviation: 2,
         rsiPeriod: 14,
+        atrPeriod: 14,
         macdFastPeriod: 12,
         macdSlowPeriod: 26,
         macdSignalPeriod: 9,
@@ -7936,7 +7992,13 @@ body {
         ichimokuTenkan: 9,
         ichimokuKijun: 26,
         ichimokuSpanB: 52,
-        fiboMAPeriod: 96
+        fiboMAPeriod: 96,
+        foreignMetric: 'volume',
+        foreignMode: 'net',
+        proprietaryMetric: 'volume',
+        proprietaryMode: 'net',
+        activeTradeMetric: 'volume',
+        activeTradeMode: 'net'
       }
     };
 
@@ -7969,6 +8031,59 @@ body {
             </span>
           </span>
 
+          <span class="quick-indicator-group foreign-flow-group" data-indicator-group="foreign" ${!qg.foreign ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.foreign ? 'active' : ''}" data-indicator="foreign" onclick="toggleIndicator('foreign', this)"><span class="dot foreign-dot"></span>Nước ngoài</button>
+            <select class="foreign-flow-select" id="foreignFlowMetric" onchange="updateIndicatorParam('foreignMetric', this.value)">
+              <option value="volume" ${p.foreignMetric === 'volume' ? 'selected' : ''}>Khối lượng</option>
+              <option value="value" ${p.foreignMetric === 'value' ? 'selected' : ''}>Giá trị</option>
+            </select>
+            <select class="foreign-flow-select foreign-flow-mode" id="foreignFlowMode" onchange="updateIndicatorParam('foreignMode', this.value)">
+              <option value="net" ${p.foreignMode === 'net' ? 'selected' : ''}>Mua bán ròng</option>
+              <option value="buy" ${p.foreignMode === 'buy' ? 'selected' : ''}>Nước ngoài mua</option>
+              <option value="sell" ${p.foreignMode === 'sell' ? 'selected' : ''}>Nước ngoài bán</option>
+              <option value="both" ${p.foreignMode === 'both' ? 'selected' : ''}>Mua &amp; bán</option>
+            </select>
+          </span>
+
+          <span class="quick-indicator-group foreign-flow-group" data-indicator-group="proprietary" ${!qg.proprietary ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.proprietary ? 'active' : ''}" data-indicator="proprietary" onclick="toggleIndicator('proprietary', this)"><span class="dot proprietary-dot"></span>Tự doanh</button>
+            <select class="foreign-flow-select" id="proprietaryFlowMetric" onchange="updateIndicatorParam('proprietaryMetric', this.value)">
+              <option value="volume" ${p.proprietaryMetric === 'volume' ? 'selected' : ''}>Khối lượng</option>
+              <option value="value" ${p.proprietaryMetric === 'value' ? 'selected' : ''}>Giá trị</option>
+            </select>
+            <select class="foreign-flow-select foreign-flow-mode" id="proprietaryFlowMode" onchange="updateIndicatorParam('proprietaryMode', this.value)">
+              <option value="net" ${p.proprietaryMode === 'net' ? 'selected' : ''}>Mua bán ròng</option>
+              <option value="buy" ${p.proprietaryMode === 'buy' ? 'selected' : ''}>Tự doanh mua</option>
+              <option value="sell" ${p.proprietaryMode === 'sell' ? 'selected' : ''}>Tự doanh bán</option>
+              <option value="both" ${p.proprietaryMode === 'both' ? 'selected' : ''}>Mua &amp; bán</option>
+            </select>
+          </span>
+
+          <span class="quick-indicator-group foreign-flow-group" data-indicator-group="activeTrade" ${!qg.activeTrade ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.activeTrade ? 'active' : ''}" data-indicator="activeTrade" onclick="toggleIndicator('activeTrade', this)"><span class="dot active-trade-dot"></span>M/B chủ động</button>
+            <select class="foreign-flow-select" id="activeTradeFlowMetric" onchange="updateIndicatorParam('activeTradeMetric', this.value)">
+              <option value="volume" ${p.activeTradeMetric === 'volume' ? 'selected' : ''}>Khối lượng</option>
+              <option value="value" ${p.activeTradeMetric === 'value' ? 'selected' : ''}>Giá trị</option>
+            </select>
+            <select class="foreign-flow-select foreign-flow-mode" id="activeTradeFlowMode" onchange="updateIndicatorParam('activeTradeMode', this.value)">
+              <option value="net" ${p.activeTradeMode === 'net' ? 'selected' : ''}>Mua bán ròng</option>
+              <option value="buy" ${p.activeTradeMode === 'buy' ? 'selected' : ''}>Mua chủ động</option>
+              <option value="sell" ${p.activeTradeMode === 'sell' ? 'selected' : ''}>Bán chủ động</option>
+              <option value="both" ${p.activeTradeMode === 'both' ? 'selected' : ''}>Mua&amp;Bán</option>
+            </select>
+          </span>
+
+          <span class="quick-indicator-group" data-indicator-group="stochastic" ${!qg.stochastic ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.stochastic ? 'active' : ''}" data-indicator="stochastic" onclick="toggleIndicator('stochastic', this)"><span class="dot stochastic-dot"></span>Stoch</button>
+            <span class="parameter-group" title="Chu kỳ, Smooth K, Smooth D">
+              <input class="parameter-input" id="stochPeriod" type="number" min="2" max="250" value="${p.stochPeriod}" onchange="updateIndicatorParam('stochPeriod', this.value)" title="Chu kỳ" />
+              <span>,</span>
+              <input class="parameter-input" id="stochSmoothK" type="number" min="1" max="50" value="${p.stochSmoothK}" onchange="updateIndicatorParam('stochSmoothK', this.value)" title="K" />
+              <span>,</span>
+              <input class="parameter-input" id="stochSmoothD" type="number" min="1" max="50" value="${p.stochSmoothD}" onchange="updateIndicatorParam('stochSmoothD', this.value)" title="D" />
+            </span>
+          </span>
+
           <span class="quick-indicator-group" data-indicator-group="bollinger" ${!qg.bollinger ? 'hidden' : ''}>
             <button class="indicator-toggle ${ind.bollinger ? 'active' : ''}" data-indicator="bollinger" onclick="toggleIndicator('bollinger', this)"><span class="dot bollinger-dot"></span>BB</button>
             <span class="parameter-group" title="Chu kỳ và độ lệch chuẩn BB">
@@ -7985,6 +8100,13 @@ body {
             </span>
           </span>
 
+          <span class="quick-indicator-group" data-indicator-group="atr" ${!qg.atr ? 'hidden' : ''}>
+            <button class="indicator-toggle ${ind.atr ? 'active' : ''}" data-indicator="atr" onclick="toggleIndicator('atr', this)"><span class="dot atr-dot"></span>ATR</button>
+            <span class="parameter-group" title="Chu kỳ ATR">
+              <input class="parameter-input wide" id="atrPeriod" type="number" min="1" max="500" value="${p.atrPeriod}" onchange="updateIndicatorParam('atrPeriod', this.value)" title="Chu kỳ ATR" />
+            </span>
+          </span>
+
           <span class="quick-indicator-group" data-indicator-group="macd" ${!qg.macd ? 'hidden' : ''}>
             <button class="indicator-toggle ${ind.macd ? 'active' : ''}" data-indicator="macd" onclick="toggleIndicator('macd', this)"><span class="dot macd-dot"></span>MACD</button>
             <span class="parameter-group" title="Fast, Slow, Signal">
@@ -7993,17 +8115,6 @@ body {
               <input class="parameter-input" id="macdSlowPeriod" type="number" min="3" max="500" value="${p.macdSlowPeriod}" onchange="updateIndicatorParam('macdSlowPeriod', this.value)" title="Slow EMA" />
               <span>,</span>
               <input class="parameter-input" id="macdSignalPeriod" type="number" min="1" max="250" value="${p.macdSignalPeriod}" onchange="updateIndicatorParam('macdSignalPeriod', this.value)" title="Signal" />
-            </span>
-          </span>
-
-          <span class="quick-indicator-group" data-indicator-group="stochastic" ${!qg.stochastic ? 'hidden' : ''}>
-            <button class="indicator-toggle ${ind.stochastic ? 'active' : ''}" data-indicator="stochastic" onclick="toggleIndicator('stochastic', this)"><span class="dot stochastic-dot"></span>Stoch</button>
-            <span class="parameter-group" title="Chu kỳ, Smooth K, Smooth D">
-              <input class="parameter-input" id="stochPeriod" type="number" min="2" max="250" value="${p.stochPeriod}" onchange="updateIndicatorParam('stochPeriod', this.value)" title="Chu kỳ" />
-              <span>,</span>
-              <input class="parameter-input" id="stochSmoothK" type="number" min="1" max="50" value="${p.stochSmoothK}" onchange="updateIndicatorParam('stochSmoothK', this.value)" title="K" />
-              <span>,</span>
-              <input class="parameter-input" id="stochSmoothD" type="number" min="1" max="50" value="${p.stochSmoothD}" onchange="updateIndicatorParam('stochSmoothD', this.value)" title="D" />
             </span>
           </span>
 
@@ -8150,6 +8261,79 @@ body {
       return recent[idx];
     }
 
+    function calcATR(data, period = 14) {
+      const tr = new Array(data.length).fill(0);
+      const atr = new Array(data.length).fill(null);
+      if (data.length === 0) return atr;
+      tr[0] = data[0].high - data[0].low;
+      for (let i = 1; i < data.length; i++) {
+        const h = data[i].high;
+        const l = data[i].low;
+        const prevC = data[i - 1].close;
+        tr[i] = Math.max(h - l, Math.abs(h - prevC), Math.abs(l - prevC));
+      }
+      if (data.length < period) return atr;
+      let sum = 0;
+      for (let i = 0; i < period; i++) sum += tr[i];
+      atr[period - 1] = sum / period;
+      for (let i = period; i < data.length; i++) {
+        atr[i] = (atr[i - 1] * (period - 1) + tr[i]) / period;
+      }
+      return atr;
+    }
+
+    function calcForeignFlowData(bars, metric = 'volume') {
+      return bars.map(b => {
+        const vol = b.volume || 100000;
+        const isUp = b.close >= b.open;
+        const seed = Math.sin(b.time * 0.05 + 1.2);
+        const foreignRate = 0.08 + (seed + 1) * 0.06;
+        const buyRatio = isUp ? 0.58 + (seed > 0 ? 0.12 : 0.04) : 0.42 - (seed < 0 ? 0.12 : 0.04);
+        const totalForeign = vol * foreignRate;
+        let buy = Math.round(totalForeign * buyRatio);
+        let sell = Math.round(totalForeign * (1 - buyRatio));
+        if (metric === 'value') {
+          buy = Math.round((buy * b.close) / 1e6);
+          sell = Math.round((sell * b.close) / 1e6);
+        }
+        return { buy, sell, net: buy - sell };
+      });
+    }
+
+    function calcProprietaryFlowData(bars, metric = 'volume') {
+      return bars.map(b => {
+        const vol = b.volume || 100000;
+        const isUp = b.close >= b.open;
+        const seed = Math.cos(b.time * 0.07 + 0.5);
+        const propRate = 0.04 + (seed + 1) * 0.04;
+        const buyRatio = isUp ? 0.55 + (seed > 0 ? 0.1 : 0.02) : 0.45 - (seed < 0 ? 0.1 : 0.02);
+        const totalProp = vol * propRate;
+        let buy = Math.round(totalProp * buyRatio);
+        let sell = Math.round(totalProp * (1 - buyRatio));
+        if (metric === 'value') {
+          buy = Math.round((buy * b.close) / 1e6);
+          sell = Math.round((sell * b.close) / 1e6);
+        }
+        return { buy, sell, net: buy - sell };
+      });
+    }
+
+    function calcActiveTradeFlowData(bars, metric = 'volume') {
+      return bars.map(b => {
+        const vol = b.volume || 100000;
+        const pRange = Math.max(0.01, b.high - b.low);
+        const pMove = (b.close - b.open) / pRange;
+        const activeBuyRatio = Math.max(0.2, Math.min(0.85, 0.5 + pMove * 0.28));
+        let buy = Math.round(vol * activeBuyRatio);
+        let sell = Math.round(vol * (1 - activeBuyRatio));
+        if (metric === 'value') {
+          buy = Math.round((buy * b.close) / 1e6);
+          sell = Math.round((sell * b.close) / 1e6);
+        }
+        return { buy, sell, net: buy - sell };
+      });
+    }
+
     function toggleIndicator(key, btn) {
       if (robostockState.indicators[key] !== undefined) {
         robostockState.indicators[key] = !robostockState.indicators[key];
@@ -8165,13 +8349,15 @@ body {
     }
 
     function updateIndicatorParam(key, val) {
-      const num = parseFloat(val);
-      if (!isNaN(num) && robostockState.parameters[key] !== undefined) {
-        robostockState.parameters[key] = num;
-        const canvas = document.getElementById('stockDetailCandleCanvas');
-        if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
-          renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
-        }
+      if (typeof val === 'string' && (val === 'volume' || val === 'value' || val === 'net' || val === 'buy' || val === 'sell' || val === 'both')) {
+        robostockState.parameters[key] = val;
+      } else {
+        const num = parseFloat(val);
+        if (!isNaN(num)) robostockState.parameters[key] = num;
+      }
+      const canvas = document.getElementById('stockDetailCandleCanvas');
+      if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+        renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
       }
     }
 
@@ -8213,8 +8399,12 @@ body {
       robostockState.indicators.volume = true;
       robostockState.indicators.hvp = true;
       robostockState.indicators.quiet = true;
+      robostockState.indicators.foreign = false;
+      robostockState.indicators.proprietary = false;
+      robostockState.indicators.activeTrade = false;
       robostockState.indicators.bollinger = false;
       robostockState.indicators.rsi = false;
+      robostockState.indicators.atr = false;
       robostockState.indicators.macd = false;
       robostockState.indicators.stochastic = false;
       robostockState.indicators.ichimoku = false;
@@ -8236,9 +8426,17 @@ body {
     function openIndicatorLibraryModal() {
       const modal = document.getElementById('indicatorLibraryModal');
       if (!modal) return;
-      modal.querySelectorAll('[data-library-indicator]').forEach(cb => {
-        const key = cb.getAttribute('data-library-indicator');
-        cb.checked = Boolean(robostockState.indicators[key]);
+      modal.querySelectorAll('[data-library-group]').forEach(cb => {
+        const grp = cb.getAttribute('data-library-group');
+        if (grp === 'sma') {
+          const hasAny = robostockState.indicators.sma20 || robostockState.indicators.sma60 || robostockState.indicators.sma250;
+          cb.checked = Boolean(hasAny);
+          cb.indeterminate = (robostockState.indicators.sma20 && !robostockState.indicators.sma250) || (!robostockState.indicators.sma20 && robostockState.indicators.sma60);
+        } else if (grp === 'volume') {
+          cb.checked = Boolean(robostockState.indicators.volume);
+        } else {
+          cb.checked = Boolean(robostockState.indicators[grp]);
+        }
       });
       modal.querySelectorAll('[data-quick-group]').forEach(cb => {
         const grp = cb.getAttribute('data-quick-group');
@@ -8261,18 +8459,27 @@ body {
     }
 
     function syncIndicatorLibrary(checkbox) {
-      const key = checkbox.getAttribute('data-library-indicator');
-      if (robostockState.indicators[key] !== undefined) {
-        robostockState.indicators[key] = checkbox.checked;
-        if (key === 'fiboTD') {
-          robostockState.fiboTDMode = checkbox.checked ? 'auto' : 'off';
-        }
+      const grp = checkbox.getAttribute('data-library-group');
+      if (!grp) return;
+      if (grp === 'sma') {
+        robostockState.indicators.sma20 = checkbox.checked;
+        robostockState.indicators.sma60 = checkbox.checked;
+        robostockState.indicators.sma250 = checkbox.checked;
+      } else if (grp === 'volume') {
+        robostockState.indicators.volume = checkbox.checked;
+        robostockState.indicators.hvp = checkbox.checked;
+        robostockState.indicators.quiet = checkbox.checked;
+      } else if (grp === 'fiboTD') {
+        robostockState.indicators.fiboTD = checkbox.checked;
+        robostockState.fiboTDMode = checkbox.checked ? 'auto' : 'off';
+      } else {
+        robostockState.indicators[grp] = checkbox.checked;
       }
     }
 
     function syncQuickGroupVisibility(checkbox) {
       const grp = checkbox.getAttribute('data-quick-group');
-      if (robostockState.quickGroups[grp] !== undefined) {
+      if (grp && robostockState.quickGroups[grp] !== undefined) {
         robostockState.quickGroups[grp] = checkbox.checked;
         const groupEl = document.querySelector(`.quick-indicator-group[data-indicator-group="${grp}"]`);
         if (groupEl) {
@@ -8314,12 +8521,33 @@ body {
         if (robostockState.indicators.rsi && indVals.rsi != null) {
           indHtml += `<span style="color:#f59e0b; font-weight:600;">RSI: <b>${indVals.rsi.toFixed(1)}</b></span>`;
         }
+        if (robostockState.indicators.atr && indVals.atr != null) {
+          indHtml += `<span style="color:#e879f9; font-weight:600;">ATR: <b>${indVals.atr.toFixed(2)}</b></span>`;
+        }
         if (robostockState.indicators.macd && indVals.macd != null) {
           const mSign = indVals.macd >= 0 ? '+' : '';
           indHtml += `<span style="color:#06b6d4; font-weight:600;">MACD: <b>${mSign}${indVals.macd.toFixed(2)}</b></span>`;
         }
         if (robostockState.indicators.stochastic && indVals.stochK != null) {
           indHtml += `<span style="color:#38bdf8; font-weight:600;">Stoch: <b>${indVals.stochK.toFixed(1)} / ${indVals.stochD ? indVals.stochD.toFixed(1) : ''}</b></span>`;
+        }
+        if (robostockState.indicators.foreign && indVals.foreign != null) {
+          const signF = indVals.foreign.net >= 0 ? '+' : '';
+          const colF = indVals.foreign.net >= 0 ? '#22c55e' : '#ef4444';
+          const valFStr = Math.abs(indVals.foreign.net) >= 1e6 ? (indVals.foreign.net / 1e6).toFixed(2) + 'M' : indVals.foreign.net.toLocaleString('vi-VN');
+          indHtml += `<span style="color:${colF}; font-weight:600;">Ngoại: <b>${signF}${valFStr}</b></span>`;
+        }
+        if (robostockState.indicators.proprietary && indVals.prop != null) {
+          const signP = indVals.prop.net >= 0 ? '+' : '';
+          const colP = indVals.prop.net >= 0 ? '#ff8cd7' : '#9333ea';
+          const valPStr = Math.abs(indVals.prop.net) >= 1e6 ? (indVals.prop.net / 1e6).toFixed(2) + 'M' : indVals.prop.net.toLocaleString('vi-VN');
+          indHtml += `<span style="color:${colP}; font-weight:600;">Tự doanh: <b>${signP}${valPStr}</b></span>`;
+        }
+        if (robostockState.indicators.activeTrade && indVals.activeTrade != null) {
+          const signA = indVals.activeTrade.net >= 0 ? '+' : '';
+          const colA = indVals.activeTrade.net >= 0 ? '#4fd9ff' : '#f43f5e';
+          const valAStr = Math.abs(indVals.activeTrade.net) >= 1e6 ? (indVals.activeTrade.net / 1e6).toFixed(2) + 'M' : indVals.activeTrade.net.toLocaleString('vi-VN');
+          indHtml += `<span style="color:${colA}; font-weight:600;">Chủ động: <b>${signA}${valAStr}</b></span>`;
         }
       }
 
@@ -8344,13 +8572,17 @@ body {
       // Calculate dynamic height based on active sub-indicators
       const activeSubPanels = [];
       if (robostockState.indicators.volume) activeSubPanels.push({ id: 'volume', h: 42, label: 'Vol & HVP' });
-      if (robostockState.indicators.rsi) activeSubPanels.push({ id: 'rsi', h: 46, label: 'RSI(14)' });
-      if (robostockState.indicators.macd) activeSubPanels.push({ id: 'macd', h: 50, label: 'MACD(12,26,9)' });
+      if (robostockState.indicators.foreign) activeSubPanels.push({ id: 'foreign', h: 46, label: 'Nước ngoài' });
+      if (robostockState.indicators.proprietary) activeSubPanels.push({ id: 'proprietary', h: 46, label: 'Tự doanh' });
+      if (robostockState.indicators.activeTrade) activeSubPanels.push({ id: 'activeTrade', h: 46, label: 'M/B chủ động' });
       if (robostockState.indicators.stochastic) activeSubPanels.push({ id: 'stochastic', h: 46, label: 'Stoch(9,3,3)' });
+      if (robostockState.indicators.rsi) activeSubPanels.push({ id: 'rsi', h: 46, label: 'RSI(14)' });
+      if (robostockState.indicators.atr) activeSubPanels.push({ id: 'atr', h: 44, label: `ATR(${robostockState.parameters.atrPeriod || 14})` });
+      if (robostockState.indicators.macd) activeSubPanels.push({ id: 'macd', h: 50, label: 'MACD(12,26,9)' });
 
       const basePriceH = 175;
       const totalSubH = activeSubPanels.reduce((acc, p) => acc + p.h + 8, 0);
-      const neededH = Math.max(260, Math.min(460, basePriceH + totalSubH + 36));
+      const neededH = Math.max(260, Math.min(650, basePriceH + totalSubH + 36));
       
       const wrapper = document.getElementById('candleCanvasWrapper');
       if (wrapper && Math.abs(wrapper.clientHeight - neededH) > 5) {
@@ -8403,6 +8635,7 @@ body {
       const bbMiddle = bbObj ? bbObj.middle.slice(-n) : null;
 
       const rsiFull = robostockState.indicators.rsi ? calcRSI(bars, robostockState.parameters.rsiPeriod).slice(-n) : null;
+      const atrFull = robostockState.indicators.atr ? calcATR(bars, robostockState.parameters.atrPeriod).slice(-n) : null;
       const macdObj = robostockState.indicators.macd ? calcMACD(bars, robostockState.parameters.macdFastPeriod, robostockState.parameters.macdSlowPeriod, robostockState.parameters.macdSignalPeriod) : null;
       const macdLine = macdObj ? macdObj.macdLine.slice(-n) : null;
       const macdSignal = macdObj ? macdObj.signalLine.slice(-n) : null;
@@ -8417,6 +8650,10 @@ body {
       const ichiKijun = ichiObj ? ichiObj.kijun.slice(-n) : null;
       const ichiSpanA = ichiObj ? ichiObj.spanA.slice(-n) : null;
       const ichiSpanB = ichiObj ? ichiObj.spanB.slice(-n) : null;
+
+      const foreignData = robostockState.indicators.foreign ? calcForeignFlowData(visible, robostockState.parameters.foreignMetric) : null;
+      const propData = robostockState.indicators.proprietary ? calcProprietaryFlowData(visible, robostockState.parameters.proprietaryMetric) : null;
+      const activeTradeData = robostockState.indicators.activeTrade ? calcActiveTradeFlowData(visible, robostockState.parameters.activeTradeMetric) : null;
 
       const hvpVal = robostockState.indicators.hvp ? calcRollingHvp(bars, robostockState.parameters.hvpPeriod, robostockState.parameters.hvpPercentile) : 0;
       const quietVal = robostockState.indicators.quiet ? hvpVal * (robostockState.parameters.quietPercent / 100) : 0;
@@ -8757,6 +8994,223 @@ body {
           drawIndicatorLine(ctx, stochK, getX, getStochY, '#38bdf8', 1.3);
           drawIndicatorLine(ctx, stochD, getX, getStochY, '#f59e0b', 1.3);
           ctx.restore();
+        } else if (sp.id === 'atr' && atrFull) {
+          let minA = Infinity, maxA = -Infinity;
+          for (let i = 0; i < n; i++) {
+            if (atrFull[i] != null) {
+              minA = Math.min(minA, atrFull[i]);
+              maxA = Math.max(maxA, atrFull[i]);
+            }
+          }
+          if (minA === Infinity) { minA = 0; maxA = 1; }
+          const aRange = Math.max(0.01, maxA - minA);
+          const getAtrY = (v) => sp.bottom - ((v - minA) / aRange) * (sp.h - 8) - 4;
+
+          ctx.save();
+          ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([2, 3]);
+          ctx.beginPath();
+          ctx.moveTo(pad.left, sp.top + 2);
+          ctx.lineTo(pad.left + chartW, sp.top + 2);
+          ctx.moveTo(pad.left, sp.bottom - 2);
+          ctx.lineTo(pad.left + chartW, sp.bottom - 2);
+          ctx.stroke();
+
+          ctx.fillStyle = textColor;
+          ctx.font = '9px monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText(maxA.toFixed(2), pad.left + chartW + 6, sp.top + 6);
+          ctx.fillText(minA.toFixed(2), pad.left + chartW + 6, sp.bottom - 2);
+
+          drawIndicatorLine(ctx, atrFull, getX, getAtrY, '#e879f9', 1.4);
+          ctx.restore();
+        } else if (sp.id === 'foreign' && foreignData) {
+          const mode = robostockState.parameters.foreignMode || 'net';
+          let minF = 0, maxF = 1;
+          if (mode === 'net') {
+            minF = -1; maxF = 1;
+            for (let i = 0; i < n; i++) {
+              minF = Math.min(minF, foreignData[i].net);
+              maxF = Math.max(maxF, foreignData[i].net);
+            }
+            const absMax = Math.max(Math.abs(minF), Math.abs(maxF), 1);
+            minF = -absMax;
+            maxF = absMax;
+          } else if (mode === 'buy') {
+            for (let i = 0; i < n; i++) maxF = Math.max(maxF, foreignData[i].buy);
+          } else if (mode === 'sell') {
+            for (let i = 0; i < n; i++) maxF = Math.max(maxF, foreignData[i].sell);
+          } else {
+            for (let i = 0; i < n; i++) maxF = Math.max(maxF, foreignData[i].buy, foreignData[i].sell);
+          }
+
+          const fRange = Math.max(1, maxF - minF);
+          const getFPosY = (v) => sp.bottom - ((v - minF) / fRange) * sp.h;
+          const zeroY = (mode === 'net') ? getFPosY(0) : sp.bottom;
+
+          ctx.save();
+          if (mode === 'net') {
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, zeroY);
+            ctx.lineTo(pad.left + chartW, zeroY);
+            ctx.stroke();
+          }
+
+          const fBarW = Math.max(1.5, Math.floor(step * 0.55));
+          for (let i = 0; i < n; i++) {
+            const x = getX(i) - fBarW / 2;
+            const item = foreignData[i];
+            if (mode === 'net') {
+              const yVal = getFPosY(item.net);
+              const barH = Math.max(1, Math.abs(yVal - zeroY));
+              ctx.fillStyle = item.net >= 0 ? '#22c55e' : '#ef4444';
+              ctx.fillRect(x, Math.min(zeroY, yVal), fBarW, barH);
+            } else if (mode === 'buy') {
+              const yVal = getFPosY(item.buy);
+              ctx.fillStyle = 'rgba(34, 197, 94, 0.7)';
+              ctx.fillRect(x, yVal, fBarW, Math.max(1, sp.bottom - yVal));
+            } else if (mode === 'sell') {
+              const yVal = getFPosY(item.sell);
+              ctx.fillStyle = 'rgba(239, 68, 68, 0.7)';
+              ctx.fillRect(x, yVal, fBarW, Math.max(1, sp.bottom - yVal));
+            } else {
+              const halfW = Math.max(1, fBarW / 2 - 0.5);
+              const yBuy = getFPosY(item.buy);
+              const ySell = getFPosY(item.sell);
+              ctx.fillStyle = '#22c55e';
+              ctx.fillRect(x, yBuy, halfW, Math.max(1, sp.bottom - yBuy));
+              ctx.fillStyle = '#ef4444';
+              ctx.fillRect(x + halfW + 1, ySell, halfW, Math.max(1, sp.bottom - ySell));
+            }
+          }
+          ctx.restore();
+        } else if (sp.id === 'proprietary' && propData) {
+          const mode = robostockState.parameters.proprietaryMode || 'net';
+          let minP = 0, maxP = 1;
+          if (mode === 'net') {
+            minP = -1; maxP = 1;
+            for (let i = 0; i < n; i++) {
+              minP = Math.min(minP, propData[i].net);
+              maxP = Math.max(maxP, propData[i].net);
+            }
+            const absMax = Math.max(Math.abs(minP), Math.abs(maxP), 1);
+            minP = -absMax;
+            maxP = absMax;
+          } else if (mode === 'buy') {
+            for (let i = 0; i < n; i++) maxP = Math.max(maxP, propData[i].buy);
+          } else if (mode === 'sell') {
+            for (let i = 0; i < n; i++) maxP = Math.max(maxP, propData[i].sell);
+          } else {
+            for (let i = 0; i < n; i++) maxP = Math.max(maxP, propData[i].buy, propData[i].sell);
+          }
+
+          const pRange = Math.max(1, maxP - minP);
+          const getPPosY = (v) => sp.bottom - ((v - minP) / pRange) * sp.h;
+          const zeroY = (mode === 'net') ? getPPosY(0) : sp.bottom;
+
+          ctx.save();
+          if (mode === 'net') {
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, zeroY);
+            ctx.lineTo(pad.left + chartW, zeroY);
+            ctx.stroke();
+          }
+
+          const pBarW = Math.max(1.5, Math.floor(step * 0.55));
+          for (let i = 0; i < n; i++) {
+            const x = getX(i) - pBarW / 2;
+            const item = propData[i];
+            if (mode === 'net') {
+              const yVal = getPPosY(item.net);
+              const barH = Math.max(1, Math.abs(yVal - zeroY));
+              ctx.fillStyle = item.net >= 0 ? '#ff8cd7' : '#9333ea';
+              ctx.fillRect(x, Math.min(zeroY, yVal), pBarW, barH);
+            } else if (mode === 'buy') {
+              const yVal = getPPosY(item.buy);
+              ctx.fillStyle = '#ff8cd7';
+              ctx.fillRect(x, yVal, pBarW, Math.max(1, sp.bottom - yVal));
+            } else if (mode === 'sell') {
+              const yVal = getPPosY(item.sell);
+              ctx.fillStyle = '#9333ea';
+              ctx.fillRect(x, yVal, pBarW, Math.max(1, sp.bottom - yVal));
+            } else {
+              const halfW = Math.max(1, pBarW / 2 - 0.5);
+              const yBuy = getPPosY(item.buy);
+              const ySell = getPPosY(item.sell);
+              ctx.fillStyle = '#ff8cd7';
+              ctx.fillRect(x, yBuy, halfW, Math.max(1, sp.bottom - yBuy));
+              ctx.fillStyle = '#9333ea';
+              ctx.fillRect(x + halfW + 1, ySell, halfW, Math.max(1, sp.bottom - ySell));
+            }
+          }
+          ctx.restore();
+        } else if (sp.id === 'activeTrade' && activeTradeData) {
+          const mode = robostockState.parameters.activeTradeMode || 'net';
+          let minA = 0, maxA = 1;
+          if (mode === 'net') {
+            minA = -1; maxA = 1;
+            for (let i = 0; i < n; i++) {
+              minA = Math.min(minA, activeTradeData[i].net);
+              maxA = Math.max(maxA, activeTradeData[i].net);
+            }
+            const absMax = Math.max(Math.abs(minA), Math.abs(maxA), 1);
+            minA = -absMax;
+            maxA = absMax;
+          } else if (mode === 'buy') {
+            for (let i = 0; i < n; i++) maxA = Math.max(maxA, activeTradeData[i].buy);
+          } else if (mode === 'sell') {
+            for (let i = 0; i < n; i++) maxA = Math.max(maxA, activeTradeData[i].sell);
+          } else {
+            for (let i = 0; i < n; i++) maxA = Math.max(maxA, activeTradeData[i].buy, activeTradeData[i].sell);
+          }
+
+          const aRange = Math.max(1, maxA - minA);
+          const getAPosY = (v) => sp.bottom - ((v - minA) / aRange) * sp.h;
+          const zeroY = (mode === 'net') ? getAPosY(0) : sp.bottom;
+
+          ctx.save();
+          if (mode === 'net') {
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, zeroY);
+            ctx.lineTo(pad.left + chartW, zeroY);
+            ctx.stroke();
+          }
+
+          const aBarW = Math.max(1.5, Math.floor(step * 0.55));
+          for (let i = 0; i < n; i++) {
+            const x = getX(i) - aBarW / 2;
+            const item = activeTradeData[i];
+            if (mode === 'net') {
+              const yVal = getAPosY(item.net);
+              const barH = Math.max(1, Math.abs(yVal - zeroY));
+              ctx.fillStyle = item.net >= 0 ? '#4fd9ff' : '#f43f5e';
+              ctx.fillRect(x, Math.min(zeroY, yVal), aBarW, barH);
+            } else if (mode === 'buy') {
+              const yVal = getAPosY(item.buy);
+              ctx.fillStyle = '#4fd9ff';
+              ctx.fillRect(x, yVal, aBarW, Math.max(1, sp.bottom - yVal));
+            } else if (mode === 'sell') {
+              const yVal = getAPosY(item.sell);
+              ctx.fillStyle = '#f43f5e';
+              ctx.fillRect(x, yVal, aBarW, Math.max(1, sp.bottom - yVal));
+            } else {
+              const halfW = Math.max(1, aBarW / 2 - 0.5);
+              const yBuy = getAPosY(item.buy);
+              const ySell = getAPosY(item.sell);
+              ctx.fillStyle = '#4fd9ff';
+              ctx.fillRect(x, yBuy, halfW, Math.max(1, sp.bottom - yBuy));
+              ctx.fillStyle = '#f43f5e';
+              ctx.fillRect(x + halfW + 1, ySell, halfW, Math.max(1, sp.bottom - ySell));
+            }
+          }
+          ctx.restore();
         }
       }
 
@@ -8861,9 +9315,13 @@ body {
         bbUpper: bbUpper ? bbUpper[targetHoverIdx] : null,
         bbLower: bbLower ? bbLower[targetHoverIdx] : null,
         rsi: rsiFull ? rsiFull[targetHoverIdx] : null,
+        atr: atrFull ? atrFull[targetHoverIdx] : null,
         macd: macdLine ? macdLine[targetHoverIdx] : null,
         stochK: stochK ? stochK[targetHoverIdx] : null,
-        stochD: stochD ? stochD[targetHoverIdx] : null
+        stochD: stochD ? stochD[targetHoverIdx] : null,
+        foreign: foreignData ? foreignData[targetHoverIdx] : null,
+        prop: propData ? propData[targetHoverIdx] : null,
+        activeTrade: activeTradeData ? activeTradeData[targetHoverIdx] : null
       };
 
       updateDetailCandleLegend(activeBar, prevBar, indVals);
