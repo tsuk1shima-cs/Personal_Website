@@ -1083,9 +1083,11 @@ app.get('/api/dnse/chart/index/:symbol', async (req, res) => {
 app.get('/api/dnse/chart/stock/:symbol', async (req, res) => {
     const { symbol } = req.params;
     let sym = (symbol || '').toUpperCase().trim();
+    const cleanSym = sym.replace(/[^A-Z0-9]/g, '');
     const INDEX_MAP = {
         'VNINDEX': 'VNINDEX',
         'VNI': 'VNINDEX',
+        'HOSE': 'VNINDEX',
         'VN30': 'VN30',
         'HNX': 'HNX',
         'HNXINDEX': 'HNX',
@@ -1093,9 +1095,9 @@ app.get('/api/dnse/chart/stock/:symbol', async (req, res) => {
         'UPCOMINDEX': 'UPCOM',
         'VNX50': 'VNX50'
     };
-    const isIndex = !!INDEX_MAP[sym];
+    const isIndex = !!(INDEX_MAP[sym] || INDEX_MAP[cleanSym]);
     const targetType = isIndex ? 'index' : 'stock';
-    if (isIndex) sym = INDEX_MAP[sym];
+    if (isIndex) sym = INDEX_MAP[sym] || INDEX_MAP[cleanSym];
 
     let { resolution = '1D', from, to } = req.query;
     if (resolution === 'D') resolution = '1D';

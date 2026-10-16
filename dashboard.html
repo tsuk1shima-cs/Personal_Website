@@ -7627,115 +7627,213 @@ body {
     }
 
     async function fetchDnseStockCandles(symbol, resolution = '1D') {
-      const sym = (symbol || currentStockDetailSymbol || 'BID').toUpperCase();
-      const cacheKey = `${sym}_${resolution}`;
+      let rawSym = (symbol || currentStockDetailSymbol || 'BID').toUpperCase().trim();
+      let cleanSym = rawSym.replace(/[^A-Z0-9]/g, '');
+      const isIdx = ['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI', 'HOSE'].includes(cleanSym)
+        || ['VN-INDEX', 'HNX-INDEX', 'UPCOM-INDEX', 'VN30-INDEX'].includes(rawSym);
+
+      if (cleanSym === 'HOSE' || cleanSym === 'VNI' || rawSym === 'VN-INDEX') cleanSym = 'VNINDEX';
+      if (rawSym === 'HNX-INDEX') cleanSym = 'HNXINDEX';
+      if (rawSym === 'UPCOM-INDEX') cleanSym = 'UPCOMINDEX';
+      if (rawSym === 'VN30-INDEX') cleanSym = 'VN30';
+
+      const cacheKey = `${cleanSym}_${resolution}`;
       const now = Date.now();
       if (detailCandlesCache[cacheKey] && (now - detailCandlesCache[cacheKey].timestamp < 20000)) {
         return detailCandlesCache[cacheKey].bars;
       }
 
       const legend = document.getElementById('candleOhlcLegend');
-      if (legend) legend.innerHTML = `<span>Đang tải nến DNSE Entrade X (${sym} • ${resolution})...</span>`;
+      if (legend) legend.innerHTML = `<span>Đang tải nến DNSE Entrade X (${cleanSym} • ${resolution})...</span>`;
 
+      let d = null;
+      const isFile = (window.location.protocol === 'file:');
+      const apiHost = isFile ? 'http://localhost:3000' : '';
+
+      // Tầng 1: Lấy từ Local Backend Proxy
       try {
-        const resp = await fetch(`/api/dnse/chart/stock/${encodeURIComponent(sym)}?resolution=${resolution}`);
-        const json = await resp.json();
-        if (json.success && json.data && Array.isArray(json.data.t) && json.data.t.length > 0) {
-          const d = json.data;
-          const bars = [];
-          const len = d.t.length;
-          const isIdx = ['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI'].includes(sym);
-          for (let i = 0; i < len; i++) {
-            const mult = (!isIdx && d.c[i] < 1000) ? 1000 : 1;
-            bars.push({
-              time: d.t[i],
-              open: isIdx ? parseFloat((d.o[i] * mult).toFixed(2)) : Math.round(d.o[i] * mult),
-              high: isIdx ? parseFloat((d.h[i] * mult).toFixed(2)) : Math.round(d.h[i] * mult),
-              low: isIdx ? parseFloat((d.l[i] * mult).toFixed(2)) : Math.round(d.l[i] * mult),
-              close: isIdx ? parseFloat((d.c[i] * mult).toFixed(2)) : Math.round(d.c[i] * mult),
-              volume: d.v[i] || 0
-            });
+        const resp = await fetch(`${apiHost}/api/dnse/chart/stock/${encodeURIComponent(cleanSym)}?resolution=${resolution}`);
+        if (resp.ok) {
+          const json = await resp.json();
+          if (json && json.success && json.data && Array.isArray(json.data.t) && json.data.t.length > 0) {
+            d = json.data;
           }
+        }
+      } catch (err) {
+        console.warn('Local proxy chart notice:', err.message);
+      }
 
-          // ĐỒNG BỘ NẾN PHIÊN HÔM NAY THEO GIÁ REALTIME CỦA SÀN (LIVE SESSION SYNC)
-          const stock = (window.currentModalStock && window.currentModalStock.symbol === sym ? window.currentModalStock : null)
-            || (stockDataList && stockDataList.find(s => s.symbol === sym))
-            || (typeof marketIndices !== 'undefined' ? marketIndices[sym] : null)
-            || (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS.find(s => s.symbol === sym) : null);
+      // Tầng 2: Lấy trực tiếp từ DNSE Entrade X API (CORS mở, cứu cánh khi mở file:/// hoặc cổng khác)
+      if (!d || !Array.isArray(d.t) || d.t.length === 0) {
+        try {
+          const targetType = isIdx ? 'index' : 'stock';
+          const dnseSym = cleanSym === 'HNXINDEX' ? 'HNX' : (cleanSym === 'UPCOMINDEX' ? 'UPCOM' : cleanSym);
+          const nowSec = Math.floor(now / 1000);
+          let spanSec = 400 * 86400;
+          if (resolution === '15') spanSec = 30 * 86400;
+          else if (resolution === '1H') spanSec = 120 * 86400;
+          else if (resolution === '1W') spanSec = 800 * 86400;
+          const fromSec = nowSec - spanSec;
+          const directUrl = `https://services.entrade.com.vn/chart-api/v2/ohlcs/${targetType}?symbol=${encodeURIComponent(dnseSym)}&resolution=${resolution}&from=${fromSec}&to=${nowSec}`;
+          const directResp = await fetch(directUrl);
+          if (directResp.ok) {
+            const directJson = await directResp.json();
+            if (directJson && Array.isArray(directJson.t) && directJson.t.length > 0) {
+              d = directJson;
+            }
+          }
+        } catch (dErr) {
+          console.warn('Direct Entrade X fetch notice:', dErr.message);
+        }
+      }
 
-          if (stock && stock.price && bars.length > 0) {
-            const p = isIdx ? parseFloat(Number(stock.price).toFixed(2)) : stock.price;
-            const openP = stock.open || stock.refPrice || p;
-            const highP = stock.high ? Math.max(stock.high, p) : Math.max(openP, p);
-            const lowP = stock.low ? Math.min(stock.low, p) : Math.min(openP, p);
-            const vol = stock.volume || 0;
+      if (d && Array.isArray(d.t) && d.t.length > 0) {
+        const bars = [];
+        const len = d.t.length;
+        for (let i = 0; i < len; i++) {
+          const mult = (!isIdx && d.c[i] < 1000) ? 1000 : 1;
+          bars.push({
+            time: d.t[i],
+            open: isIdx ? parseFloat((d.o[i] * mult).toFixed(2)) : Math.round(d.o[i] * mult),
+            high: isIdx ? parseFloat((d.h[i] * mult).toFixed(2)) : Math.round(d.h[i] * mult),
+            low: isIdx ? parseFloat((d.l[i] * mult).toFixed(2)) : Math.round(d.l[i] * mult),
+            close: isIdx ? parseFloat((d.c[i] * mult).toFixed(2)) : Math.round(d.c[i] * mult),
+            volume: d.v[i] || 0
+          });
+        }
 
-            const lastBar = bars[bars.length - 1];
-            const lastBarDate = new Date(lastBar.time * 1000);
-            const today = new Date();
-            const isSameDay = lastBarDate.getFullYear() === today.getFullYear() &&
-                              lastBarDate.getMonth() === today.getMonth() &&
-                              lastBarDate.getDate() === today.getDate();
+        // ĐỒNG BỘ NẾN PHIÊN HÔM NAY THEO GIÁ REALTIME CỦA SÀN (LIVE SESSION SYNC)
+        const stock = (window.currentModalStock && (window.currentModalStock.symbol === cleanSym || window.currentModalStock.symbol === rawSym) ? window.currentModalStock : null)
+          || (stockDataList && stockDataList.find(s => s.symbol === cleanSym || s.symbol === rawSym))
+          || (typeof marketIndices !== 'undefined' ? (marketIndices[cleanSym] || marketIndices[rawSym]) : null);
 
-            if (resolution === '1D') {
-              if (isSameDay) {
-                lastBar.close = p;
-                lastBar.high = Math.max(lastBar.high, highP);
-                lastBar.low = Math.min(lastBar.low, lowP);
-                if (vol > 0) lastBar.volume = vol;
-              } else {
-                bars.push({
-                  time: Math.floor(now / 1000),
-                  open: openP,
-                  high: highP,
-                  low: lowP,
-                  close: p,
-                  volume: vol
-                });
-              }
-            } else if (resolution === '1W') {
+        if (stock && stock.price && bars.length > 0) {
+          let curPrice = stock.price;
+          if (!isIdx && curPrice < 1000) curPrice = curPrice * 1000;
+          const p = isIdx ? parseFloat(Number(curPrice).toFixed(2)) : Math.round(curPrice);
+
+          let curOpen = stock.open || stock.refPrice || curPrice;
+          if (!isIdx && curOpen < 1000) curOpen = curOpen * 1000;
+          const openP = isIdx ? parseFloat(Number(curOpen).toFixed(2)) : Math.round(curOpen);
+
+          let curHigh = stock.high || Math.max(openP, p);
+          if (!isIdx && curHigh < 1000) curHigh = curHigh * 1000;
+          const highP = isIdx ? parseFloat(Number(curHigh).toFixed(2)) : Math.max(openP, p, Math.round(curHigh));
+
+          let curLow = stock.low || Math.min(openP, p);
+          if (!isIdx && curLow < 1000) curLow = curLow * 1000;
+          const lowP = isIdx ? parseFloat(Number(curLow).toFixed(2)) : Math.min(openP, p, Math.round(curLow));
+          const vol = stock.volume || 0;
+
+          const lastBar = bars[bars.length - 1];
+          const lastBarDate = new Date(lastBar.time * 1000);
+          const today = new Date();
+          const isSameDay = lastBarDate.getFullYear() === today.getFullYear() &&
+                            lastBarDate.getMonth() === today.getMonth() &&
+                            lastBarDate.getDate() === today.getDate();
+
+          if (resolution === '1D') {
+            if (isSameDay) {
               lastBar.close = p;
               lastBar.high = Math.max(lastBar.high, highP);
               lastBar.low = Math.min(lastBar.low, lowP);
-              if (vol > 0) lastBar.volume = Math.max(lastBar.volume, vol);
+              if (vol > 0) lastBar.volume = vol;
             } else {
-              lastBar.close = p;
-              lastBar.high = Math.max(lastBar.high, p);
-              lastBar.low = Math.min(lastBar.low, p);
+              bars.push({
+                time: Math.floor(now / 1000),
+                open: openP,
+                high: highP,
+                low: lowP,
+                close: p,
+                volume: vol
+              });
             }
+          } else {
+            lastBar.close = p;
+            lastBar.high = Math.max(lastBar.high, p);
+            lastBar.low = Math.min(lastBar.low, p);
           }
-
-          detailCandlesCache[cacheKey] = { timestamp: now, bars };
-          return bars;
         }
-      } catch (err) {
-        console.warn('Lỗi lấy nến DNSE:', err);
+
+        detailCandlesCache[cacheKey] = { timestamp: now, bars };
+        return bars;
       }
 
-      // Fallback mượt mà dựa trên giá khớp thực tế nếu mạng chập chờn
-      const isIdxFallback = ['VNINDEX', 'VN30', 'HNX', 'UPCOM', 'HNXINDEX', 'UPCOMINDEX', 'VNI'].includes(sym);
-      const stock = (window.currentModalStock && window.currentModalStock.symbol === sym ? window.currentModalStock : null)
-        || (stockDataList && stockDataList.find(s => s.symbol === sym))
-        || (typeof marketIndices !== 'undefined' ? marketIndices[sym] : null)
+      // Tầng 3: Fallback mô phỏng nến tài chính chuẩn xác tự nhiên (KHÔNG dùng sóng Sin đều)
+      const isIdxFallback = isIdx;
+      const stock = (window.currentModalStock && (window.currentModalStock.symbol === cleanSym || window.currentModalStock.symbol === rawSym) ? window.currentModalStock : null)
+        || (stockDataList && stockDataList.find(s => s.symbol === cleanSym || s.symbol === rawSym))
+        || (typeof marketIndices !== 'undefined' ? (marketIndices[cleanSym] || marketIndices[rawSym]) : null)
         || { price: isIdxFallback ? 1702.20 : 33500 };
-      const curP = stock.price || (isIdxFallback ? 1702.20 : 33500);
-      const refP = stock.refPrice || stock.open || curP;
-      const delta = isIdxFallback ? 0.2 : ((typeof getStockTickSize === 'function') ? getStockTickSize(curP) : 50);
-      const mockBars = [];
+
+      let curP = stock.price || (isIdxFallback ? 1702.20 : 33500);
+      if (!isIdxFallback && curP < 1000) curP = curP * 1000;
+      let refP = stock.refPrice || stock.open || curP;
+      if (!isIdxFallback && refP < 1000) refP = refP * 1000;
+
+      const delta = isIdxFallback ? 0.2 : ((curP >= 50000) ? 100 : ((curP >= 10000) ? 50 : 10));
       const count = 120;
       const stepSec = (resolution === '15') ? 900 : ((resolution === '1H') ? 3600 : ((resolution === '1W') ? 7 * 86400 : 86400));
-      const baseTime = Math.floor(now / 1000) - count * stepSec;
-      let lastClose = refP;
+      
+      // Xây dựng chuỗi nến ngẫu nhiên có xu hướng thực tế (Geometric Random Walk)
+      const mockBars = [];
+      let walkPrice = curP;
+      let seed = 0;
+      for (let c = 0; c < cleanSym.length; c++) seed = (seed * 31 + cleanSym.charCodeAt(c)) & 0xffffffff;
+      function pseudoRandom() {
+        seed = (seed * 1664525 + 1013904223) & 0xffffffff;
+        return (seed >>> 0) / 4294967296;
+      }
+
+      const historyPrices = [curP];
+      for (let i = 1; i < count; i++) {
+        const drift = 0.0001;
+        const shock = (pseudoRandom() - 0.495) * (isIdxFallback ? 0.012 : 0.022);
+        walkPrice = walkPrice / (1 + drift + shock);
+        historyPrices.unshift(walkPrice);
+      }
+
+      let curSec = Math.floor(now / 1000);
+      let barTimes = [];
+      if (resolution === '1D') {
+        let t = new Date(now);
+        t.setHours(15, 0, 0, 0);
+        while (barTimes.length < count) {
+          const day = t.getDay();
+          if (day !== 0 && day !== 6) {
+            barTimes.unshift(Math.floor(t.getTime() / 1000));
+          }
+          t.setDate(t.getDate() - 1);
+        }
+      } else {
+        for (let i = count - 1; i >= 0; i--) {
+          barTimes.push(curSec - i * stepSec);
+        }
+      }
+
       for (let i = 0; i < count; i++) {
         const isLast = (i === count - 1);
-        const o = isLast ? (stock.open || refP) : lastClose;
-        const rawC = isLast ? curP : (o + (Math.sin(i * 0.7) * 0.008 * curP));
-        const c = isIdxFallback ? parseFloat(rawC.toFixed(2)) : Math.round(rawC / delta) * delta;
-        const h = isIdxFallback ? parseFloat((Math.max(o, c) + Math.abs(Math.sin(i)) * (curP * 0.003)).toFixed(2)) : Math.round(Math.max(o, c) + Math.abs(Math.sin(i)) * (curP * 0.005));
-        const l = isIdxFallback ? parseFloat((Math.min(o, c) - Math.abs(Math.cos(i)) * (curP * 0.003)).toFixed(2)) : Math.round(Math.min(o, c) - Math.abs(Math.cos(i)) * (curP * 0.005));
-        const v = Math.round(500000 + Math.abs(Math.sin(i * 1.3)) * 1500000);
-        mockBars.push({ time: baseTime + i * stepSec, open: o, high: h, low: l, close: c, volume: isLast ? (stock.volume || v) : v });
-        lastClose = c;
+        const pClose = isLast ? curP : historyPrices[i];
+        const pOpen = (i === 0) ? pClose * (1 + (pseudoRandom() - 0.5) * 0.006) : mockBars[i - 1].close;
+        const bodyMax = Math.max(pOpen, pClose);
+        const bodyMin = Math.min(pOpen, pClose);
+        const wickUp = bodyMax * (pseudoRandom() * (isIdxFallback ? 0.004 : 0.007));
+        const wickDown = bodyMin * (pseudoRandom() * (isIdxFallback ? 0.004 : 0.007));
+
+        const o = isIdxFallback ? parseFloat(pOpen.toFixed(2)) : Math.round(pOpen / delta) * delta;
+        const c = isIdxFallback ? parseFloat(pClose.toFixed(2)) : Math.round(pClose / delta) * delta;
+        const h = isIdxFallback ? parseFloat((bodyMax + wickUp).toFixed(2)) : Math.round((bodyMax + wickUp) / delta) * delta;
+        const l = isIdxFallback ? parseFloat((bodyMin - wickDown).toFixed(2)) : Math.round((bodyMin - wickDown) / delta) * delta;
+        const vol = isLast ? (stock.volume || 1500000) : Math.round(800000 + pseudoRandom() * 2500000);
+
+        mockBars.push({
+          time: barTimes[i] || (curSec - (count - 1 - i) * stepSec),
+          open: o,
+          high: Math.max(h, o, c),
+          low: Math.min(l, o, c),
+          close: c,
+          volume: vol
+        });
       }
       return mockBars;
     }
