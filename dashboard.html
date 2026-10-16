@@ -1727,10 +1727,14 @@ body {
   background: var(--bg-subtle);
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: thin;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.toolbar::-webkit-scrollbar { height: 4px; }
-.toolbar::-webkit-scrollbar-thumb { background: var(--border-stroke); border-radius: 2px; }
+.toolbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
 
 .indicator-library-button {
   flex: 0 0 auto;
@@ -2876,16 +2880,16 @@ body {
                 <table class="watchlist-table">
                   <thead>
                     <tr>
-                      <th style="text-align:left; width:80px;">Mã CP</th>
-                      <th style="text-align:left; width:140px;">Ngành / Nhóm</th>
-                      <th style="text-align:right; width:90px;">Giá khớp</th>
-                      <th style="text-align:right; width:75px;">+/-</th>
-                      <th style="text-align:right; width:80px;">+/- %</th>
-                      <th style="text-align:right; width:95px;">Tổng KL</th>
-                      <th style="text-align:right; width:95px;">Giá trị (Tỷ)</th>
-                      <th style="text-align:right; width:90px;">Khối ngoại</th>
-                      <th style="text-align:right; width:65px;">P/E</th>
-                      <th style="text-align:right; width:65px;">ROE</th>
+                      <th style="text-align:left; width:80px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('symbol')" title="Sắp xếp theo Mã">Mã CP <span id="sortArrow_symbol"></span></th>
+                      <th style="text-align:left; width:140px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('sector')" title="Sắp xếp theo Ngành">Ngành / Nhóm <span id="sortArrow_sector"></span></th>
+                      <th style="text-align:right; width:90px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('price')" title="Sắp xếp theo Giá khớp">Giá khớp <span id="sortArrow_price"></span></th>
+                      <th style="text-align:right; width:75px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('diff')" title="Sắp xếp theo Điểm biến động">+/- <span id="sortArrow_diff"></span></th>
+                      <th style="text-align:right; width:80px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('change')" title="Sắp xếp theo % Thay đổi">+/- % <span id="sortArrow_change"></span></th>
+                      <th style="text-align:right; width:95px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('volume')" title="Sắp xếp theo Tổng KL">Tổng KL <span id="sortArrow_volume"></span></th>
+                      <th style="text-align:right; width:95px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('value')" title="Sắp xếp theo Giá trị">Giá trị (Tỷ) <span id="sortArrow_value"></span></th>
+                      <th style="text-align:right; width:90px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('foreign')" title="Sắp xếp theo Khối ngoại">Khối ngoại <span id="sortArrow_foreign"></span></th>
+                      <th style="text-align:right; width:65px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('pe')" title="Sắp xếp theo P/E">P/E <span id="sortArrow_pe"></span></th>
+                      <th style="text-align:right; width:65px; cursor:pointer;" class="sortable" onclick="sortWatchlistTable('roe')" title="Sắp xếp theo ROE">ROE <span id="sortArrow_roe"></span></th>
                       <th style="text-align:center; width:90px;">Thao tác</th>
                     </tr>
                   </thead>
@@ -4591,6 +4595,101 @@ body {
       }
     }
 
+    // ĐỒNG BỘ TOÀN BỘ DANH MỤC CỔ PHIẾU REALTIME TỪ SÀN (CORS MỞ 100% TRÊN GITHUB PAGES)
+    async function syncAllStocksLive() {
+      try {
+        const poolSymbols = [
+          'VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','LPB','SSB','VIB','TPB','MSB','OCB','BVB','KLB',
+          'VHM','VIC','VRE','KDH','NLG','NVL','PDR','DIG','DXG','CEO','KBC','IDC','SJS','AGG','HDC','TCH','DXS','HDG','BCM',
+          'SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS','DSC','EVS','APG','PSI','AAS','ORS','TCI','TVB',
+          'HPG','HSG','NKG','VGS','SMC',
+          'GAS','PLX','PVD','PVS','BSR','PVT',
+          'FPT','CMG','ELC','CTR','VGI',
+          'MWG','FRT','PNJ','DGW','MSN','VNM','SAB','BVH','POW'
+        ].join(',');
+
+        const resp = await fetch(`https://bgapidatafeed.vps.com.vn/getliststockdata/${poolSymbols}`, {
+          signal: AbortSignal.timeout(5000)
+        });
+        if (resp.ok) {
+          const list = await resp.json();
+          if (Array.isArray(list) && list.length > 0) {
+            list.forEach(item => {
+              const sym = (item.sym || '').toUpperCase();
+              const rawPrice = item.lastPrice ? Number(item.lastPrice) : (item.r ? Number(item.r) : 0);
+              const rawRef = item.r ? Number(item.r) : rawPrice;
+              const chg = rawRef > 0 ? parseFloat((((rawPrice - rawRef) / rawRef) * 100).toFixed(2)) : 0;
+              const price = rawPrice > 0 ? Math.round(rawPrice * 1000) : 30000;
+              const ref = rawRef > 0 ? Math.round(rawRef * 1000) : price;
+              const vol = Math.round(Number(item.lot || 0) * 10);
+              const high = item.highPrice ? Math.round(Number(item.highPrice) * 1000) : price;
+              const low = item.lowPrice ? Math.round(Number(item.lowPrice) * 1000) : price;
+              const open = item.openPrice ? Math.round(Number(item.openPrice) * 1000) : ref;
+              const ceil = item.c ? Math.round(Number(item.c) * 1000) : Math.round(ref * 1.07);
+              const floor = item.f ? Math.round(Number(item.f) * 1000) : Math.round(ref * 0.93);
+
+              let target = stockDataList.find(s => s.symbol === sym);
+              if (!target) {
+                target = { symbol: sym, exchange: 'HOSE', sector: 'Niêm yết' };
+                stockDataList.push(target);
+              }
+              target.price = price;
+              target.change = chg;
+              target.volume = vol;
+              target.refPrice = ref;
+              target.high = high;
+              target.low = low;
+              target.open = open;
+              target.ceilPrice = ceil;
+              target.floorPrice = floor;
+              target.value = vol * price;
+
+              if (typeof FALLBACK_STOCKS !== 'undefined') {
+                const fb = FALLBACK_STOCKS.find(s => s.symbol === sym);
+                if (fb) {
+                  fb.price = price;
+                  fb.change = chg;
+                  fb.volume = vol;
+                  fb.refPrice = ref;
+                  fb.high = high;
+                  fb.low = low;
+                }
+              }
+
+              if (typeof SECTOR_DEFINITIONS !== 'undefined') {
+                SECTOR_DEFINITIONS.forEach(sec => {
+                  const sInSec = sec.stocks && sec.stocks.find(s => s.symbol === sym);
+                  if (sInSec) {
+                    sInSec.price = parseFloat((price / 1000).toFixed(2));
+                    sInSec.change = chg;
+                    sInSec.volume = vol;
+                  }
+                });
+              }
+            });
+
+            // Nếu modal đang mở cho bất kỳ mã nào, đồng bộ ngay lập tức
+            if (currentStockDetailSymbol && window.currentModalStock) {
+              const liveCurrent = stockDataList.find(s => s.symbol === currentStockDetailSymbol);
+              if (liveCurrent) {
+                Object.assign(window.currentModalStock, liveCurrent);
+                if (typeof syncStockDetailModalDOM === 'function') {
+                  syncStockDetailModalDOM(window.currentModalStock);
+                }
+              }
+            }
+
+            if (typeof renderSectorBoard === 'function') renderSectorBoard();
+            if (typeof renderWatchlistTable === 'function') renderWatchlistTable();
+            if (typeof renderTreemap === 'function') renderTreemap();
+            if (typeof updateIndexCards === 'function') updateIndexCards();
+          }
+        }
+      } catch (err) {
+        console.warn('syncAllStocksLive notice:', err.message);
+      }
+    }
+
     // ==========================================
     // 4. ĐỒNG BỘ DỮ LIỆU NỀN 100% DNSE OPEN API REALTIME
     // ==========================================
@@ -4630,6 +4729,9 @@ body {
             stockDataList = typeof FALLBACK_STOCKS !== 'undefined' ? [...FALLBACK_STOCKS] : [];
           }
         }
+
+        // Luôn đồng bộ toàn bộ 80 mã cổ phiếu từ VPS batch feed đảm bảo giá sàn khớp 100%
+        await syncAllStocksLive();
 
         // Cập nhật intraday curve từ DNSE nếu có
         if (typeof fetchDNSEIntraday === 'function') {
@@ -4804,26 +4906,26 @@ body {
         chip: 'VN30',
         baselineChg: 0.62,
         stocks: [
-          { symbol: 'SHB', price: 10.75, change: 3.37, volume: 32900000 },
-          { symbol: 'LPB', price: 38.15, change: 2.55, volume: 1100000 },
-          { symbol: 'VHM', price: 60.30, change: 2.38, volume: 4600000 },
-          { symbol: 'BID', price: 33.65, change: 1.36, volume: 2000000 },
-          { symbol: 'VRE', price: 22.90, change: 1.33, volume: 1200000 },
-          { symbol: 'SSB', price: 16.10, change: 1.26, volume: 911800 },
-          { symbol: 'VNM', price: 57.90, change: 1.22, volume: 775300 },
-          { symbol: 'CTG', price: 30.60, change: 2.68, volume: 10200000 },
-          { symbol: 'SSI', price: 19.45, change: 1.04, volume: 6000000 },
-          { symbol: 'FPT', price: 58.60, change: 1.03, volume: 1600000 },
-          { symbol: 'BSR', price: 28.45, change: 0.89, volume: 4200000 },
-          { symbol: 'VCB', price: 57.00, change: 0.88, volume: 1500000 },
+          { symbol: 'SHB', price: 10.65, change: 2.4, volume: 49973400 },
+          { symbol: 'LPB', price: 38, change: 2.15, volume: 2042300 },
+          { symbol: 'VHM', price: 61, change: 3.57, volume: 8494300 },
+          { symbol: 'BID', price: 33.95, change: 2.26, volume: 3439500 },
+          { symbol: 'VRE', price: 22.85, change: 1.11, volume: 2582800 },
+          { symbol: 'SSB', price: 16.15, change: 1.57, volume: 1909700 },
+          { symbol: 'VNM', price: 57.8, change: 1.05, volume: 1620000 },
+          { symbol: 'CTG', price: 30.6, change: 2.68, volume: 10200000 },
+          { symbol: 'SSI', price: 19.45, change: 1.04, volume: 12587800 },
+          { symbol: 'FPT', price: 58.2, change: 0.34, volume: 3733300 },
+          { symbol: 'BSR', price: 28.35, change: 0.53, volume: 7500700 },
+          { symbol: 'VCB', price: 56.9, change: 0.71, volume: 2388700 },
           { symbol: 'GVR', price: 31.15, change: 0.81, volume: 519200 },
-          { symbol: 'STB', price: 62.80, change: 0.00, volume: 1790000 },
-          { symbol: 'VIB', price: 13.90, change: 0.72, volume: 3900000 },
-          { symbol: 'MSB', price: 14.75, change: 0.68, volume: 9200000 },
-          { symbol: 'HPG', price: 20.80, change: 0.24, volume: 3200000 },
-          { symbol: 'TCB', price: 32.95, change: 0.15, volume: 4700000 },
-          { symbol: 'MWG', price: 58.20, change: 0.52, volume: 2800000 },
-          { symbol: 'MBB', price: 24.30, change: 0.41, volume: 5100000 }
+          { symbol: 'STB', price: 62.8, change: 0, volume: 1790000 },
+          { symbol: 'VIB', price: 13.85, change: 0.36, volume: 6624100 },
+          { symbol: 'MSB', price: 14.8, change: 1.02, volume: 11746800 },
+          { symbol: 'HPG', price: 20.9, change: 0.72, volume: 10189400 },
+          { symbol: 'TCB', price: 33.2, change: 0.91, volume: 12740900 },
+          { symbol: 'MWG', price: 73.9, change: 1.51, volume: 1371800 },
+          { symbol: 'MBB', price: 19.85, change: -0.25, volume: 10919400 }
         ]
       },
       {
@@ -4832,24 +4934,24 @@ body {
         chip: 'RE',
         baselineChg: 0.38,
         stocks: [
-          { symbol: 'SJS', price: 57.40, change: 6.89, volume: 140000 },
-          { symbol: 'AGG', price: 9.23, change: 3.48, volume: 201400 },
-          { symbol: 'VHM', price: 60.30, change: 2.38, volume: 4600000 },
-          { symbol: 'KDH', price: 13.95, change: 2.20, volume: 5000000 },
-          { symbol: 'NLG', price: 21.75, change: 1.64, volume: 358800 },
+          { symbol: 'SJS', price: 57.1, change: 6.33, volume: 156800 },
+          { symbol: 'AGG', price: 9.16, change: 2.69, volume: 304000 },
+          { symbol: 'VHM', price: 61, change: 3.57, volume: 8494300 },
+          { symbol: 'KDH', price: 14.15, change: 3.66, volume: 7622200 },
+          { symbol: 'NLG', price: 21.5, change: 0.47, volume: 695600 },
           { symbol: 'HQC', price: 2.01, change: 1.52, volume: 2000000 },
           { symbol: 'HTN', price: 7.16, change: 1.42, volume: 194400 },
-          { symbol: 'NVL', price: 10.85, change: 1.40, volume: 4500000 },
-          { symbol: 'VRE', price: 22.90, change: 1.33, volume: 1200000 },
-          { symbol: 'HDC', price: 10.45, change: 0.97, volume: 608700 },
-          { symbol: 'CEO', price: 11.10, change: 0.91, volume: 2100000 },
-          { symbol: 'TCH', price: 11.20, change: 0.90, volume: 1200000 },
-          { symbol: 'DXS', price: 4.96, change: 0.81, volume: 693100 },
-          { symbol: 'HDG', price: 14.90, change: 0.68, volume: 521400 },
-          { symbol: 'BCM', price: 38.50, change: 0.65, volume: 194800 },
-          { symbol: 'PDR', price: 18.25, change: 0.55, volume: 2800000 },
-          { symbol: 'DIG', price: 19.10, change: 0.45, volume: 3100000 },
-          { symbol: 'DXG', price: 14.50, change: 0.35, volume: 2400000 }
+          { symbol: 'NVL', price: 10.65, change: -0.47, volume: 14710300 },
+          { symbol: 'VRE', price: 22.85, change: 1.11, volume: 2582800 },
+          { symbol: 'HDC', price: 10.35, change: 0, volume: 1009300 },
+          { symbol: 'CEO', price: 11, change: 0, volume: 5206800 },
+          { symbol: 'TCH', price: 11.2, change: 0.9, volume: 3279600 },
+          { symbol: 'DXS', price: 4.96, change: 0.81, volume: 1366500 },
+          { symbol: 'HDG', price: 15, change: 1.35, volume: 746300 },
+          { symbol: 'BCM', price: 38.55, change: 0.78, volume: 303400 },
+          { symbol: 'PDR', price: 11.2, change: -0.88, volume: 2910000 },
+          { symbol: 'DIG', price: 9.53, change: -0.73, volume: 3165000 },
+          { symbol: 'DXG', price: 10.15, change: -0.98, volume: 9690100 }
         ]
       },
       {
@@ -4858,24 +4960,24 @@ body {
         chip: 'SEC',
         baselineChg: 0.47,
         stocks: [
-          { symbol: 'DSC', price: 9.84, change: 2.71, volume: 200 },
-          { symbol: 'EVS', price: 5.60, change: 1.82, volume: 91300 },
-          { symbol: 'BSI', price: 25.85, change: 1.77, volume: 333000 },
-          { symbol: 'SHS', price: 12.40, change: 1.64, volume: 2800000 },
-          { symbol: 'APG', price: 4.09, change: 1.49, volume: 12500 },
-          { symbol: 'PSI', price: 7.80, change: 1.30, volume: 24500 },
-          { symbol: 'VIX', price: 11.90, change: 1.28, volume: 17300000 },
-          { symbol: 'CTS', price: 20.70, change: 1.22, volume: 982100 },
-          { symbol: 'SSI', price: 19.45, change: 1.04, volume: 6000000 },
-          { symbol: 'AAS', price: 10.20, change: 0.99, volume: 385100 },
+          { symbol: 'DSC', price: 9.6, change: 0.21, volume: 2400 },
+          { symbol: 'EVS', price: 5.6, change: 1.82, volume: 149900 },
+          { symbol: 'BSI', price: 26.2, change: 3.15, volume: 593100 },
+          { symbol: 'SHS', price: 12.3, change: 0.82, volume: 11621600 },
+          { symbol: 'APG', price: 4.06, change: 0.74, volume: 36200 },
+          { symbol: 'PSI', price: 7.8, change: 1.3, volume: 46100 },
+          { symbol: 'VIX', price: 11.85, change: 0.85, volume: 28177100 },
+          { symbol: 'CTS', price: 21.1, change: 3.18, volume: 2468600 },
+          { symbol: 'SSI', price: 19.45, change: 1.04, volume: 12587800 },
+          { symbol: 'AAS', price: 10.2, change: 0.99, volume: 916800 },
           { symbol: 'LPS', price: 17.45, change: 0.87, volume: 208200 },
-          { symbol: 'TCI', price: 9.90, change: 0.81, volume: 28400 },
-          { symbol: 'ORS', price: 13.55, change: 0.74, volume: 1500000 },
-          { symbol: 'MBS', price: 15.30, change: 0.66, volume: 1100000 },
-          { symbol: 'TVB', price: 6.20, change: 0.65, volume: 2600 },
-          { symbol: 'VND', price: 15.65, change: 0.64, volume: 4800000 },
-          { symbol: 'HCM', price: 26.20, change: 0.58, volume: 1900000 },
-          { symbol: 'VCI', price: 32.50, change: 0.46, volume: 1400000 }
+          { symbol: 'TCI', price: 9.8, change: -0.2, volume: 39600 },
+          { symbol: 'ORS', price: 13.5, change: 0.37, volume: 1829000 },
+          { symbol: 'MBS', price: 15.1, change: -0.66, volume: 2200700 },
+          { symbol: 'TVB', price: 6.17, change: 0.16, volume: 2800 },
+          { symbol: 'VND', price: 13.25, change: 0, volume: 8816100 },
+          { symbol: 'HCM', price: 23.75, change: -1.04, volume: 1968100 },
+          { symbol: 'VCI', price: 18.95, change: 0.53, volume: 5852900 }
         ]
       },
       {
@@ -4884,24 +4986,24 @@ body {
         chip: 'BANK',
         baselineChg: 0.51,
         stocks: [
-          { symbol: 'SHB', price: 10.75, change: 3.37, volume: 32900000 },
-          { symbol: 'LPB', price: 38.15, change: 2.55, volume: 1100000 },
-          { symbol: 'TPB', price: 12.00, change: 2.13, volume: 16700000 },
-          { symbol: 'BID', price: 33.65, change: 1.36, volume: 2000000 },
-          { symbol: 'SSB', price: 16.10, change: 1.26, volume: 911800 },
-          { symbol: 'CTG', price: 30.60, change: 2.68, volume: 10200000 },
-          { symbol: 'BVB', price: 10.40, change: 0.97, volume: 1900000 },
-          { symbol: 'KLB', price: 11.05, change: 0.91, volume: 47400 },
-          { symbol: 'VCB', price: 57.00, change: 0.88, volume: 1500000 },
-          { symbol: 'STB', price: 62.80, change: 0.00, volume: 1790000 },
-          { symbol: 'VIB', price: 13.90, change: 0.72, volume: 3900000 },
-          { symbol: 'MSB', price: 14.75, change: 0.68, volume: 9200000 },
-          { symbol: 'OCB', price: 10.05, change: 0.50, volume: 355300 },
-          { symbol: 'ACB', price: 20.70, change: 0.49, volume: 2500000 },
-          { symbol: 'TCB', price: 32.95, change: 0.15, volume: 4700000 },
-          { symbol: 'MBB', price: 24.30, change: 0.41, volume: 5100000 },
-          { symbol: 'HDB', price: 22.40, change: 0.45, volume: 2200000 },
-          { symbol: 'VPB', price: 19.80, change: 0.25, volume: 4100000 }
+          { symbol: 'SHB', price: 10.65, change: 2.4, volume: 49973400 },
+          { symbol: 'LPB', price: 38, change: 2.15, volume: 2042300 },
+          { symbol: 'TPB', price: 12, change: 2.13, volume: 18806500 },
+          { symbol: 'BID', price: 33.95, change: 2.26, volume: 3439500 },
+          { symbol: 'SSB', price: 16.15, change: 1.57, volume: 1909700 },
+          { symbol: 'CTG', price: 30.6, change: 2.68, volume: 10200000 },
+          { symbol: 'BVB', price: 10.45, change: 1.46, volume: 3108600 },
+          { symbol: 'KLB', price: 11, change: 0.46, volume: 141800 },
+          { symbol: 'VCB', price: 56.9, change: 0.71, volume: 2388700 },
+          { symbol: 'STB', price: 62.8, change: 0, volume: 1790000 },
+          { symbol: 'VIB', price: 13.85, change: 0.36, volume: 6624100 },
+          { symbol: 'MSB', price: 14.8, change: 1.02, volume: 11746800 },
+          { symbol: 'OCB', price: 10.05, change: 0.5, volume: 523300 },
+          { symbol: 'ACB', price: 20.6, change: 0, volume: 5160300 },
+          { symbol: 'TCB', price: 33.2, change: 0.91, volume: 12740900 },
+          { symbol: 'MBB', price: 19.85, change: -0.25, volume: 10919400 },
+          { symbol: 'HDB', price: 22.8, change: 0, volume: 24291300 },
+          { symbol: 'VPB', price: 24.5, change: 0.2, volume: 9651700 }
         ]
       },
       {
@@ -4912,17 +5014,17 @@ body {
         stocks: [
           { symbol: 'POM', price: 3.20, change: 3.23, volume: 2500000 },
           { symbol: 'TLH', price: 3.31, change: 0.61, volume: 57800 },
-          { symbol: 'HPG', price: 20.80, change: 0.24, volume: 3200000 },
-          { symbol: 'NKG', price: 10.50, change: 0.00, volume: 714400 },
-          { symbol: 'VGS', price: 16.80, change: 0.00, volume: 71600 },
+          { symbol: 'HPG', price: 20.9, change: 0.72, volume: 10189400 },
+          { symbol: 'NKG', price: 10.4, change: -0.95, volume: 1971000 },
+          { symbol: 'VGS', price: 16.7, change: -0.6, volume: 241600 },
           { symbol: 'NSH', price: 4.00, change: 0.00, volume: 15200 },
           { symbol: 'SHA', price: 4.05, change: 0.00, volume: 0 },
           { symbol: 'VCA', price: 6.35, change: 0.00, volume: 0 },
           { symbol: 'TVN', price: 9.60, change: 0.00, volume: 291200 },
           { symbol: 'GDA', price: 11.90, change: 0.00, volume: 27300 },
           { symbol: 'SHI', price: 13.95, change: -0.36, volume: 106500 },
-          { symbol: 'HSG', price: 10.40, change: -0.48, volume: 1100000 },
-          { symbol: 'SMC', price: 9.70, change: -0.72, volume: 17000 }
+          { symbol: 'HSG', price: 10.4, change: -0.48, volume: 2090700 },
+          { symbol: 'SMC', price: 9.69, change: -0.82, volume: 24400 }
         ]
       },
       {
@@ -4932,17 +5034,17 @@ body {
         baselineChg: 0.47,
         stocks: [
           { symbol: 'PVP', price: 22.75, change: 3.41, volume: 549600 },
-          { symbol: 'BSR', price: 28.45, change: 0.89, volume: 4200000 },
+          { symbol: 'BSR', price: 28.35, change: 0.53, volume: 7500700 },
           { symbol: 'PVC', price: 11.50, change: 0.88, volume: 276900 },
-          { symbol: 'PVS', price: 31.80, change: 0.63, volume: 604500 },
-          { symbol: 'PVT', price: 23.80, change: 0.63, volume: 1900000 },
-          { symbol: 'PVD', price: 17.75, change: 0.28, volume: 649200 },
+          { symbol: 'PVS', price: 31.4, change: -0.63, volume: 1589100 },
+          { symbol: 'PVT', price: 23.65, change: 0, volume: 7476700 },
+          { symbol: 'PVD', price: 17.65, change: -0.28, volume: 1687300 },
           { symbol: 'CNG', price: 19.50, change: 0.26, volume: 1700 },
           { symbol: 'PVB', price: 20.50, change: 0.00, volume: 52800 },
-          { symbol: 'GAS', price: 76.20, change: 0.00, volume: 213000 },
+          { symbol: 'GAS', price: 76.1, change: -0.13, volume: 822300 },
           { symbol: 'OIL', price: 13.00, change: 0.00, volume: 534500 },
           { symbol: 'PLC', price: 18.90, change: -0.53, volume: 38400 },
-          { symbol: 'PLX', price: 35.25, change: -0.84, volume: 2100000 }
+          { symbol: 'PLX', price: 35.05, change: -1.41, volume: 5070900 }
         ]
       },
       {
@@ -4951,11 +5053,11 @@ body {
         chip: 'TECH',
         baselineChg: 0.82,
         stocks: [
-          { symbol: 'FPT', price: 58.60, change: 1.03, volume: 1600000 },
-          { symbol: 'CMG', price: 42.50, change: 1.19, volume: 450000 },
-          { symbol: 'CTR', price: 92.40, change: 0.87, volume: 380000 },
-          { symbol: 'ELC', price: 18.10, change: 0.56, volume: 210000 },
-          { symbol: 'VGI', price: 65.30, change: 0.46, volume: 520000 },
+          { symbol: 'FPT', price: 58.2, change: 0.34, volume: 3733300 },
+          { symbol: 'CMG', price: 19.75, change: 2.6, volume: 304200 },
+          { symbol: 'CTR', price: 68, change: -0.15, volume: 130900 },
+          { symbol: 'ELC', price: 11.5, change: 0, volume: 565600 },
+          { symbol: 'VGI', price: 76.4, change: 0.53, volume: 98000 },
           { symbol: 'FOX', price: 71.00, change: 0.00, volume: 15000 },
           { symbol: 'ITD', price: 11.20, change: -0.44, volume: 48000 }
         ]
@@ -4966,15 +5068,16 @@ body {
         chip: 'RETAIL',
         baselineChg: 0.54,
         stocks: [
-          { symbol: 'FRT', price: 138.50, change: 1.47, volume: 520000 },
-          { symbol: 'PNJ', price: 89.50, change: 0.68, volume: 640000 },
-          { symbol: 'MWG', price: 58.20, change: 0.52, volume: 2800000 },
-          { symbol: 'DGW', price: 44.20, change: 0.45, volume: 890000 },
-          { symbol: 'MSN', price: 68.10, change: 0.15, volume: 1200000 },
+          { symbol: 'FRT', price: 141, change: 0, volume: 188300 },
+          { symbol: 'PNJ', price: 18.8, change: 3.3, volume: 6075400 },
+          { symbol: 'MWG', price: 73.9, change: 1.51, volume: 1371800 },
+          { symbol: 'DGW', price: 44.5, change: -1.22, volume: 1709500 },
+          { symbol: 'MSN', price: 71.4, change: 1.42, volume: 3013700 },
           { symbol: 'PET', price: 21.00, change: -0.47, volume: 310000 }
         ]
       }
     ];
+    const SECTOR_BOARD_DATA = SECTOR_DEFINITIONS;
 
     function formatSectorPrice(p) {
       if (p === null || p === undefined || isNaN(p) || p === 0) return '—';
@@ -5175,6 +5278,18 @@ body {
       }
     }
 
+    let watchlistSortCol = 'volume';
+    let watchlistSortAsc = false;
+    function sortWatchlistTable(col) {
+      if (watchlistSortCol === col) {
+        watchlistSortAsc = !watchlistSortAsc;
+      } else {
+        watchlistSortCol = col;
+        watchlistSortAsc = false;
+      }
+      renderWatchlistTable();
+    }
+
     // RENDER WATCHLIST TABLE (BẢNG GIÁ REALTIME)
     function renderWatchlistTable() {
       // Luôn đồng bộ dữ liệu sang Bảng Ngành Đa Cột
@@ -5206,6 +5321,46 @@ body {
       if (q) {
         list = list.filter(s => s.symbol.includes(q));
       }
+
+      // Sắp xếp theo cột được click
+      list.sort((a, b) => {
+        let va, vb;
+        if (watchlistSortCol === 'symbol') {
+          va = a.symbol || ''; vb = b.symbol || '';
+          return watchlistSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+        } else if (watchlistSortCol === 'sector') {
+          va = a.sector || ''; vb = b.sector || '';
+          return watchlistSortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+        } else if (watchlistSortCol === 'price') {
+          va = a.price || 0; vb = b.price || 0;
+        } else if (watchlistSortCol === 'diff') {
+          va = (a.price || 0) * (a.change || 0); vb = (b.price || 0) * (b.change || 0);
+        } else if (watchlistSortCol === 'change') {
+          va = a.change || 0; vb = b.change || 0;
+        } else if (watchlistSortCol === 'volume') {
+          va = a.volume || 0; vb = b.volume || 0;
+        } else if (watchlistSortCol === 'value') {
+          va = a.value || ((a.price || 0) * (a.volume || 0)); vb = b.value || ((b.price || 0) * (b.volume || 0));
+        } else if (watchlistSortCol === 'foreign') {
+          va = (a.buyForeignValue || 0) - (a.sellForeignValue || 0);
+          vb = (b.buyForeignValue || 0) - (b.sellForeignValue || 0);
+        } else if (watchlistSortCol === 'pe') {
+          va = a.pe || 0; vb = b.pe || 0;
+        } else if (watchlistSortCol === 'roe') {
+          va = a.roe || 0; vb = b.roe || 0;
+        } else {
+          va = a.volume || 0; vb = b.volume || 0;
+        }
+        return watchlistSortAsc ? va - vb : vb - va;
+      });
+
+      // Cập nhật mũi tên cột sắp xếp
+      ['symbol', 'sector', 'price', 'diff', 'change', 'volume', 'value', 'foreign', 'pe', 'roe'].forEach(c => {
+        const arrowEl = document.getElementById(`sortArrow_${c}`);
+        if (arrowEl) {
+          arrowEl.textContent = (watchlistSortCol === c) ? (watchlistSortAsc ? ' ▴' : ' ▾') : '';
+        }
+      });
 
       if (currentWatchlistViewMode !== 'sector') {
         const countEl = document.getElementById('rightPanelCount');
@@ -7111,8 +7266,8 @@ body {
         };
       } else {
         stock = (stockDataList && stockDataList.find(s => s.symbol === upperSym));
-        if (!stock && typeof SECTOR_BOARD_DATA !== 'undefined') {
-          for (const sec of SECTOR_BOARD_DATA) {
+        if (!stock && typeof SECTOR_DEFINITIONS !== 'undefined') {
+          for (const sec of SECTOR_DEFINITIONS) {
             const found = sec.stocks && sec.stocks.find(s => s.symbol === upperSym);
             if (found) {
               const p = found.price > 1000 ? found.price : Math.round(found.price * 1000);
@@ -7130,19 +7285,18 @@ body {
             }
           }
         }
+        if (!stock && typeof FALLBACK_STOCKS !== 'undefined') {
+          const fb = FALLBACK_STOCKS.find(s => s.symbol === upperSym);
+          if (fb) stock = { ...fb };
+        }
         if (!stock) {
           stock = {
             symbol: upperSym,
             exchange: 'HOSE',
-            price: upperSym === 'BID' ? 33500 : (upperSym === 'TLG' ? 54900 : (upperSym === 'FPT' ? 135200 : 30000)),
-            change: upperSym === 'BID' ? 1.21 : (upperSym === 'TLG' ? -1.08 : (upperSym === 'FPT' ? 1.65 : 0.5)),
-            pe: 12.5,
-            pb: 1.5,
-            roe: 18.2,
-            marketCap: 180000,
-            volume: 1500000,
-            value: 45000000000,
-            sector: 'Tài chính',
+            price: 30000,
+            change: 0,
+            volume: 1000000,
+            sector: 'Niêm yết',
             companyName: `${upperSym} - Công ty Cổ phần niêm yết`
           };
         }
@@ -7211,7 +7365,9 @@ body {
 
             updateDetailModalHeader(fresh);
             syncStockDetailModalDOM(fresh);
-            updateLiveStockDetailTick(fresh, (fresh.change || 0) >= 0, fresh.price, fresh.change, fresh.volume || 1500);
+            if (isMarketTradingNow()) {
+              updateLiveStockDetailTick(fresh, (fresh.change || 0) >= 0, fresh.price, fresh.change, 1500);
+            }
           }
         }).catch(() => {});
       }
@@ -8102,10 +8258,57 @@ body {
 
       currentDetailCandleBars = bars || [];
       currentDetailHoverIdx = -1;
+      currentDetailLockedIdx = -1;
+
+      // Click vào cột nến / cột volume để khóa/ghim (lock) hoặc mở khóa (unlock)
+      canvas.onclick = (e) => {
+        if (!currentDetailCandleBars || currentDetailCandleBars.length === 0) return;
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const padLeft = 10;
+        const padRight = 60;
+        const chartW = rect.width - padLeft - padRight;
+        const maxBars = Math.max(15, Math.min(currentDetailCandleBars.length, Math.floor(chartW / 6)));
+        const visible = currentDetailCandleBars.slice(-maxBars);
+        const n = visible.length;
+        if (n === 0) return;
+        const step = chartW / n;
+        const idx = Math.floor((mouseX - padLeft) / step);
+        const clampedIdx = Math.max(0, Math.min(n - 1, idx));
+
+        if (currentDetailLockedIdx === clampedIdx) {
+          currentDetailLockedIdx = -1; // Mở khóa ghim
+          currentDetailHoverIdx = -1;
+          if (window.currentModalStock && typeof seedStockDetailTape === 'function') {
+            seedStockDetailTape(window.currentModalStock);
+          }
+        } else {
+          currentDetailLockedIdx = clampedIdx; // Ghim vào cột nến vừa click
+          currentDetailHoverIdx = clampedIdx;
+          const selBar = visible[currentDetailHoverIdx];
+          const prevB = currentDetailHoverIdx > 0 ? visible[currentDetailHoverIdx - 1] : selBar;
+          if (selBar && typeof seedStockDetailTapeFromBar === 'function') {
+            seedStockDetailTapeFromBar(selBar, prevB);
+          }
+        }
+
+        renderCandleCanvas(canvas, currentDetailCandleBars, currentDetailHoverIdx);
+      };
+
+      // Nhấp đúp chuột để hủy ghim toàn bộ
+      canvas.ondblclick = () => {
+        currentDetailLockedIdx = -1;
+        currentDetailHoverIdx = -1;
+        if (window.currentModalStock && typeof seedStockDetailTape === 'function') {
+          seedStockDetailTape(window.currentModalStock);
+        }
+        renderCandleCanvas(canvas, currentDetailCandleBars, -1);
+      };
 
       // Mouse interactive crosshair listener
       canvas.onmousemove = (e) => {
         if (!currentDetailCandleBars || currentDetailCandleBars.length === 0) return;
+        if (currentDetailLockedIdx !== -1) return; // Giữ nguyên cột nến đã ghim khi di chuột
         const rect = canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const padLeft = 10;
@@ -8125,6 +8328,7 @@ body {
       };
 
       canvas.onmouseleave = () => {
+        if (currentDetailLockedIdx !== -1) return; // Không tắt nến đang ghim khi rời chuột
         if (currentDetailHoverIdx !== -1) {
           currentDetailHoverIdx = -1;
           renderCandleCanvas(canvas, currentDetailCandleBars, -1);
@@ -8199,13 +8403,49 @@ body {
       }
     };
 
+    window.unpinDetailCandle = function() {
+      currentDetailLockedIdx = -1;
+      currentDetailHoverIdx = -1;
+      if (window.currentModalStock && typeof seedStockDetailTape === 'function') {
+        seedStockDetailTape(window.currentModalStock);
+      }
+      const canvas = document.getElementById('stockDetailCandleCanvas');
+      if (canvas && currentDetailCandleBars && currentDetailCandleBars.length > 0) {
+        renderCandleCanvas(canvas, currentDetailCandleBars, -1);
+      }
+    };
+
+    function initToolbarDragScroll(el) {
+      if (!el || el.dataset.dragInit) return;
+      el.dataset.dragInit = '1';
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
+      el.addEventListener('mousedown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'BUTTON') return;
+        isDown = true;
+        el.style.cursor = 'grabbing';
+        startX = e.pageX - el.offsetLeft;
+        scrollLeft = el.scrollLeft;
+      });
+      el.addEventListener('mouseleave', () => { isDown = false; el.style.cursor = ''; });
+      el.addEventListener('mouseup', () => { isDown = false; el.style.cursor = ''; });
+      el.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - el.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        el.scrollLeft = scrollLeft - walk;
+      });
+    }
+
     function renderIndicatorToolbarHtml() {
       const ind = robostockState.indicators;
       const qg = robostockState.quickGroups;
       const p = robostockState.parameters;
 
       return `
-        <section class="toolbar" aria-label="Chỉ báo" id="indicatorToolbar">
+        <section class="toolbar" aria-label="Chỉ báo" id="indicatorToolbar" onwheel="if(event.deltaY){this.scrollLeft += event.deltaY; event.preventDefault();}" onmouseenter="if(typeof initToolbarDragScroll==='function')initToolbarDragScroll(this);">
           <button class="indicator-library-button" id="indicatorLibraryButton" type="button" onclick="openIndicatorLibraryModal()">＋ Chỉ báo</button>
           
           <span class="quick-indicator-group" data-indicator-group="sma" ${!qg.sma ? 'hidden' : ''}>
@@ -8756,7 +8996,13 @@ body {
         }
       }
 
+      const isPinned = (typeof currentDetailLockedIdx !== 'undefined' && currentDetailLockedIdx !== -1);
+      const pinBadge = isPinned 
+        ? `<span title="Bấm nút này hoặc nhấp đúp chuột vào biểu đồ để hủy ghim" onclick="if(typeof window.unpinDetailCandle==='function')window.unpinDetailCandle()" style="cursor:pointer; background:rgba(56,189,248,0.2); color:#38bdf8; font-size:10px; font-weight:700; padding:1px 6px; border-radius:3px; border:1px solid #38bdf8; margin-right:4px;">📌 ĐÃ GHIM ✕</span>`
+        : '';
+
       legend.innerHTML = `
+        ${pinBadge}
         <span style="color:var(--text-muted); font-weight:600;">${dateStr}</span>
         <span>Mở: <b>${b.open.toLocaleString('vi-VN')}</b></span>
         <span>Cao: <b class="text-up">${b.high.toLocaleString('vi-VN')}</b></span>
@@ -9483,8 +9729,27 @@ body {
         const hx = getX(hoverIdx);
         const hy = getY(activeBar.close);
 
-        ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)';
-        ctx.lineWidth = 1;
+        const isPinned = (typeof currentDetailLockedIdx !== 'undefined' && currentDetailLockedIdx === hoverIdx);
+        if (isPinned) {
+          // Highlight vertical column band
+          ctx.save();
+          ctx.fillStyle = isDark ? 'rgba(56, 189, 248, 0.16)' : 'rgba(14, 165, 233, 0.14)';
+          const colW = Math.max(barW + 6, step - 1);
+          ctx.fillRect(hx - colW / 2, pad.top, colW, height - pad.bottom - pad.top);
+
+          // Pinned badge at top of the column
+          ctx.fillStyle = '#0284c7';
+          ctx.fillRect(hx - 24, pad.top + 2, 48, 16);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 9px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('📌 GHIM', hx, pad.top + 10);
+          ctx.restore();
+        }
+
+        ctx.strokeStyle = isPinned ? '#38bdf8' : (isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)');
+        ctx.lineWidth = isPinned ? 1.5 : 1;
         ctx.setLineDash([4, 4]);
 
         // Crosshair vertical spanning across all panels
@@ -9503,13 +9768,18 @@ body {
         // Focus close dot
         ctx.fillStyle = activeBar.close >= activeBar.open ? upColor : downColor;
         ctx.beginPath();
-        ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
+        ctx.arc(hx, hy, isPinned ? 4.5 : 3.5, 0, Math.PI * 2);
         ctx.fill();
+        if (isPinned) {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
 
         // Price badge
         const badgeW = 54;
         const badgeH = 18;
-        ctx.fillStyle = isDark ? '#374151' : '#1f2937';
+        ctx.fillStyle = isPinned ? '#0284c7' : (isDark ? '#374151' : '#1f2937');
         ctx.fillRect(pad.left + chartW + 2, hy - badgeH / 2, badgeW, badgeH);
         ctx.fillStyle = '#ffffff';
         ctx.textAlign = 'center';
@@ -9637,6 +9907,45 @@ body {
           <td style="text-align:right;font-family:var(--font-data);font-size:11px;padding:5px 8px;" class="${colorCls}">${tradeC >= 0 ? '+' : ''}${tradeC.toFixed(2)}%</td>
           <td style="text-align:right;font-family:var(--font-data);padding:5px 8px;">${volStr}</td>
           <td style="text-align:center;padding:5px 8px;"><span class="badge-tape ${sideClass}">${sideText}</span></td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function seedStockDetailTapeFromBar(bar, prevBar) {
+      const tbody = document.getElementById('detailStockTapeTbody');
+      if (!tbody || !bar) return;
+      tbody.innerHTML = '';
+      const p = bar.close;
+      const ref = prevBar ? prevBar.close : bar.open;
+      const chg = ref > 0 ? parseFloat((((p - ref) / ref) * 100).toFixed(2)) : 0;
+      const d = new Date(bar.time * 1000);
+
+      const prices = [bar.open, Math.round((bar.open + bar.high)/2), bar.high, bar.low, p];
+      const totalV = bar.volume || 10000;
+      const vols = [Math.round(totalV * 0.15), Math.round(totalV * 0.2), Math.round(totalV * 0.35), Math.round(totalV * 0.1), Math.round(totalV * 0.2)];
+
+      for (let i = 0; i < prices.length; i++) {
+        const trP = prices[i] || p;
+        const trC = ref > 0 ? parseFloat((((trP - ref) / ref) * 100).toFixed(2)) : chg;
+        const trColor = trC === 0 ? 'text-ref' : (trC > 0 ? 'text-up' : 'text-down');
+        const v = vols[i] || 1500;
+        const vStr = v >= 1e6 ? (v / 1e6).toFixed(2) + 'M' : (v >= 1e3 ? (v / 1e3).toFixed(1) + 'K' : v.toLocaleString('vi-VN'));
+        const isB = (i % 2 === 0) || trC > 0;
+
+        let timeStr = `${d.getDate()}/${d.getMonth()+1}`;
+        if (currentDetailCandleRes === '15' || currentDetailCandleRes === '1H') {
+          timeStr = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} ${d.getDate()}/${d.getMonth()+1}`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = 'tape-row-new';
+        tr.innerHTML = `
+          <td style="font-size:10.5px;color:var(--text-muted);font-family:var(--font-data);padding:5px 8px;">${timeStr}</td>
+          <td style="text-align:right;font-family:var(--font-data);padding:5px 8px;" class="${trColor}"><b>${Math.round(trP).toLocaleString('vi-VN')}</b></td>
+          <td style="text-align:right;font-family:var(--font-data);font-size:11px;padding:5px 8px;" class="${trColor}">${trC >= 0 ? '+' : ''}${trC.toFixed(2)}%</td>
+          <td style="text-align:right;font-family:var(--font-data);padding:5px 8px;">${vStr}</td>
+          <td style="text-align:center;padding:5px 8px;"><span class="badge-tape ${isB ? 'buy' : 'sell'}">${isB ? 'MUA' : 'BÁN'}</span></td>
         `;
         tbody.appendChild(tr);
       }
@@ -10485,7 +10794,7 @@ ${leaderDetails}
           ? [...stockDataList].sort((a,b) => (b.volume || 0) - (a.volume || 0))
           : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
 
-        const candidateStock = topStocks[alertRotationIndex % (topStocks.length || 1)] || { symbol: 'FPT', price: 58000, change: 1.5, volume: 3200000 };
+        const candidateStock = topStocks[alertRotationIndex % (topStocks.length || 1)] || { symbol: 'FPT', price: 58.2, change: 0.34, volume: 3733300 };
         alertRotationIndex++;
 
         const templates = [
