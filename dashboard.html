@@ -2600,7 +2600,7 @@ body {
                       <span style="font-size:11.5px; font-weight:700; white-space:nowrap;">DIỄN BIẾN TRONG PHIÊN</span>
                       <span id="heroRefText" style="color:var(--price-ref); font-size:10px; white-space:nowrap;">Tham chiếu: 1.704,87</span>
                     </div>
-                    <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật Robostock">Biểu đồ Kỹ thuật</button>
+                    <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật FireAnt">Biểu đồ Kỹ thuật</button>
                   </div>
                   <div style="flex:1; width:100%; display:flex; align-items:center; justify-content:center; min-height:150px;">
                     <svg id="intradaySvg" viewBox="0 0 280 135" preserveAspectRatio="none" style="width:100%; height:100%; min-height:145px; display:block;"></svg>
@@ -3537,8 +3537,8 @@ body {
         <div style="display:flex; align-items:center; gap:10px;">
           <span style="font-size:12px; font-weight:700; color:var(--text-secondary); font-family:var(--font-data);" id="stockDetailRealtimeClock"></span>
           <div style="width:1px; height:18px; background:var(--border-stroke);"></div>
-          <button onclick="toggleStockDetailChartMode(currentStockDetailSymbol)" id="btnToggleDetailChart" class="btn-theme-toggle" style="width:auto; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer;" title="Chuyển đổi đồ thị nến DNSE">
-            Biểu đồ Nến DNSE
+          <button onclick="toggleStockDetailChartMode(currentStockDetailSymbol)" id="btnToggleDetailChart" class="btn-theme-toggle" style="width:auto; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer;" title="Chuyển đổi đồ thị nến FireAnt">
+            Biểu đồ Nến FireAnt
           </button>
           <button onclick="askAiStockDetail(currentStockDetailSymbol)" class="btn-login-main" style="height:32px; font-size:12px; gap:6px; border:none; cursor:pointer; padding:0 14px;">
             <span>Hỏi AI Chatbot</span>
@@ -7328,7 +7328,7 @@ body {
       const btnTv = document.getElementById('btnToggleDetailChart');
       if (btnTv) btnTv.innerHTML = 'Biểu đồ Intraday';
 
-      // Kích hoạt ngay chế độ biểu đồ nến với chỉ báo Robostock
+      // Kích hoạt ngay chế độ biểu đồ nến FireAnt
       const svgCont = document.getElementById('stockDetailSvgContainer');
       const candleCont = document.getElementById('stockDetailCandleContainer');
       const tfControls = document.getElementById('stockDetailCandleTfControls');
@@ -7338,15 +7338,28 @@ body {
       if (svgCont && candleCont) {
         svgCont.style.display = 'none';
         candleCont.style.display = 'flex';
-        if (tfControls) tfControls.style.display = 'inline-flex';
+        if (tfControls) tfControls.style.display = 'none';
         if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN NHẬT BẢN • ${upperSym}`;
-        if (chartBadge) chartBadge.textContent = 'DNSE Entrade X';
+        if (chartBadge) chartBadge.textContent = 'FireAnt Chart';
         if (refLabel) refLabel.style.display = 'none';
       }
 
-      // Vẽ nến DNSE sau khi modal đã render xong layout
+      // Cập nhật iframe FireAnt theo đúng mã cổ phiếu được chọn
+      const fireantIframe = document.getElementById('stockDetailFireantIframe');
+      if (fireantIframe) {
+        fireantIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(upperSym)}`;
+      }
+
+      // Đặt lại subview về FireAnt làm mặc định
+      if (typeof switchCandleSubView === 'function') {
+        switchCandleSubView('fireant');
+      }
+
+      // Chuẩn bị sẵn dữ liệu nến Robostock nền phòng khi chuyển đổi tab
       setTimeout(() => {
-        drawDnseStockCandleChart(upperSym, currentDetailCandleRes);
+        if (typeof drawDnseStockCandleChart === 'function') {
+          drawDnseStockCandleChart(upperSym, currentDetailCandleRes);
+        }
       }, 60);
 
       // Tải và đồng bộ chỉ số kỹ thuật RSI thực tế đa khung thời gian cho modal
@@ -7565,24 +7578,24 @@ body {
             </div>
           </div>
 
-          <!-- BIỂU ĐỒ INTRADAY TRONG PHIÊN HOẶC BIỂU ĐỒ NẾN NHẬT BẢN DNSE -->
+          <!-- BIỂU ĐỒ INTRADAY TRONG PHIÊN HOẶC BIỂU ĐỒ NẾN NHẬT BẢN FIREANT -->
           <div class="tongquan-card" style="margin:0; display:flex; flex-direction:column; position:relative;">
             <div class="intraday-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
               <div style="display:flex; align-items:center; gap:8px;">
                 <span id="stockDetailChartTitle" style="font-weight:700;">${detailChartMode === 'candle' ? `BIỂU ĐỒ NẾN NHẬT BẢN • ${stock.symbol}` : `DIỄN BIẾN TRONG PHIÊN • ${stock.symbol}`}</span>
-                <span style="font-size:10.5px; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); color:var(--primary-brand); border:1px solid var(--border-stroke); font-weight:600;" id="stockDetailChartBadge">${detailChartMode === 'candle' ? 'DNSE Entrade X' : 'DNSE Realtime'}</span>
+                <span style="font-size:10.5px; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); color:var(--primary-brand); border:1px solid var(--border-stroke); font-weight:600;" id="stockDetailChartBadge">${detailChartMode === 'candle' ? 'FireAnt Chart' : 'DNSE Realtime'}</span>
               </div>
               <div style="display:flex; align-items:center; gap:8px;">
-                <!-- Bộ chọn khung giờ nến DNSE -->
-                <div id="stockDetailCandleTfControls" style="display:${detailChartMode === 'candle' ? 'inline-flex' : 'none'}; gap:4px; align-items:center;">
+                <!-- Bộ chọn khung giờ nến nội bộ (hiển thị khi chuyển sang tab Chỉ báo Robostock) -->
+                <div id="stockDetailCandleTfControls" style="display:none; gap:4px; align-items:center;">
                   <button class="period-tab-btn ${currentDetailCandleRes === '15' ? 'active' : ''}" onclick="switchDetailCandleResolution('15', this)">15m</button>
                   <button class="period-tab-btn ${currentDetailCandleRes === '1H' ? 'active' : ''}" onclick="switchDetailCandleResolution('1H', this)">1H</button>
                   <button class="period-tab-btn ${currentDetailCandleRes === '1D' ? 'active' : ''}" onclick="switchDetailCandleResolution('1D', this)">1D</button>
                   <button class="period-tab-btn ${currentDetailCandleRes === '1W' ? 'active' : ''}" onclick="switchDetailCandleResolution('1W', this)">1W</button>
                 </div>
                 <span style="color:var(--price-ref); font-size:11px; display:${detailChartMode === 'candle' ? 'none' : 'inline'};" id="stockDetailRefLabel">Tham chiếu: ${refPrice.toLocaleString('vi-VN')}</span>
-                <a id="stockDetailTvExternalLink" href="https://vn.tradingview.com/chart/?symbol=${(stock.exchange || 'HOSE').toUpperCase()}%3A${stock.symbol}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--text-secondary); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px;" title="Mở trang TradingView chuyên sâu trong tab mới">
-                  TradingView ↗
+                <a id="stockDetailTvExternalLink" href="https://stockchart.vietstock.vn/" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--text-secondary); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px;" title="Mở biểu đồ kỹ thuật Vietstock StockChart trong tab mới">
+                  Vietstock ↗
                 </a>
               </div>
             </div>
@@ -7599,21 +7612,40 @@ body {
               </div>
             </div>
 
-            <!-- CHẾ ĐỘ 2: BIỂU ĐỒ NẾN NHẬT BẢN OHLC & KHỐI LƯỢNG TỪ DNSE ENTRADE X + TOOLBAR CHỈ BÁO ROBOSTOCK -->
+            <!-- CHẾ ĐỘ 2: BIỂU ĐỒ NẾN NHẬT BẢN FIREANT CHUẨN XÁC CAO (https://fireant.vn/charts) + TÙY CHỌN CHỈ BÁO NỘI BỘ -->
             <div id="stockDetailCandleContainer" style="display:${detailChartMode === 'candle' ? 'flex' : 'none'}; flex-direction:column; width:100%; padding-top:4px; gap:6px;">
-              <!-- CONTAINER THANH CÔNG CỤ CHỈ BÁO ROBOSTOCK -->
-              <div id="indicatorToolbarContainer">
-                ${renderIndicatorToolbarHtml()}
+              <!-- THANH ĐIỀU HƯỚNG TAB CON: FIREANT (CHUẨN XÁC CAO) & CHỈ BÁO NỘI BỘ ROBOSTOCK -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                <div style="display:inline-flex; gap:4px; background:var(--bg-subtle); padding:2px; border-radius:4px; border:1px solid var(--border-stroke);">
+                  <button type="button" id="btnSubChartFireant" class="period-tab-btn active" onclick="switchCandleSubView('fireant')" style="font-size:11px; padding:3px 10px; font-weight:600;">Biểu đồ FireAnt (Chuẩn xác)</button>
+                  <button type="button" id="btnSubChartRobo" class="period-tab-btn" onclick="switchCandleSubView('robostock')" style="font-size:11px; padding:3px 10px; font-weight:600;">Chỉ báo Robostock (Nội bộ)</button>
+                </div>
+                <a href="https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="Mở biểu đồ kỹ thuật FireAnt toàn màn hình">
+                  FireAnt.vn ↗
+                </a>
               </div>
 
-              <!-- THANH THÔNG TIN NẾN & CHỈ SỐ OHLC + GIÁ TRỊ CHỈ BÁO REALTIME -->
-              <div id="candleOhlcLegend" style="font-family:var(--font-data); font-size:11px; color:var(--text-secondary); min-height:22px; padding:3px 8px; background:var(--bg-subtle); border-radius:4px; border:1px solid var(--border-stroke); display:flex; align-items:center; gap:8px; overflow-x:auto; white-space:nowrap;">
-                <span>Đang tải nến DNSE...</span>
+              <!-- VIEW 1: BIỂU ĐỒ NẾN FIREANT CHÍNH THỨC (MẶC ĐỊNH CHUẨN XÁC) -->
+              <div id="candleFireantWrapper" style="position:relative; width:100%; height:460px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden;">
+                <iframe id="stockDetailFireantIframe" src="https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}" style="width:100%; height:100%; border:none; display:block;" allowfullscreen title="Biểu đồ nến FireAnt"></iframe>
               </div>
 
-              <!-- KHUNG CANVAS ĐỒ THỊ CHÍNH & CÁC CỬA SỔ PHỤ CHỈ BÁO -->
-              <div id="candleCanvasWrapper" style="position:relative; width:100%; height:320px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden; transition:height 0.2s ease;">
-                <canvas id="stockDetailCandleCanvas" style="width:100%; height:100%; display:block; cursor:crosshair;"></canvas>
+              <!-- VIEW 2: BIỂU ĐỒ CHỈ BÁO ROBOSTOCK CANVAS (DỰ PHÒNG KHI CẦN SOI HVP/QUIET/STOCH) -->
+              <div id="candleRobostockWrapper" style="display:none; flex-direction:column; gap:6px; width:100%;">
+                <!-- CONTAINER THANH CÔNG CỤ CHỈ BÁO ROBOSTOCK -->
+                <div id="indicatorToolbarContainer">
+                  ${renderIndicatorToolbarHtml()}
+                </div>
+
+                <!-- THANH THÔNG TIN NẾN & CHỈ SỐ OHLC + GIÁ TRỊ CHỈ BÁO REALTIME -->
+                <div id="candleOhlcLegend" style="font-family:var(--font-data); font-size:11px; color:var(--text-secondary); min-height:22px; padding:3px 8px; background:var(--bg-subtle); border-radius:4px; border:1px solid var(--border-stroke); display:flex; align-items:center; gap:8px; overflow-x:auto; white-space:nowrap;">
+                  <span>Đang tải nến biểu đồ...</span>
+                </div>
+
+                <!-- KHUNG CANVAS ĐỒ THỊ CHÍNH & CÁC CỬA SỔ PHỤ CHỈ BÁO -->
+                <div id="candleCanvasWrapper" style="position:relative; width:100%; height:320px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden; transition:height 0.2s ease;">
+                  <canvas id="stockDetailCandleCanvas" style="width:100%; height:100%; display:block; cursor:crosshair;"></canvas>
+                </div>
               </div>
             </div>
           </div>
@@ -7911,8 +7943,38 @@ body {
       `;
     }
 
-    // ==================== BỘ ĐỒ THỊ NẾN NHẬT BẢN DNSE ENTRADE X ====================
-    // ==================== BỘ ĐỒ THỊ NẾN NHẬT BẢN DNSE ENTRADE X ====================
+    // ==================== BỘ ĐỒ THỊ NẾN NHẬT BẢN FIREANT & ROBOSTOCK ====================
+    let currentCandleSubView = 'fireant';
+
+    function switchCandleSubView(mode) {
+      currentCandleSubView = mode;
+      const faWrap = document.getElementById('candleFireantWrapper');
+      const roboWrap = document.getElementById('candleRobostockWrapper');
+      const btnFa = document.getElementById('btnSubChartFireant');
+      const btnRobo = document.getElementById('btnSubChartRobo');
+      const tfControls = document.getElementById('stockDetailCandleTfControls');
+      const chartBadge = document.getElementById('stockDetailChartBadge');
+
+      if (mode === 'fireant') {
+        if (faWrap) faWrap.style.display = 'block';
+        if (roboWrap) roboWrap.style.display = 'none';
+        if (btnFa) btnFa.classList.add('active');
+        if (btnRobo) btnRobo.classList.remove('active');
+        if (tfControls) tfControls.style.display = 'none';
+        if (chartBadge) chartBadge.textContent = 'FireAnt Chart';
+      } else {
+        if (faWrap) faWrap.style.display = 'none';
+        if (roboWrap) roboWrap.style.display = 'flex';
+        if (btnFa) btnFa.classList.remove('active');
+        if (btnRobo) btnRobo.classList.add('active');
+        if (tfControls) tfControls.style.display = 'inline-flex';
+        if (chartBadge) chartBadge.textContent = 'DNSE Entrade X';
+        if (currentStockDetailSymbol && typeof drawDnseStockCandleChart === 'function') {
+          drawDnseStockCandleChart(currentStockDetailSymbol, currentDetailCandleRes);
+        }
+      }
+    }
+
     let currentDetailCandleRes = '1D';
     let detailCandlesCache = {};
     let currentDetailCandleBars = [];
@@ -9850,13 +9912,20 @@ body {
         detailChartMode = 'candle';
         svgCont.style.display = 'none';
         candleCont.style.display = 'flex';
-        if (tfControls) tfControls.style.display = 'inline-flex';
+        const isRobo = (typeof currentCandleSubView !== 'undefined' && currentCandleSubView === 'robostock');
+        if (tfControls) tfControls.style.display = isRobo ? 'inline-flex' : 'none';
         if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN NHẬT BẢN • ${targetSym}`;
-        if (chartBadge) chartBadge.textContent = 'DNSE Entrade X';
+        if (chartBadge) chartBadge.textContent = isRobo ? 'DNSE Entrade X' : 'FireAnt Chart';
         if (refLabel) refLabel.style.display = 'none';
         btn.innerHTML = 'Biểu đồ Intraday';
 
-        drawDnseStockCandleChart(targetSym, currentDetailCandleRes);
+        const fireantIframe = document.getElementById('stockDetailFireantIframe');
+        if (fireantIframe) {
+          fireantIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(targetSym)}`;
+        }
+        if (isRobo && typeof drawDnseStockCandleChart === 'function') {
+          drawDnseStockCandleChart(targetSym, currentDetailCandleRes);
+        }
       } else {
         detailChartMode = 'intraday';
         svgCont.style.display = 'block';
@@ -9865,7 +9934,7 @@ body {
         if (chartTitle) chartTitle.textContent = `DIỄN BIẾN TRONG PHIÊN • ${targetSym}`;
         if (chartBadge) chartBadge.textContent = 'DNSE Realtime';
         if (refLabel) refLabel.style.display = 'inline';
-        btn.innerHTML = 'Biểu đồ Nến DNSE';
+        btn.innerHTML = 'Biểu đồ Nến FireAnt';
 
         const stock = (stockDataList && stockDataList.find(s => s.symbol === targetSym)) || { price: 33500 };
         renderStockDetailIntradaySvg(stock);
