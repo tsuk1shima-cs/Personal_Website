@@ -1321,16 +1321,20 @@ body {
     max-height: 96vh;
   }
 }
-.modal-card-detail .grid-row-2col {
+.modal-card-detail .grid-row-2col,
+.stock-detail-body-grid {
   display: grid;
-  grid-template-columns: minmax(290px, 1fr) minmax(0, 2.2fr);
+  grid-template-columns: minmax(310px, 1fr) minmax(0, 2.2fr);
   gap: 12px;
+  align-items: start;
 }
-.modal-card-detail .grid-row-2col > * {
+.modal-card-detail .grid-row-2col > *,
+.stock-detail-body-grid > * {
   min-width: 0;
 }
 @media (max-width: 960px) {
-  .modal-card-detail .grid-row-2col {
+  .modal-card-detail .grid-row-2col,
+  .stock-detail-body-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -7570,7 +7574,7 @@ body {
       const btnTv = document.getElementById('btnToggleDetailChart');
       if (btnTv) btnTv.innerHTML = 'Biểu đồ Intraday';
 
-      // Kích hoạt ngay chế độ biểu đồ nến FireAnt
+      // Kích hoạt ngay chế độ biểu đồ nến kỹ thuật chuẩn xác theo mã
       const svgCont = document.getElementById('stockDetailSvgContainer');
       const candleCont = document.getElementById('stockDetailCandleContainer');
       const tfControls = document.getElementById('stockDetailCandleTfControls');
@@ -7580,29 +7584,29 @@ body {
       if (svgCont && candleCont) {
         svgCont.style.display = 'none';
         candleCont.style.display = 'flex';
-        if (tfControls) tfControls.style.display = 'none';
-        if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN NHẬT BẢN • ${upperSym}`;
-        if (chartBadge) chartBadge.textContent = 'FireAnt Chart';
+        if (tfControls) tfControls.style.display = 'inline-flex';
+        if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN KỸ THUẬT • ${upperSym}`;
+        if (chartBadge) chartBadge.textContent = 'FireAnt Realtime';
         if (refLabel) refLabel.style.display = 'none';
       }
 
-      // Cập nhật iframe FireAnt theo đúng mã cổ phiếu được chọn
+      // Cập nhật iframe FireAnt theo đúng mã cổ phiếu được chọn (phục vụ tab phụ FireAnt Web)
       const fireantIframe = document.getElementById('stockDetailFireantIframe');
       if (fireantIframe) {
         fireantIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(upperSym)}`;
       }
 
-      // Đặt lại subview về FireAnt làm mặc định
+      // Đặt subview mặc định là Biểu đồ Kỹ thuật Pro để đảm bảo khớp 100% mã cổ phiếu, không lệch mã
       if (typeof switchCandleSubView === 'function') {
-        switchCandleSubView('fireant');
+        switchCandleSubView('robostock');
       }
 
-      // Chuẩn bị sẵn dữ liệu nến Robostock nền phòng khi chuyển đổi tab
+      // Tải và vẽ ngay nến kỹ thuật thực tế cho mã được chọn
       setTimeout(() => {
         if (typeof drawDnseStockCandleChart === 'function') {
           drawDnseStockCandleChart(upperSym, currentDetailCandleRes);
         }
-      }, 60);
+      }, 50);
 
       // Tải và đồng bộ chỉ số kỹ thuật RSI thực tế đa khung thời gian cho modal
       if (typeof fetchStockDetailTechnicalRSI === 'function') {
@@ -7783,269 +7787,269 @@ body {
           </div>
         </div>
 
-        <!-- ROW 1: HERO STOCK CARD & BIỂU ĐỒ INTRADAY TRONG PHIÊN (CHUẨN CỘT TRÁI) -->
-        <div class="grid-row-2col">
+        <!-- KHUNG BỐ CỤC 2 CỘT LIÊN TỤC CHUẨN HÌNH 4: KHÔNG ĐỨNG RIÊNG HÀNG, KHÔNG ĐỂ LỖ HỔNG TRỐNG -->
+        <div class="stock-detail-body-grid" style="margin-top:8px;">
 
-          <!-- HERO SECTION CỦA MÃ CỔ PHIẾU -->
-          <div class="tongquan-card" style="margin:0;">
-            <div class="hero-index-title-row">
-              <span class="hero-index-name" style="font-size:15px;">${stock.symbol} • ${companyTitle}</span>
-              <span class="hero-index-clock" id="stockDetailMarketState">${currentHeroState}</span>
-            </div>
-            <div class="hero-index-main-val ${colorCls}" id="stockDetailHeroPrice" style="font-size:28px;">
-              ${p.toLocaleString('vi-VN')} <span style="font-size:16px;font-weight:500;">đ</span>
-            </div>
-            <div class="hero-index-sub-chg ${colorCls}" id="stockDetailHeroChg">
-              <span>${arrow} ${sign}${pointChg} (${sign}${chg.toFixed(2)}%)</span>
-            </div>
+          <!-- CỘT TRÁI: 1. HERO STOCK CARD + 2. PHÂN TÍCH KỸ THUẬT RSI + 3. NHẬT KÝ KHỚP LỆNH REALTIME -->
+          <div style="display:flex; flex-direction:column; gap:10px; min-width:0;">
 
-            <div class="hero-index-stats-grid" style="margin-top:10px;">
-              <div>Cao nhất: <b id="stockDetailHeroHigh" class="text-up">${high.toLocaleString('vi-VN')}</b></div>
-              <div>Thấp nhất: <b id="stockDetailHeroLow" class="text-down">${low.toLocaleString('vi-VN')}</b></div>
-              <div>Khối lượng: <b id="stockDetailHeroVol">${volStr}</b> CP</div>
-              <div>Giá trị GD: <b id="stockDetailHeroVal">${valStr}</b></div>
-            </div>
-
-            <!-- CUNG CẦU & KHỐI NGOẠI MINI BAR -->
-            <div style="margin-top:12px; padding-top:10px; border-top:1px dashed var(--border-stroke);">
-              <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px;">
-                <span class="text-up" style="font-weight:600;" id="stockDetailBarBuyLabel">Mua CĐ: ${buyRatio}%</span>
-                <span style="color:var(--text-secondary);">NN Mua: ${buyForeignStr} • Bán: ${sellForeignStr}</span>
-                <span class="text-down" style="font-weight:600;" id="stockDetailBarSellLabel">Bán CĐ: ${sellRatio}%</span>
+            <!-- 1. HERO SECTION CỦA MÃ CỔ PHIẾU -->
+            <div class="tongquan-card" style="margin:0;">
+              <div class="hero-index-title-row">
+                <span class="hero-index-name" style="font-size:15px;">${stock.symbol} • ${companyTitle}</span>
+                <span class="hero-index-clock" id="stockDetailMarketState">${currentHeroState}</span>
               </div>
-              <div style="display:flex; height:6px; border-radius:3px; overflow:hidden; background:var(--bg-subtle);">
-                <div id="stockDetailBarBuy" style="width:${buyRatio}%; background:var(--price-up);"></div>
-                <div id="stockDetailBarSell" style="width:${sellRatio}%; background:var(--price-down);"></div>
+              <div class="hero-index-main-val ${colorCls}" id="stockDetailHeroPrice" style="font-size:28px;">
+                ${p.toLocaleString('vi-VN')} <span style="font-size:16px;font-weight:500;">đ</span>
+              </div>
+              <div class="hero-index-sub-chg ${colorCls}" id="stockDetailHeroChg">
+                <span>${arrow} ${sign}${pointChg} (${sign}${chg.toFixed(2)}%)</span>
+              </div>
+
+              <div class="hero-index-stats-grid" style="margin-top:10px;">
+                <div>Cao nhất: <b id="stockDetailHeroHigh" class="text-up">${high.toLocaleString('vi-VN')}</b></div>
+                <div>Thấp nhất: <b id="stockDetailHeroLow" class="text-down">${low.toLocaleString('vi-VN')}</b></div>
+                <div>Khối lượng: <b id="stockDetailHeroVol">${volStr}</b> CP</div>
+                <div>Giá trị GD: <b id="stockDetailHeroVal">${valStr}</b></div>
+              </div>
+
+              <!-- CUNG CẦU & KHỐI NGOẠI MINI BAR -->
+              <div style="margin-top:12px; padding-top:10px; border-top:1px dashed var(--border-stroke);">
+                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px;">
+                  <span class="text-up" style="font-weight:600;" id="stockDetailBarBuyLabel">Mua CĐ: ${buyRatio}%</span>
+                  <span style="color:var(--text-secondary);">NN Mua: ${buyForeignStr} • Bán: ${sellForeignStr}</span>
+                  <span class="text-down" style="font-weight:600;" id="stockDetailBarSellLabel">Bán CĐ: ${sellRatio}%</span>
+                </div>
+                <div style="display:flex; height:6px; border-radius:3px; overflow:hidden; background:var(--bg-subtle);">
+                  <div id="stockDetailBarBuy" style="width:${buyRatio}%; background:var(--price-up);"></div>
+                  <div id="stockDetailBarSell" style="width:${sellRatio}%; background:var(--price-down);"></div>
+                </div>
               </div>
             </div>
+
+            <!-- 2. CARD KỸ THUẬT & RSI GAUGE (ĐƯA VÀO CỘT TRÁI DƯỚI HERO THEO HÌNH 4, LẤP KÍN Ô TRỐNG HÌNH 2) -->
+            <div class="tongquan-card" style="margin:0;">
+              <div class="rsi-section-title">
+                <span class="blue-accent-bar"></span>
+                Phân tích kỹ thuật & Chỉ báo RSI
+              </div>
+
+              <div class="stats-cards-grid" id="detailRsiCards">
+                <div class="stats-card" id="detailCard_15m" onclick="selectDetailRSIInterval('15m', this)" style="cursor:pointer;">
+                  <div class="stats-card-label">15 Phút</div>
+                  <div class="stats-card-value text-ref" id="detailRsiVal_15m">Đang tải...</div>
+                </div>
+                <div class="stats-card" id="detailCard_1h" onclick="selectDetailRSIInterval('1h', this)" style="cursor:pointer;">
+                  <div class="stats-card-label">Hàng giờ</div>
+                  <div class="stats-card-value text-ref" id="detailRsiVal_1h">Đang tải...</div>
+                </div>
+                <div class="stats-card active" id="detailCard_1d" onclick="selectDetailRSIInterval('1d', this)" style="cursor:pointer;">
+                  <div class="stats-card-label">Hàng ngày</div>
+                  <div class="stats-card-value text-ref" id="detailRsiVal_1d">Đang tải...</div>
+                </div>
+                <div class="stats-card" id="detailCard_1w" onclick="selectDetailRSIInterval('1w', this)" style="cursor:pointer;">
+                  <div class="stats-card-label">Hàng tuần</div>
+                  <div class="stats-card-value text-ref" id="detailRsiVal_1w">Đang tải...</div>
+                </div>
+              </div>
+
+              <!-- GAUGE CHART (RSI) -->
+              <div class="gauge-panel" style="margin-top:6px;">
+                <div class="gauge-svg-wrap">
+                  <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
+                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
+                    <path id="stockDetailRsiArc" d="M 10 50 A 40 40 0 0 1 ${initArcX} ${initArcY}" fill="none" stroke="${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'}" stroke-width="8" stroke-linecap="round"/>
+                    <circle cx="50" cy="50" r="4" fill="var(--text-primary)"/>
+                    <line id="stockDetailRsiNeedle" x1="50" y1="50" x2="${initTipX}" y2="${initTipY}" stroke="${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'}" stroke-width="2.5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+                <div class="gauge-info">
+                  <div class="gauge-info-title">Chỉ báo RSI (14) của ${stock.symbol}</div>
+                  <div class="gauge-info-score" id="stockDetailRsiScore" style="color:${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'};">${rsiScore}</div>
+                  <div class="gauge-info-desc" id="stockDetailRsiDesc">${rsiDesc}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. DÒNG LỆNH KHỚP REALTIME RIÊNG CỦA MÃ NÀY (ĐỒNG BỘ CỘT TRÁI LIÊN TỤC) -->
+            <div class="tongquan-card" style="margin:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;">
+                  ${isMarketTradingNow() ? '<span class="pulse-dot" style="width:6px;height:6px;"></span>' : ''}
+                  <span>Nhật ký Khớp lệnh ${isMarketTradingNow() ? 'Realtime' : 'Chốt phiên'} • ${stock.symbol}</span>
+                </div>
+                ${isMarketTradingNow() ? '<span class="badge-tape buy" style="font-size:10px;">Khớp liên tục</span>' : '<span class="badge-tape" style="font-size:10px; background:var(--bg-subtle); color:var(--text-muted); border:1px solid var(--border-stroke);">Đóng cửa phiên</span>'}
+              </div>
+              <div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-stroke); border-radius:var(--radius-sm);">
+                <table class="market-table" style="width:100%; font-size:11.5px; border-collapse:collapse;">
+                  <thead>
+                    <tr style="background:var(--bg-subtle); position:sticky; top:0; z-index:2;">
+                      <th style="padding:5px 8px; text-align:left;">Giờ</th>
+                      <th style="padding:5px 8px; text-align:right;">Giá khớp</th>
+                      <th style="padding:5px 8px; text-align:right;">+/- %</th>
+                      <th style="padding:5px 8px; text-align:right;">Khối lượng</th>
+                      <th style="padding:5px 8px; text-align:center;">Lệnh</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detailStockTapeTbody">
+                    <!-- Populated dynamically and updated on every live tick -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
 
-          <!-- BIỂU ĐỒ INTRADAY TRONG PHIÊN HOẶC BIỂU ĐỒ NẾN NHẬT BẢN FIREANT -->
-          <div class="tongquan-card" style="margin:0; display:flex; flex-direction:column; position:relative;">
-            <div class="intraday-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span id="stockDetailChartTitle" style="font-weight:700;">${detailChartMode === 'candle' ? `BIỂU ĐỒ NẾN NHẬT BẢN • ${stock.symbol}` : `DIỄN BIẾN TRONG PHIÊN • ${stock.symbol}`}</span>
-                <span style="font-size:10.5px; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); color:var(--primary-brand); border:1px solid var(--border-stroke); font-weight:600;" id="stockDetailChartBadge">${detailChartMode === 'candle' ? 'FireAnt Chart' : 'DNSE Realtime'}</span>
-              </div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <!-- Bộ chọn khung giờ nến nội bộ (hiển thị khi chuyển sang tab Chỉ báo Robostock) -->
-                <div id="stockDetailCandleTfControls" style="display:none; gap:4px; align-items:center;">
-                  <button class="period-tab-btn ${currentDetailCandleRes === '15' ? 'active' : ''}" onclick="switchDetailCandleResolution('15', this)">15m</button>
-                  <button class="period-tab-btn ${currentDetailCandleRes === '1H' ? 'active' : ''}" onclick="switchDetailCandleResolution('1H', this)">1H</button>
-                  <button class="period-tab-btn ${currentDetailCandleRes === '1D' ? 'active' : ''}" onclick="switchDetailCandleResolution('1D', this)">1D</button>
-                  <button class="period-tab-btn ${currentDetailCandleRes === '1W' ? 'active' : ''}" onclick="switchDetailCandleResolution('1W', this)">1W</button>
+          <!-- CỘT PHẢI: 1. BIỂU ĐỒ (NẾN KỸ THUẬT / INTRADAY) + 2. ĐỊNH GIÁ FA + 3. TRỢ LÝ AI -->
+          <div style="display:flex; flex-direction:column; gap:10px; min-width:0;">
+
+            <!-- 1. BIỂU ĐỒ INTRADAY TRONG PHIÊN HOẶC BIỂU ĐỒ NẾN KỸ THUẬT -->
+            <div class="tongquan-card" style="margin:0; display:flex; flex-direction:column; position:relative;">
+              <div class="intraday-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span id="stockDetailChartTitle" style="font-weight:700;">${detailChartMode === 'candle' ? `BIỂU ĐỒ NẾN KỸ THUẬT • ${stock.symbol}` : `DIỄN BIẾN TRONG PHIÊN • ${stock.symbol}`}</span>
+                  <span style="font-size:10.5px; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); color:var(--primary-brand); border:1px solid var(--border-stroke); font-weight:600;" id="stockDetailChartBadge">${detailChartMode === 'candle' ? 'FireAnt Realtime' : 'Khớp lệnh Realtime'}</span>
                 </div>
-                <span style="color:var(--price-ref); font-size:11px; display:${detailChartMode === 'candle' ? 'none' : 'inline'};" id="stockDetailRefLabel">Tham chiếu: ${refPrice.toLocaleString('vi-VN')}</span>
-                <a id="stockDetailTvExternalLink" href="https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px; font-weight:600;" title="Mở biểu đồ kỹ thuật FireAnt trong tab mới">
-                  FireAnt.vn ↗
-                </a>
-              </div>
-            </div>
-
-            <!-- CHẾ ĐỘ 1: INTRADAY SVG -->
-            <div id="stockDetailSvgContainer" style="flex:1; min-height:140px; position:relative; display:${detailChartMode === 'candle' ? 'none' : 'block'};">
-              <svg id="stockDetailIntradaySvg" viewBox="0 0 450 140" style="width:100%; height:140px; display:block;"></svg>
-              <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-muted); margin-top:4px;">
-                <span>09:15</span>
-                <span>10:30</span>
-                <span>11:30</span>
-                <span>13:30</span>
-                <span>14:30 (Đóng cửa)</span>
-              </div>
-            </div>
-
-            <!-- CHẾ ĐỘ 2: BIỂU ĐỒ NẾN NHẬT BẢN FIREANT CHUẨN XÁC CAO (https://fireant.vn/charts) + TÙY CHỌN CHỈ BÁO NỘI BỘ -->
-            <div id="stockDetailCandleContainer" style="display:${detailChartMode === 'candle' ? 'flex' : 'none'}; flex-direction:column; width:100%; padding-top:4px; gap:6px;">
-              <!-- THANH ĐIỀU HƯỚNG TAB CON: FIREANT (CHUẨN XÁC CAO) & CHỈ BÁO NỘI BỘ ROBOSTOCK -->
-              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                <div style="display:inline-flex; gap:4px; background:var(--bg-subtle); padding:2px; border-radius:4px; border:1px solid var(--border-stroke);">
-                  <button type="button" id="btnSubChartFireant" class="period-tab-btn active" onclick="switchCandleSubView('fireant')" style="font-size:11px; padding:3px 10px; font-weight:600;">Biểu đồ FireAnt (Chuẩn xác)</button>
-                  <button type="button" id="btnSubChartRobo" class="period-tab-btn" onclick="switchCandleSubView('robostock')" style="font-size:11px; padding:3px 10px; font-weight:600;">Chỉ báo Robostock (Nội bộ)</button>
-                </div>
-                <a href="https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="Mở biểu đồ kỹ thuật FireAnt toàn màn hình">
-                  FireAnt.vn ↗
-                </a>
-              </div>
-
-              <!-- VIEW 1: BIỂU ĐỒ NẾN FIREANT CHÍNH THỨC (MẶC ĐỊNH CHUẨN XÁC) -->
-              <div id="candleFireantWrapper" style="position:relative; width:100%; height:460px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden;">
-                <iframe id="stockDetailFireantIframe" src="https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}" style="width:100%; height:100%; border:none; display:block;" allowfullscreen title="Biểu đồ nến FireAnt"></iframe>
-              </div>
-
-              <!-- VIEW 2: BIỂU ĐỒ CHỈ BÁO ROBOSTOCK CANVAS (DỰ PHÒNG KHI CẦN SOI HVP/QUIET/STOCH) -->
-              <div id="candleRobostockWrapper" style="display:none; flex-direction:column; gap:6px; width:100%;">
-                <!-- CONTAINER THANH CÔNG CỤ CHỈ BÁO ROBOSTOCK -->
-                <div id="indicatorToolbarContainer">
-                  ${renderIndicatorToolbarHtml()}
-                </div>
-
-                <!-- THANH THÔNG TIN NẾN & CHỈ SỐ OHLC + GIÁ TRỊ CHỈ BÁO REALTIME -->
-                <div id="candleOhlcLegend" style="font-family:var(--font-data); font-size:11px; color:var(--text-secondary); min-height:22px; padding:3px 8px; background:var(--bg-subtle); border-radius:4px; border:1px solid var(--border-stroke); display:flex; align-items:center; gap:8px; overflow-x:auto; white-space:nowrap;">
-                  <span>Đang tải nến biểu đồ...</span>
-                </div>
-
-                <!-- KHUNG CANVAS ĐỒ THỊ CHÍNH & CÁC CỬA SỔ PHỤ CHỈ BÁO -->
-                <div id="candleCanvasWrapper" style="position:relative; width:100%; height:320px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden; transition:height 0.2s ease;">
-                  <canvas id="stockDetailCandleCanvas" style="width:100%; height:100%; display:block; cursor:crosshair;"></canvas>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <!-- Bộ chọn khung giờ nến (15m, 1H, 1D, 1W) hoạt động trực tiếp tức thì -->
+                  <div id="stockDetailCandleTfControls" style="display:${detailChartMode === 'candle' ? 'inline-flex' : 'none'}; gap:4px; align-items:center;">
+                    <button class="period-tab-btn ${currentDetailCandleRes === '15' ? 'active' : ''}" onclick="switchDetailCandleResolution('15', this)">15m</button>
+                    <button class="period-tab-btn ${currentDetailCandleRes === '1H' ? 'active' : ''}" onclick="switchDetailCandleResolution('1H', this)">1H</button>
+                    <button class="period-tab-btn ${currentDetailCandleRes === '1D' ? 'active' : ''}" onclick="switchDetailCandleResolution('1D', this)">1D</button>
+                    <button class="period-tab-btn ${currentDetailCandleRes === '1W' ? 'active' : ''}" onclick="switchDetailCandleResolution('1W', this)">1W</button>
+                  </div>
+                  <span style="color:var(--price-ref); font-size:11px; display:${detailChartMode === 'candle' ? 'none' : 'inline'};" id="stockDetailRefLabel">Tham chiếu: ${refPrice.toLocaleString('vi-VN')}</span>
+                  <a id="stockDetailTvExternalLink" href="https://fireant.vn/ma-chung-khoan/${encodeURIComponent(stock.symbol)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px; font-weight:600;" title="Mở trang hồ sơ cổ phiếu trên FireAnt">
+                    FireAnt.vn ↗
+                  </a>
                 </div>
               </div>
-            </div>
-          </div>
 
-        </div>
-
-        <!-- ROW 2: PHÂN TÍCH KỸ THUẬT & RSI GAUGE + CHỈ SỐ CƠ BẢN FA -->
-        <div class="grid-row-2col">
-
-          <!-- CARD KỸ THUẬT & RSI GAUGE (CHUẨN RSI-SECTION Ở CỘT TRÁI) -->
-          <div class="tongquan-card" style="margin:0;">
-            <div class="rsi-section-title">
-              <span class="blue-accent-bar"></span>
-              Phân tích kỹ thuật & Chỉ báo RSI
-            </div>
-
-            <div class="stats-cards-grid" id="detailRsiCards">
-              <div class="stats-card" id="detailCard_15m" onclick="selectDetailRSIInterval('15m', this)" style="cursor:pointer;">
-                <div class="stats-card-label">15 Phút</div>
-                <div class="stats-card-value text-ref" id="detailRsiVal_15m">Đang tải...</div>
-              </div>
-              <div class="stats-card" id="detailCard_1h" onclick="selectDetailRSIInterval('1h', this)" style="cursor:pointer;">
-                <div class="stats-card-label">Hàng giờ</div>
-                <div class="stats-card-value text-ref" id="detailRsiVal_1h">Đang tải...</div>
-              </div>
-              <div class="stats-card active" id="detailCard_1d" onclick="selectDetailRSIInterval('1d', this)" style="cursor:pointer;">
-                <div class="stats-card-label">Hàng ngày</div>
-                <div class="stats-card-value text-ref" id="detailRsiVal_1d">Đang tải...</div>
-              </div>
-              <div class="stats-card" id="detailCard_1w" onclick="selectDetailRSIInterval('1w', this)" style="cursor:pointer;">
-                <div class="stats-card-label">Hàng tuần</div>
-                <div class="stats-card-value text-ref" id="detailRsiVal_1w">Đang tải...</div>
-              </div>
-            </div>
-
-            <!-- GAUGE CHART (RSI) -->
-            <div class="gauge-panel" style="margin-top:6px;">
-              <div class="gauge-svg-wrap">
-                <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
-                  <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
-                  <path id="stockDetailRsiArc" d="M 10 50 A 40 40 0 0 1 ${initArcX} ${initArcY}" fill="none" stroke="${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'}" stroke-width="8" stroke-linecap="round"/>
-                  <circle cx="50" cy="50" r="4" fill="var(--text-primary)"/>
-                  <line id="stockDetailRsiNeedle" x1="50" y1="50" x2="${initTipX}" y2="${initTipY}" stroke="${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'}" stroke-width="2.5" stroke-linecap="round"/>
-                </svg>
-              </div>
-              <div class="gauge-info">
-                <div class="gauge-info-title">Chỉ báo RSI (14) của ${stock.symbol}</div>
-                <div class="gauge-info-score" id="stockDetailRsiScore" style="color:${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'};">${rsiScore}</div>
-                <div class="gauge-info-desc" id="stockDetailRsiDesc">${rsiDesc}</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- CARD ĐỊNH GIÁ & TÀI CHÍNH FA -->
-          <div class="tongquan-card" style="margin:0;">
-            <div class="rsi-section-title">
-              <span class="blue-accent-bar"></span>
-              Định giá & Chỉ số Cơ bản (FA)
-            </div>
-
-            <div class="cap-boxes-grid" style="grid-template-columns: repeat(2, 1fr); gap:8px;">
-              <div class="cap-stat-box">
-                <div class="cap-stat-name">P/E (Hệ số giá / Lợi nhuận)</div>
-                <div class="cap-stat-val text-up">${stock.pe ? stock.pe.toFixed(1) + 'x' : '11.8x'}</div>
-                <div class="cap-stat-sub">TB ngành: ~14.5x</div>
-              </div>
-              <div class="cap-stat-box">
-                <div class="cap-stat-name">P/B (Giá / Giá trị sổ sách)</div>
-                <div class="cap-stat-val text-up">${stock.pb ? stock.pb.toFixed(2) + 'x' : '1.48x'}</div>
-                <div class="cap-stat-sub">Định giá hấp dẫn</div>
-              </div>
-              <div class="cap-stat-box">
-                <div class="cap-stat-name">ROE (Hiệu quả vốn CSH)</div>
-                <div class="cap-stat-val text-up">${stock.roe ? stock.roe.toFixed(1) + '%' : '18.2%'}</div>
-                <div class="cap-stat-sub">Top doanh nghiệp hiệu quả</div>
-              </div>
-              <div class="cap-stat-box">
-                <div class="cap-stat-name">Vốn hóa thị trường</div>
-                <div class="cap-stat-val text-up">${stock.marketCap ? stock.marketCap.toLocaleString('vi-VN') : '188.000'} tỷ</div>
-                <div class="cap-stat-sub">Rổ cổ phiếu lớn VN30</div>
-              </div>
-            </div>
-
-            <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.45; margin-top:8px; padding-top:6px; border-top:1px dashed var(--border-stroke);">
-              <b>Nhận định FA</b>: Mã <b>${stock.symbol}</b> có định giá P/E ở mức ${stock.pe || 11.8}x, thấp hơn trung bình ngành, ROE đạt ${stock.roe || 18.2}% thể hiện sức sinh lời vượt trội và cơ hội đầu tư bền vững.
-            </div>
-          </div>
-
-        </div>
-
-        <!-- ROW 3: DÒNG LỆNH KHỚP REALTIME RIÊNG CỦA MÃ & TRỢ LÝ AI TẠI CHỖ -->
-        <div class="grid-row-2col">
-
-          <!-- CARD 1: DÒNG KHỚP LỆNH THỜI GIAN THỰC CỦA MÃ NÀY -->
-          <div class="tongquan-card" style="margin:0;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;">
-                ${isMarketTradingNow() ? '<span class="pulse-dot" style="width:6px;height:6px;"></span>' : ''}
-                <span>Nhật ký Khớp lệnh ${isMarketTradingNow() ? 'Realtime' : 'Chốt phiên'} • ${stock.symbol}</span>
-              </div>
-              ${isMarketTradingNow() ? '<span class="badge-tape buy" style="font-size:10px;">Khớp liên tục</span>' : '<span class="badge-tape" style="font-size:10px; background:var(--bg-subtle); color:var(--text-muted); border:1px solid var(--border-stroke);">Đóng cửa phiên</span>'}
-            </div>
-            <div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-stroke); border-radius:var(--radius-sm);">
-              <table class="market-table" style="width:100%; font-size:11.5px; border-collapse:collapse;">
-                <thead>
-                  <tr style="background:var(--bg-subtle); position:sticky; top:0; z-index:2;">
-                    <th style="padding:5px 8px; text-align:left;">Giờ</th>
-                    <th style="padding:5px 8px; text-align:right;">Giá khớp</th>
-                    <th style="padding:5px 8px; text-align:right;">+/- %</th>
-                    <th style="padding:5px 8px; text-align:right;">Khối lượng</th>
-                    <th style="padding:5px 8px; text-align:center;">Lệnh</th>
-                  </tr>
-                </thead>
-                <tbody id="detailStockTapeTbody">
-                  <!-- Populated dynamically and updated on every live tick -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- CARD 2: KHUNG HỎI TRỢ LÝ AI PHÂN TÍCH TẠI CHỖ -->
-          <div class="tongquan-card" style="margin:0; background:linear-gradient(180deg, var(--bg-container) 0%, var(--bg-subtle) 100%);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <div style="display:flex; align-items:center; gap:8px;">
-                <div class="ai-avatar-badge" style="width:26px; height:26px; font-size:11px; font-weight:700;">AI</div>
-                <div>
-                  <div style="font-size:13px; font-weight:700;">Trợ lý AI Phân tích Cổ phiếu ${stock.symbol} Realtime</div>
-                  <div style="font-size:11px; color:var(--text-muted);">Phân tích định giá, kỹ thuật và điểm mua/bán tối ưu trực tiếp trong Dashboard</div>
+              <!-- CHẾ ĐỘ 1: INTRADAY SVG -->
+              <div id="stockDetailSvgContainer" style="flex:1; min-height:140px; position:relative; display:${detailChartMode === 'candle' ? 'none' : 'block'};">
+                <svg id="stockDetailIntradaySvg" viewBox="0 0 450 140" style="width:100%; height:140px; display:block;"></svg>
+                <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-muted); margin-top:4px;">
+                  <span>09:15</span>
+                  <span>10:30</span>
+                  <span>11:30</span>
+                  <span>13:30</span>
+                  <span>14:30 (Đóng cửa)</span>
                 </div>
               </div>
-              <span class="badge-tape buy" style="font-size:10px;">AI Online</span>
+
+              <!-- CHẾ ĐỘ 2: BIỂU ĐỒ NẾN KỸ THUẬT CHUẨN XÁC THEO MÃ VÀ TÙY CHỌN FIREANT WEB -->
+              <div id="stockDetailCandleContainer" style="display:${detailChartMode === 'candle' ? 'flex' : 'none'}; flex-direction:column; width:100%; padding-top:4px; gap:6px;">
+                <!-- THANH ĐIỀU HƯỚNG TAB CON -->
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                  <div style="display:inline-flex; gap:4px; background:var(--bg-subtle); padding:2px; border-radius:4px; border:1px solid var(--border-stroke);">
+                    <button type="button" id="btnSubChartRobo" class="period-tab-btn ${currentCandleSubView !== 'fireant' ? 'active' : ''}" onclick="switchCandleSubView('robostock')" style="font-size:11px; padding:3px 10px; font-weight:600;">Biểu đồ Kỹ thuật Pro (Chuẩn xác)</button>
+                    <button type="button" id="btnSubChartFireant" class="period-tab-btn ${currentCandleSubView === 'fireant' ? 'active' : ''}" onclick="switchCandleSubView('fireant')" style="font-size:11px; padding:3px 10px; font-weight:600;">FireAnt Web (Bản đầy đủ)</button>
+                  </div>
+                  <a href="https://fireant.vn/ma-chung-khoan/${encodeURIComponent(stock.symbol)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="Mở trang cổ phiếu trên FireAnt">
+                    Mở FireAnt ↗
+                  </a>
+                </div>
+
+                <!-- VIEW 1: BIỂU ĐỒ CHỈ BÁO NỘI BỘ CANVAS (MẶC ĐỊNH CHUẨN XÁC 100% THEO MÃ, ĐA KHUNG GIỜ) -->
+                <div id="candleRobostockWrapper" style="display:${currentCandleSubView === 'fireant' ? 'none' : 'flex'}; flex-direction:column; gap:6px; width:100%;">
+                  <!-- CONTAINER THANH CÔNG CỤ CHỈ BÁO -->
+                  <div id="indicatorToolbarContainer">
+                    ${renderIndicatorToolbarHtml()}
+                  </div>
+
+                  <!-- THANH THÔNG TIN NẾN & CHỈ SỐ OHLC + GIÁ TRỊ CHỈ BÁO REALTIME -->
+                  <div id="candleOhlcLegend" style="font-family:var(--font-data); font-size:11px; color:var(--text-secondary); min-height:22px; padding:3px 8px; background:var(--bg-subtle); border-radius:4px; border:1px solid var(--border-stroke); display:flex; align-items:center; gap:8px; overflow-x:auto; white-space:nowrap;">
+                    <span>Đang tải nến biểu đồ...</span>
+                  </div>
+
+                  <!-- KHUNG CANVAS ĐỒ THỊ CHÍNH & CÁC CỬA SỔ PHỤ CHỈ BÁO -->
+                  <div id="candleCanvasWrapper" style="position:relative; width:100%; height:380px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden; transition:height 0.2s ease;">
+                    <canvas id="stockDetailCandleCanvas" style="width:100%; height:100%; display:block; cursor:crosshair;"></canvas>
+                  </div>
+                </div>
+
+                <!-- VIEW 2: BIỂU ĐỒ NẾN FIREANT IFRAME -->
+                <div id="candleFireantWrapper" style="display:${currentCandleSubView === 'fireant' ? 'block' : 'none'}; position:relative; width:100%; height:460px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden;">
+                  <iframe id="stockDetailFireantIframe" src="https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}" style="width:100%; height:100%; border:none; display:block;" allowfullscreen title="Biểu đồ nến FireAnt"></iframe>
+                </div>
+              </div>
             </div>
 
-            <!-- PROMPT QUICK PILLS -->
-            <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
-              <button onclick="askAiStockDetail('Đánh giá định giá P/E, P/B và tiềm năng tăng trưởng của ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
-                Định giá P/E, P/B
-              </button>
-              <button onclick="askAiStockDetail('Phân tích kỹ thuật, xu hướng dòng tiền và điểm mua/bán tối ưu cho ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
-                Điểm Mua / Bán
-              </button>
-              <button onclick="askAiStockDetail('Phân tích cung cầu, lực mua chủ động và khối ngoại của ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
-                Cung cầu & Rủi ro
-              </button>
+            <!-- 2. CARD ĐỊNH GIÁ & TÀI CHÍNH FA -->
+            <div class="tongquan-card" style="margin:0;">
+              <div class="rsi-section-title">
+                <span class="blue-accent-bar"></span>
+                Định giá & Chỉ số Cơ bản (FA)
+              </div>
+
+              <div class="cap-boxes-grid" style="grid-template-columns: repeat(2, 1fr); gap:8px;">
+                <div class="cap-stat-box">
+                  <div class="cap-stat-name">P/E (Hệ số giá / Lợi nhuận)</div>
+                  <div class="cap-stat-val text-up">${stock.pe ? stock.pe.toFixed(1) + 'x' : '11.8x'}</div>
+                  <div class="cap-stat-sub">TB ngành: ~14.5x</div>
+                </div>
+                <div class="cap-stat-box">
+                  <div class="cap-stat-name">P/B (Giá / Giá trị sổ sách)</div>
+                  <div class="cap-stat-val text-up">${stock.pb ? stock.pb.toFixed(2) + 'x' : '1.48x'}</div>
+                  <div class="cap-stat-sub">Định giá hấp dẫn</div>
+                </div>
+                <div class="cap-stat-box">
+                  <div class="cap-stat-name">ROE (Hiệu quả vốn CSH)</div>
+                  <div class="cap-stat-val text-up">${stock.roe ? stock.roe.toFixed(1) + '%' : '18.2%'}</div>
+                  <div class="cap-stat-sub">Top doanh nghiệp hiệu quả</div>
+                </div>
+                <div class="cap-stat-box">
+                  <div class="cap-stat-name">Vốn hóa thị trường</div>
+                  <div class="cap-stat-val text-up">${stock.marketCap ? stock.marketCap.toLocaleString('vi-VN') : '188.000'} tỷ</div>
+                  <div class="cap-stat-sub">Rổ cổ phiếu lớn VN30</div>
+                </div>
+              </div>
+
+              <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.45; margin-top:8px; padding-top:6px; border-top:1px dashed var(--border-stroke);">
+                <b>Nhận định FA</b>: Mã <b>${stock.symbol}</b> có định giá P/E ở mức ${stock.pe || 11.8}x, thấp hơn trung bình ngành, ROE đạt ${stock.roe || 18.2}% thể hiện sức sinh lời vượt trội và cơ hội đầu tư bền vững.
+              </div>
             </div>
 
-            <!-- INPUT FIELD & SEND -->
-            <div style="display:flex; gap:8px;">
-              <input type="text" id="aiStockPromptInput" placeholder="Đặt câu hỏi phân tích về ${stock.symbol} (ví dụ: target giá bao nhiêu, có nên mua hôm nay?)..." onkeydown="if(event.key==='Enter')submitAiStockDetailPrompt('${stock.symbol}')" style="flex:1; padding:7px 12px; border:1px solid var(--border-stroke); border-radius:var(--radius-sm); background:var(--bg-container); color:var(--text-primary); font-size:12.5px; outline:none;">
-              <button onclick="submitAiStockDetailPrompt('${stock.symbol}')" id="btnSubmitAiStock" class="btn-login-main" style="border:none; cursor:pointer; font-size:12px; padding:0 16px;">
-                Gửi câu hỏi
-              </button>
+            <!-- 3. KHUNG HỎI TRỢ LÝ AI PHÂN TÍCH TẠI CHỖ -->
+            <div class="tongquan-card" style="margin:0; background:linear-gradient(180deg, var(--bg-container) 0%, var(--bg-subtle) 100%);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <div class="ai-avatar-badge" style="width:26px; height:26px; font-size:11px; font-weight:700;">AI</div>
+                  <div>
+                    <div style="font-size:13px; font-weight:700;">Trợ lý AI Phân tích Cổ phiếu ${stock.symbol} Realtime</div>
+                    <div style="font-size:11px; color:var(--text-muted);">Phân tích định giá, kỹ thuật và điểm mua/bán tối ưu trực tiếp trong Dashboard</div>
+                  </div>
+                </div>
+                <span class="badge-tape buy" style="font-size:10px;">AI Online</span>
+              </div>
+
+              <!-- PROMPT QUICK PILLS -->
+              <div style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+                <button onclick="askAiStockDetail('Đánh giá định giá P/E, P/B và tiềm năng tăng trưởng của ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
+                  Định giá P/E, P/B
+                </button>
+                <button onclick="askAiStockDetail('Phân tích kỹ thuật, xu hướng dòng tiền và điểm mua/bán tối ưu cho ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
+                  Điểm Mua / Bán
+                </button>
+                <button onclick="askAiStockDetail('Phân tích cung cầu, lực mua chủ động và khối ngoại của ${stock.symbol}')" class="watchlist-chip-btn active" style="font-size:11px; padding:3px 10px;">
+                  Cung cầu & Rủi ro
+                </button>
+              </div>
+
+              <!-- INPUT FIELD & SEND -->
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="aiStockPromptInput" placeholder="Đặt câu hỏi phân tích về ${stock.symbol} (ví dụ: target giá bao nhiêu, có nên mua hôm nay?)..." onkeydown="if(event.key==='Enter')submitAiStockDetailPrompt('${stock.symbol}')" style="flex:1; padding:7px 12px; border:1px solid var(--border-stroke); border-radius:var(--radius-sm); background:var(--bg-container); color:var(--text-primary); font-size:12.5px; outline:none;">
+                <button onclick="submitAiStockDetailPrompt('${stock.symbol}')" id="btnSubmitAiStock" class="btn-login-main" style="border:none; cursor:pointer; font-size:12px; padding:0 16px;">
+                  Gửi câu hỏi
+                </button>
+              </div>
+
+              <!-- AI RESPONSE BOX -->
+              <div id="aiStockDetailResponseBox" style="margin-top:8px; max-height:130px; overflow-y:auto; padding:10px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-stroke); background:var(--bg-container); font-size:12px; line-height:1.55; display:none;">
+                <!-- AI Answer injected here -->
+              </div>
             </div>
 
-            <!-- AI RESPONSE BOX -->
-            <div id="aiStockDetailResponseBox" style="margin-top:8px; max-height:130px; overflow-y:auto; padding:10px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-stroke); background:var(--bg-container); font-size:12px; line-height:1.55; display:none;">
-              <!-- AI Answer injected here -->
-            </div>
           </div>
 
         </div>
@@ -8078,6 +8082,7 @@ body {
       if (card) card.classList.add('active');
 
       const sym = (currentStockDetailSymbol || 'BID').toUpperCase();
+      const baseChg = (window.currentModalStock && window.currentModalStock.change !== undefined && window.currentModalStock.change !== null) ? window.currentModalStock.change : 0;
       const cached = detailRsiDataCache[sym]?.data;
       if (cached && cached.rsi && cached.rsi[interval] !== undefined && cached.rsi[interval] !== null) {
         const liveScore = Number(cached.rsi[interval]);
@@ -8186,7 +8191,7 @@ body {
     }
 
     // ==================== BỘ ĐỒ THỊ NẾN NHẬT BẢN FIREANT & ROBOSTOCK ====================
-    let currentCandleSubView = 'fireant';
+    let currentCandleSubView = 'robostock';
 
     function switchCandleSubView(mode) {
       currentCandleSubView = mode;
@@ -8202,15 +8207,18 @@ body {
         if (roboWrap) roboWrap.style.display = 'none';
         if (btnFa) btnFa.classList.add('active');
         if (btnRobo) btnRobo.classList.remove('active');
-        if (tfControls) tfControls.style.display = 'none';
-        if (chartBadge) chartBadge.textContent = 'FireAnt Chart';
+        if (chartBadge) chartBadge.textContent = 'FireAnt Web';
+        const iframe = document.getElementById('stockDetailFireantIframe');
+        if (iframe && currentStockDetailSymbol && !iframe.src.includes(encodeURIComponent(currentStockDetailSymbol))) {
+          iframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(currentStockDetailSymbol)}`;
+        }
       } else {
         if (faWrap) faWrap.style.display = 'none';
         if (roboWrap) roboWrap.style.display = 'flex';
         if (btnFa) btnFa.classList.remove('active');
         if (btnRobo) btnRobo.classList.add('active');
         if (tfControls) tfControls.style.display = 'inline-flex';
-        if (chartBadge) chartBadge.textContent = 'DNSE Entrade X';
+        if (chartBadge) chartBadge.textContent = 'FireAnt Realtime';
         if (currentStockDetailSymbol && typeof drawDnseStockCandleChart === 'function') {
           drawDnseStockCandleChart(currentStockDetailSymbol, currentDetailCandleRes);
         }
@@ -10142,8 +10150,8 @@ body {
         candleCont.style.display = 'flex';
         const isRobo = (typeof currentCandleSubView !== 'undefined' && currentCandleSubView === 'robostock');
         if (tfControls) tfControls.style.display = isRobo ? 'inline-flex' : 'none';
-        if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN NHẬT BẢN • ${targetSym}`;
-        if (chartBadge) chartBadge.textContent = isRobo ? 'DNSE Entrade X' : 'FireAnt Chart';
+        if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN KỸ THUẬT • ${targetSym}`;
+        if (chartBadge) chartBadge.textContent = isRobo ? 'FireAnt Realtime' : 'FireAnt Web';
         if (refLabel) refLabel.style.display = 'none';
         btn.innerHTML = 'Biểu đồ Intraday';
 
@@ -10160,9 +10168,9 @@ body {
         candleCont.style.display = 'none';
         if (tfControls) tfControls.style.display = 'none';
         if (chartTitle) chartTitle.textContent = `DIỄN BIẾN TRONG PHIÊN • ${targetSym}`;
-        if (chartBadge) chartBadge.textContent = 'DNSE Realtime';
+        if (chartBadge) chartBadge.textContent = 'Khớp lệnh Realtime';
         if (refLabel) refLabel.style.display = 'inline';
-        btn.innerHTML = 'Biểu đồ Nến FireAnt';
+        btn.innerHTML = 'Biểu đồ Nến Kỹ thuật';
 
         const stock = (stockDataList && stockDataList.find(s => s.symbol === targetSym)) || { price: 33500 };
         renderStockDetailIntradaySvg(stock);
