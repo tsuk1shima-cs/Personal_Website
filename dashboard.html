@@ -2951,10 +2951,19 @@ body {
                     <button class="watchlist-chip-btn" onclick="selectChip('LOGISTICS', this)">Cảng biển</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('POWER', this)">Điện & NL</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('PUBLIC', this)">Đầu tư công</button>
-                    <button class="watchlist-chip-btn" onclick="selectChip('AGRI', this)">Thủy sản & Nông nghiệp</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('BUILD', this)">VLXD</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('KCN', this)">BĐS KCN</button>
-                    <button class="watchlist-chip-btn" onclick="selectChip('INS', this)">Bảo hiểm</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('RUBBER', this)">Cao su</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('AGRI', this)">Thủy sản</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('CONSUMER', this)">Thực phẩm</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('SUGAR', this)">Đường-Gỗ-Giấy</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('TEXTILE', this)">Dệt may</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('PHARMA', this)">Dược - Y tế</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('AIR', this)">Hàng không</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('WATER_PLASTIC', this)">Nước - Nhựa</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('AUTO', this)">Ôtô-Phụ tùng</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('MINING', this)">Khoáng sản</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('INS', this)">Bảo hiểm</button>
                   </div>
                 </div>
 
@@ -4002,21 +4011,537 @@ body {
 
     // Danh mục 16 nhóm ngành đầy đủ và cổ phiếu thành phần đại diện
     const SECTOR_GROUPS = [
-      { name: 'Ngân hàng', symbols: ['VCB', 'BID', 'CTG', 'TCB', 'MBB', 'VPB', 'ACB', 'STB', 'HDB', 'SHB', 'LPB', 'SSB', 'VIB', 'MSB', 'OCB'] },
-      { name: 'Bất động sản', symbols: ['VHM', 'VIC', 'VRE', 'NVL', 'PDR', 'DXG', 'KDH', 'NLG', 'DIG', 'CEO', 'SJS', 'AGG', 'HDC', 'TCH'] },
-      { name: 'Chứng khoán', symbols: ['SSI', 'VND', 'VIX', 'HCM', 'SHS', 'MBS', 'VCI', 'FTS', 'BSI', 'CTS', 'ORS'] },
-      { name: 'Thép & VLXD', symbols: ['HPG', 'HSG', 'NKG', 'VGS', 'SMC', 'POM', 'TLH'] },
-      { name: 'Dầu khí', symbols: ['GAS', 'PLX', 'PVD', 'PVS', 'BSR', 'PVT', 'PVC', 'PVP'] },
-      { name: 'Công nghệ thông tin', symbols: ['FPT', 'CTR', 'ELC', 'CMG', 'VGI', 'FOX'] },
-      { name: 'Bán lẻ', symbols: ['MWG', 'FRT', 'PNJ', 'DGW', 'PET'] },
-      { name: 'Hóa chất & Phân bón', symbols: ['DGC', 'DCM', 'DPM', 'BFC', 'CSV', 'LAS', 'DDV'] },
-      { name: 'Cảng biển & Logistics', symbols: ['GMD', 'HAH', 'VOS', 'VSC', 'PVT', 'PVP'] },
-      { name: 'Điện & Năng lượng', symbols: ['POW', 'PC1', 'REE', 'GEG', 'TV2', 'HDG', 'BCG', 'NT2'] },
-      { name: 'Đầu tư công & Hạ tầng', symbols: ['VCG', 'HHV', 'LCG', 'FCN', 'C4G', 'DPG', 'CII', 'CTD', 'HBC', 'HUT'] },
-      { name: 'Thủy sản & Nông nghiệp', symbols: ['VHC', 'ANV', 'IDI', 'FMC', 'BAF', 'DBC', 'HAG', 'HNG', 'PAN'] },
-      { name: 'BĐS Khu công nghiệp', symbols: ['KBC', 'IDC', 'GVR', 'BCM', 'PHR', 'DPR', 'SZC', 'TIP'] },
-      { name: 'Bảo hiểm', symbols: ['BVH', 'BMI', 'MIG', 'BIC', 'PVI'] },
-      { name: 'Thực phẩm & Đồ uống', symbols: ['VNM', 'MSN', 'SAB', 'KDC', 'QNS', 'SBT'] }
+          {
+                "name": "Ngân hàng",
+                "symbols": [
+                      "ABB",
+                      "BAB",
+                      "BVB",
+                      "HDB",
+                      "TCB",
+                      "NVB",
+                      "OCB",
+                      "SSB",
+                      "ACB",
+                      "BID",
+                      "CTG",
+                      "EIB",
+                      "EVF",
+                      "MSB",
+                      "KLB",
+                      "LPB",
+                      "MBB",
+                      "NAB",
+                      "SHB",
+                      "STB",
+                      "TPB",
+                      "VAB",
+                      "VCB",
+                      "VIB",
+                      "VPB"
+                ]
+          },
+          {
+                "name": "Bất động sản",
+                "symbols": [
+                      "CEO",
+                      "HTN",
+                      "NLG",
+                      "NTL",
+                      "NVL",
+                      "PDR",
+                      "QCG",
+                      "DXS",
+                      "AGG",
+                      "DXG",
+                      "BCM",
+                      "CRE",
+                      "DC4",
+                      "DIG",
+                      "CII",
+                      "SGR",
+                      "VPL",
+                      "RGG",
+                      "HHS",
+                      "HDC",
+                      "HDG",
+                      "HLD",
+                      "HQC",
+                      "HUT",
+                      "IJC",
+                      "KDH",
+                      "KHG",
+                      "KBC",
+                      "L18",
+                      "NDN",
+                      "SCR",
+                      "SJS",
+                      "TCH",
+                      "TDC",
+                      "VHM",
+                      "VIC",
+                      "VPI",
+                      "VRE"
+                ]
+          },
+          {
+                "name": "Chứng khoán",
+                "symbols": [
+                      "AGR",
+                      "APG",
+                      "LPS",
+                      "AAS",
+                      "VPX",
+                      "TCI",
+                      "ORS",
+                      "VCK",
+                      "PSI",
+                      "APS",
+                      "BMS",
+                      "BVS",
+                      "CTS",
+                      "BSI",
+                      "DSC",
+                      "DSE",
+                      "TCX",
+                      "EVS",
+                      "FTS",
+                      "HCM",
+                      "MBS",
+                      "SBS",
+                      "SHS",
+                      "SSI",
+                      "TVB",
+                      "TVC",
+                      "TVS",
+                      "VCI",
+                      "VDS",
+                      "VIG",
+                      "VND",
+                      "VIX",
+                      "WSS"
+                ]
+          },
+          {
+                "name": "Thép",
+                "symbols": [
+                      "HPG",
+                      "HSG",
+                      "POM",
+                      "NKG",
+                      "VGS",
+                      "NSH",
+                      "SHA",
+                      "SHI",
+                      "VCA",
+                      "TVN",
+                      "TLH",
+                      "SMC",
+                      "GDA"
+                ]
+          },
+          {
+                "name": "Dầu khí",
+                "symbols": [
+                      "PVS",
+                      "PVD",
+                      "PVC",
+                      "PVB",
+                      "BSR",
+                      "PLC",
+                      "PVT",
+                      "CNG",
+                      "GAS",
+                      "PVP",
+                      "OIL",
+                      "PLX"
+                ]
+          },
+          {
+                "name": "Công nghệ - TT",
+                "symbols": [
+                      "FPT",
+                      "CMG",
+                      "VGI",
+                      "VTP",
+                      "FOX",
+                      "FOC",
+                      "ITD",
+                      "CTR",
+                      "ELC",
+                      "YEG"
+                ]
+          },
+          {
+                "name": "Bán lẻ",
+                "symbols": [
+                      "DGW",
+                      "MWG",
+                      "PET",
+                      "PNJ",
+                      "FRT",
+                      "PSD",
+                      "MSN",
+                      "MCH",
+                      "DMX"
+                ]
+          },
+          {
+                "name": "Hóa chất - Phân bón",
+                "symbols": [
+                      "BFC",
+                      "CSV",
+                      "DCM",
+                      "DDV",
+                      "DPM",
+                      "DGC",
+                      "LAS",
+                      "LIX",
+                      "PMB",
+                      "NET",
+                      "PAC"
+                ]
+          },
+          {
+                "name": "Cảng biển - Vận tải",
+                "symbols": [
+                      "PVT",
+                      "PHP",
+                      "TCL",
+                      "DVP",
+                      "SKG",
+                      "DXP",
+                      "PVP",
+                      "HAH",
+                      "GMD",
+                      "GSP",
+                      "HHG",
+                      "ILB",
+                      "MAC",
+                      "SGP",
+                      "STG",
+                      "SWC",
+                      "TCO",
+                      "TCW",
+                      "TMS",
+                      "VIP",
+                      "VNA",
+                      "VOS",
+                      "VSC",
+                      "VTO"
+                ]
+          },
+          {
+                "name": "Điện - Năng lượng",
+                "symbols": [
+                      "KHP",
+                      "PPC",
+                      "PVG",
+                      "QTP",
+                      "VSH",
+                      "TTA",
+                      "GEG",
+                      "SJD",
+                      "NT2",
+                      "REE",
+                      "PC1",
+                      "HND",
+                      "GEX",
+                      "VNE",
+                      "TV2",
+                      "POW",
+                      "HDG",
+                      "GEE",
+                      "TV1",
+                      "SJE",
+                      "BCG"
+                ]
+          },
+          {
+                "name": "Đầu tư công",
+                "symbols": [
+                      "BCC",
+                      "C4G",
+                      "BTS",
+                      "SD6",
+                      "THG",
+                      "C32",
+                      "C47",
+                      "CTD",
+                      "DHA",
+                      "CII",
+                      "CTI",
+                      "DPG",
+                      "FCN",
+                      "G36",
+                      "HHV",
+                      "HOM",
+                      "HT1",
+                      "KSB",
+                      "LCG",
+                      "SD5",
+                      "TV2",
+                      "VCG"
+                ]
+          },
+          {
+                "name": "Vật liệu xây dựng",
+                "symbols": [
+                      "LIG",
+                      "BCC",
+                      "BOT",
+                      "C4G",
+                      "BTS",
+                      "CRC",
+                      "HVH",
+                      "NNC",
+                      "L14",
+                      "BDT",
+                      "DVG",
+                      "PC1",
+                      "PHC",
+                      "NED",
+                      "VC2",
+                      "PTB",
+                      "PXT",
+                      "S99",
+                      "SD6",
+                      "TTF",
+                      "AMS",
+                      "BCE",
+                      "BMP",
+                      "C47",
+                      "C69",
+                      "CIG",
+                      "DC4",
+                      "CTR",
+                      "NDX",
+                      "ACC",
+                      "CTI",
+                      "DTD",
+                      "EVG",
+                      "FCM",
+                      "FCN",
+                      "G36",
+                      "GEX",
+                      "HBC",
+                      "HHV",
+                      "HOM",
+                      "HT1",
+                      "HUB",
+                      "HUT",
+                      "LCG",
+                      "L18",
+                      "SD5",
+                      "MVC",
+                      "NHA",
+                      "SCI",
+                      "SDD",
+                      "SD9",
+                      "TNA",
+                      "UDC",
+                      "VCG",
+                      "VCS",
+                      "VGC",
+                      "VC7",
+                      "VC9",
+                      "VLB",
+                      "VNE",
+                      "VTV"
+                ]
+          },
+          {
+                "name": "BĐS KCN",
+                "symbols": [
+                      "D2D",
+                      "GVR",
+                      "IDC",
+                      "KBC",
+                      "LHG",
+                      "PHR",
+                      "SIP",
+                      "SZC",
+                      "SZL",
+                      "TIP",
+                      "VGC",
+                      "DTD",
+                      "IDV",
+                      "NTC",
+                      "BCM",
+                      "GEL"
+                ]
+          },
+          {
+                "name": "Cao su",
+                "symbols": [
+                      "DPR",
+                      "DRI",
+                      "GVR",
+                      "PHR",
+                      "TNC",
+                      "DRG",
+                      "HRC",
+                      "TRC"
+                ]
+          },
+          {
+                "name": "Thủy sản",
+                "symbols": [
+                      "AAM",
+                      "ACL",
+                      "ANV",
+                      "CMX",
+                      "FMC",
+                      "IDI",
+                      "VHC",
+                      "ASM"
+                ]
+          },
+          {
+                "name": "Thực phẩm",
+                "symbols": [
+                      "AFX",
+                      "HAG",
+                      "PAN",
+                      "QNS",
+                      "APF",
+                      "BAF",
+                      "BNA",
+                      "DBC",
+                      "HPA",
+                      "AIG",
+                      "LSS",
+                      "HNG",
+                      "MSN",
+                      "KDC",
+                      "MCM",
+                      "MLS",
+                      "NAF",
+                      "SLS",
+                      "TAR",
+                      "VHE",
+                      "VLC",
+                      "VNM",
+                      "SAB"
+                ]
+          },
+          {
+                "name": "Đường - Gỗ - Giấy",
+                "symbols": [
+                      "GDT",
+                      "LSS",
+                      "QNS",
+                      "SBT",
+                      "SLS",
+                      "CBS",
+                      "KTS",
+                      "DHC",
+                      "HHP",
+                      "TLG"
+                ]
+          },
+          {
+                "name": "Dệt may",
+                "symbols": [
+                      "ADS",
+                      "EVE",
+                      "GIL",
+                      "KMR",
+                      "MSH",
+                      "STK",
+                      "TCM",
+                      "TNG",
+                      "VGT"
+                ]
+          },
+          {
+                "name": "Dược - Y tế",
+                "symbols": [
+                      "DBD",
+                      "DCL",
+                      "DHG",
+                      "DHT",
+                      "DMC",
+                      "IMP",
+                      "LDP",
+                      "SPM",
+                      "TNH",
+                      "JVC",
+                      "DHD"
+                ]
+          },
+          {
+                "name": "Hàng không - Du lịch",
+                "symbols": [
+                      "ACV",
+                      "AST",
+                      "HVN",
+                      "SAS",
+                      "VJC",
+                      "VTD",
+                      "NCT",
+                      "DAH",
+                      "RIC",
+                      "SCS",
+                      "SGN",
+                      "SKG"
+                ]
+          },
+          {
+                "name": "Nước - Nhựa",
+                "symbols": [
+                      "AAA",
+                      "APH",
+                      "BMP",
+                      "BWE",
+                      "DAG",
+                      "NTP",
+                      "TDM",
+                      "VNP",
+                      "HII",
+                      "NHH",
+                      "PGN",
+                      "PLP"
+                ]
+          },
+          {
+                "name": "Ôtô - Phụ tùng",
+                "symbols": [
+                      "DRC",
+                      "HAX",
+                      "CTF",
+                      "CSM",
+                      "PAC"
+                ]
+          },
+          {
+                "name": "Khoáng sản",
+                "symbols": [
+                      "KSV",
+                      "HGM",
+                      "KCB",
+                      "YBM",
+                      "BKC",
+                      "BMC",
+                      "FCM",
+                      "MSR"
+                ]
+          },
+          {
+                "name": "Bảo hiểm",
+                "symbols": [
+                      "BIC",
+                      "BMI",
+                      "BVH",
+                      "MIG",
+                      "PGI",
+                      "PRE",
+                      "PTI",
+                      "PVI",
+                      "VNR",
+                      "ABI"
+                ]
+          }
     ];
     let SECTOR_DATA = [];
 
@@ -5176,301 +5701,2877 @@ body {
     const sectorSortState = {};
 
     const SECTOR_DEFINITIONS = [
-      {
-        id: 'VN30',
-        title: 'VN30',
-        chip: 'VN30',
-        baselineChg: 0.62,
-        stocks: [
-          { symbol: 'SHB', price: 10.65, change: 2.4, volume: 49973400 },
-          { symbol: 'LPB', price: 38, change: 2.15, volume: 2042300 },
-          { symbol: 'VHM', price: 61, change: 3.57, volume: 8494300 },
-          { symbol: 'BID', price: 33.95, change: 2.26, volume: 3439500 },
-          { symbol: 'VRE', price: 22.85, change: 1.11, volume: 2582800 },
-          { symbol: 'SSB', price: 16.15, change: 1.57, volume: 1909700 },
-          { symbol: 'VNM', price: 57.8, change: 1.05, volume: 1620000 },
-          { symbol: 'CTG', price: 30.6, change: 2.68, volume: 10200000 },
-          { symbol: 'SSI', price: 19.45, change: 1.04, volume: 12587800 },
-          { symbol: 'FPT', price: 58.2, change: 0.34, volume: 3733300 },
-          { symbol: 'BSR', price: 28.35, change: 0.53, volume: 7500700 },
-          { symbol: 'VCB', price: 56.9, change: 0.71, volume: 2388700 },
-          { symbol: 'GVR', price: 31.15, change: 0.81, volume: 519200 },
-          { symbol: 'STB', price: 62.8, change: 0, volume: 1790000 },
-          { symbol: 'VIB', price: 13.85, change: 0.36, volume: 6624100 },
-          { symbol: 'MSB', price: 14.8, change: 1.02, volume: 11746800 },
-          { symbol: 'HPG', price: 20.9, change: 0.72, volume: 10189400 },
-          { symbol: 'TCB', price: 33.2, change: 0.91, volume: 12740900 },
-          { symbol: 'MWG', price: 73.9, change: 1.51, volume: 1371800 },
-          { symbol: 'MBB', price: 19.85, change: -0.25, volume: 10919400 }
-        ]
-      },
-      {
-        id: 'BANK',
-        title: 'Ngân hàng',
-        chip: 'BANK',
-        baselineChg: 0.51,
-        stocks: [
-          { symbol: 'SHB', price: 10.65, change: 2.4, volume: 49973400 },
-          { symbol: 'LPB', price: 38, change: 2.15, volume: 2042300 },
-          { symbol: 'TPB', price: 12, change: 2.13, volume: 18806500 },
-          { symbol: 'BID', price: 33.95, change: 2.26, volume: 3439500 },
-          { symbol: 'SSB', price: 16.15, change: 1.57, volume: 1909700 },
-          { symbol: 'CTG', price: 30.6, change: 2.68, volume: 10200000 },
-          { symbol: 'BVB', price: 10.45, change: 1.46, volume: 3108600 },
-          { symbol: 'KLB', price: 11, change: 0.46, volume: 141800 },
-          { symbol: 'VCB', price: 56.9, change: 0.71, volume: 2388700 },
-          { symbol: 'STB', price: 62.8, change: 0, volume: 1790000 },
-          { symbol: 'VIB', price: 13.85, change: 0.36, volume: 6624100 },
-          { symbol: 'MSB', price: 14.8, change: 1.02, volume: 11746800 },
-          { symbol: 'OCB', price: 10.05, change: 0.5, volume: 523300 },
-          { symbol: 'ACB', price: 20.6, change: 0, volume: 5160300 },
-          { symbol: 'TCB', price: 33.2, change: 0.91, volume: 12740900 },
-          { symbol: 'MBB', price: 19.85, change: -0.25, volume: 10919400 },
-          { symbol: 'HDB', price: 22.8, change: 0, volume: 24291300 },
-          { symbol: 'VPB', price: 24.5, change: 0.2, volume: 9651700 }
-        ]
-      },
-      {
-        id: 'RE',
-        title: 'Bất động sản',
-        chip: 'RE',
-        baselineChg: 0.38,
-        stocks: [
-          { symbol: 'SJS', price: 57.1, change: 6.33, volume: 156800 },
-          { symbol: 'AGG', price: 9.16, change: 2.69, volume: 304000 },
-          { symbol: 'VHM', price: 61, change: 3.57, volume: 8494300 },
-          { symbol: 'KDH', price: 14.15, change: 3.66, volume: 7622200 },
-          { symbol: 'NLG', price: 21.5, change: 0.47, volume: 695600 },
-          { symbol: 'HQC', price: 2.01, change: 1.52, volume: 2000000 },
-          { symbol: 'HTN', price: 7.16, change: 1.42, volume: 194400 },
-          { symbol: 'NVL', price: 10.65, change: -0.47, volume: 14710300 },
-          { symbol: 'VRE', price: 22.85, change: 1.11, volume: 2582800 },
-          { symbol: 'HDC', price: 10.35, change: 0, volume: 1009300 },
-          { symbol: 'CEO', price: 11, change: 0, volume: 5206800 },
-          { symbol: 'TCH', price: 11.2, change: 0.9, volume: 3279600 },
-          { symbol: 'DXS', price: 4.96, change: 0.81, volume: 1366500 },
-          { symbol: 'HDG', price: 15, change: 1.35, volume: 746300 },
-          { symbol: 'BCM', price: 38.55, change: 0.78, volume: 303400 },
-          { symbol: 'PDR', price: 11.2, change: -0.88, volume: 2910000 },
-          { symbol: 'DIG', price: 9.53, change: -0.73, volume: 3165000 },
-          { symbol: 'DXG', price: 10.15, change: -0.98, volume: 9690100 }
-        ]
-      },
-      {
-        id: 'SEC',
-        title: 'Chứng khoán',
-        chip: 'SEC',
-        baselineChg: 0.47,
-        stocks: [
-          { symbol: 'DSC', price: 9.6, change: 0.21, volume: 2400 },
-          { symbol: 'EVS', price: 5.6, change: 1.82, volume: 149900 },
-          { symbol: 'BSI', price: 26.2, change: 3.15, volume: 593100 },
-          { symbol: 'SHS', price: 12.3, change: 0.82, volume: 11621600 },
-          { symbol: 'APG', price: 4.06, change: 0.74, volume: 36200 },
-          { symbol: 'PSI', price: 7.8, change: 1.3, volume: 46100 },
-          { symbol: 'VIX', price: 11.85, change: 0.85, volume: 28177100 },
-          { symbol: 'CTS', price: 21.1, change: 3.18, volume: 2468600 },
-          { symbol: 'SSI', price: 19.45, change: 1.04, volume: 12587800 },
-          { symbol: 'AAS', price: 10.2, change: 0.99, volume: 916800 },
-          { symbol: 'TCI', price: 9.8, change: -0.2, volume: 39600 },
-          { symbol: 'ORS', price: 13.5, change: 0.37, volume: 1829000 },
-          { symbol: 'MBS', price: 15.1, change: -0.66, volume: 2200700 },
-          { symbol: 'TVB', price: 6.17, change: 0.16, volume: 2800 },
-          { symbol: 'VND', price: 13.25, change: 0, volume: 8816100 },
-          { symbol: 'HCM', price: 23.75, change: -1.04, volume: 1968100 },
-          { symbol: 'VCI', price: 18.95, change: 0.53, volume: 5852900 },
-          { symbol: 'FTS', price: 41.5, change: 1.22, volume: 1850000 }
-        ]
-      },
-      {
-        id: 'STEEL',
-        title: 'Thép',
-        chip: 'STEEL',
-        baselineChg: 0.19,
-        stocks: [
-          { symbol: 'POM', price: 3.20, change: 3.23, volume: 2500000 },
-          { symbol: 'TLH', price: 3.31, change: 0.61, volume: 57800 },
-          { symbol: 'HPG', price: 20.9, change: 0.72, volume: 10189400 },
-          { symbol: 'NKG', price: 10.4, change: -0.95, volume: 1971000 },
-          { symbol: 'VGS', price: 16.7, change: -0.6, volume: 241600 },
-          { symbol: 'TVN', price: 9.60, change: 0.00, volume: 291200 },
-          { symbol: 'GDA', price: 11.90, change: 0.00, volume: 27300 },
-          { symbol: 'SHI', price: 13.95, change: -0.36, volume: 106500 },
-          { symbol: 'HSG', price: 10.4, change: -0.48, volume: 2090700 },
-          { symbol: 'SMC', price: 9.69, change: -0.82, volume: 24400 }
-        ]
-      },
-      {
-        id: 'OIL',
-        title: 'Dầu khí',
-        chip: 'OIL',
-        baselineChg: 0.47,
-        stocks: [
-          { symbol: 'PVP', price: 22.75, change: 3.41, volume: 549600 },
-          { symbol: 'BSR', price: 28.35, change: 0.53, volume: 7500700 },
-          { symbol: 'PVC', price: 11.50, change: 0.88, volume: 276900 },
-          { symbol: 'PVS', price: 31.4, change: -0.63, volume: 1589100 },
-          { symbol: 'PVT', price: 23.65, change: 0, volume: 7476700 },
-          { symbol: 'PVD', price: 17.65, change: -0.28, volume: 1687300 },
-          { symbol: 'CNG', price: 19.50, change: 0.26, volume: 1700 },
-          { symbol: 'PVB', price: 20.50, change: 0.00, volume: 52800 },
-          { symbol: 'GAS', price: 76.1, change: -0.13, volume: 822300 },
-          { symbol: 'OIL', price: 13.00, change: 0.00, volume: 534500 },
-          { symbol: 'PLC', price: 18.90, change: -0.53, volume: 38400 },
-          { symbol: 'PLX', price: 35.05, change: -1.41, volume: 5070900 }
-        ]
-      },
-      {
-        id: 'TECH',
-        title: 'Công nghệ',
-        chip: 'TECH',
-        baselineChg: 0.82,
-        stocks: [
-          { symbol: 'FPT', price: 58.2, change: 0.34, volume: 3733300 },
-          { symbol: 'CMG', price: 19.75, change: 2.6, volume: 304200 },
-          { symbol: 'CTR', price: 68, change: -0.15, volume: 130900 },
-          { symbol: 'ELC', price: 11.5, change: 0, volume: 565600 },
-          { symbol: 'VGI', price: 76.4, change: 0.53, volume: 98000 },
-          { symbol: 'FOX', price: 71.00, change: 0.00, volume: 15000 },
-          { symbol: 'ITD', price: 11.20, change: -0.44, volume: 48000 }
-        ]
-      },
-      {
-        id: 'RETAIL',
-        title: 'Bán lẻ',
-        chip: 'RETAIL',
-        baselineChg: 0.54,
-        stocks: [
-          { symbol: 'FRT', price: 141, change: 0, volume: 188300 },
-          { symbol: 'PNJ', price: 18.8, change: 3.3, volume: 6075400 },
-          { symbol: 'MWG', price: 73.9, change: 1.51, volume: 1371800 },
-          { symbol: 'DGW', price: 44.5, change: -1.22, volume: 1709500 },
-          { symbol: 'PET', price: 21.00, change: -0.47, volume: 310000 }
-        ]
-      },
-      {
-        id: 'CHEM',
-        title: 'Hóa chất & Phân bón',
-        chip: 'CHEM',
-        baselineChg: 0.72,
-        stocks: [
-          { symbol: 'DGC', price: 112.5, change: 0.90, volume: 1850000 },
-          { symbol: 'DCM', price: 36.8, change: 0.55, volume: 2100000 },
-          { symbol: 'DPM', price: 34.2, change: 0.44, volume: 1750000 },
-          { symbol: 'BFC', price: 39.5, change: 1.28, volume: 680000 },
-          { symbol: 'CSV', price: 42.0, change: 0.72, volume: 490000 },
-          { symbol: 'LAS', price: 23.5, change: 0.86, volume: 820000 },
-          { symbol: 'DDV', price: 18.2, change: 0.00, volume: 350000 }
-        ]
-      },
-      {
-        id: 'LOGISTICS',
-        title: 'Cảng biển & Vận tải',
-        chip: 'LOGISTICS',
-        baselineChg: 0.65,
-        stocks: [
-          { symbol: 'GMD', price: 82.5, change: 0.61, volume: 1250000 },
-          { symbol: 'HAH', price: 42.8, change: 1.42, volume: 2450000 },
-          { symbol: 'VOS', price: 14.5, change: 0.69, volume: 980000 },
-          { symbol: 'VSC', price: 21.2, change: 0.47, volume: 1400000 },
-          { symbol: 'PVT', price: 23.65, change: 0.00, volume: 7476700 },
-          { symbol: 'PVP', price: 22.75, change: 3.41, volume: 549600 }
-        ]
-      },
-      {
-        id: 'POWER',
-        title: 'Điện & Năng lượng',
-        chip: 'POWER',
-        baselineChg: 0.45,
-        stocks: [
-          { symbol: 'POW', price: 12.8, change: 0.79, volume: 4500000 },
-          { symbol: 'PC1', price: 27.5, change: 0.36, volume: 1650000 },
-          { symbol: 'REE', price: 65.0, change: 0.78, volume: 850000 },
-          { symbol: 'GEG', price: 12.4, change: 0.40, volume: 620000 },
-          { symbol: 'TV2', price: 38.0, change: 0.00, volume: 210000 },
-          { symbol: 'HDG', price: 15.0, change: 1.35, volume: 746300 },
-          { symbol: 'BCG', price: 6.8, change: -0.44, volume: 1850000 },
-          { symbol: 'NT2', price: 20.5, change: 0.24, volume: 480000 }
-        ]
-      },
-      {
-        id: 'PUBLIC',
-        title: 'Đầu tư công & Hạ tầng',
-        chip: 'PUBLIC',
-        baselineChg: 0.85,
-        stocks: [
-          { symbol: 'VCG', price: 22.5, change: 1.12, volume: 3600000 },
-          { symbol: 'HHV', price: 13.8, change: 0.73, volume: 2800000 },
-          { symbol: 'LCG', price: 11.2, change: 0.90, volume: 2400000 },
-          { symbol: 'FCN', price: 14.6, change: 1.04, volume: 1950000 },
-          { symbol: 'C4G', price: 9.8, change: 0.00, volume: 1100000 },
-          { symbol: 'DPG', price: 52.0, change: 1.56, volume: 820000 },
-          { symbol: 'CII', price: 16.2, change: 0.62, volume: 2900000 },
-          { symbol: 'CTD', price: 68.5, change: 1.03, volume: 1150000 },
-          { symbol: 'HBC', price: 7.2, change: 0.00, volume: 1300000 },
-          { symbol: 'HUT', price: 17.5, change: 0.57, volume: 1500000 }
-        ]
-      },
-      {
-        id: 'AGRI',
-        title: 'Thủy sản & Nông nghiệp',
-        chip: 'AGRI',
-        baselineChg: 0.58,
-        stocks: [
-          { symbol: 'VHC', price: 72.0, change: 0.84, volume: 1400000 },
-          { symbol: 'ANV', price: 31.5, change: 1.12, volume: 1850000 },
-          { symbol: 'IDI', price: 11.2, change: 0.45, volume: 1200000 },
-          { symbol: 'FMC', price: 48.0, change: 0.00, volume: 350000 },
-          { symbol: 'BAF', price: 21.8, change: 0.69, volume: 1600000 },
-          { symbol: 'DBC', price: 28.5, change: 1.06, volume: 2950000 },
-          { symbol: 'HAG', price: 13.2, change: 0.76, volume: 6800000 },
-          { symbol: 'HNG', price: 4.8, change: 0.00, volume: 1450000 },
-          { symbol: 'PAN', price: 23.0, change: 0.44, volume: 780000 }
-        ]
-      },
-      {
-        id: 'KCN',
-        title: 'BĐS Khu công nghiệp',
-        chip: 'KCN',
-        baselineChg: 0.78,
-        stocks: [
-          { symbol: 'KBC', price: 29.5, change: 1.37, volume: 4200000 },
-          { symbol: 'IDC', price: 58.2, change: 0.87, volume: 1950000 },
-          { symbol: 'GVR', price: 31.15, change: 0.81, volume: 519200 },
-          { symbol: 'BCM', price: 38.55, change: 0.78, volume: 303400 },
-          { symbol: 'PHR', price: 56.0, change: 0.54, volume: 480000 },
-          { symbol: 'DPR', price: 41.5, change: 0.73, volume: 360000 },
-          { symbol: 'SZC', price: 38.8, change: 1.04, volume: 1100000 },
-          { symbol: 'TIP', price: 24.2, change: 0.41, volume: 290000 }
-        ]
-      },
-      {
-        id: 'INS',
-        title: 'Bảo hiểm',
-        chip: 'INS',
-        baselineChg: 0.35,
-        stocks: [
-          { symbol: 'BVH', price: 42.5, change: 0.47, volume: 950000 },
-          { symbol: 'BMI', price: 22.0, change: 0.00, volume: 320000 },
-          { symbol: 'MIG', price: 17.8, change: 0.56, volume: 410000 },
-          { symbol: 'BIC', price: 31.5, change: 0.00, volume: 150000 },
-          { symbol: 'PVI', price: 48.5, change: 0.21, volume: 180000 }
-        ]
-      },
-      {
-        id: 'CONSUMER',
-        title: 'Thực phẩm & Đồ uống',
-        chip: 'CONSUMER',
-        baselineChg: 0.62,
-        stocks: [
-          { symbol: 'VNM', price: 57.8, change: 1.05, volume: 1620000 },
-          { symbol: 'MSN', price: 71.4, change: 1.42, volume: 3013700 },
-          { symbol: 'SAB', price: 56.5, change: 0.36, volume: 680000 },
-          { symbol: 'KDC', price: 58.0, change: 0.00, volume: 250000 },
-          { symbol: 'QNS', price: 48.5, change: 0.62, volume: 520000 },
-          { symbol: 'SBT', price: 12.8, change: 0.39, volume: 1150000 }
-        ]
-      }
+          {
+                "id": "VN30",
+                "title": "VN30",
+                "chip": "VN30",
+                "chipLabel": "VN30",
+                "baselineChg": 0.38,
+                "stocks": [
+                      {
+                            "symbol": "VCB",
+                            "price": 56.3,
+                            "change": 0.6,
+                            "volume": 3387900
+                      },
+                      {
+                            "symbol": "BID",
+                            "price": 33.5,
+                            "change": 0.45,
+                            "volume": 2786700
+                      },
+                      {
+                            "symbol": "CTG",
+                            "price": 29.95,
+                            "change": 0.65,
+                            "volume": 14545200
+                      },
+                      {
+                            "symbol": "TCB",
+                            "price": 32.85,
+                            "change": 0.35,
+                            "volume": 12680100
+                      },
+                      {
+                            "symbol": "MBB",
+                            "price": 19.65,
+                            "change": 0.2,
+                            "volume": 9965500
+                      },
+                      {
+                            "symbol": "VPB",
+                            "price": 23.65,
+                            "change": 0.85,
+                            "volume": 21784000
+                      },
+                      {
+                            "symbol": "ACB",
+                            "price": 20.35,
+                            "change": 0.25,
+                            "volume": 4868400
+                      },
+                      {
+                            "symbol": "STB",
+                            "price": 62.5,
+                            "change": 0.3,
+                            "volume": 1072300
+                      },
+                      {
+                            "symbol": "HDB",
+                            "price": 22.45,
+                            "change": 0.35,
+                            "volume": 8002500
+                      },
+                      {
+                            "symbol": "SHB",
+                            "price": 10.55,
+                            "change": 0.1,
+                            "volume": 18436300
+                      },
+                      {
+                            "symbol": "LPB",
+                            "price": 38.15,
+                            "change": 0.15,
+                            "volume": 896700
+                      },
+                      {
+                            "symbol": "SSB",
+                            "price": 15.85,
+                            "change": 0.3,
+                            "volume": 1366100
+                      },
+                      {
+                            "symbol": "VIB",
+                            "price": 13.7,
+                            "change": 0.15,
+                            "volume": 4016900
+                      },
+                      {
+                            "symbol": "TPB",
+                            "price": 11.9,
+                            "change": 0.1,
+                            "volume": 7635000
+                      },
+                      {
+                            "symbol": "MSB",
+                            "price": 14.8,
+                            "change": 0,
+                            "volume": 8691800
+                      },
+                      {
+                            "symbol": "FPT",
+                            "price": 57.5,
+                            "change": 0.7,
+                            "volume": 3288000
+                      },
+                      {
+                            "symbol": "HPG",
+                            "price": 20.75,
+                            "change": 0.15,
+                            "volume": 8526700
+                      },
+                      {
+                            "symbol": "MWG",
+                            "price": 74.2,
+                            "change": 0.3,
+                            "volume": 1273100
+                      },
+                      {
+                            "symbol": "MSN",
+                            "price": 71.5,
+                            "change": 0.1,
+                            "volume": 2884000
+                      },
+                      {
+                            "symbol": "VNM",
+                            "price": 57.7,
+                            "change": 0.1,
+                            "volume": 1073100
+                      },
+                      {
+                            "symbol": "SAB",
+                            "price": 56.5,
+                            "change": 0.36,
+                            "volume": 680000
+                      },
+                      {
+                            "symbol": "VHM",
+                            "price": 59.6,
+                            "change": 1.4,
+                            "volume": 3653000
+                      },
+                      {
+                            "symbol": "VIC",
+                            "price": 213.5,
+                            "change": 1.5,
+                            "volume": 838100
+                      },
+                      {
+                            "symbol": "VRE",
+                            "price": 22.85,
+                            "change": 0,
+                            "volume": 1175400
+                      },
+                      {
+                            "symbol": "SSI",
+                            "price": 19.8,
+                            "change": 0.35,
+                            "volume": 21803300
+                      },
+                      {
+                            "symbol": "GAS",
+                            "price": 76.8,
+                            "change": 0.7,
+                            "volume": 451100
+                      },
+                      {
+                            "symbol": "PLX",
+                            "price": 35.25,
+                            "change": 0.2,
+                            "volume": 1486900
+                      },
+                      {
+                            "symbol": "POW",
+                            "price": 12.25,
+                            "change": 0.05,
+                            "volume": 2123000
+                      },
+                      {
+                            "symbol": "GVR",
+                            "price": 31.1,
+                            "change": 0.15,
+                            "volume": 1021500
+                      },
+                      {
+                            "symbol": "BCM",
+                            "price": 39.1,
+                            "change": 0.55,
+                            "volume": 490800
+                      }
+                ]
+          },
+          {
+                "id": "BANK",
+                "title": "Ngân hàng",
+                "chip": "BANK",
+                "chipLabel": "Ngân hàng",
+                "baselineChg": 0.25,
+                "stocks": [
+                      {
+                            "symbol": "ABB",
+                            "price": 17.6,
+                            "change": 0,
+                            "volume": 585500
+                      },
+                      {
+                            "symbol": "BAB",
+                            "price": 10.6,
+                            "change": 0,
+                            "volume": 2500
+                      },
+                      {
+                            "symbol": "BVB",
+                            "price": 10.35,
+                            "change": 0.1,
+                            "volume": 2718600
+                      },
+                      {
+                            "symbol": "HDB",
+                            "price": 22.45,
+                            "change": 0.35,
+                            "volume": 8002500
+                      },
+                      {
+                            "symbol": "TCB",
+                            "price": 32.85,
+                            "change": 0.35,
+                            "volume": 12680100
+                      },
+                      {
+                            "symbol": "NVB",
+                            "price": 13.1,
+                            "change": 0.7,
+                            "volume": 1798200
+                      },
+                      {
+                            "symbol": "OCB",
+                            "price": 10.05,
+                            "change": 0,
+                            "volume": 481500
+                      },
+                      {
+                            "symbol": "SSB",
+                            "price": 15.85,
+                            "change": 0.3,
+                            "volume": 1366100
+                      },
+                      {
+                            "symbol": "ACB",
+                            "price": 20.35,
+                            "change": 0.25,
+                            "volume": 4868400
+                      },
+                      {
+                            "symbol": "BID",
+                            "price": 33.5,
+                            "change": 0.45,
+                            "volume": 2786700
+                      },
+                      {
+                            "symbol": "CTG",
+                            "price": 29.95,
+                            "change": 0.65,
+                            "volume": 14545200
+                      },
+                      {
+                            "symbol": "EIB",
+                            "price": 16.25,
+                            "change": 0.1,
+                            "volume": 2802800
+                      },
+                      {
+                            "symbol": "EVF",
+                            "price": 11.5,
+                            "change": 0.1,
+                            "volume": 796400
+                      },
+                      {
+                            "symbol": "MSB",
+                            "price": 14.8,
+                            "change": 0,
+                            "volume": 8691800
+                      },
+                      {
+                            "symbol": "KLB",
+                            "price": 11.1,
+                            "change": 0.1,
+                            "volume": 77500
+                      },
+                      {
+                            "symbol": "LPB",
+                            "price": 38.15,
+                            "change": 0.15,
+                            "volume": 896700
+                      },
+                      {
+                            "symbol": "MBB",
+                            "price": 19.65,
+                            "change": 0.2,
+                            "volume": 9965500
+                      },
+                      {
+                            "symbol": "NAB",
+                            "price": 11.7,
+                            "change": 0.4,
+                            "volume": 1711300
+                      },
+                      {
+                            "symbol": "SHB",
+                            "price": 10.55,
+                            "change": 0.1,
+                            "volume": 18436300
+                      },
+                      {
+                            "symbol": "STB",
+                            "price": 62.5,
+                            "change": 0.3,
+                            "volume": 1072300
+                      },
+                      {
+                            "symbol": "TPB",
+                            "price": 11.9,
+                            "change": 0.1,
+                            "volume": 7635000
+                      },
+                      {
+                            "symbol": "VAB",
+                            "price": 8.99,
+                            "change": 0.01,
+                            "volume": 217900
+                      },
+                      {
+                            "symbol": "VCB",
+                            "price": 56.3,
+                            "change": 0.6,
+                            "volume": 3387900
+                      },
+                      {
+                            "symbol": "VIB",
+                            "price": 13.7,
+                            "change": 0.15,
+                            "volume": 4016900
+                      },
+                      {
+                            "symbol": "VPB",
+                            "price": 23.65,
+                            "change": 0.85,
+                            "volume": 21784000
+                      }
+                ]
+          },
+          {
+                "id": "RE",
+                "title": "Bất động sản",
+                "chip": "RE",
+                "chipLabel": "Bất động sản",
+                "baselineChg": 0.27,
+                "stocks": [
+                      {
+                            "symbol": "CEO",
+                            "price": 10.9,
+                            "change": 0.1,
+                            "volume": 5578900
+                      },
+                      {
+                            "symbol": "HTN",
+                            "price": 7.17,
+                            "change": 0.02,
+                            "volume": 365700
+                      },
+                      {
+                            "symbol": "NLG",
+                            "price": 21.55,
+                            "change": 0.05,
+                            "volume": 660600
+                      },
+                      {
+                            "symbol": "NTL",
+                            "price": 11.9,
+                            "change": 0.1,
+                            "volume": 131000
+                      },
+                      {
+                            "symbol": "NVL",
+                            "price": 10.9,
+                            "change": 0.25,
+                            "volume": 20005300
+                      },
+                      {
+                            "symbol": "PDR",
+                            "price": 11.2,
+                            "change": 0,
+                            "volume": 3087400
+                      },
+                      {
+                            "symbol": "QCG",
+                            "price": 10.7,
+                            "change": 0.1,
+                            "volume": 135200
+                      },
+                      {
+                            "symbol": "DXS",
+                            "price": 4.98,
+                            "change": 0.02,
+                            "volume": 1277600
+                      },
+                      {
+                            "symbol": "AGG",
+                            "price": 9.24,
+                            "change": 0.08,
+                            "volume": 122500
+                      },
+                      {
+                            "symbol": "DXG",
+                            "price": 10.3,
+                            "change": 0.15,
+                            "volume": 11837700
+                      },
+                      {
+                            "symbol": "BCM",
+                            "price": 39.1,
+                            "change": 0.55,
+                            "volume": 490800
+                      },
+                      {
+                            "symbol": "CRE",
+                            "price": 5.25,
+                            "change": 0.15,
+                            "volume": 136500
+                      },
+                      {
+                            "symbol": "DC4",
+                            "price": 6.08,
+                            "change": 0.07,
+                            "volume": 82600
+                      },
+                      {
+                            "symbol": "DIG",
+                            "price": 9.53,
+                            "change": 0,
+                            "volume": 3739700
+                      },
+                      {
+                            "symbol": "CII",
+                            "price": 12.95,
+                            "change": 0.15,
+                            "volume": 7469400
+                      },
+                      {
+                            "symbol": "SGR",
+                            "price": 10.15,
+                            "change": 0.15,
+                            "volume": 23500
+                      },
+                      {
+                            "symbol": "VPL",
+                            "price": 79.1,
+                            "change": 0.1,
+                            "volume": 527700
+                      },
+                      {
+                            "symbol": "RGG",
+                            "price": 43.9,
+                            "change": 0,
+                            "volume": 100
+                      },
+                      {
+                            "symbol": "HHS",
+                            "price": 8.88,
+                            "change": 0.12,
+                            "volume": 1660000
+                      },
+                      {
+                            "symbol": "HDC",
+                            "price": 10.35,
+                            "change": 0,
+                            "volume": 547700
+                      },
+                      {
+                            "symbol": "HDG",
+                            "price": 14.9,
+                            "change": 0.1,
+                            "volume": 353200
+                      },
+                      {
+                            "symbol": "HLD",
+                            "price": 12.1,
+                            "change": 0.1,
+                            "volume": 1100
+                      },
+                      {
+                            "symbol": "HQC",
+                            "price": 1.99,
+                            "change": 0.01,
+                            "volume": 1370500
+                      },
+                      {
+                            "symbol": "HUT",
+                            "price": 12.1,
+                            "change": 0.1,
+                            "volume": 2003300
+                      },
+                      {
+                            "symbol": "IJC",
+                            "price": 6.88,
+                            "change": 0.01,
+                            "volume": 910300
+                      },
+                      {
+                            "symbol": "KDH",
+                            "price": 14.15,
+                            "change": 0,
+                            "volume": 2416900
+                      },
+                      {
+                            "symbol": "KHG",
+                            "price": 4.5,
+                            "change": 0.02,
+                            "volume": 2760400
+                      },
+                      {
+                            "symbol": "KBC",
+                            "price": 25.75,
+                            "change": 0.15,
+                            "volume": 377900
+                      },
+                      {
+                            "symbol": "L18",
+                            "price": 11.9,
+                            "change": 0,
+                            "volume": 46200
+                      },
+                      {
+                            "symbol": "NDN",
+                            "price": 7.5,
+                            "change": 0,
+                            "volume": 49900
+                      },
+                      {
+                            "symbol": "SCR",
+                            "price": 4.07,
+                            "change": 0.03,
+                            "volume": 806200
+                      },
+                      {
+                            "symbol": "SJS",
+                            "price": 54.8,
+                            "change": 2.3,
+                            "volume": 14100
+                      },
+                      {
+                            "symbol": "TCH",
+                            "price": 11.15,
+                            "change": 0.05,
+                            "volume": 3384300
+                      },
+                      {
+                            "symbol": "TDC",
+                            "price": 6.46,
+                            "change": 0.01,
+                            "volume": 16300
+                      },
+                      {
+                            "symbol": "VHM",
+                            "price": 59.6,
+                            "change": 1.4,
+                            "volume": 3653000
+                      },
+                      {
+                            "symbol": "VIC",
+                            "price": 213.5,
+                            "change": 1.5,
+                            "volume": 838100
+                      },
+                      {
+                            "symbol": "VPI",
+                            "price": 50.4,
+                            "change": 2.3,
+                            "volume": 1934500
+                      },
+                      {
+                            "symbol": "VRE",
+                            "price": 22.85,
+                            "change": 0,
+                            "volume": 1175400
+                      }
+                ]
+          },
+          {
+                "id": "SEC",
+                "title": "Chứng khoán",
+                "chip": "SEC",
+                "chipLabel": "Chứng khoán",
+                "baselineChg": 0.12,
+                "stocks": [
+                      {
+                            "symbol": "AGR",
+                            "price": 11.35,
+                            "change": 0.05,
+                            "volume": 238400
+                      },
+                      {
+                            "symbol": "APG",
+                            "price": 4.08,
+                            "change": 0.02,
+                            "volume": 126800
+                      },
+                      {
+                            "symbol": "LPS",
+                            "price": 17.3,
+                            "change": 0.05,
+                            "volume": 168700
+                      },
+                      {
+                            "symbol": "AAS",
+                            "price": 10.3,
+                            "change": 0.1,
+                            "volume": 7404000
+                      },
+                      {
+                            "symbol": "VPX",
+                            "price": 23.05,
+                            "change": 0.05,
+                            "volume": 323700
+                      },
+                      {
+                            "symbol": "TCI",
+                            "price": 9.8,
+                            "change": 0,
+                            "volume": 46600
+                      },
+                      {
+                            "symbol": "ORS",
+                            "price": 13.5,
+                            "change": 0,
+                            "volume": 1369000
+                      },
+                      {
+                            "symbol": "VCK",
+                            "price": 27.85,
+                            "change": 0.25,
+                            "volume": 1908400
+                      },
+                      {
+                            "symbol": "PSI",
+                            "price": 7.9,
+                            "change": 0.1,
+                            "volume": 109300
+                      },
+                      {
+                            "symbol": "APS",
+                            "price": 5.3,
+                            "change": 0,
+                            "volume": 511600
+                      },
+                      {
+                            "symbol": "BMS",
+                            "price": 11.9,
+                            "change": 0,
+                            "volume": 24300
+                      },
+                      {
+                            "symbol": "BVS",
+                            "price": 26.5,
+                            "change": 0,
+                            "volume": 595800
+                      },
+                      {
+                            "symbol": "CTS",
+                            "price": 20.9,
+                            "change": 0.2,
+                            "volume": 1139000
+                      },
+                      {
+                            "symbol": "BSI",
+                            "price": 25.85,
+                            "change": 0.35,
+                            "volume": 431900
+                      },
+                      {
+                            "symbol": "DSC",
+                            "price": 9.61,
+                            "change": 0.01,
+                            "volume": 7700
+                      },
+                      {
+                            "symbol": "DSE",
+                            "price": 20.65,
+                            "change": 0,
+                            "volume": 445100
+                      },
+                      {
+                            "symbol": "TCX",
+                            "price": 27.85,
+                            "change": 0.25,
+                            "volume": 3556700
+                      },
+                      {
+                            "symbol": "EVS",
+                            "price": 5.3,
+                            "change": 0.3,
+                            "volume": 564700
+                      },
+                      {
+                            "symbol": "FTS",
+                            "price": 18.45,
+                            "change": 0.15,
+                            "volume": 702000
+                      },
+                      {
+                            "symbol": "HCM",
+                            "price": 23.9,
+                            "change": 0.15,
+                            "volume": 1861300
+                      },
+                      {
+                            "symbol": "MBS",
+                            "price": 15.2,
+                            "change": 0.1,
+                            "volume": 2631400
+                      },
+                      {
+                            "symbol": "SBS",
+                            "price": 4,
+                            "change": 0.1,
+                            "volume": 219700
+                      },
+                      {
+                            "symbol": "SHS",
+                            "price": 12.4,
+                            "change": 0.1,
+                            "volume": 18709800
+                      },
+                      {
+                            "symbol": "SSI",
+                            "price": 19.8,
+                            "change": 0.35,
+                            "volume": 21803300
+                      },
+                      {
+                            "symbol": "TVB",
+                            "price": 6.17,
+                            "change": 0,
+                            "volume": 14000
+                      },
+                      {
+                            "symbol": "TVC",
+                            "price": 6.6,
+                            "change": 0.1,
+                            "volume": 2000
+                      },
+                      {
+                            "symbol": "TVS",
+                            "price": 13,
+                            "change": 0.3,
+                            "volume": 43100
+                      },
+                      {
+                            "symbol": "VCI",
+                            "price": 19.1,
+                            "change": 0.15,
+                            "volume": 6734600
+                      },
+                      {
+                            "symbol": "VDS",
+                            "price": 9.78,
+                            "change": 0.12,
+                            "volume": 708400
+                      },
+                      {
+                            "symbol": "VIG",
+                            "price": 4.1,
+                            "change": 0,
+                            "volume": 153100
+                      },
+                      {
+                            "symbol": "VND",
+                            "price": 13.4,
+                            "change": 0.15,
+                            "volume": 15035800
+                      },
+                      {
+                            "symbol": "VIX",
+                            "price": 12.05,
+                            "change": 0.2,
+                            "volume": 32021900
+                      },
+                      {
+                            "symbol": "WSS",
+                            "price": 6,
+                            "change": 0.1,
+                            "volume": 100
+                      }
+                ]
+          },
+          {
+                "id": "STEEL",
+                "title": "Thép",
+                "chip": "STEEL",
+                "chipLabel": "Thép",
+                "baselineChg": 0.07,
+                "stocks": [
+                      {
+                            "symbol": "HPG",
+                            "price": 20.75,
+                            "change": 0.15,
+                            "volume": 8526700
+                      },
+                      {
+                            "symbol": "HSG",
+                            "price": 10.4,
+                            "change": 0,
+                            "volume": 2058100
+                      },
+                      {
+                            "symbol": "POM",
+                            "price": 3.3,
+                            "change": 0,
+                            "volume": 5362356
+                      },
+                      {
+                            "symbol": "NKG",
+                            "price": 10.6,
+                            "change": 0.2,
+                            "volume": 2782700
+                      },
+                      {
+                            "symbol": "VGS",
+                            "price": 17,
+                            "change": 0.3,
+                            "volume": 172100
+                      },
+                      {
+                            "symbol": "NSH",
+                            "price": 4,
+                            "change": 0,
+                            "volume": 2400
+                      },
+                      {
+                            "symbol": "SHA",
+                            "price": 4,
+                            "change": 0,
+                            "volume": 6502
+                      },
+                      {
+                            "symbol": "SHI",
+                            "price": 13.9,
+                            "change": 0.1,
+                            "volume": 232800
+                      },
+                      {
+                            "symbol": "VCA",
+                            "price": 6.36,
+                            "change": 0,
+                            "volume": 1200
+                      },
+                      {
+                            "symbol": "TVN",
+                            "price": 9.6,
+                            "change": 0.1,
+                            "volume": 449600
+                      },
+                      {
+                            "symbol": "TLH",
+                            "price": 3.23,
+                            "change": 0.06,
+                            "volume": 91400
+                      },
+                      {
+                            "symbol": "SMC",
+                            "price": 9.75,
+                            "change": 0.06,
+                            "volume": 146600
+                      },
+                      {
+                            "symbol": "GDA",
+                            "price": 11.9,
+                            "change": 0,
+                            "volume": 25200
+                      }
+                ]
+          },
+          {
+                "id": "OIL",
+                "title": "Dầu khí",
+                "chip": "OIL",
+                "chipLabel": "Dầu khí",
+                "baselineChg": 0.36,
+                "stocks": [
+                      {
+                            "symbol": "PVS",
+                            "price": 31.8,
+                            "change": 0.4,
+                            "volume": 1185100
+                      },
+                      {
+                            "symbol": "PVD",
+                            "price": 17.75,
+                            "change": 0.1,
+                            "volume": 1924200
+                      },
+                      {
+                            "symbol": "PVC",
+                            "price": 11.5,
+                            "change": 0.1,
+                            "volume": 480500
+                      },
+                      {
+                            "symbol": "PVB",
+                            "price": 20.5,
+                            "change": 0,
+                            "volume": 13100
+                      },
+                      {
+                            "symbol": "BSR",
+                            "price": 28.9,
+                            "change": 0.55,
+                            "volume": 3958100
+                      },
+                      {
+                            "symbol": "PLC",
+                            "price": 20.7,
+                            "change": 1.8,
+                            "volume": 610500
+                      },
+                      {
+                            "symbol": "PVT",
+                            "price": 23.9,
+                            "change": 0.25,
+                            "volume": 2579600
+                      },
+                      {
+                            "symbol": "CNG",
+                            "price": 19.5,
+                            "change": 0,
+                            "volume": 5000
+                      },
+                      {
+                            "symbol": "GAS",
+                            "price": 76.8,
+                            "change": 0.7,
+                            "volume": 451100
+                      },
+                      {
+                            "symbol": "PVP",
+                            "price": 22.5,
+                            "change": 0.1,
+                            "volume": 690200
+                      },
+                      {
+                            "symbol": "OIL",
+                            "price": 13,
+                            "change": 0.1,
+                            "volume": 569500
+                      },
+                      {
+                            "symbol": "PLX",
+                            "price": 35.25,
+                            "change": 0.2,
+                            "volume": 1486900
+                      }
+                ]
+          },
+          {
+                "id": "TECH",
+                "title": "Công nghệ - TT",
+                "chip": "TECH",
+                "chipLabel": "Công nghệ",
+                "baselineChg": 0.21,
+                "stocks": [
+                      {
+                            "symbol": "FPT",
+                            "price": 57.5,
+                            "change": 0.7,
+                            "volume": 3288000
+                      },
+                      {
+                            "symbol": "CMG",
+                            "price": 19.75,
+                            "change": 0,
+                            "volume": 114000
+                      },
+                      {
+                            "symbol": "VGI",
+                            "price": 76.2,
+                            "change": 0.4,
+                            "volume": 71500
+                      },
+                      {
+                            "symbol": "VTP",
+                            "price": 46.25,
+                            "change": 0.45,
+                            "volume": 298400
+                      },
+                      {
+                            "symbol": "FOX",
+                            "price": 55.8,
+                            "change": 0.2,
+                            "volume": 22400
+                      },
+                      {
+                            "symbol": "FOC",
+                            "price": 61,
+                            "change": 0.1,
+                            "volume": 7800
+                      },
+                      {
+                            "symbol": "ITD",
+                            "price": 10.3,
+                            "change": 0,
+                            "volume": 400
+                      },
+                      {
+                            "symbol": "CTR",
+                            "price": 67.9,
+                            "change": 0.1,
+                            "volume": 58400
+                      },
+                      {
+                            "symbol": "ELC",
+                            "price": 11.35,
+                            "change": 0.15,
+                            "volume": 299500
+                      },
+                      {
+                            "symbol": "YEG",
+                            "price": 7.79,
+                            "change": 0,
+                            "volume": 527100
+                      }
+                ]
+          },
+          {
+                "id": "RETAIL",
+                "title": "Bán lẻ",
+                "chip": "RETAIL",
+                "chipLabel": "Bán lẻ",
+                "baselineChg": 0.3,
+                "stocks": [
+                      {
+                            "symbol": "DGW",
+                            "price": 44.45,
+                            "change": 0.05,
+                            "volume": 737200
+                      },
+                      {
+                            "symbol": "MWG",
+                            "price": 74.2,
+                            "change": 0.3,
+                            "volume": 1273100
+                      },
+                      {
+                            "symbol": "PET",
+                            "price": 50,
+                            "change": 0.5,
+                            "volume": 452300
+                      },
+                      {
+                            "symbol": "PNJ",
+                            "price": 18.55,
+                            "change": 0.25,
+                            "volume": 5141300
+                      },
+                      {
+                            "symbol": "FRT",
+                            "price": 141.9,
+                            "change": 0.9,
+                            "volume": 270500
+                      },
+                      {
+                            "symbol": "PSD",
+                            "price": 16,
+                            "change": 0.5,
+                            "volume": 70400
+                      },
+                      {
+                            "symbol": "MSN",
+                            "price": 71.5,
+                            "change": 0.1,
+                            "volume": 2884000
+                      },
+                      {
+                            "symbol": "MCH",
+                            "price": 139.9,
+                            "change": 0.1,
+                            "volume": 784700
+                      },
+                      {
+                            "symbol": "DMX",
+                            "price": 75,
+                            "change": 0,
+                            "volume": 12100
+                      }
+                ]
+          },
+          {
+                "id": "CHEM",
+                "title": "Hóa chất - Phân bón",
+                "chip": "CHEM",
+                "chipLabel": "Hóa chất",
+                "baselineChg": 0.39,
+                "stocks": [
+                      {
+                            "symbol": "BFC",
+                            "price": 56.4,
+                            "change": 2.6,
+                            "volume": 71000
+                      },
+                      {
+                            "symbol": "CSV",
+                            "price": 23.7,
+                            "change": 0.7,
+                            "volume": 605000
+                      },
+                      {
+                            "symbol": "DCM",
+                            "price": 33.7,
+                            "change": 0.2,
+                            "volume": 545900
+                      },
+                      {
+                            "symbol": "DDV",
+                            "price": 16.7,
+                            "change": 0,
+                            "volume": 230600
+                      },
+                      {
+                            "symbol": "DPM",
+                            "price": 21.25,
+                            "change": 0.05,
+                            "volume": 964600
+                      },
+                      {
+                            "symbol": "DGC",
+                            "price": 32.9,
+                            "change": 0.1,
+                            "volume": 146700
+                      },
+                      {
+                            "symbol": "LAS",
+                            "price": 11.6,
+                            "change": 0.1,
+                            "volume": 172300
+                      },
+                      {
+                            "symbol": "LIX",
+                            "price": 24.95,
+                            "change": 0.05,
+                            "volume": 8600
+                      },
+                      {
+                            "symbol": "PMB",
+                            "price": 9.4,
+                            "change": 0,
+                            "volume": 600
+                      },
+                      {
+                            "symbol": "NET",
+                            "price": 58,
+                            "change": 0.3,
+                            "volume": 1000
+                      },
+                      {
+                            "symbol": "PAC",
+                            "price": 14.75,
+                            "change": 0.15,
+                            "volume": 163100
+                      }
+                ]
+          },
+          {
+                "id": "LOGISTICS",
+                "title": "Cảng biển - Vận tải",
+                "chip": "LOGISTICS",
+                "chipLabel": "Cảng biển",
+                "baselineChg": 0.1,
+                "stocks": [
+                      {
+                            "symbol": "PVT",
+                            "price": 23.9,
+                            "change": 0.25,
+                            "volume": 2579600
+                      },
+                      {
+                            "symbol": "PHP",
+                            "price": 47.5,
+                            "change": 0,
+                            "volume": 134400
+                      },
+                      {
+                            "symbol": "TCL",
+                            "price": 28.6,
+                            "change": 0,
+                            "volume": 3900
+                      },
+                      {
+                            "symbol": "DVP",
+                            "price": 75.1,
+                            "change": 0.1,
+                            "volume": 4100
+                      },
+                      {
+                            "symbol": "SKG",
+                            "price": 7.3,
+                            "change": 0,
+                            "volume": 11200
+                      },
+                      {
+                            "symbol": "DXP",
+                            "price": 15,
+                            "change": 0.4,
+                            "volume": 404800
+                      },
+                      {
+                            "symbol": "PVP",
+                            "price": 22.5,
+                            "change": 0.1,
+                            "volume": 690200
+                      },
+                      {
+                            "symbol": "HAH",
+                            "price": 48.85,
+                            "change": 0.05,
+                            "volume": 499500
+                      },
+                      {
+                            "symbol": "GMD",
+                            "price": 53.7,
+                            "change": 0.3,
+                            "volume": 374700
+                      },
+                      {
+                            "symbol": "GSP",
+                            "price": 10.25,
+                            "change": 0.25,
+                            "volume": 46500
+                      },
+                      {
+                            "symbol": "HHG",
+                            "price": 0.8,
+                            "change": 0.1,
+                            "volume": 19800
+                      },
+                      {
+                            "symbol": "ILB",
+                            "price": 19.2,
+                            "change": 0.2,
+                            "volume": 16300
+                      },
+                      {
+                            "symbol": "MAC",
+                            "price": 10,
+                            "change": 0.3,
+                            "volume": 5600
+                      },
+                      {
+                            "symbol": "SGP",
+                            "price": 20,
+                            "change": 0.2,
+                            "volume": 19500
+                      },
+                      {
+                            "symbol": "STG",
+                            "price": 37.5,
+                            "change": 0,
+                            "volume": 100
+                      },
+                      {
+                            "symbol": "SWC",
+                            "price": 24.5,
+                            "change": 0,
+                            "volume": 1100
+                      },
+                      {
+                            "symbol": "TCO",
+                            "price": 9.95,
+                            "change": 0,
+                            "volume": 98300
+                      },
+                      {
+                            "symbol": "TCW",
+                            "price": 30.8,
+                            "change": 0.1,
+                            "volume": 800
+                      },
+                      {
+                            "symbol": "TMS",
+                            "price": 33,
+                            "change": 0,
+                            "volume": 5325
+                      },
+                      {
+                            "symbol": "VIP",
+                            "price": 9.8,
+                            "change": 0.01,
+                            "volume": 16800
+                      },
+                      {
+                            "symbol": "VNA",
+                            "price": 13.3,
+                            "change": 0,
+                            "volume": 304
+                      },
+                      {
+                            "symbol": "VOS",
+                            "price": 11.4,
+                            "change": 0,
+                            "volume": 393100
+                      },
+                      {
+                            "symbol": "VSC",
+                            "price": 13,
+                            "change": 0,
+                            "volume": 3511800
+                      },
+                      {
+                            "symbol": "VTO",
+                            "price": 11.1,
+                            "change": 0.15,
+                            "volume": 146800
+                      }
+                ]
+          },
+          {
+                "id": "POWER",
+                "title": "Điện - Năng lượng",
+                "chip": "POWER",
+                "chipLabel": "Điện & NL",
+                "baselineChg": 0.07,
+                "stocks": [
+                      {
+                            "symbol": "KHP",
+                            "price": 9.45,
+                            "change": 0,
+                            "volume": 1700
+                      },
+                      {
+                            "symbol": "PPC",
+                            "price": 8.69,
+                            "change": 0,
+                            "volume": 91400
+                      },
+                      {
+                            "symbol": "PVG",
+                            "price": 5.9,
+                            "change": 0.1,
+                            "volume": 4200
+                      },
+                      {
+                            "symbol": "QTP",
+                            "price": 10.7,
+                            "change": 0,
+                            "volume": 52100
+                      },
+                      {
+                            "symbol": "VSH",
+                            "price": 41,
+                            "change": 0,
+                            "volume": 5400
+                      },
+                      {
+                            "symbol": "TTA",
+                            "price": 10.55,
+                            "change": 0.1,
+                            "volume": 112900
+                      },
+                      {
+                            "symbol": "GEG",
+                            "price": 11.75,
+                            "change": 0.05,
+                            "volume": 31000
+                      },
+                      {
+                            "symbol": "SJD",
+                            "price": 13.9,
+                            "change": 0.05,
+                            "volume": 26900
+                      },
+                      {
+                            "symbol": "NT2",
+                            "price": 23.2,
+                            "change": 0.1,
+                            "volume": 539000
+                      },
+                      {
+                            "symbol": "REE",
+                            "price": 45.05,
+                            "change": 0.1,
+                            "volume": 100800
+                      },
+                      {
+                            "symbol": "PC1",
+                            "price": 18.5,
+                            "change": 0.1,
+                            "volume": 228600
+                      },
+                      {
+                            "symbol": "HND",
+                            "price": 8.9,
+                            "change": 0,
+                            "volume": 900
+                      },
+                      {
+                            "symbol": "GEX",
+                            "price": 22.7,
+                            "change": 0.2,
+                            "volume": 8058900
+                      },
+                      {
+                            "symbol": "VNE",
+                            "price": 1.9,
+                            "change": 0,
+                            "volume": 70800
+                      },
+                      {
+                            "symbol": "TV2",
+                            "price": 24.85,
+                            "change": 0.25,
+                            "volume": 201100
+                      },
+                      {
+                            "symbol": "POW",
+                            "price": 12.25,
+                            "change": 0.05,
+                            "volume": 2123000
+                      },
+                      {
+                            "symbol": "HDG",
+                            "price": 14.9,
+                            "change": 0.1,
+                            "volume": 353200
+                      },
+                      {
+                            "symbol": "GEE",
+                            "price": 66.1,
+                            "change": 0.1,
+                            "volume": 899900
+                      },
+                      {
+                            "symbol": "TV1",
+                            "price": 18.4,
+                            "change": 0,
+                            "volume": 29000
+                      },
+                      {
+                            "symbol": "SJE",
+                            "price": 10.6,
+                            "change": 0.1,
+                            "volume": 18900
+                      },
+                      {
+                            "symbol": "BCG",
+                            "price": 6.8,
+                            "change": 0,
+                            "volume": 1200000
+                      }
+                ]
+          },
+          {
+                "id": "PUBLIC",
+                "title": "Đầu tư công",
+                "chip": "PUBLIC",
+                "chipLabel": "Đầu tư công",
+                "baselineChg": 0.26,
+                "stocks": [
+                      {
+                            "symbol": "BCC",
+                            "price": 5.8,
+                            "change": 0.4,
+                            "volume": 240300
+                      },
+                      {
+                            "symbol": "C4G",
+                            "price": 4.6,
+                            "change": 0,
+                            "volume": 82700
+                      },
+                      {
+                            "symbol": "BTS",
+                            "price": 4.4,
+                            "change": 0,
+                            "volume": 3900
+                      },
+                      {
+                            "symbol": "SD6",
+                            "price": 1.7,
+                            "change": 0,
+                            "volume": 19800
+                      },
+                      {
+                            "symbol": "THG",
+                            "price": 26.9,
+                            "change": 0.1,
+                            "volume": 10900
+                      },
+                      {
+                            "symbol": "C32",
+                            "price": 15,
+                            "change": 0,
+                            "volume": 10000
+                      },
+                      {
+                            "symbol": "C47",
+                            "price": 8,
+                            "change": 0.13,
+                            "volume": 3100
+                      },
+                      {
+                            "symbol": "CTD",
+                            "price": 63.1,
+                            "change": 0.7,
+                            "volume": 296400
+                      },
+                      {
+                            "symbol": "DHA",
+                            "price": 55.5,
+                            "change": 1.2,
+                            "volume": 15200
+                      },
+                      {
+                            "symbol": "CII",
+                            "price": 12.95,
+                            "change": 0.15,
+                            "volume": 7469400
+                      },
+                      {
+                            "symbol": "CTI",
+                            "price": 16.2,
+                            "change": 0.25,
+                            "volume": 294100
+                      },
+                      {
+                            "symbol": "DPG",
+                            "price": 27.35,
+                            "change": 0.3,
+                            "volume": 220800
+                      },
+                      {
+                            "symbol": "FCN",
+                            "price": 10.5,
+                            "change": 0.05,
+                            "volume": 362900
+                      },
+                      {
+                            "symbol": "G36",
+                            "price": 9,
+                            "change": 0.1,
+                            "volume": 118800
+                      },
+                      {
+                            "symbol": "HHV",
+                            "price": 9.31,
+                            "change": 0.19,
+                            "volume": 3147700
+                      },
+                      {
+                            "symbol": "HOM",
+                            "price": 3.9,
+                            "change": 0,
+                            "volume": 25000
+                      },
+                      {
+                            "symbol": "HT1",
+                            "price": 13.2,
+                            "change": 0.85,
+                            "volume": 1821400
+                      },
+                      {
+                            "symbol": "KSB",
+                            "price": 13.7,
+                            "change": 0.5,
+                            "volume": 1995600
+                      },
+                      {
+                            "symbol": "LCG",
+                            "price": 6.47,
+                            "change": 0.05,
+                            "volume": 953600
+                      },
+                      {
+                            "symbol": "SD5",
+                            "price": 6.6,
+                            "change": 0.3,
+                            "volume": 300
+                      },
+                      {
+                            "symbol": "TV2",
+                            "price": 24.85,
+                            "change": 0.25,
+                            "volume": 201100
+                      },
+                      {
+                            "symbol": "VCG",
+                            "price": 14.95,
+                            "change": 0.2,
+                            "volume": 1801800
+                      }
+                ]
+          },
+          {
+                "id": "BUILD",
+                "title": "Vật liệu xây dựng",
+                "chip": "BUILD",
+                "chipLabel": "VLXD",
+                "baselineChg": 0.21,
+                "stocks": [
+                      {
+                            "symbol": "LIG",
+                            "price": 2.9,
+                            "change": 0,
+                            "volume": 61500
+                      },
+                      {
+                            "symbol": "BCC",
+                            "price": 5.8,
+                            "change": 0.4,
+                            "volume": 240300
+                      },
+                      {
+                            "symbol": "BOT",
+                            "price": 1.1,
+                            "change": 0,
+                            "volume": 168432
+                      },
+                      {
+                            "symbol": "C4G",
+                            "price": 4.6,
+                            "change": 0,
+                            "volume": 82700
+                      },
+                      {
+                            "symbol": "BTS",
+                            "price": 4.4,
+                            "change": 0,
+                            "volume": 3900
+                      },
+                      {
+                            "symbol": "CRC",
+                            "price": 4.95,
+                            "change": 0.05,
+                            "volume": 51500
+                      },
+                      {
+                            "symbol": "HVH",
+                            "price": 10.35,
+                            "change": 0,
+                            "volume": 137200
+                      },
+                      {
+                            "symbol": "NNC",
+                            "price": 45.85,
+                            "change": 0.85,
+                            "volume": 7600
+                      },
+                      {
+                            "symbol": "L14",
+                            "price": 18.1,
+                            "change": 0.1,
+                            "volume": 25800
+                      },
+                      {
+                            "symbol": "BDT",
+                            "price": 7.9,
+                            "change": 0.2,
+                            "volume": 3000
+                      },
+                      {
+                            "symbol": "DVG",
+                            "price": 700,
+                            "change": 0,
+                            "volume": 21300
+                      },
+                      {
+                            "symbol": "PC1",
+                            "price": 18.5,
+                            "change": 0.1,
+                            "volume": 228600
+                      },
+                      {
+                            "symbol": "PHC",
+                            "price": 3.71,
+                            "change": 0.14,
+                            "volume": 34700
+                      },
+                      {
+                            "symbol": "NED",
+                            "price": 5.9,
+                            "change": 0,
+                            "volume": 4800
+                      },
+                      {
+                            "symbol": "VC2",
+                            "price": 3,
+                            "change": 0.1,
+                            "volume": 84400
+                      },
+                      {
+                            "symbol": "PTB",
+                            "price": 29.8,
+                            "change": 0.15,
+                            "volume": 67000
+                      },
+                      {
+                            "symbol": "PXT",
+                            "price": 1.3,
+                            "change": 0,
+                            "volume": 12300
+                      },
+                      {
+                            "symbol": "S99",
+                            "price": 7,
+                            "change": 0.7,
+                            "volume": 96300
+                      },
+                      {
+                            "symbol": "SD6",
+                            "price": 1.7,
+                            "change": 0,
+                            "volume": 19800
+                      },
+                      {
+                            "symbol": "TTF",
+                            "price": 1.27,
+                            "change": 0.02,
+                            "volume": 374900
+                      },
+                      {
+                            "symbol": "AMS",
+                            "price": 7.1,
+                            "change": 0.1,
+                            "volume": 800
+                      },
+                      {
+                            "symbol": "BCE",
+                            "price": 5.81,
+                            "change": 0.29,
+                            "volume": 35900
+                      },
+                      {
+                            "symbol": "BMP",
+                            "price": 138,
+                            "change": 2.5,
+                            "volume": 150500
+                      },
+                      {
+                            "symbol": "C47",
+                            "price": 8,
+                            "change": 0.13,
+                            "volume": 3100
+                      },
+                      {
+                            "symbol": "C69",
+                            "price": 17.5,
+                            "change": 0.4,
+                            "volume": 347500
+                      },
+                      {
+                            "symbol": "CIG",
+                            "price": 6.41,
+                            "change": 0.07,
+                            "volume": 1212400
+                      },
+                      {
+                            "symbol": "DC4",
+                            "price": 6.08,
+                            "change": 0.07,
+                            "volume": 82600
+                      },
+                      {
+                            "symbol": "CTR",
+                            "price": 67.9,
+                            "change": 0.1,
+                            "volume": 58400
+                      },
+                      {
+                            "symbol": "NDX",
+                            "price": 5,
+                            "change": 0.2,
+                            "volume": 300
+                      },
+                      {
+                            "symbol": "ACC",
+                            "price": 3.78,
+                            "change": 0.16,
+                            "volume": 152300
+                      },
+                      {
+                            "symbol": "CTI",
+                            "price": 16.2,
+                            "change": 0.25,
+                            "volume": 294100
+                      },
+                      {
+                            "symbol": "DTD",
+                            "price": 10.3,
+                            "change": 0.1,
+                            "volume": 43900
+                      },
+                      {
+                            "symbol": "EVG",
+                            "price": 3.8,
+                            "change": 0,
+                            "volume": 718400
+                      },
+                      {
+                            "symbol": "FCM",
+                            "price": 2.86,
+                            "change": 0.02,
+                            "volume": 11400
+                      },
+                      {
+                            "symbol": "FCN",
+                            "price": 10.5,
+                            "change": 0.05,
+                            "volume": 362900
+                      },
+                      {
+                            "symbol": "G36",
+                            "price": 9,
+                            "change": 0.1,
+                            "volume": 118800
+                      },
+                      {
+                            "symbol": "GEX",
+                            "price": 22.7,
+                            "change": 0.2,
+                            "volume": 8058900
+                      },
+                      {
+                            "symbol": "HBC",
+                            "price": 3,
+                            "change": 0,
+                            "volume": 396100
+                      },
+                      {
+                            "symbol": "HHV",
+                            "price": 9.31,
+                            "change": 0.19,
+                            "volume": 3147700
+                      },
+                      {
+                            "symbol": "HOM",
+                            "price": 3.9,
+                            "change": 0,
+                            "volume": 25000
+                      },
+                      {
+                            "symbol": "HT1",
+                            "price": 13.2,
+                            "change": 0.85,
+                            "volume": 1821400
+                      },
+                      {
+                            "symbol": "HUB",
+                            "price": 10.7,
+                            "change": 0.1,
+                            "volume": 5300
+                      },
+                      {
+                            "symbol": "HUT",
+                            "price": 12.1,
+                            "change": 0.1,
+                            "volume": 2003300
+                      },
+                      {
+                            "symbol": "LCG",
+                            "price": 6.47,
+                            "change": 0.05,
+                            "volume": 953600
+                      },
+                      {
+                            "symbol": "L18",
+                            "price": 11.9,
+                            "change": 0,
+                            "volume": 46200
+                      },
+                      {
+                            "symbol": "SD5",
+                            "price": 6.6,
+                            "change": 0.3,
+                            "volume": 300
+                      },
+                      {
+                            "symbol": "MVC",
+                            "price": 14,
+                            "change": 0.7,
+                            "volume": 45600
+                      },
+                      {
+                            "symbol": "NHA",
+                            "price": 7.1,
+                            "change": 0.16,
+                            "volume": 109700
+                      },
+                      {
+                            "symbol": "SCI",
+                            "price": 7.6,
+                            "change": 0.2,
+                            "volume": 100
+                      },
+                      {
+                            "symbol": "SDD",
+                            "price": 1.3,
+                            "change": 0,
+                            "volume": 5492
+                      },
+                      {
+                            "symbol": "SD9",
+                            "price": 10.5,
+                            "change": 0.1,
+                            "volume": 79100
+                      },
+                      {
+                            "symbol": "TNA",
+                            "price": 10,
+                            "change": 0,
+                            "volume": 100000
+                      },
+                      {
+                            "symbol": "UDC",
+                            "price": 2.5,
+                            "change": 0,
+                            "volume": 1100
+                      },
+                      {
+                            "symbol": "VCG",
+                            "price": 14.95,
+                            "change": 0.2,
+                            "volume": 1801800
+                      },
+                      {
+                            "symbol": "VCS",
+                            "price": 30.2,
+                            "change": 0.2,
+                            "volume": 21000
+                      },
+                      {
+                            "symbol": "VGC",
+                            "price": 43.7,
+                            "change": 0.35,
+                            "volume": 148900
+                      },
+                      {
+                            "symbol": "VC7",
+                            "price": 7,
+                            "change": 0.3,
+                            "volume": 94400
+                      },
+                      {
+                            "symbol": "VC9",
+                            "price": 4.3,
+                            "change": 0,
+                            "volume": 100
+                      },
+                      {
+                            "symbol": "VLB",
+                            "price": 49.3,
+                            "change": 1.5,
+                            "volume": 103100
+                      },
+                      {
+                            "symbol": "VNE",
+                            "price": 1.9,
+                            "change": 0,
+                            "volume": 70800
+                      },
+                      {
+                            "symbol": "VTV",
+                            "price": 14,
+                            "change": 0.1,
+                            "volume": 95000
+                      }
+                ]
+          },
+          {
+                "id": "KCN",
+                "title": "BĐS KCN",
+                "chip": "KCN",
+                "chipLabel": "BĐS KCN",
+                "baselineChg": 0.19,
+                "stocks": [
+                      {
+                            "symbol": "D2D",
+                            "price": 21.8,
+                            "change": 0.1,
+                            "volume": 16200
+                      },
+                      {
+                            "symbol": "GVR",
+                            "price": 31.1,
+                            "change": 0.15,
+                            "volume": 1021500
+                      },
+                      {
+                            "symbol": "IDC",
+                            "price": 33.3,
+                            "change": 0.6,
+                            "volume": 506800
+                      },
+                      {
+                            "symbol": "KBC",
+                            "price": 25.75,
+                            "change": 0.15,
+                            "volume": 377900
+                      },
+                      {
+                            "symbol": "LHG",
+                            "price": 25.95,
+                            "change": 0.1,
+                            "volume": 8200
+                      },
+                      {
+                            "symbol": "PHR",
+                            "price": 32.25,
+                            "change": 0.25,
+                            "volume": 258200
+                      },
+                      {
+                            "symbol": "SIP",
+                            "price": 48.5,
+                            "change": 0.2,
+                            "volume": 18300
+                      },
+                      {
+                            "symbol": "SZC",
+                            "price": 17.4,
+                            "change": 0,
+                            "volume": 145300
+                      },
+                      {
+                            "symbol": "SZL",
+                            "price": 28.25,
+                            "change": 0.15,
+                            "volume": 11500
+                      },
+                      {
+                            "symbol": "TIP",
+                            "price": 15.85,
+                            "change": 0.1,
+                            "volume": 1000
+                      },
+                      {
+                            "symbol": "VGC",
+                            "price": 43.7,
+                            "change": 0.35,
+                            "volume": 148900
+                      },
+                      {
+                            "symbol": "DTD",
+                            "price": 10.3,
+                            "change": 0.1,
+                            "volume": 43900
+                      },
+                      {
+                            "symbol": "IDV",
+                            "price": 21.4,
+                            "change": 0,
+                            "volume": 2300
+                      },
+                      {
+                            "symbol": "NTC",
+                            "price": 133.1,
+                            "change": 0.2,
+                            "volume": 700
+                      },
+                      {
+                            "symbol": "BCM",
+                            "price": 39.1,
+                            "change": 0.55,
+                            "volume": 490800
+                      },
+                      {
+                            "symbol": "GEL",
+                            "price": 27.45,
+                            "change": 0.05,
+                            "volume": 764800
+                      }
+                ]
+          },
+          {
+                "id": "RUBBER",
+                "title": "Cao su",
+                "chip": "RUBBER",
+                "chipLabel": "Cao su",
+                "baselineChg": 0.37,
+                "stocks": [
+                      {
+                            "symbol": "DPR",
+                            "price": 36.9,
+                            "change": 0.2,
+                            "volume": 74100
+                      },
+                      {
+                            "symbol": "DRI",
+                            "price": 15.6,
+                            "change": 0.1,
+                            "volume": 496800
+                      },
+                      {
+                            "symbol": "GVR",
+                            "price": 31.1,
+                            "change": 0.15,
+                            "volume": 1021500
+                      },
+                      {
+                            "symbol": "PHR",
+                            "price": 32.25,
+                            "change": 0.25,
+                            "volume": 258200
+                      },
+                      {
+                            "symbol": "TNC",
+                            "price": 29.3,
+                            "change": 1.9,
+                            "volume": 200
+                      },
+                      {
+                            "symbol": "DRG",
+                            "price": 7.4,
+                            "change": 0,
+                            "volume": 3200
+                      },
+                      {
+                            "symbol": "HRC",
+                            "price": 30.9,
+                            "change": 0,
+                            "volume": 200
+                      },
+                      {
+                            "symbol": "TRC",
+                            "price": 23.9,
+                            "change": 0.35,
+                            "volume": 280100
+                      }
+                ]
+          },
+          {
+                "id": "AGRI",
+                "title": "Thủy sản",
+                "chip": "AGRI",
+                "chipLabel": "Thủy sản",
+                "baselineChg": 0.3,
+                "stocks": [
+                      {
+                            "symbol": "AAM",
+                            "price": 7.4,
+                            "change": 0,
+                            "volume": 3800
+                      },
+                      {
+                            "symbol": "ACL",
+                            "price": 11.2,
+                            "change": 0.3,
+                            "volume": 5200
+                      },
+                      {
+                            "symbol": "ANV",
+                            "price": 18.75,
+                            "change": 0.5,
+                            "volume": 1719400
+                      },
+                      {
+                            "symbol": "CMX",
+                            "price": 4.45,
+                            "change": 0,
+                            "volume": 55300
+                      },
+                      {
+                            "symbol": "FMC",
+                            "price": 35.4,
+                            "change": 0.45,
+                            "volume": 19500
+                      },
+                      {
+                            "symbol": "IDI",
+                            "price": 5.29,
+                            "change": 0.12,
+                            "volume": 540700
+                      },
+                      {
+                            "symbol": "VHC",
+                            "price": 51.6,
+                            "change": 1,
+                            "volume": 335300
+                      },
+                      {
+                            "symbol": "ASM",
+                            "price": 4.63,
+                            "change": 0.04,
+                            "volume": 176600
+                      }
+                ]
+          },
+          {
+                "id": "CONSUMER",
+                "title": "Thực phẩm",
+                "chip": "CONSUMER",
+                "chipLabel": "Thực phẩm",
+                "baselineChg": 0.29,
+                "stocks": [
+                      {
+                            "symbol": "AFX",
+                            "price": 9.8,
+                            "change": 0,
+                            "volume": 240900
+                      },
+                      {
+                            "symbol": "HAG",
+                            "price": 14.3,
+                            "change": 0.1,
+                            "volume": 1238400
+                      },
+                      {
+                            "symbol": "PAN",
+                            "price": 18.3,
+                            "change": 0.1,
+                            "volume": 355500
+                      },
+                      {
+                            "symbol": "QNS",
+                            "price": 50.1,
+                            "change": 0.6,
+                            "volume": 21000
+                      },
+                      {
+                            "symbol": "APF",
+                            "price": 43.5,
+                            "change": 0,
+                            "volume": 2400
+                      },
+                      {
+                            "symbol": "BAF",
+                            "price": 30.8,
+                            "change": 0.2,
+                            "volume": 588400
+                      },
+                      {
+                            "symbol": "BNA",
+                            "price": 10,
+                            "change": 0,
+                            "volume": 100000
+                      },
+                      {
+                            "symbol": "DBC",
+                            "price": 15.65,
+                            "change": 0.05,
+                            "volume": 936500
+                      },
+                      {
+                            "symbol": "HPA",
+                            "price": 26.8,
+                            "change": 0.25,
+                            "volume": 38300
+                      },
+                      {
+                            "symbol": "AIG",
+                            "price": 46.4,
+                            "change": 0.2,
+                            "volume": 17000
+                      },
+                      {
+                            "symbol": "LSS",
+                            "price": 7.8,
+                            "change": 0.05,
+                            "volume": 6700
+                      },
+                      {
+                            "symbol": "HNG",
+                            "price": 5.8,
+                            "change": 0.1,
+                            "volume": 305000
+                      },
+                      {
+                            "symbol": "MSN",
+                            "price": 71.5,
+                            "change": 0.1,
+                            "volume": 2884000
+                      },
+                      {
+                            "symbol": "KDC",
+                            "price": 50.2,
+                            "change": 0.4,
+                            "volume": 79900
+                      },
+                      {
+                            "symbol": "MCM",
+                            "price": 26.45,
+                            "change": 0,
+                            "volume": 14300
+                      },
+                      {
+                            "symbol": "MLS",
+                            "price": 15.3,
+                            "change": 0,
+                            "volume": 100
+                      },
+                      {
+                            "symbol": "NAF",
+                            "price": 47.9,
+                            "change": 0.1,
+                            "volume": 167300
+                      },
+                      {
+                            "symbol": "SLS",
+                            "price": 148.8,
+                            "change": 3.8,
+                            "volume": 2700
+                      },
+                      {
+                            "symbol": "TAR",
+                            "price": 2.2,
+                            "change": 0,
+                            "volume": 20150
+                      },
+                      {
+                            "symbol": "VHE",
+                            "price": 2.8,
+                            "change": 0.1,
+                            "volume": 900
+                      },
+                      {
+                            "symbol": "VLC",
+                            "price": 11.2,
+                            "change": 0,
+                            "volume": 20700
+                      },
+                      {
+                            "symbol": "VNM",
+                            "price": 57.7,
+                            "change": 0.1,
+                            "volume": 1073100
+                      },
+                      {
+                            "symbol": "SAB",
+                            "price": 56.5,
+                            "change": 0.36,
+                            "volume": 680000
+                      }
+                ]
+          },
+          {
+                "id": "SUGAR",
+                "title": "Đường - Gỗ - Giấy",
+                "chip": "SUGAR",
+                "chipLabel": "Đường-Gỗ-Giấy",
+                "baselineChg": 0.67,
+                "stocks": [
+                      {
+                            "symbol": "GDT",
+                            "price": 15.7,
+                            "change": 0.05,
+                            "volume": 9400
+                      },
+                      {
+                            "symbol": "LSS",
+                            "price": 7.8,
+                            "change": 0.05,
+                            "volume": 6700
+                      },
+                      {
+                            "symbol": "QNS",
+                            "price": 50.1,
+                            "change": 0.6,
+                            "volume": 21000
+                      },
+                      {
+                            "symbol": "SBT",
+                            "price": 22.45,
+                            "change": 0.2,
+                            "volume": 877200
+                      },
+                      {
+                            "symbol": "SLS",
+                            "price": 148.8,
+                            "change": 3.8,
+                            "volume": 2700
+                      },
+                      {
+                            "symbol": "CBS",
+                            "price": 22,
+                            "change": 0.6,
+                            "volume": 500
+                      },
+                      {
+                            "symbol": "KTS",
+                            "price": 20.7,
+                            "change": 0,
+                            "volume": 109
+                      },
+                      {
+                            "symbol": "DHC",
+                            "price": 37.3,
+                            "change": 0.3,
+                            "volume": 282100
+                      },
+                      {
+                            "symbol": "HHP",
+                            "price": 17,
+                            "change": 0.25,
+                            "volume": 1184600
+                      },
+                      {
+                            "symbol": "TLG",
+                            "price": 58.5,
+                            "change": 0.86,
+                            "volume": 450000
+                      }
+                ]
+          },
+          {
+                "id": "TEXTILE",
+                "title": "Dệt may",
+                "chip": "TEXTILE",
+                "chipLabel": "Dệt may",
+                "baselineChg": 0.2,
+                "stocks": [
+                      {
+                            "symbol": "ADS",
+                            "price": 7.6,
+                            "change": 0.06,
+                            "volume": 16700
+                      },
+                      {
+                            "symbol": "EVE",
+                            "price": 8.4,
+                            "change": 0.1,
+                            "volume": 900
+                      },
+                      {
+                            "symbol": "GIL",
+                            "price": 7.88,
+                            "change": 0.02,
+                            "volume": 43200
+                      },
+                      {
+                            "symbol": "KMR",
+                            "price": 2.2,
+                            "change": 0.01,
+                            "volume": 1200
+                      },
+                      {
+                            "symbol": "MSH",
+                            "price": 32,
+                            "change": 0.55,
+                            "volume": 123400
+                      },
+                      {
+                            "symbol": "STK",
+                            "price": 7.71,
+                            "change": 0.19,
+                            "volume": 4300
+                      },
+                      {
+                            "symbol": "TCM",
+                            "price": 14.7,
+                            "change": 0,
+                            "volume": 447100
+                      },
+                      {
+                            "symbol": "TNG",
+                            "price": 18.5,
+                            "change": 0.7,
+                            "volume": 1455400
+                      },
+                      {
+                            "symbol": "VGT",
+                            "price": 11.7,
+                            "change": 0.2,
+                            "volume": 427700
+                      }
+                ]
+          },
+          {
+                "id": "PHARMA",
+                "title": "Dược - Y tế",
+                "chip": "PHARMA",
+                "chipLabel": "Dược - Y tế",
+                "baselineChg": 0.55,
+                "stocks": [
+                      {
+                            "symbol": "DBD",
+                            "price": 45.8,
+                            "change": 0.65,
+                            "volume": 1200
+                      },
+                      {
+                            "symbol": "DCL",
+                            "price": 52.5,
+                            "change": 2.5,
+                            "volume": 715200
+                      },
+                      {
+                            "symbol": "DHG",
+                            "price": 89.2,
+                            "change": 0,
+                            "volume": 2300
+                      },
+                      {
+                            "symbol": "DHT",
+                            "price": 49.5,
+                            "change": 0.5,
+                            "volume": 800
+                      },
+                      {
+                            "symbol": "DMC",
+                            "price": 55,
+                            "change": 0.9,
+                            "volume": 500
+                      },
+                      {
+                            "symbol": "IMP",
+                            "price": 36,
+                            "change": 0.6,
+                            "volume": 12200
+                      },
+                      {
+                            "symbol": "LDP",
+                            "price": 7.6,
+                            "change": 0,
+                            "volume": 4300
+                      },
+                      {
+                            "symbol": "SPM",
+                            "price": 8.81,
+                            "change": 0,
+                            "volume": 100
+                      },
+                      {
+                            "symbol": "TNH",
+                            "price": 7.24,
+                            "change": 0.47,
+                            "volume": 261200
+                      },
+                      {
+                            "symbol": "JVC",
+                            "price": 2.93,
+                            "change": 0.01,
+                            "volume": 88800
+                      },
+                      {
+                            "symbol": "DHD",
+                            "price": 27,
+                            "change": 0.4,
+                            "volume": 1700
+                      }
+                ]
+          },
+          {
+                "id": "AIR",
+                "title": "Hàng không - Du lịch",
+                "chip": "AIR",
+                "chipLabel": "Hàng không",
+                "baselineChg": 0.23,
+                "stocks": [
+                      {
+                            "symbol": "ACV",
+                            "price": 41,
+                            "change": 0.7,
+                            "volume": 720300
+                      },
+                      {
+                            "symbol": "AST",
+                            "price": 60,
+                            "change": 0,
+                            "volume": 3200
+                      },
+                      {
+                            "symbol": "HVN",
+                            "price": 20.9,
+                            "change": 0.1,
+                            "volume": 576900
+                      },
+                      {
+                            "symbol": "SAS",
+                            "price": 38,
+                            "change": 0.5,
+                            "volume": 46200
+                      },
+                      {
+                            "symbol": "VJC",
+                            "price": 126.8,
+                            "change": 0.7,
+                            "volume": 1196100
+                      },
+                      {
+                            "symbol": "VTD",
+                            "price": 4.1,
+                            "change": 0.1,
+                            "volume": 129700
+                      },
+                      {
+                            "symbol": "NCT",
+                            "price": 83.1,
+                            "change": 0,
+                            "volume": 7000
+                      },
+                      {
+                            "symbol": "DAH",
+                            "price": 2.52,
+                            "change": 0.14,
+                            "volume": 70800
+                      },
+                      {
+                            "symbol": "RIC",
+                            "price": 4.9,
+                            "change": 0,
+                            "volume": 100300
+                      },
+                      {
+                            "symbol": "SCS",
+                            "price": 40.35,
+                            "change": 0.25,
+                            "volume": 90000
+                      },
+                      {
+                            "symbol": "SGN",
+                            "price": 51.5,
+                            "change": 0.3,
+                            "volume": 4200
+                      },
+                      {
+                            "symbol": "SKG",
+                            "price": 7.3,
+                            "change": 0,
+                            "volume": 11200
+                      }
+                ]
+          },
+          {
+                "id": "WATER_PLASTIC",
+                "title": "Nước - Nhựa",
+                "chip": "WATER_PLASTIC",
+                "chipLabel": "Nước - Nhựa",
+                "baselineChg": 0.39,
+                "stocks": [
+                      {
+                            "symbol": "AAA",
+                            "price": 7.14,
+                            "change": 0.04,
+                            "volume": 711600
+                      },
+                      {
+                            "symbol": "APH",
+                            "price": 7.03,
+                            "change": 0.04,
+                            "volume": 109500
+                      },
+                      {
+                            "symbol": "BMP",
+                            "price": 138,
+                            "change": 2.5,
+                            "volume": 150500
+                      },
+                      {
+                            "symbol": "BWE",
+                            "price": 41.9,
+                            "change": 0.1,
+                            "volume": 23600
+                      },
+                      {
+                            "symbol": "DAG",
+                            "price": 10,
+                            "change": 0,
+                            "volume": 100000
+                      },
+                      {
+                            "symbol": "NTP",
+                            "price": 52.2,
+                            "change": 1,
+                            "volume": 171300
+                      },
+                      {
+                            "symbol": "TDM",
+                            "price": 59.4,
+                            "change": 0,
+                            "volume": 5500
+                      },
+                      {
+                            "symbol": "VNP",
+                            "price": 17.1,
+                            "change": 0.4,
+                            "volume": 4300
+                      },
+                      {
+                            "symbol": "HII",
+                            "price": 9.95,
+                            "change": 0.44,
+                            "volume": 545100
+                      },
+                      {
+                            "symbol": "NHH",
+                            "price": 9.7,
+                            "change": 0.1,
+                            "volume": 1400
+                      },
+                      {
+                            "symbol": "PGN",
+                            "price": 6,
+                            "change": 0,
+                            "volume": 500
+                      },
+                      {
+                            "symbol": "PLP",
+                            "price": 3.53,
+                            "change": 0.03,
+                            "volume": 44100
+                      }
+                ]
+          },
+          {
+                "id": "AUTO",
+                "title": "Ôtô - Phụ tùng",
+                "chip": "AUTO",
+                "chipLabel": "Ôtô-Phụ tùng",
+                "baselineChg": 0.23,
+                "stocks": [
+                      {
+                            "symbol": "DRC",
+                            "price": 9.37,
+                            "change": 0.51,
+                            "volume": 1562600
+                      },
+                      {
+                            "symbol": "HAX",
+                            "price": 8.59,
+                            "change": 0.14,
+                            "volume": 80700
+                      },
+                      {
+                            "symbol": "CTF",
+                            "price": 18.55,
+                            "change": 0.35,
+                            "volume": 102500
+                      },
+                      {
+                            "symbol": "CSM",
+                            "price": 12.35,
+                            "change": 0,
+                            "volume": 17000
+                      },
+                      {
+                            "symbol": "PAC",
+                            "price": 14.75,
+                            "change": 0.15,
+                            "volume": 163100
+                      }
+                ]
+          },
+          {
+                "id": "MINING",
+                "title": "Khoáng sản",
+                "chip": "MINING",
+                "chipLabel": "Khoáng sản",
+                "baselineChg": 0.48,
+                "stocks": [
+                      {
+                            "symbol": "KSV",
+                            "price": 115,
+                            "change": 0.2,
+                            "volume": 30100
+                      },
+                      {
+                            "symbol": "HGM",
+                            "price": 115,
+                            "change": 3,
+                            "volume": 800
+                      },
+                      {
+                            "symbol": "KCB",
+                            "price": 10.4,
+                            "change": 0.2,
+                            "volume": 4700
+                      },
+                      {
+                            "symbol": "YBM",
+                            "price": 9.97,
+                            "change": 0.12,
+                            "volume": 500
+                      },
+                      {
+                            "symbol": "BKC",
+                            "price": 14.9,
+                            "change": 0.1,
+                            "volume": 16000
+                      },
+                      {
+                            "symbol": "BMC",
+                            "price": 10.1,
+                            "change": 0.2,
+                            "volume": 15700
+                      },
+                      {
+                            "symbol": "FCM",
+                            "price": 2.86,
+                            "change": 0.02,
+                            "volume": 11400
+                      },
+                      {
+                            "symbol": "MSR",
+                            "price": 64.3,
+                            "change": 0,
+                            "volume": 546400
+                      }
+                ]
+          },
+          {
+                "id": "INS",
+                "title": "Bảo hiểm",
+                "chip": "INS",
+                "chipLabel": "Bảo hiểm",
+                "baselineChg": 0.3,
+                "stocks": [
+                      {
+                            "symbol": "BIC",
+                            "price": 19.25,
+                            "change": 0.15,
+                            "volume": 2900
+                      },
+                      {
+                            "symbol": "BMI",
+                            "price": 13.65,
+                            "change": 0.15,
+                            "volume": 16000
+                      },
+                      {
+                            "symbol": "BVH",
+                            "price": 70,
+                            "change": 2,
+                            "volume": 1473300
+                      },
+                      {
+                            "symbol": "MIG",
+                            "price": 15.5,
+                            "change": 0,
+                            "volume": 59000
+                      },
+                      {
+                            "symbol": "PGI",
+                            "price": 22,
+                            "change": 0,
+                            "volume": 700
+                      },
+                      {
+                            "symbol": "PRE",
+                            "price": 29.9,
+                            "change": 0,
+                            "volume": 1300
+                      },
+                      {
+                            "symbol": "PTI",
+                            "price": 18,
+                            "change": 0.5,
+                            "volume": 1500
+                      },
+                      {
+                            "symbol": "PVI",
+                            "price": 61.9,
+                            "change": 0.1,
+                            "volume": 9600
+                      },
+                      {
+                            "symbol": "VNR",
+                            "price": 17.9,
+                            "change": 0,
+                            "volume": 800
+                      },
+                      {
+                            "symbol": "ABI",
+                            "price": 19,
+                            "change": 0.1,
+                            "volume": 1200
+                      }
+                ]
+          }
     ];
     const SECTOR_BOARD_DATA = SECTOR_DEFINITIONS;
 
@@ -5573,22 +8674,11 @@ body {
         stockDataList.forEach(live => {
           if (!stocks.some(s => s.symbol === live.symbol)) {
             let matchesSector = false;
-            if (sector.id === 'VN30' && ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR'].includes(live.symbol)) matchesSector = true;
-            else if (sector.id === 'BANK' && (['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','TPB','SHB','LPB','SSB','VIB','MSB','OCB','BVB','KLB'].includes(live.symbol) || live.sector === 'Ngân hàng' || live.sector === 'Tài chính')) matchesSector = true;
-            else if (sector.id === 'RE' && (['VHM','VIC','VRE','KDH','NLG','DIG','DXG','PDR','NVL','CEO','KBC','IDC','SJS','AGG','HQC','HTN','HDC','TCH','DXS','HDG','BCM'].includes(live.symbol) || live.sector === 'Bất động sản')) matchesSector = true;
-            else if (sector.id === 'SEC' && (['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS','ORS','DSC','EVS','AGR','BVS','APG','PSI','AAS','TCI','TVB'].includes(live.symbol) || live.sector === 'Chứng khoán')) matchesSector = true;
-            else if (sector.id === 'STEEL' && (['HPG','HSG','NKG','VGS','SMC','POM','TLH','TVN','GDA','SHI'].includes(live.symbol) || live.sector === 'Thép')) matchesSector = true;
-            else if (sector.id === 'OIL' && (['GAS','PLX','PVD','PVS','BSR','PVT','PVC','PVP','CNG','PVB','OIL','PLC'].includes(live.symbol) || live.sector === 'Dầu khí')) matchesSector = true;
-            else if (sector.id === 'TECH' && (['FPT','CMG','ELC','CTR','VGI','FOX','ITD'].includes(live.symbol) || live.sector === 'Công nghệ')) matchesSector = true;
-            else if (sector.id === 'RETAIL' && (['MWG','FRT','PNJ','DGW','PET'].includes(live.symbol) || live.sector === 'Bán lẻ')) matchesSector = true;
-            else if (sector.id === 'CHEM' && (['DGC','DCM','DPM','BFC','CSV','LAS','DDV'].includes(live.symbol) || live.sector === 'Hóa chất')) matchesSector = true;
-            else if (sector.id === 'LOGISTICS' && (['GMD','HAH','VOS','VSC','PVT','PVP'].includes(live.symbol) || (live.sector && live.sector.includes('Logistics')))) matchesSector = true;
-            else if (sector.id === 'POWER' && (['POW','PC1','REE','GEG','TV2','HDG','BCG','NT2'].includes(live.symbol) || (live.sector && live.sector.includes('Năng lượng')))) matchesSector = true;
-            else if (sector.id === 'PUBLIC' && (['VCG','HHV','LCG','FCN','C4G','DPG','CII','CTD','HBC','HUT'].includes(live.symbol) || (live.sector && live.sector.includes('Đầu tư công')))) matchesSector = true;
-            else if (sector.id === 'AGRI' && (['VHC','ANV','IDI','FMC','BAF','DBC','HAG','HNG','PAN'].includes(live.symbol) || live.sector === 'Thủy sản' || live.sector === 'Nông nghiệp')) matchesSector = true;
-            else if (sector.id === 'KCN' && (['KBC','IDC','GVR','BCM','PHR','DPR','SZC','TIP'].includes(live.symbol) || live.sector === 'Khu công nghiệp')) matchesSector = true;
-            else if (sector.id === 'INS' && (['BVH','BMI','MIG','BIC','PVI'].includes(live.symbol) || live.sector === 'Bảo hiểm')) matchesSector = true;
-            else if (sector.id === 'CONSUMER' && (['VNM','MSN','SAB','KDC','QNS','SBT'].includes(live.symbol) || live.sector === 'Hàng tiêu dùng' || live.sector === 'Thực phẩm')) matchesSector = true;
+            if (sector.stocks && sector.stocks.some(base => base.symbol === live.symbol)) {
+              matchesSector = true;
+            } else if (live.sector && (live.sector === sector.title || sector.title.includes(live.sector) || live.sector.includes(sector.title))) {
+              matchesSector = true;
+            }
 
             if (matchesSector) {
               stocks.push({
@@ -5706,39 +8796,12 @@ body {
       const q = (document.getElementById('watchSearchInput')?.value || '').toUpperCase().trim();
       let list = [...stockDataList];
 
-      if (activeChip === 'VN30') {
-        const vn30 = new Set(['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR']);
-        list = list.filter(s => vn30.has(s.symbol));
-      } else if (activeChip === 'BANK') {
-        list = list.filter(s => ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','TPB','SHB','LPB','SSB','VIB','MSB','OCB','BVB','KLB'].includes(s.symbol) || s.sector === 'Ngân hàng' || s.sector === 'Tài chính');
-      } else if (activeChip === 'RE') {
-        list = list.filter(s => ['VHM','VIC','VRE','KDH','NLG','DIG','DXG','PDR','NVL','CEO','KBC','IDC','SJS','AGG','HQC','HTN','HDC','TCH','DXS','HDG','BCM'].includes(s.symbol) || s.sector === 'Bất động sản');
-      } else if (activeChip === 'SEC') {
-        list = list.filter(s => ['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS','ORS','DSC','EVS','AGR','BVS','APG','PSI','AAS','TCI','TVB'].includes(s.symbol) || s.sector === 'Chứng khoán');
-      } else if (activeChip === 'STEEL') {
-        list = list.filter(s => ['HPG','HSG','NKG','VGS','SMC','POM','TLH','TVN','GDA','SHI'].includes(s.symbol) || s.sector === 'Thép');
-      } else if (activeChip === 'OIL') {
-        list = list.filter(s => ['GAS','PLX','PVD','PVS','BSR','PVT','PVC','PVP','CNG','PVB','OIL','PLC'].includes(s.symbol) || s.sector === 'Dầu khí');
-      } else if (activeChip === 'TECH') {
-        list = list.filter(s => ['FPT','CMG','ELC','CTR','VGI','FOX','ITD'].includes(s.symbol) || s.sector === 'Công nghệ');
-      } else if (activeChip === 'RETAIL') {
-        list = list.filter(s => ['MWG','FRT','PNJ','DGW','PET'].includes(s.symbol) || s.sector === 'Bán lẻ');
-      } else if (activeChip === 'CHEM') {
-        list = list.filter(s => ['DGC','DCM','DPM','BFC','CSV','LAS','DDV'].includes(s.symbol) || s.sector === 'Hóa chất');
-      } else if (activeChip === 'LOGISTICS') {
-        list = list.filter(s => ['GMD','HAH','VOS','VSC','PVT','PVP'].includes(s.symbol) || (s.sector && s.sector.includes('Logistics')));
-      } else if (activeChip === 'POWER') {
-        list = list.filter(s => ['POW','PC1','REE','GEG','TV2','HDG','BCG','NT2'].includes(s.symbol) || (s.sector && s.sector.includes('Năng lượng')));
-      } else if (activeChip === 'PUBLIC') {
-        list = list.filter(s => ['VCG','HHV','LCG','FCN','C4G','DPG','CII','CTD','HBC','HUT'].includes(s.symbol) || (s.sector && s.sector.includes('Đầu tư công')));
-      } else if (activeChip === 'AGRI') {
-        list = list.filter(s => ['VHC','ANV','IDI','FMC','BAF','DBC','HAG','HNG','PAN'].includes(s.symbol) || s.sector === 'Thủy sản' || s.sector === 'Nông nghiệp');
-      } else if (activeChip === 'KCN') {
-        list = list.filter(s => ['KBC','IDC','GVR','BCM','PHR','DPR','SZC','TIP'].includes(s.symbol) || s.sector === 'Khu công nghiệp');
-      } else if (activeChip === 'INS') {
-        list = list.filter(s => ['BVH','BMI','MIG','BIC','PVI'].includes(s.symbol) || s.sector === 'Bảo hiểm');
-      } else if (activeChip === 'CONSUMER') {
-        list = list.filter(s => ['VNM','MSN','SAB','KDC','QNS','SBT'].includes(s.symbol) || s.sector === 'Hàng tiêu dùng' || s.sector === 'Thực phẩm');
+      if (activeChip && activeChip !== 'ALL') {
+        const currentSec = (typeof SECTOR_DEFINITIONS !== 'undefined') ? SECTOR_DEFINITIONS.find(s => s.id === activeChip || s.chip === activeChip) : null;
+        if (currentSec && Array.isArray(currentSec.stocks)) {
+          const secSyms = new Set(currentSec.stocks.map(s => s.symbol));
+          list = list.filter(s => secSyms.has(s.symbol) || (s.sector && (s.sector === currentSec.title || currentSec.title.includes(s.sector) || s.sector.includes(currentSec.title))));
+        }
       }
 
       if (q) {
