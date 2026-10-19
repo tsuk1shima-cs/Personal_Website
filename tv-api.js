@@ -129,17 +129,75 @@ const STOCK_DIRECTORY = {
     'SAB': { name: 'Tổng CTCP Bia - Rượu - Nước giải khát Sài Gòn (Sabeco)', sector: 'Hàng tiêu dùng', exchange: 'HOSE' },
     'TLG': { name: 'Công ty Cổ phần Tập đoàn Thiên Long (Thien Long Group)', sector: 'Hàng tiêu dùng', exchange: 'HOSE' },
 
-    // Hóa chất & Công nghiệp & Khác
+    // Hóa chất & Phân bón
     'DGC': { name: 'Công ty Cổ phần Tập đoàn Hóa chất Đức Giang', sector: 'Hóa chất', exchange: 'HOSE' },
     'DCM': { name: 'Công ty Cổ phần Phân bón Dầu khí Cà Mau (PVCFC)', sector: 'Hóa chất', exchange: 'HOSE' },
     'DPM': { name: 'Tổng CTCP Phân bón và Hóa chất Dầu khí (PVFCCo)', sector: 'Hóa chất', exchange: 'HOSE' },
-    'GVR': { name: 'Tập đoàn Công nghiệp Cao su Việt Nam - CTCP', sector: 'Công nghiệp', exchange: 'HOSE' },
-    'GMD': { name: 'Công ty Cổ phần Gemadept', sector: 'Vận tải', exchange: 'HOSE' },
-    'HAH': { name: 'Công ty Cổ phần Vận tải và Xếp dỡ Hải An', sector: 'Vận tải', exchange: 'HOSE' },
-    'VGC': { name: 'Tổng Công ty Viglacera - CTCP', sector: 'Bất động sản KCN', exchange: 'HOSE' },
-    'PC1': { name: 'Công ty Cổ phần Tập đoàn PC1', sector: 'Điện & Tiện ích', exchange: 'HOSE' },
-    'POW': { name: 'Tổng Công ty Điện lực Dầu khí Việt Nam - CTCP (PV Power)', sector: 'Điện & Tiện ích', exchange: 'HOSE' },
-    'BVH': { name: 'Tập đoàn Bảo Việt (Bao Viet Holdings)', sector: 'Bảo hiểm', exchange: 'HOSE' }
+    'BFC': { name: 'Công ty Cổ phần Phân bón Bình Điền', sector: 'Hóa chất', exchange: 'HOSE' },
+    'LAS': { name: 'Công ty Cổ phần Supe Phốt phát và Hóa chất Lâm Thao', sector: 'Hóa chất', exchange: 'HNX' },
+    'CSV': { name: 'Công ty Cổ phần Hóa chất Cơ bản Miền Nam', sector: 'Hóa chất', exchange: 'HOSE' },
+    'DDV': { name: 'Công ty Cổ phần DAP - VINACHEM', sector: 'Hóa chất', exchange: 'UPCOM' },
+
+    // Cảng biển & Logistics
+    'GMD': { name: 'Công ty Cổ phần Gemadept', sector: 'Cảng biển & Logistics', exchange: 'HOSE' },
+    'HAH': { name: 'Công ty Cổ phần Vận tải và Xếp dỡ Hải An', sector: 'Cảng biển & Logistics', exchange: 'HOSE' },
+    'VOS': { name: 'Công ty Cổ phần Vận tải Biển Việt Nam (Vosco)', sector: 'Cảng biển & Logistics', exchange: 'HOSE' },
+    'VSC': { name: 'Công ty Cổ phần Container Việt Nam (Viconship)', sector: 'Cảng biển & Logistics', exchange: 'HOSE' },
+    'DVP': { name: 'Công ty Cổ phần Đầu tư và Phát triển Cảng Đình Vũ', sector: 'Cảng biển & Logistics', exchange: 'HOSE' },
+    'VTO': { name: 'Công ty Cổ phần Vận tải Xăng dầu VITACO', sector: 'Cảng biển & Logistics', exchange: 'HOSE' },
+
+    // Điện & Năng lượng
+    'POW': { name: 'Tổng Công ty Điện lực Dầu khí Việt Nam - CTCP (PV Power)', sector: 'Điện & Năng lượng', exchange: 'HOSE' },
+    'PC1': { name: 'Công ty Cổ phần Tập đoàn PC1', sector: 'Điện & Năng lượng', exchange: 'HOSE' },
+    'REE': { name: 'Công ty Cổ phần Cơ Điện Lạnh (REE Corporation)', sector: 'Điện & Năng lượng', exchange: 'HOSE' },
+    'GEG': { name: 'Công ty Cổ phần Điện Gia Lai', sector: 'Điện & Năng lượng', exchange: 'HOSE' },
+    'TV2': { name: 'Công ty Cổ phần Tư vấn Xây dựng Điện 2', sector: 'Điện & Năng lượng', exchange: 'HOSE' },
+    'BCG': { name: 'Công ty Cổ phần Tập đoàn Bamboo Capital', sector: 'Điện & Năng lượng', exchange: 'HOSE' },
+    'NT2': { name: 'Công ty Cổ phần Điện lực Dầu khí Nhơn Trạch 2', sector: 'Điện & Năng lượng', exchange: 'HOSE' },
+    'QTP': { name: 'Công ty Cổ phần Nhiệt điện Quảng Ninh', sector: 'Điện & Năng lượng', exchange: 'UPCOM' },
+
+    // Đầu tư công & Hạ tầng xây dựng
+    'VCG': { name: 'Tổng Công ty Cổ phần Xuất nhập khẩu và Xây dựng Việt Nam (Vinaconex)', sector: 'Đầu tư công', exchange: 'HOSE' },
+    'HHV': { name: 'Công ty Cổ phần Đầu tư Hạ tầng Giao thông Đèo Cả', sector: 'Đầu tư công', exchange: 'HOSE' },
+    'LCG': { name: 'Công ty Cổ phần LIZEN', sector: 'Đầu tư công', exchange: 'HOSE' },
+    'FCN': { name: 'Công ty Cổ phần FECON', sector: 'Đầu tư công', exchange: 'HOSE' },
+    'C4G': { name: 'Công ty Cổ phần Tập đoàn CIENCO4', sector: 'Đầu tư công', exchange: 'UPCOM' },
+    'CTD': { name: 'Công ty Cổ phần Xây dựng Coteccons', sector: 'Đầu tư công', exchange: 'HOSE' },
+    'HBC': { name: 'Công ty Cổ phần Tập đoàn Xây dựng Hòa Bình', sector: 'Đầu tư công', exchange: 'UPCOM' },
+    'KSB': { name: 'Công ty Cổ phần Khoáng sản và Xây dựng Bình Dương', sector: 'Đầu tư công', exchange: 'HOSE' },
+    'HT1': { name: 'Công ty Cổ phần Xi măng Vicem Hà Tiên', sector: 'Đầu tư công', exchange: 'HOSE' },
+    'BCC': { name: 'Công ty Cổ phần Xi măng Vicem Bỉm Sơn', sector: 'Đầu tư công', exchange: 'HNX' },
+
+    // Thủy sản & Nông nghiệp
+    'VHC': { name: 'Công ty Cổ phần Vĩnh Hoàn', sector: 'Thủy sản', exchange: 'HOSE' },
+    'ANV': { name: 'Công ty Cổ phần Nam Việt (Navico)', sector: 'Thủy sản', exchange: 'HOSE' },
+    'IDI': { name: 'Công ty Cổ phần Đầu tư và Phát triển Đa Quốc Gia I.D.I', sector: 'Thủy sản', exchange: 'HOSE' },
+    'ASM': { name: 'Công ty Cổ phần Tập đoàn Sao Mai', sector: 'Thủy sản', exchange: 'HOSE' },
+    'FMC': { name: 'Công ty Cổ phần Thực phẩm Sao Ta', sector: 'Thủy sản', exchange: 'HOSE' },
+    'BAF': { name: 'Công ty Cổ phần Nông nghiệp BAF Việt Nam', sector: 'Nông nghiệp', exchange: 'HOSE' },
+    'DBC': { name: 'Công ty Cổ phần Tập đoàn Dabaco Việt Nam', sector: 'Nông nghiệp', exchange: 'HOSE' },
+    'HAG': { name: 'Công ty Cổ phần Hoàng Anh Gia Lai', sector: 'Nông nghiệp', exchange: 'HOSE' },
+    'HNG': { name: 'Công ty Cổ phần Nông nghiệp Quốc tế Hoàng Anh Gia Lai', sector: 'Nông nghiệp', exchange: 'UPCOM' },
+
+    // Bất động sản Khu công nghiệp & Cao su
+    'GVR': { name: 'Tập đoàn Công nghiệp Cao su Việt Nam - CTCP', sector: 'Khu công nghiệp', exchange: 'HOSE' },
+    'VGC': { name: 'Tổng Công ty Viglacera - CTCP', sector: 'Khu công nghiệp', exchange: 'HOSE' },
+    'SZC': { name: 'Công ty Cổ phần Sonadezi Châu Đức', sector: 'Khu công nghiệp', exchange: 'HOSE' },
+    'NTC': { name: 'Công ty Cổ phần Khu Công nghiệp Nam Tân Uyên', sector: 'Khu công nghiệp', exchange: 'UPCOM' },
+    'TIP': { name: 'Công ty Cổ phần Phát triển Đô thị Công nghiệp số 2', sector: 'Khu công nghiệp', exchange: 'HOSE' },
+    'LHG': { name: 'Công ty Cổ phần Long Hậu', sector: 'Khu công nghiệp', exchange: 'HOSE' },
+    'PHR': { name: 'Công ty Cổ phần Cao su Phước Hòa', sector: 'Khu công nghiệp', exchange: 'HOSE' },
+    'DPR': { name: 'Công ty Cổ phần Cao su Đồng Phú', sector: 'Khu công nghiệp', exchange: 'HOSE' },
+
+    // Bảo hiểm
+    'BVH': { name: 'Tập đoàn Bảo Việt (Bao Viet Holdings)', sector: 'Bảo hiểm', exchange: 'HOSE' },
+    'MIG': { name: 'Tổng Công ty Cổ phần Bảo hiểm Quân đội (MIC)', sector: 'Bảo hiểm', exchange: 'HOSE' },
+    'BMI': { name: 'Tổng Công ty Cổ phần Bảo Minh', sector: 'Bảo hiểm', exchange: 'HOSE' },
+    'PVI': { name: 'Công ty Cổ phần PVI', sector: 'Bảo hiểm', exchange: 'HNX' },
+    'BIC': { name: 'Tổng Công ty Cổ phần Bảo hiểm Ngân hàng BIDV', sector: 'Bảo hiểm', exchange: 'HOSE' },
+
+    // Hàng tiêu dùng & Thực phẩm
+    'KDC': { name: 'Công ty Cổ phần Tập đoàn KIDO', sector: 'Hàng tiêu dùng', exchange: 'HOSE' }
 };
 
 // Danh mục cổ phiếu cơ sở toàn diện (tự động đồng bộ và làm mới giá trực tiếp theo từng phiên giao dịch thực tế)
@@ -250,15 +308,75 @@ const FALLBACK_STOCKS = [
     { symbol: 'SAB', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 43000, change: 0.00, pe: 16.5, pb: 2.59, roe: 18.5, marketCap: 55000, volume: 363600, value: 1672294500, buyForeignValue: 1200000000, sellForeignValue: 2400000000 },
     { symbol: 'TLG', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 54900, change: -1.08, pe: 11.2, pb: 2.10, roe: 19.2, marketCap: 5357, volume: 54500, value: 2992873500, buyForeignValue: 4571800000, sellForeignValue: 11888650000 },
 
-    // Hóa chất & Công nghiệp & Khác
+    // Hóa chất & Phân bón
     { symbol: 'DGC', exchange: 'HOSE', sector: 'Hóa chất', price: 32600, change: 0.00, pe: 12.5, pb: 0.82, roe: 26.4, marketCap: 12400, volume: 170500, value: 5558300000, buyForeignValue: 55465000, sellForeignValue: 477370000 },
     { symbol: 'DCM', exchange: 'HOSE', sector: 'Hóa chất', price: 33350, change: -2.20, pe: 11.8, pb: 1.64, roe: 14.8, marketCap: 18000, volume: 545200, value: 18183487200, buyForeignValue: 9697785000, sellForeignValue: 4505802250 },
     { symbol: 'DPM', exchange: 'HOSE', sector: 'Hóa chất', price: 21200, change: -0.70, pe: 13.5, pb: 1.27, roe: 10.2, marketCap: 8400, volume: 718000, value: 15222999200, buyForeignValue: 538890000, sellForeignValue: 3118221250 },
-    { symbol: 'GVR', exchange: 'HOSE', sector: 'Công nghiệp', price: 31350, change: -0.16, pe: 24.0, pb: 2.21, roe: 9.5, marketCap: 125000, volume: 370600, value: 11619532650, buyForeignValue: 0, sellForeignValue: 157250000 },
-    { symbol: 'GMD', exchange: 'HOSE', sector: 'Vận tải', price: 52800, change: -0.38, pe: 15.2, pb: 2.57, roe: 19.5, marketCap: 16200, volume: 335800, value: 17733144000, buyForeignValue: 31043930000, sellForeignValue: 30200596000 },
-    { symbol: 'HAH', exchange: 'HOSE', sector: 'Vận tải', price: 47600, change: -1.55, pe: 10.2, pb: 1.78, roe: 16.2, marketCap: 5800, volume: 181000, value: 8618598800, buyForeignValue: 2019825000, sellForeignValue: 10212785600 },
-    { symbol: 'VGC', exchange: 'HOSE', sector: 'Bất động sản KCN', price: 43150, change: -1.37, pe: 14.8, pb: 2.23, roe: 14.2, marketCap: 19600, volume: 57300, value: 2475515500, buyForeignValue: 6357500000, sellForeignValue: 1599465000 },
-    { symbol: 'PC1', exchange: 'HOSE', sector: 'Điện & Tiện ích', price: 18300, change: 0.27, pe: 14.8, pb: 1.16, roe: 10.5, marketCap: 8800, volume: 125100, value: 2289476400, buyForeignValue: 3100000000, sellForeignValue: 2400000000 }
+    { symbol: 'BFC', exchange: 'HOSE', sector: 'Hóa chất', price: 39500, change: 1.28, pe: 9.8, pb: 1.45, roe: 15.6, marketCap: 2500, volume: 220000, value: 8690000000 },
+    { symbol: 'LAS', exchange: 'HNX', sector: 'Hóa chất', price: 21400, change: 0.94, pe: 10.5, pb: 1.35, roe: 13.8, marketCap: 2400, volume: 380000, value: 8132000000 },
+    { symbol: 'CSV', exchange: 'HOSE', sector: 'Hóa chất', price: 38600, change: 0.52, pe: 11.2, pb: 1.55, roe: 14.2, marketCap: 3200, volume: 195000, value: 7527000000 },
+    { symbol: 'DDV', exchange: 'UPCOM', sector: 'Hóa chất', price: 16800, change: -0.59, pe: 12.0, pb: 1.15, roe: 11.0, marketCap: 2300, volume: 410000, value: 6888000000 },
+
+    // Cảng biển & Logistics
+    { symbol: 'GMD', exchange: 'HOSE', sector: 'Cảng biển & Logistics', price: 52800, change: -0.38, pe: 15.2, pb: 2.57, roe: 19.5, marketCap: 16200, volume: 335800, value: 17733144000, buyForeignValue: 31043930000, sellForeignValue: 30200596000 },
+    { symbol: 'HAH', exchange: 'HOSE', sector: 'Cảng biển & Logistics', price: 47600, change: -1.55, pe: 10.2, pb: 1.78, roe: 16.2, marketCap: 5800, volume: 181000, value: 8618598800, buyForeignValue: 2019825000, sellForeignValue: 10212785600 },
+    { symbol: 'VOS', exchange: 'HOSE', sector: 'Cảng biển & Logistics', price: 13200, change: 1.54, pe: 11.5, pb: 1.12, roe: 10.8, marketCap: 1800, volume: 850000, value: 11220000000 },
+    { symbol: 'VSC', exchange: 'HOSE', sector: 'Cảng biển & Logistics', price: 18500, change: 0.54, pe: 12.8, pb: 1.25, roe: 10.2, marketCap: 5200, volume: 920000, value: 17020000000 },
+    { symbol: 'DVP', exchange: 'HOSE', sector: 'Cảng biển & Logistics', price: 62000, change: 0.00, pe: 9.5, pb: 1.65, roe: 18.5, marketCap: 2500, volume: 45000, value: 2790000000 },
+    { symbol: 'VTO', exchange: 'HOSE', sector: 'Cảng biển & Logistics', price: 12400, change: 0.81, pe: 10.2, pb: 0.95, roe: 9.8, marketCap: 1100, volume: 180000, value: 2232000000 },
+
+    // Điện & Năng lượng
+    { symbol: 'POW', exchange: 'HOSE', sector: 'Điện & Năng lượng', price: 12150, change: 0.83, pe: 16.5, pb: 0.88, roe: 6.2, marketCap: 28500, volume: 4800000, value: 58320000000 },
+    { symbol: 'PC1', exchange: 'HOSE', sector: 'Điện & Năng lượng', price: 18300, change: 0.27, pe: 14.8, pb: 1.16, roe: 10.5, marketCap: 8800, volume: 125100, value: 2289476400, buyForeignValue: 3100000000, sellForeignValue: 2400000000 },
+    { symbol: 'REE', exchange: 'HOSE', sector: 'Điện & Năng lượng', price: 64200, change: 0.47, pe: 11.2, pb: 1.48, roe: 14.2, marketCap: 26000, volume: 450000, value: 28890000000 },
+    { symbol: 'GEG', exchange: 'HOSE', sector: 'Điện & Năng lượng', price: 11800, change: 0.00, pe: 17.5, pb: 0.92, roe: 6.8, marketCap: 4100, volume: 320000, value: 3776000000 },
+    { symbol: 'TV2', exchange: 'HOSE', sector: 'Điện & Năng lượng', price: 38500, change: 1.32, pe: 13.0, pb: 1.35, roe: 11.5, marketCap: 2600, volume: 85000, value: 3272500000 },
+    { symbol: 'BCG', exchange: 'HOSE', sector: 'Điện & Năng lượng', price: 6200, change: -0.80, pe: 18.0, pb: 0.45, roe: 3.5, marketCap: 3300, volume: 2100000, value: 13020000000 },
+    { symbol: 'NT2', exchange: 'HOSE', sector: 'Điện & Năng lượng', price: 19800, change: 0.51, pe: 14.5, pb: 1.32, roe: 10.2, marketCap: 5700, volume: 290000, value: 5742000000 },
+    { symbol: 'QTP', exchange: 'UPCOM', sector: 'Điện & Năng lượng', price: 13600, change: 0.00, pe: 9.8, pb: 1.15, roe: 12.8, marketCap: 6100, volume: 420000, value: 5712000000 },
+
+    // Đầu tư công & Hạ tầng xây dựng
+    { symbol: 'VCG', exchange: 'HOSE', sector: 'Đầu tư công', price: 18200, change: 1.39, pe: 13.5, pb: 1.10, roe: 8.5, marketCap: 9800, volume: 4500000, value: 81900000000 },
+    { symbol: 'HHV', exchange: 'HOSE', sector: 'Đầu tư công', price: 11350, change: 0.89, pe: 12.2, pb: 0.90, roe: 7.8, marketCap: 4800, volume: 3200000, value: 36320000000 },
+    { symbol: 'LCG', exchange: 'HOSE', sector: 'Đầu tư công', price: 9850, change: 1.55, pe: 11.8, pb: 0.82, roe: 7.5, marketCap: 1900, volume: 2100000, value: 20685000000 },
+    { symbol: 'FCN', exchange: 'HOSE', sector: 'Đầu tư công', price: 12100, change: 0.83, pe: 15.0, pb: 0.85, roe: 6.2, marketCap: 1900, volume: 1450000, value: 17545000000 },
+    { symbol: 'C4G', exchange: 'UPCOM', sector: 'Đầu tư công', price: 8200, change: 0.00, pe: 12.8, pb: 0.78, roe: 6.8, marketCap: 3100, volume: 950000, value: 7790000000 },
+    { symbol: 'CTD', exchange: 'HOSE', sector: 'Đầu tư công', price: 68500, change: 1.48, pe: 16.5, pb: 0.85, roe: 5.5, marketCap: 7100, volume: 850000, value: 58225000000 },
+    { symbol: 'HBC', exchange: 'UPCOM', sector: 'Đầu tư công', price: 5400, change: -1.82, pe: 22.0, pb: 0.65, roe: 3.2, marketCap: 1800, volume: 1200000, value: 6480000000 },
+    { symbol: 'KSB', exchange: 'HOSE', sector: 'Đầu tư công', price: 16400, change: 0.61, pe: 14.2, pb: 0.95, roe: 7.2, marketCap: 2100, volume: 890000, value: 14596000000 },
+    { symbol: 'HT1', exchange: 'HOSE', sector: 'Đầu tư công', price: 11200, change: 0.45, pe: 16.0, pb: 0.88, roe: 5.8, marketCap: 4300, volume: 620000, value: 6944000000 },
+    { symbol: 'BCC', exchange: 'HNX', sector: 'Đầu tư công', price: 6800, change: 0.00, pe: 18.5, pb: 0.60, roe: 3.5, marketCap: 850, volume: 150000, value: 1020000000 },
+
+    // Thủy sản & Nông nghiệp
+    { symbol: 'VHC', exchange: 'HOSE', sector: 'Thủy sản', price: 68200, change: 1.19, pe: 12.8, pb: 1.75, roe: 14.5, marketCap: 15300, volume: 1100000, value: 75020000000 },
+    { symbol: 'ANV', exchange: 'HOSE', sector: 'Thủy sản', price: 29500, change: 0.68, pe: 13.5, pb: 1.40, roe: 11.2, marketCap: 4000, volume: 1250000, value: 36875000000 },
+    { symbol: 'IDI', exchange: 'HOSE', sector: 'Thủy sản', price: 7850, change: -0.63, pe: 15.2, pb: 0.75, roe: 5.5, marketCap: 1800, volume: 950000, value: 7457500000 },
+    { symbol: 'ASM', exchange: 'HOSE', sector: 'Thủy sản', price: 8900, change: 0.22, pe: 12.0, pb: 0.70, roe: 6.5, marketCap: 3000, volume: 1100000, value: 9790000000 },
+    { symbol: 'FMC', exchange: 'HOSE', sector: 'Thủy sản', price: 46200, change: 0.43, pe: 10.8, pb: 1.45, roe: 14.2, marketCap: 3000, volume: 180000, value: 8316000000 },
+    { symbol: 'BAF', exchange: 'HOSE', sector: 'Nông nghiệp', price: 18400, change: 1.10, pe: 14.5, pb: 1.25, roe: 9.2, marketCap: 4400, volume: 1800000, value: 33120000000 },
+    { symbol: 'DBC', exchange: 'HOSE', sector: 'Nông nghiệp', price: 25600, change: 1.59, pe: 12.2, pb: 1.35, roe: 12.0, marketCap: 8200, volume: 2900000, value: 74240000000 },
+    { symbol: 'HAG', exchange: 'HOSE', sector: 'Nông nghiệp', price: 11400, change: -0.87, pe: 9.8, pb: 1.30, roe: 14.0, marketCap: 12000, volume: 5400000, value: 61560000000 },
+    { symbol: 'HNG', exchange: 'UPCOM', sector: 'Nông nghiệp', price: 4200, change: 0.00, pe: 25.0, pb: 0.70, roe: 2.5, marketCap: 4600, volume: 1500000, value: 6300000000 },
+
+    // Bất động sản Khu công nghiệp & Cao su
+    { symbol: 'GVR', exchange: 'HOSE', sector: 'Khu công nghiệp', price: 31350, change: -0.16, pe: 24.0, pb: 2.21, roe: 9.5, marketCap: 125000, volume: 370600, value: 11619532650, buyForeignValue: 0, sellForeignValue: 157250000 },
+    { symbol: 'VGC', exchange: 'HOSE', sector: 'Khu công nghiệp', price: 43150, change: -1.37, pe: 14.8, pb: 2.23, roe: 14.2, marketCap: 19600, volume: 57300, value: 2475515500, buyForeignValue: 6357500000, sellForeignValue: 1599465000 },
+    { symbol: 'SZC', exchange: 'HOSE', sector: 'Khu công nghiệp', price: 38200, change: 1.33, pe: 14.2, pb: 1.85, roe: 13.8, marketCap: 6800, volume: 750000, value: 28650000000 },
+    { symbol: 'NTC', exchange: 'UPCOM', sector: 'Khu công nghiệp', price: 185000, change: 0.54, pe: 11.5, pb: 2.80, roe: 25.0, marketCap: 4400, volume: 25000, value: 4625000000 },
+    { symbol: 'TIP', exchange: 'HOSE', sector: 'Khu công nghiệp', price: 21600, change: 0.00, pe: 12.0, pb: 1.15, roe: 10.5, marketCap: 1400, volume: 95000, value: 2052000000 },
+    { symbol: 'LHG', exchange: 'HOSE', sector: 'Khu công nghiệp', price: 32400, change: 0.62, pe: 10.2, pb: 1.10, roe: 11.5, marketCap: 1600, volume: 140000, value: 4536000000 },
+    { symbol: 'PHR', exchange: 'HOSE', sector: 'Khu công nghiệp', price: 54200, change: 0.74, pe: 13.8, pb: 1.80, roe: 13.5, marketCap: 7300, volume: 320000, value: 17344000000 },
+    { symbol: 'DPR', exchange: 'HOSE', sector: 'Khu công nghiệp', price: 36800, change: 0.27, pe: 12.5, pb: 1.45, roe: 12.0, marketCap: 3800, volume: 210000, value: 7728000000 },
+
+    // Bảo hiểm
+    { symbol: 'BVH', exchange: 'HOSE', sector: 'Bảo hiểm', price: 41200, change: 0.49, pe: 16.2, pb: 1.42, roe: 9.5, marketCap: 30500, volume: 550000, value: 22660000000 },
+    { symbol: 'MIG', exchange: 'HOSE', sector: 'Bảo hiểm', price: 17200, change: 1.18, pe: 11.8, pb: 1.25, roe: 11.2, marketCap: 3100, volume: 680000, value: 11696000000 },
+    { symbol: 'BMI', exchange: 'HOSE', sector: 'Bảo hiểm', price: 20500, change: 0.00, pe: 12.5, pb: 1.05, roe: 9.0, marketCap: 2400, volume: 180000, value: 3690000000 },
+    { symbol: 'PVI', exchange: 'HNX', sector: 'Bảo hiểm', price: 48500, change: 0.62, pe: 10.5, pb: 1.35, roe: 13.5, marketCap: 11500, volume: 85000, value: 4122500000 },
+    { symbol: 'BIC', exchange: 'HOSE', sector: 'Bảo hiểm', price: 28400, change: 0.71, pe: 11.2, pb: 1.20, roe: 11.5, marketCap: 3300, volume: 110000, value: 3124000000 },
+
+    // Hàng tiêu dùng & Thực phẩm
+    { symbol: 'KDC', exchange: 'HOSE', sector: 'Hàng tiêu dùng', price: 47200, change: 0.00, pe: 18.0, pb: 1.65, roe: 9.5, marketCap: 13600, volume: 280000, value: 13216000000 }
 ];
 
 // Helper lay dia chi backend API thong nhat

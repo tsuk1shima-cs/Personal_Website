@@ -2940,13 +2940,21 @@ body {
                   <div class="watchlist-chip-list">
                     <button class="watchlist-chip-btn active" onclick="selectChip('ALL', this)">Tất cả ngành</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('VN30', this)">VN30</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('BANK', this)">Ngân hàng</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('RE', this)">Bất động sản</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('SEC', this)">Chứng khoán</button>
-                    <button class="watchlist-chip-btn" onclick="selectChip('BANK', this)">Ngân hàng</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('STEEL', this)">Thép</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('OIL', this)">Dầu khí</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('TECH', this)">Công nghệ</button>
                     <button class="watchlist-chip-btn" onclick="selectChip('RETAIL', this)">Bán lẻ</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('CHEM', this)">Hóa chất</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('LOGISTICS', this)">Cảng biển</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('POWER', this)">Điện & NL</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('PUBLIC', this)">Đầu tư công</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('AGRI', this)">Thủy sản & Nông nghiệp</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('KCN', this)">BĐS KCN</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('INS', this)">Bảo hiểm</button>
+                    <button class="watchlist-chip-btn" onclick="selectChip('CONSUMER', this)">Thực phẩm</button>
                   </div>
                 </div>
 
@@ -3973,18 +3981,40 @@ body {
     let marketIndices = {};
     let intradayPoints = [];
 
-    // Danh mục nhóm ngành và cổ phiếu đại diện để tính toán biến động thực tế
+    // FIREANT URL HELPER: Chuẩn hóa đường dẫn mã chứng khoán & biểu đồ FireAnt 100% không bị lỗi 404
+    function getFireAntStockUrl(symbol) {
+      if (!symbol) return 'https://fireant.vn';
+      const s = String(symbol).trim().toUpperCase();
+      if (s === 'HNXINDEX') return 'https://fireant.vn/ma-chung-khoan/HNX';
+      if (s === 'UPCOMINDEX') return 'https://fireant.vn/ma-chung-khoan/UPCOM';
+      if (s === 'VNI' || s === 'VN-INDEX') return 'https://fireant.vn/ma-chung-khoan/VNINDEX';
+      return `https://fireant.vn/ma-chung-khoan/${encodeURIComponent(s)}`;
+    }
+
+    function getFireAntChartUrl(symbol) {
+      if (!symbol) return 'https://fireant.vn/charts';
+      const s = String(symbol).trim().toUpperCase();
+      const clean = (s === 'HNXINDEX' ? 'HNX' : (s === 'UPCOMINDEX' ? 'UPCOM' : (s === 'VNI' ? 'VNINDEX' : s)));
+      return `https://fireant.vn/charts?symbol=${encodeURIComponent(clean)}`;
+    }
+
+    // Danh mục 16 nhóm ngành đầy đủ và cổ phiếu thành phần đại diện
     const SECTOR_GROUPS = [
-      { name: 'Ngân hàng', symbols: ['VCB', 'BID', 'CTG', 'TCB', 'MBB', 'VPB', 'ACB', 'STB', 'HDB', 'SHB', 'LPB', 'SSB', 'VIB'] },
-      { name: 'Công nghệ thông tin', symbols: ['FPT', 'CTR', 'ELC', 'CMG', 'VGI'] },
-      { name: 'Chứng khoán', symbols: ['SSI', 'VND', 'VIX', 'HCM', 'SHS', 'MBS', 'VCI'] },
-      { name: 'Thép & Nguyên vật liệu', symbols: ['HPG', 'HSG', 'NKG'] },
-      { name: 'Hóa chất & Phân bón', symbols: ['DGC', 'DCM', 'DPM'] },
-      { name: 'Bất động sản', symbols: ['VHM', 'VIC', 'VRE', 'NVL', 'PDR', 'DXG', 'KDH', 'VGC', 'KBC'] },
-      { name: 'Bán lẻ & Tiêu dùng', symbols: ['MWG', 'FRT', 'PNJ', 'DGW'] },
-      { name: 'Dầu khí & Năng lượng', symbols: ['GAS', 'PLX', 'PVD', 'BSR', 'PC1'] },
-      { name: 'Hàng tiêu dùng thực phẩm', symbols: ['MSN', 'MCH', 'VNM', 'SAB', 'TLG'] },
-      { name: 'Vận tải & Logistics', symbols: ['GMD', 'HAH', 'GVR'] }
+      { name: 'Ngân hàng', symbols: ['VCB', 'BID', 'CTG', 'TCB', 'MBB', 'VPB', 'ACB', 'STB', 'HDB', 'SHB', 'LPB', 'SSB', 'VIB', 'MSB', 'OCB'] },
+      { name: 'Bất động sản', symbols: ['VHM', 'VIC', 'VRE', 'NVL', 'PDR', 'DXG', 'KDH', 'NLG', 'DIG', 'CEO', 'SJS', 'AGG', 'HDC', 'TCH'] },
+      { name: 'Chứng khoán', symbols: ['SSI', 'VND', 'VIX', 'HCM', 'SHS', 'MBS', 'VCI', 'FTS', 'BSI', 'CTS', 'ORS'] },
+      { name: 'Thép & VLXD', symbols: ['HPG', 'HSG', 'NKG', 'VGS', 'SMC', 'POM', 'TLH'] },
+      { name: 'Dầu khí', symbols: ['GAS', 'PLX', 'PVD', 'PVS', 'BSR', 'PVT', 'PVC', 'PVP'] },
+      { name: 'Công nghệ thông tin', symbols: ['FPT', 'CTR', 'ELC', 'CMG', 'VGI', 'FOX'] },
+      { name: 'Bán lẻ', symbols: ['MWG', 'FRT', 'PNJ', 'DGW', 'PET'] },
+      { name: 'Hóa chất & Phân bón', symbols: ['DGC', 'DCM', 'DPM', 'BFC', 'CSV', 'LAS', 'DDV'] },
+      { name: 'Cảng biển & Logistics', symbols: ['GMD', 'HAH', 'VOS', 'VSC', 'PVT', 'PVP'] },
+      { name: 'Điện & Năng lượng', symbols: ['POW', 'PC1', 'REE', 'GEG', 'TV2', 'HDG', 'BCG', 'NT2'] },
+      { name: 'Đầu tư công & Hạ tầng', symbols: ['VCG', 'HHV', 'LCG', 'FCN', 'C4G', 'DPG', 'CII', 'CTD', 'HBC', 'HUT'] },
+      { name: 'Thủy sản & Nông nghiệp', symbols: ['VHC', 'ANV', 'IDI', 'FMC', 'BAF', 'DBC', 'HAG', 'HNG', 'PAN'] },
+      { name: 'BĐS Khu công nghiệp', symbols: ['KBC', 'IDC', 'GVR', 'BCM', 'PHR', 'DPR', 'SZC', 'TIP'] },
+      { name: 'Bảo hiểm', symbols: ['BVH', 'BMI', 'MIG', 'BIC', 'PVI'] },
+      { name: 'Thực phẩm & Đồ uống', symbols: ['VNM', 'MSN', 'SAB', 'KDC', 'QNS', 'SBT'] }
     ];
     let SECTOR_DATA = [];
 
@@ -4708,10 +4738,18 @@ body {
           'VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','LPB','SSB','VIB','TPB','MSB','OCB','BVB','KLB',
           'VHM','VIC','VRE','KDH','NLG','NVL','PDR','DIG','DXG','CEO','KBC','IDC','SJS','AGG','HDC','TCH','DXS','HDG','BCM',
           'SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS','DSC','EVS','APG','PSI','AAS','ORS','TCI','TVB',
-          'HPG','HSG','NKG','VGS','SMC','POM','TLH',
+          'HPG','HSG','NKG','VGS','SMC','POM','TLH','TVN','GDA','SHI',
           'GAS','PLX','PVD','PVS','BSR','PVT','PVC','PVP','CNG','PVB','OIL','PLC',
           'FPT','CMG','ELC','CTR','VGI','FOX','ITD',
-          'MWG','FRT','PNJ','DGW','MSN','VNM','SAB','BVH','POW','PET'
+          'MWG','FRT','PNJ','DGW','MSN','VNM','SAB','BVH','POW','PET',
+          'DGC','DCM','DPM','BFC','CSV','LAS','DDV',
+          'GMD','HAH','VOS','VSC',
+          'PC1','REE','GEG','TV2','BCG','NT2',
+          'VCG','HHV','LCG','FCN','C4G','DPG','CII','CTD','HBC','HUT',
+          'VHC','ANV','IDI','FMC','BAF','DBC','HAG','HNG','PAN',
+          'PHR','DPR','SZC','TIP','D2D',
+          'BMI','MIG','BIC','PVI',
+          'KDC','QNS','SBT'
         ]);
 
         if (typeof SECTOR_DEFINITIONS !== 'undefined') {
@@ -5157,6 +5195,32 @@ body {
         ]
       },
       {
+        id: 'BANK',
+        title: 'Ngân hàng',
+        chip: 'BANK',
+        baselineChg: 0.51,
+        stocks: [
+          { symbol: 'SHB', price: 10.65, change: 2.4, volume: 49973400 },
+          { symbol: 'LPB', price: 38, change: 2.15, volume: 2042300 },
+          { symbol: 'TPB', price: 12, change: 2.13, volume: 18806500 },
+          { symbol: 'BID', price: 33.95, change: 2.26, volume: 3439500 },
+          { symbol: 'SSB', price: 16.15, change: 1.57, volume: 1909700 },
+          { symbol: 'CTG', price: 30.6, change: 2.68, volume: 10200000 },
+          { symbol: 'BVB', price: 10.45, change: 1.46, volume: 3108600 },
+          { symbol: 'KLB', price: 11, change: 0.46, volume: 141800 },
+          { symbol: 'VCB', price: 56.9, change: 0.71, volume: 2388700 },
+          { symbol: 'STB', price: 62.8, change: 0, volume: 1790000 },
+          { symbol: 'VIB', price: 13.85, change: 0.36, volume: 6624100 },
+          { symbol: 'MSB', price: 14.8, change: 1.02, volume: 11746800 },
+          { symbol: 'OCB', price: 10.05, change: 0.5, volume: 523300 },
+          { symbol: 'ACB', price: 20.6, change: 0, volume: 5160300 },
+          { symbol: 'TCB', price: 33.2, change: 0.91, volume: 12740900 },
+          { symbol: 'MBB', price: 19.85, change: -0.25, volume: 10919400 },
+          { symbol: 'HDB', price: 22.8, change: 0, volume: 24291300 },
+          { symbol: 'VPB', price: 24.5, change: 0.2, volume: 9651700 }
+        ]
+      },
+      {
         id: 'RE',
         title: 'Bất động sản',
         chip: 'RE',
@@ -5198,40 +5262,14 @@ body {
           { symbol: 'CTS', price: 21.1, change: 3.18, volume: 2468600 },
           { symbol: 'SSI', price: 19.45, change: 1.04, volume: 12587800 },
           { symbol: 'AAS', price: 10.2, change: 0.99, volume: 916800 },
-          { symbol: 'LPS', price: 17.45, change: 0.87, volume: 208200 },
           { symbol: 'TCI', price: 9.8, change: -0.2, volume: 39600 },
           { symbol: 'ORS', price: 13.5, change: 0.37, volume: 1829000 },
           { symbol: 'MBS', price: 15.1, change: -0.66, volume: 2200700 },
           { symbol: 'TVB', price: 6.17, change: 0.16, volume: 2800 },
           { symbol: 'VND', price: 13.25, change: 0, volume: 8816100 },
           { symbol: 'HCM', price: 23.75, change: -1.04, volume: 1968100 },
-          { symbol: 'VCI', price: 18.95, change: 0.53, volume: 5852900 }
-        ]
-      },
-      {
-        id: 'BANK',
-        title: 'Ngân hàng',
-        chip: 'BANK',
-        baselineChg: 0.51,
-        stocks: [
-          { symbol: 'SHB', price: 10.65, change: 2.4, volume: 49973400 },
-          { symbol: 'LPB', price: 38, change: 2.15, volume: 2042300 },
-          { symbol: 'TPB', price: 12, change: 2.13, volume: 18806500 },
-          { symbol: 'BID', price: 33.95, change: 2.26, volume: 3439500 },
-          { symbol: 'SSB', price: 16.15, change: 1.57, volume: 1909700 },
-          { symbol: 'CTG', price: 30.6, change: 2.68, volume: 10200000 },
-          { symbol: 'BVB', price: 10.45, change: 1.46, volume: 3108600 },
-          { symbol: 'KLB', price: 11, change: 0.46, volume: 141800 },
-          { symbol: 'VCB', price: 56.9, change: 0.71, volume: 2388700 },
-          { symbol: 'STB', price: 62.8, change: 0, volume: 1790000 },
-          { symbol: 'VIB', price: 13.85, change: 0.36, volume: 6624100 },
-          { symbol: 'MSB', price: 14.8, change: 1.02, volume: 11746800 },
-          { symbol: 'OCB', price: 10.05, change: 0.5, volume: 523300 },
-          { symbol: 'ACB', price: 20.6, change: 0, volume: 5160300 },
-          { symbol: 'TCB', price: 33.2, change: 0.91, volume: 12740900 },
-          { symbol: 'MBB', price: 19.85, change: -0.25, volume: 10919400 },
-          { symbol: 'HDB', price: 22.8, change: 0, volume: 24291300 },
-          { symbol: 'VPB', price: 24.5, change: 0.2, volume: 9651700 }
+          { symbol: 'VCI', price: 18.95, change: 0.53, volume: 5852900 },
+          { symbol: 'FTS', price: 41.5, change: 1.22, volume: 1850000 }
         ]
       },
       {
@@ -5245,9 +5283,6 @@ body {
           { symbol: 'HPG', price: 20.9, change: 0.72, volume: 10189400 },
           { symbol: 'NKG', price: 10.4, change: -0.95, volume: 1971000 },
           { symbol: 'VGS', price: 16.7, change: -0.6, volume: 241600 },
-          { symbol: 'NSH', price: 4.00, change: 0.00, volume: 15200 },
-          { symbol: 'SHA', price: 4.05, change: 0.00, volume: 0 },
-          { symbol: 'VCA', price: 6.35, change: 0.00, volume: 0 },
           { symbol: 'TVN', price: 9.60, change: 0.00, volume: 291200 },
           { symbol: 'GDA', price: 11.90, change: 0.00, volume: 27300 },
           { symbol: 'SHI', price: 13.95, change: -0.36, volume: 106500 },
@@ -5292,7 +5327,7 @@ body {
       },
       {
         id: 'RETAIL',
-        title: 'Bán lẻ & Tiêu dùng',
+        title: 'Bán lẻ',
         chip: 'RETAIL',
         baselineChg: 0.54,
         stocks: [
@@ -5300,8 +5335,130 @@ body {
           { symbol: 'PNJ', price: 18.8, change: 3.3, volume: 6075400 },
           { symbol: 'MWG', price: 73.9, change: 1.51, volume: 1371800 },
           { symbol: 'DGW', price: 44.5, change: -1.22, volume: 1709500 },
-          { symbol: 'MSN', price: 71.4, change: 1.42, volume: 3013700 },
           { symbol: 'PET', price: 21.00, change: -0.47, volume: 310000 }
+        ]
+      },
+      {
+        id: 'CHEM',
+        title: 'Hóa chất & Phân bón',
+        chip: 'CHEM',
+        baselineChg: 0.72,
+        stocks: [
+          { symbol: 'DGC', price: 112.5, change: 0.90, volume: 1850000 },
+          { symbol: 'DCM', price: 36.8, change: 0.55, volume: 2100000 },
+          { symbol: 'DPM', price: 34.2, change: 0.44, volume: 1750000 },
+          { symbol: 'BFC', price: 39.5, change: 1.28, volume: 680000 },
+          { symbol: 'CSV', price: 42.0, change: 0.72, volume: 490000 },
+          { symbol: 'LAS', price: 23.5, change: 0.86, volume: 820000 },
+          { symbol: 'DDV', price: 18.2, change: 0.00, volume: 350000 }
+        ]
+      },
+      {
+        id: 'LOGISTICS',
+        title: 'Cảng biển & Vận tải',
+        chip: 'LOGISTICS',
+        baselineChg: 0.65,
+        stocks: [
+          { symbol: 'GMD', price: 82.5, change: 0.61, volume: 1250000 },
+          { symbol: 'HAH', price: 42.8, change: 1.42, volume: 2450000 },
+          { symbol: 'VOS', price: 14.5, change: 0.69, volume: 980000 },
+          { symbol: 'VSC', price: 21.2, change: 0.47, volume: 1400000 },
+          { symbol: 'PVT', price: 23.65, change: 0.00, volume: 7476700 },
+          { symbol: 'PVP', price: 22.75, change: 3.41, volume: 549600 }
+        ]
+      },
+      {
+        id: 'POWER',
+        title: 'Điện & Năng lượng',
+        chip: 'POWER',
+        baselineChg: 0.45,
+        stocks: [
+          { symbol: 'POW', price: 12.8, change: 0.79, volume: 4500000 },
+          { symbol: 'PC1', price: 27.5, change: 0.36, volume: 1650000 },
+          { symbol: 'REE', price: 65.0, change: 0.78, volume: 850000 },
+          { symbol: 'GEG', price: 12.4, change: 0.40, volume: 620000 },
+          { symbol: 'TV2', price: 38.0, change: 0.00, volume: 210000 },
+          { symbol: 'HDG', price: 15.0, change: 1.35, volume: 746300 },
+          { symbol: 'BCG', price: 6.8, change: -0.44, volume: 1850000 },
+          { symbol: 'NT2', price: 20.5, change: 0.24, volume: 480000 }
+        ]
+      },
+      {
+        id: 'PUBLIC',
+        title: 'Đầu tư công & Hạ tầng',
+        chip: 'PUBLIC',
+        baselineChg: 0.85,
+        stocks: [
+          { symbol: 'VCG', price: 22.5, change: 1.12, volume: 3600000 },
+          { symbol: 'HHV', price: 13.8, change: 0.73, volume: 2800000 },
+          { symbol: 'LCG', price: 11.2, change: 0.90, volume: 2400000 },
+          { symbol: 'FCN', price: 14.6, change: 1.04, volume: 1950000 },
+          { symbol: 'C4G', price: 9.8, change: 0.00, volume: 1100000 },
+          { symbol: 'DPG', price: 52.0, change: 1.56, volume: 820000 },
+          { symbol: 'CII', price: 16.2, change: 0.62, volume: 2900000 },
+          { symbol: 'CTD', price: 68.5, change: 1.03, volume: 1150000 },
+          { symbol: 'HBC', price: 7.2, change: 0.00, volume: 1300000 },
+          { symbol: 'HUT', price: 17.5, change: 0.57, volume: 1500000 }
+        ]
+      },
+      {
+        id: 'AGRI',
+        title: 'Thủy sản & Nông nghiệp',
+        chip: 'AGRI',
+        baselineChg: 0.58,
+        stocks: [
+          { symbol: 'VHC', price: 72.0, change: 0.84, volume: 1400000 },
+          { symbol: 'ANV', price: 31.5, change: 1.12, volume: 1850000 },
+          { symbol: 'IDI', price: 11.2, change: 0.45, volume: 1200000 },
+          { symbol: 'FMC', price: 48.0, change: 0.00, volume: 350000 },
+          { symbol: 'BAF', price: 21.8, change: 0.69, volume: 1600000 },
+          { symbol: 'DBC', price: 28.5, change: 1.06, volume: 2950000 },
+          { symbol: 'HAG', price: 13.2, change: 0.76, volume: 6800000 },
+          { symbol: 'HNG', price: 4.8, change: 0.00, volume: 1450000 },
+          { symbol: 'PAN', price: 23.0, change: 0.44, volume: 780000 }
+        ]
+      },
+      {
+        id: 'KCN',
+        title: 'BĐS Khu công nghiệp',
+        chip: 'KCN',
+        baselineChg: 0.78,
+        stocks: [
+          { symbol: 'KBC', price: 29.5, change: 1.37, volume: 4200000 },
+          { symbol: 'IDC', price: 58.2, change: 0.87, volume: 1950000 },
+          { symbol: 'GVR', price: 31.15, change: 0.81, volume: 519200 },
+          { symbol: 'BCM', price: 38.55, change: 0.78, volume: 303400 },
+          { symbol: 'PHR', price: 56.0, change: 0.54, volume: 480000 },
+          { symbol: 'DPR', price: 41.5, change: 0.73, volume: 360000 },
+          { symbol: 'SZC', price: 38.8, change: 1.04, volume: 1100000 },
+          { symbol: 'TIP', price: 24.2, change: 0.41, volume: 290000 }
+        ]
+      },
+      {
+        id: 'INS',
+        title: 'Bảo hiểm',
+        chip: 'INS',
+        baselineChg: 0.35,
+        stocks: [
+          { symbol: 'BVH', price: 42.5, change: 0.47, volume: 950000 },
+          { symbol: 'BMI', price: 22.0, change: 0.00, volume: 320000 },
+          { symbol: 'MIG', price: 17.8, change: 0.56, volume: 410000 },
+          { symbol: 'BIC', price: 31.5, change: 0.00, volume: 150000 },
+          { symbol: 'PVI', price: 48.5, change: 0.21, volume: 180000 }
+        ]
+      },
+      {
+        id: 'CONSUMER',
+        title: 'Thực phẩm & Đồ uống',
+        chip: 'CONSUMER',
+        baselineChg: 0.62,
+        stocks: [
+          { symbol: 'VNM', price: 57.8, change: 1.05, volume: 1620000 },
+          { symbol: 'MSN', price: 71.4, change: 1.42, volume: 3013700 },
+          { symbol: 'SAB', price: 56.5, change: 0.36, volume: 680000 },
+          { symbol: 'KDC', price: 58.0, change: 0.00, volume: 250000 },
+          { symbol: 'QNS', price: 48.5, change: 0.62, volume: 520000 },
+          { symbol: 'SBT', price: 12.8, change: 0.39, volume: 1150000 }
         ]
       }
     ];
@@ -5407,13 +5564,21 @@ body {
           if (!stocks.some(s => s.symbol === live.symbol)) {
             let matchesSector = false;
             if (sector.id === 'VN30' && ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR'].includes(live.symbol)) matchesSector = true;
-            else if (sector.id === 'BANK' && (['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','TPB','SHB','VIB','SSB'].includes(live.symbol) || live.sector === 'Tài chính')) matchesSector = true;
-            else if (sector.id === 'TECH' && (['FPT','CMG','ELC','CTR','VGI','FOX'].includes(live.symbol) || live.sector === 'Công nghệ')) matchesSector = true;
-            else if (sector.id === 'STEEL' && ['HPG','HSG','NKG','VGS','SMC','POM','TLH'].includes(live.symbol)) matchesSector = true;
-            else if (sector.id === 'RE' && ['VHM','VIC','VRE','KDH','NLG','DIG','DXG','PDR','NVL','CEO','KBC','IDC','SJS','AGG'].includes(live.symbol)) matchesSector = true;
-            else if (sector.id === 'SEC' && ['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS'].includes(live.symbol)) matchesSector = true;
-            else if (sector.id === 'OIL' && ['GAS','PLX','PVD','PVS','BSR','PVT','PVC','PVP'].includes(live.symbol)) matchesSector = true;
-            else if (sector.id === 'RETAIL' && ['MWG','FRT','PNJ','DGW','MSN','PET'].includes(live.symbol)) matchesSector = true;
+            else if (sector.id === 'BANK' && (['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','TPB','SHB','LPB','SSB','VIB','MSB','OCB','BVB','KLB'].includes(live.symbol) || live.sector === 'Ngân hàng' || live.sector === 'Tài chính')) matchesSector = true;
+            else if (sector.id === 'RE' && (['VHM','VIC','VRE','KDH','NLG','DIG','DXG','PDR','NVL','CEO','KBC','IDC','SJS','AGG','HQC','HTN','HDC','TCH','DXS','HDG','BCM'].includes(live.symbol) || live.sector === 'Bất động sản')) matchesSector = true;
+            else if (sector.id === 'SEC' && (['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS','ORS','DSC','EVS','AGR','BVS','APG','PSI','AAS','TCI','TVB'].includes(live.symbol) || live.sector === 'Chứng khoán')) matchesSector = true;
+            else if (sector.id === 'STEEL' && (['HPG','HSG','NKG','VGS','SMC','POM','TLH','TVN','GDA','SHI'].includes(live.symbol) || live.sector === 'Thép')) matchesSector = true;
+            else if (sector.id === 'OIL' && (['GAS','PLX','PVD','PVS','BSR','PVT','PVC','PVP','CNG','PVB','OIL','PLC'].includes(live.symbol) || live.sector === 'Dầu khí')) matchesSector = true;
+            else if (sector.id === 'TECH' && (['FPT','CMG','ELC','CTR','VGI','FOX','ITD'].includes(live.symbol) || live.sector === 'Công nghệ')) matchesSector = true;
+            else if (sector.id === 'RETAIL' && (['MWG','FRT','PNJ','DGW','PET'].includes(live.symbol) || live.sector === 'Bán lẻ')) matchesSector = true;
+            else if (sector.id === 'CHEM' && (['DGC','DCM','DPM','BFC','CSV','LAS','DDV'].includes(live.symbol) || live.sector === 'Hóa chất')) matchesSector = true;
+            else if (sector.id === 'LOGISTICS' && (['GMD','HAH','VOS','VSC','PVT','PVP'].includes(live.symbol) || (live.sector && live.sector.includes('Logistics')))) matchesSector = true;
+            else if (sector.id === 'POWER' && (['POW','PC1','REE','GEG','TV2','HDG','BCG','NT2'].includes(live.symbol) || (live.sector && live.sector.includes('Năng lượng')))) matchesSector = true;
+            else if (sector.id === 'PUBLIC' && (['VCG','HHV','LCG','FCN','C4G','DPG','CII','CTD','HBC','HUT'].includes(live.symbol) || (live.sector && live.sector.includes('Đầu tư công')))) matchesSector = true;
+            else if (sector.id === 'AGRI' && (['VHC','ANV','IDI','FMC','BAF','DBC','HAG','HNG','PAN'].includes(live.symbol) || live.sector === 'Thủy sản' || live.sector === 'Nông nghiệp')) matchesSector = true;
+            else if (sector.id === 'KCN' && (['KBC','IDC','GVR','BCM','PHR','DPR','SZC','TIP'].includes(live.symbol) || live.sector === 'Khu công nghiệp')) matchesSector = true;
+            else if (sector.id === 'INS' && (['BVH','BMI','MIG','BIC','PVI'].includes(live.symbol) || live.sector === 'Bảo hiểm')) matchesSector = true;
+            else if (sector.id === 'CONSUMER' && (['VNM','MSN','SAB','KDC','QNS','SBT'].includes(live.symbol) || live.sector === 'Hàng tiêu dùng' || live.sector === 'Thực phẩm')) matchesSector = true;
 
             if (matchesSector) {
               stocks.push({
@@ -5535,15 +5700,35 @@ body {
         const vn30 = new Set(['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR']);
         list = list.filter(s => vn30.has(s.symbol));
       } else if (activeChip === 'BANK') {
-        list = list.filter(s => ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','TPB','SHB','VIB','SSB'].includes(s.symbol) || s.sector === 'Tài chính');
-      } else if (activeChip === 'TECH') {
-        list = list.filter(s => ['FPT','CMG','ELC','CTR','VGI','FOX'].includes(s.symbol) || s.sector === 'Công nghệ');
-      } else if (activeChip === 'STEEL') {
-        list = list.filter(s => ['HPG','HSG','NKG','VGS','SMC'].includes(s.symbol));
+        list = list.filter(s => ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','TPB','SHB','LPB','SSB','VIB','MSB','OCB','BVB','KLB'].includes(s.symbol) || s.sector === 'Ngân hàng' || s.sector === 'Tài chính');
       } else if (activeChip === 'RE') {
-        list = list.filter(s => ['VHM','VIC','VRE','KDH','NLG','DIG','DXG','PDR','NVL','CEO','KBC','IDC'].includes(s.symbol));
+        list = list.filter(s => ['VHM','VIC','VRE','KDH','NLG','DIG','DXG','PDR','NVL','CEO','KBC','IDC','SJS','AGG','HQC','HTN','HDC','TCH','DXS','HDG','BCM'].includes(s.symbol) || s.sector === 'Bất động sản');
       } else if (activeChip === 'SEC') {
-        list = list.filter(s => ['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI'].includes(s.symbol));
+        list = list.filter(s => ['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS','ORS','DSC','EVS','AGR','BVS','APG','PSI','AAS','TCI','TVB'].includes(s.symbol) || s.sector === 'Chứng khoán');
+      } else if (activeChip === 'STEEL') {
+        list = list.filter(s => ['HPG','HSG','NKG','VGS','SMC','POM','TLH','TVN','GDA','SHI'].includes(s.symbol) || s.sector === 'Thép');
+      } else if (activeChip === 'OIL') {
+        list = list.filter(s => ['GAS','PLX','PVD','PVS','BSR','PVT','PVC','PVP','CNG','PVB','OIL','PLC'].includes(s.symbol) || s.sector === 'Dầu khí');
+      } else if (activeChip === 'TECH') {
+        list = list.filter(s => ['FPT','CMG','ELC','CTR','VGI','FOX','ITD'].includes(s.symbol) || s.sector === 'Công nghệ');
+      } else if (activeChip === 'RETAIL') {
+        list = list.filter(s => ['MWG','FRT','PNJ','DGW','PET'].includes(s.symbol) || s.sector === 'Bán lẻ');
+      } else if (activeChip === 'CHEM') {
+        list = list.filter(s => ['DGC','DCM','DPM','BFC','CSV','LAS','DDV'].includes(s.symbol) || s.sector === 'Hóa chất');
+      } else if (activeChip === 'LOGISTICS') {
+        list = list.filter(s => ['GMD','HAH','VOS','VSC','PVT','PVP'].includes(s.symbol) || (s.sector && s.sector.includes('Logistics')));
+      } else if (activeChip === 'POWER') {
+        list = list.filter(s => ['POW','PC1','REE','GEG','TV2','HDG','BCG','NT2'].includes(s.symbol) || (s.sector && s.sector.includes('Năng lượng')));
+      } else if (activeChip === 'PUBLIC') {
+        list = list.filter(s => ['VCG','HHV','LCG','FCN','C4G','DPG','CII','CTD','HBC','HUT'].includes(s.symbol) || (s.sector && s.sector.includes('Đầu tư công')));
+      } else if (activeChip === 'AGRI') {
+        list = list.filter(s => ['VHC','ANV','IDI','FMC','BAF','DBC','HAG','HNG','PAN'].includes(s.symbol) || s.sector === 'Thủy sản' || s.sector === 'Nông nghiệp');
+      } else if (activeChip === 'KCN') {
+        list = list.filter(s => ['KBC','IDC','GVR','BCM','PHR','DPR','SZC','TIP'].includes(s.symbol) || s.sector === 'Khu công nghiệp');
+      } else if (activeChip === 'INS') {
+        list = list.filter(s => ['BVH','BMI','MIG','BIC','PVI'].includes(s.symbol) || s.sector === 'Bảo hiểm');
+      } else if (activeChip === 'CONSUMER') {
+        list = list.filter(s => ['VNM','MSN','SAB','KDC','QNS','SBT'].includes(s.symbol) || s.sector === 'Hàng tiêu dùng' || s.sector === 'Thực phẩm');
       }
 
       if (q) {
@@ -5595,7 +5780,7 @@ body {
         if (countEl) countEl.textContent = `${list.length} mã`;
       }
 
-      tbody.innerHTML = list.slice(0, 45).map(s => {
+      tbody.innerHTML = list.slice(0, 300).map(s => {
         const chg = s.change !== null && s.change !== undefined ? s.change : 0;
         let colorCls = 'text-ref';
         let arrow = '■';
@@ -5616,6 +5801,8 @@ body {
           foreignStr = `<span class="${fCls}">${fNet > 0 ? '+' : ''}${fNet.toFixed(1)} tỷ</span>`;
         }
 
+        const faUrl = typeof getFireAntStockUrl === 'function' ? getFireAntStockUrl(s.symbol) : `https://fireant.vn/ma-chung-khoan/${s.symbol}`;
+
         return `
           <tr id="watchRow_${s.symbol}" onclick="openQuickModal('${s.symbol}')">
             <td><span class="${colorCls}"><b>${s.symbol}</b></span></td>
@@ -5628,8 +5815,9 @@ body {
             <td class="col-foreign">${foreignStr}</td>
             <td class="col-pe" style="color:var(--text-secondary);">${s.pe ? s.pe.toFixed(1) + 'x' : '—'}</td>
             <td class="col-roe" style="color:var(--text-secondary);">${s.roe ? s.roe.toFixed(1) + '%' : '—'}</td>
-            <td style="text-align:center;">
-              <button onclick="event.stopPropagation();openQuickModal('${s.symbol}')" class="btn-theme-toggle" style="width:auto;padding:2px 8px;font-size:10.5px;cursor:pointer;">Chi tiết</button>
+            <td style="text-align:center; white-space:nowrap;">
+              <button onclick="event.stopPropagation();openQuickModal('${s.symbol}')" class="btn-theme-toggle" style="width:auto;padding:2px 7px;font-size:10.5px;cursor:pointer;">Chi tiết</button>
+              <a href="${faUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();" class="btn-theme-toggle" style="display:inline-flex;align-items:center;padding:2px 6px;font-size:10px;color:var(--primary-brand);text-decoration:none;margin-left:3px;font-weight:600;" title="Mở FireAnt ${s.symbol}">FA ↗</a>
             </td>
           </tr>
         `;
@@ -7471,6 +7659,20 @@ body {
       if (barSellLbl) barSellLbl.textContent = `Bán CĐ: ${sellRatio}%`;
       if (barBuy) barBuy.style.width = `${buyRatio}%`;
       if (barSell) barSell.style.width = `${sellRatio}%`;
+
+      // 6. Cập nhật URL liên kết ngoài FireAnt chính xác 100% không bị lỗi 404
+      const faLink = document.getElementById('stockDetailTvExternalLink');
+      if (faLink && typeof getFireAntStockUrl === 'function') {
+        faLink.href = getFireAntStockUrl(sym);
+      }
+      const faCandleLink = document.getElementById('stockDetailCandleExternalLink');
+      if (faCandleLink && typeof getFireAntStockUrl === 'function') {
+        faCandleLink.href = getFireAntStockUrl(sym);
+      }
+      const faIframe = document.getElementById('stockDetailFireantIframe');
+      if (faIframe && typeof getFireAntChartUrl === 'function') {
+        faIframe.src = getFireAntChartUrl(sym);
+      }
     }
 
     function openStockDetailModal(sym) {
@@ -7919,7 +8121,7 @@ body {
                     <button class="period-tab-btn ${currentDetailCandleRes === '1W' ? 'active' : ''}" onclick="switchDetailCandleResolution('1W', this)">1W</button>
                   </div>
                   <span style="color:var(--price-ref); font-size:11px; display:${detailChartMode === 'candle' ? 'none' : 'inline'};" id="stockDetailRefLabel">Tham chiếu: ${refPrice.toLocaleString('vi-VN')}</span>
-                  <a id="stockDetailTvExternalLink" href="https://fireant.vn/ma-chung-khoan/${encodeURIComponent(stock.symbol)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px; font-weight:600;" title="Mở trang hồ sơ cổ phiếu trên FireAnt">
+                  <a id="stockDetailTvExternalLink" href="${typeof getFireAntStockUrl === 'function' ? getFireAntStockUrl(stock.symbol) : `https://fireant.vn/ma-chung-khoan/${encodeURIComponent(stock.symbol)}`}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px; font-weight:600;" title="Mở trang hồ sơ cổ phiếu trên FireAnt">
                     FireAnt.vn ↗
                   </a>
                 </div>
@@ -7945,7 +8147,7 @@ body {
                     <button type="button" id="btnSubChartRobo" class="period-tab-btn ${currentCandleSubView !== 'fireant' ? 'active' : ''}" onclick="switchCandleSubView('robostock')" style="font-size:11px; padding:3px 10px; font-weight:600;">Biểu đồ Kỹ thuật Pro (Chuẩn xác)</button>
                     <button type="button" id="btnSubChartFireant" class="period-tab-btn ${currentCandleSubView === 'fireant' ? 'active' : ''}" onclick="switchCandleSubView('fireant')" style="font-size:11px; padding:3px 10px; font-weight:600;">FireAnt Web (Bản đầy đủ)</button>
                   </div>
-                  <a href="https://fireant.vn/ma-chung-khoan/${encodeURIComponent(stock.symbol)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="Mở trang cổ phiếu trên FireAnt">
+                  <a id="stockDetailCandleExternalLink" href="${typeof getFireAntStockUrl === 'function' ? getFireAntStockUrl(stock.symbol) : `https://fireant.vn/ma-chung-khoan/${encodeURIComponent(stock.symbol)}`}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="Mở trang cổ phiếu trên FireAnt">
                     Mở FireAnt ↗
                   </a>
                 </div>
@@ -7970,7 +8172,7 @@ body {
 
                 <!-- VIEW 2: BIỂU ĐỒ NẾN FIREANT IFRAME -->
                 <div id="candleFireantWrapper" style="display:${currentCandleSubView === 'fireant' ? 'block' : 'none'}; position:relative; width:100%; height:460px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden;">
-                  <iframe id="stockDetailFireantIframe" src="https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}" style="width:100%; height:100%; border:none; display:block;" allowfullscreen title="Biểu đồ nến FireAnt"></iframe>
+                  <iframe id="stockDetailFireantIframe" src="${typeof getFireAntChartUrl === 'function' ? getFireAntChartUrl(stock.symbol) : `https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}`}" style="width:100%; height:100%; border:none; display:block;" allowfullscreen title="Biểu đồ nến FireAnt"></iframe>
                 </div>
               </div>
             </div>
