@@ -388,6 +388,11 @@ const STOCK_DIRECTORY = {
     'YEG': { name: 'Yeah1 Group Corp.', sector: 'Công nghệ - Truyền thông', exchange: 'HOSE' }
 };
 
+if (typeof window !== 'undefined') {
+    window.STOCK_DIRECTORY = STOCK_DIRECTORY;
+    window.FALLBACK_INDICES = FALLBACK_INDICES;
+}
+
 const FALLBACK_STOCKS = [
     { symbol: 'AAA', exchange: 'HOSE', sector: 'Nước - Nhựa', price: 7140, change: 0.04, pe: 5.2, pb: 0.51, roe: 10, volume: 711600, value: 5080824000 },
     { symbol: 'AAM', exchange: 'HOSE', sector: 'Thủy sản', price: 7400, change: 0, pe: 14.6, pb: 0.39, roe: 2.6, volume: 3800, value: 28120000 },
@@ -761,6 +766,10 @@ const FALLBACK_STOCKS = [
     { symbol: 'YBM', exchange: 'HOSE', sector: 'Khoáng sản', price: 9970, change: 0.12, pe: 7.7, pb: 0.83, roe: 10.5, volume: 500, value: 4985000 },
     { symbol: 'YEG', exchange: 'HOSE', sector: 'Công nghệ - Truyền thông', price: 7790, change: 0, pe: 30.2, pb: 0.77, roe: 2.6, volume: 527100, value: 4106109000 }
 ];
+
+if (typeof window !== 'undefined') {
+    window.FALLBACK_STOCKS = FALLBACK_STOCKS;
+}
 
 // Helper lay dia chi backend API thong nhat
 function getBackendApiBase() {
