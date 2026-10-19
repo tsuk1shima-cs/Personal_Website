@@ -11003,14 +11003,6 @@ body {
       if (faCandleLink && typeof getFireAntStockUrl === 'function') {
         faCandleLink.href = getFireAntStockUrl(sym);
       }
-      const faIframe = document.getElementById('stockDetailFireantIframe');
-      if (faIframe && typeof getFireAntChartUrl === 'function') {
-        const targetUrl = getFireAntChartUrl(sym);
-        if (faIframe.dataset.symbol !== sym || !faIframe.src) {
-          faIframe.dataset.symbol = sym;
-          faIframe.src = targetUrl;
-        }
-      }
     }
 
     function openStockDetailModal(sym) {
@@ -11126,24 +11118,11 @@ body {
         candleCont.style.display = 'flex';
         if (tfControls) tfControls.style.display = 'inline-flex';
         if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN KỸ THUẬT • ${upperSym}`;
-        if (chartBadge) chartBadge.textContent = 'FireAnt Realtime';
+        if (chartBadge) chartBadge.textContent = 'Biểu đồ Pro';
         if (refLabel) refLabel.style.display = 'none';
       }
 
-      // Cập nhật iframe FireAnt theo đúng mã cổ phiếu được chọn (phục vụ tab phụ FireAnt Web)
-      const fireantIframe = document.getElementById('stockDetailFireantIframe');
-      if (fireantIframe) {
-        const targetUrl = getFireAntChartUrl(upperSym);
-        if (fireantIframe.dataset.symbol !== upperSym || !fireantIframe.src) {
-          fireantIframe.dataset.symbol = upperSym;
-          fireantIframe.src = targetUrl;
-        }
-      }
-
-      // Đặt subview mặc định là Biểu đồ Kỹ thuật Pro để đảm bảo khớp 100% mã cổ phiếu, không lệch mã
-      if (typeof switchCandleSubView === 'function') {
-        switchCandleSubView('robostock');
-      }
+      currentCandleSubView = 'robostock';
 
       // Tải và vẽ ngay nến kỹ thuật thực tế cho mã được chọn
       setTimeout(() => {
@@ -11483,19 +11462,19 @@ body {
 
               <!-- CHẾ ĐỘ 2: BIỂU ĐỒ NẾN KỸ THUẬT CHUẨN XÁC THEO MÃ VÀ TÙY CHỌN FIREANT WEB -->
               <div id="stockDetailCandleContainer" style="display:${detailChartMode === 'candle' ? 'flex' : 'none'}; flex-direction:column; width:100%; padding-top:4px; gap:6px;">
-                <!-- THANH ĐIỀU HƯỚNG TAB CON -->
+                <!-- THANH TIÊU ĐỀ BIỂU ĐỒ KỸ THUẬT & LIÊN KẾT NGOÀI -->
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
-                  <div style="display:inline-flex; gap:4px; background:var(--bg-subtle); padding:2px; border-radius:4px; border:1px solid var(--border-stroke);">
-                    <button type="button" id="btnSubChartRobo" class="period-tab-btn ${currentCandleSubView !== 'fireant' ? 'active' : ''}" onclick="switchCandleSubView('robostock')" style="font-size:11px; padding:3px 10px; font-weight:600;">Biểu đồ Kỹ thuật Pro (Chuẩn xác)</button>
-                    <button type="button" id="btnSubChartFireant" class="period-tab-btn ${currentCandleSubView === 'fireant' ? 'active' : ''}" onclick="switchCandleSubView('fireant')" style="font-size:11px; padding:3px 10px; font-weight:600;">FireAnt Web (Bản đầy đủ)</button>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <span class="blue-accent-bar"></span>
+                    <span style="font-size:11.5px; font-weight:700; color:var(--text-primary);">Biểu đồ Kỹ thuật Pro (Realtime)</span>
                   </div>
-                  <a id="stockDetailCandleExternalLink" href="${typeof getFireAntStockUrl === 'function' ? getFireAntStockUrl(stock.symbol) : `https://fireant.vn/ma-chung-khoan/${encodeURIComponent(stock.symbol)}`}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; display:inline-flex; align-items:center; gap:3px;" title="Mở trang cổ phiếu trên FireAnt">
+                  <a id="stockDetailCandleExternalLink" href="${typeof getFireAntStockUrl === 'function' ? getFireAntStockUrl(stock.symbol) : `https://fireant.vn/ma-chung-khoan/${encodeURIComponent(stock.symbol)}`}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); font-weight:600;" title="Mở trang cổ phiếu trên FireAnt">
                     Mở FireAnt ↗
                   </a>
                 </div>
 
-                <!-- VIEW 1: BIỂU ĐỒ CHỈ BÁO NỘI BỘ CANVAS (MẶC ĐỊNH CHUẨN XÁC 100% THEO MÃ, ĐA KHUNG GIỜ) -->
-                <div id="candleRobostockWrapper" style="display:${currentCandleSubView === 'fireant' ? 'none' : 'flex'}; flex-direction:column; gap:6px; width:100%;">
+                <!-- BIỂU ĐỒ CHỈ BÁO NỘI BỘ CANVAS (CHUẨN XÁC 100% THEO MÃ, ĐA KHUNG GIỜ) -->
+                <div id="candleRobostockWrapper" style="display:flex; flex-direction:column; gap:6px; width:100%;">
                   <!-- CONTAINER THANH CÔNG CỤ CHỈ BÁO -->
                   <div id="indicatorToolbarContainer">
                     ${renderIndicatorToolbarHtml()}
@@ -11507,14 +11486,9 @@ body {
                   </div>
 
                   <!-- KHUNG CANVAS ĐỒ THỊ CHÍNH & CÁC CỬA SỔ PHỤ CHỈ BÁO -->
-                  <div id="candleCanvasWrapper" style="position:relative; width:100%; height:380px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden; transition:height 0.2s ease;">
+                  <div id="candleCanvasWrapper" style="position:relative; width:100%; height:400px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden; transition:height 0.2s ease;">
                     <canvas id="stockDetailCandleCanvas" style="width:100%; height:100%; display:block; cursor:crosshair;"></canvas>
                   </div>
-                </div>
-
-                <!-- VIEW 2: BIỂU ĐỒ NẾN FIREANT IFRAME -->
-                <div id="candleFireantWrapper" style="display:${currentCandleSubView === 'fireant' ? 'block' : 'none'}; position:relative; width:100%; height:460px; background:#131722; border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden;">
-                  <iframe id="stockDetailFireantIframe" src="${typeof getFireAntChartUrl === 'function' ? getFireAntChartUrl(stock.symbol) : `https://s.tradingview.com/widgetembed/?symbol=HOSE%3A${encodeURIComponent(stock.symbol)}&interval=D&theme=dark&locale=vi`}" data-symbol="${stock.symbol}" style="width:100%; height:100%; border:none; display:block; background:#131722;" allowfullscreen title="Biểu đồ nến FireAnt"></iframe>
                 </div>
               </div>
             </div>
@@ -11734,43 +11708,19 @@ body {
       `;
     }
 
-    // ==================== BỘ ĐỒ THỊ NẾN NHẬT BẢN FIREANT & ROBOSTOCK ====================
+    // ==================== BỘ ĐỒ THỊ NẾN NHẬT BẢN KỸ THUẬT PRO ====================
     let currentCandleSubView = 'robostock';
 
     function switchCandleSubView(mode) {
-      currentCandleSubView = mode;
-      const faWrap = document.getElementById('candleFireantWrapper');
+      currentCandleSubView = 'robostock';
       const roboWrap = document.getElementById('candleRobostockWrapper');
-      const btnFa = document.getElementById('btnSubChartFireant');
-      const btnRobo = document.getElementById('btnSubChartRobo');
+      if (roboWrap) roboWrap.style.display = 'flex';
       const tfControls = document.getElementById('stockDetailCandleTfControls');
+      if (tfControls) tfControls.style.display = 'inline-flex';
       const chartBadge = document.getElementById('stockDetailChartBadge');
-
-      if (mode === 'fireant') {
-        if (faWrap) faWrap.style.display = 'block';
-        if (roboWrap) roboWrap.style.display = 'none';
-        if (btnFa) btnFa.classList.add('active');
-        if (btnRobo) btnRobo.classList.remove('active');
-        if (chartBadge) chartBadge.textContent = 'FireAnt Web';
-        const iframe = document.getElementById('stockDetailFireantIframe');
-        const sym = (currentStockDetailSymbol || 'VNINDEX').toUpperCase();
-        if (iframe) {
-          const targetUrl = getFireAntChartUrl(sym);
-          if (iframe.dataset.symbol !== sym || !iframe.src) {
-            iframe.dataset.symbol = sym;
-            iframe.src = targetUrl;
-          }
-        }
-      } else {
-        if (faWrap) faWrap.style.display = 'none';
-        if (roboWrap) roboWrap.style.display = 'flex';
-        if (btnFa) btnFa.classList.remove('active');
-        if (btnRobo) btnRobo.classList.add('active');
-        if (tfControls) tfControls.style.display = 'inline-flex';
-        if (chartBadge) chartBadge.textContent = 'FireAnt Realtime';
-        if (currentStockDetailSymbol && typeof drawDnseStockCandleChart === 'function') {
-          drawDnseStockCandleChart(currentStockDetailSymbol, currentDetailCandleRes);
-        }
+      if (chartBadge) chartBadge.textContent = 'Biểu đồ Pro';
+      if (currentStockDetailSymbol && typeof drawDnseStockCandleChart === 'function') {
+        drawDnseStockCandleChart(currentStockDetailSymbol, currentDetailCandleRes);
       }
     }
 
@@ -13697,22 +13647,13 @@ body {
         detailChartMode = 'candle';
         svgCont.style.display = 'none';
         candleCont.style.display = 'flex';
-        const isRobo = (typeof currentCandleSubView !== 'undefined' && currentCandleSubView === 'robostock');
-        if (tfControls) tfControls.style.display = isRobo ? 'inline-flex' : 'none';
+        if (tfControls) tfControls.style.display = 'inline-flex';
         if (chartTitle) chartTitle.textContent = `BIỂU ĐỒ NẾN KỸ THUẬT • ${targetSym}`;
-        if (chartBadge) chartBadge.textContent = isRobo ? 'FireAnt Realtime' : 'FireAnt Web';
+        if (chartBadge) chartBadge.textContent = 'Biểu đồ Pro';
         if (refLabel) refLabel.style.display = 'none';
         btn.innerHTML = 'Biểu đồ Intraday';
 
-        const fireantIframe = document.getElementById('stockDetailFireantIframe');
-        if (fireantIframe) {
-          const targetUrl = getFireAntChartUrl(targetSym);
-          if (fireantIframe.dataset.symbol !== targetSym || !fireantIframe.src) {
-            fireantIframe.dataset.symbol = targetSym;
-            fireantIframe.src = targetUrl;
-          }
-        }
-        if (isRobo && typeof drawDnseStockCandleChart === 'function') {
+        if (typeof drawDnseStockCandleChart === 'function') {
           drawDnseStockCandleChart(targetSym, currentDetailCandleRes);
         }
       } else {
