@@ -736,11 +736,18 @@ body {
     grid-template-columns: 1fr;
   }
 }
-@media (max-width: 1100px) {
-  .grid-row-2col {
-    grid-template-columns: 1fr;
+@media (max-width: 992px) {
+  #treemapWorkspace {
+    flex-direction: column !important;
+  }
+  #treemapLeftSidebar {
+    width: 100% !important;
+  }
+  #treemapCanvasContainer {
+    height: 520px !important;
   }
 }
+
 
 .tongquan-card {
   background: var(--bg-container);
@@ -3102,46 +3109,145 @@ body {
 
         </div>
 
-        <!-- SUBTAB 2: BẢN ĐỒ NHIỆT (TREEMAP THEO NGÀNH) -->
+        <!-- SUBTAB 2: BẢN ĐỒ THỊ TRƯỜNG (CHUẨN VIETSTOCK FINANCE TREEMAP) -->
         <div id="subview_bando" style="display:none; flex-direction:column; gap:8px;">
-          <!-- Controls bar -->
-          <div class="tongquan-card" style="padding:10px 12px;">
+          <!-- Controls bar (Vietstock Toolbar) -->
+          <div class="tongquan-card" style="padding:10px 12px; gap:8px;">
+            <!-- Row 1: Title + View Switcher + Metric + Search -->
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-              <div style="display:flex; align-items:center; gap:6px;">
-                <span class="blue-accent-bar"></span>
-                <span style="font-weight:700; font-size:13.5px;">Bản đồ nhiệt Thị trường</span>
-                <span class="tongquan-card-subtitle">(Quy mô Vốn hóa & Biến động giá)</span>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="blue-accent-bar" style="height:16px;"></span>
+                <span style="font-weight:700; font-size:14px; letter-spacing:-0.2px;">Bản đồ thị trường</span>
+                <span class="tongquan-card-subtitle" style="display:inline-flex; align-items:center; gap:4px;">
+                  <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#22c55e;"></span>
+                  Chuẩn VietstockFinance (Treemap & Soi cổ phiếu Realtime)
+                </span>
               </div>
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <!-- View Mode: Treemap vs Lưới ngành vs Top 30 -->
+                <div class="center-tab-controls" id="treemapViewModeControls" title="Chọn kiểu hiển thị">
+                  <button class="period-tab-btn active" onclick="switchTreemapViewMode('treemap', this)">🗺️ Treemap</button>
+                  <button class="period-tab-btn" onclick="switchTreemapViewMode('sectors', this)">📑 Theo ngành</button>
+                  <button class="period-tab-btn" onclick="switchTreemapViewMode('top30', this)">⭐ Top 30 trụ</button>
+                </div>
+
+                <!-- Size By Metric: Vốn hóa vs GTGD -->
+                <div class="center-tab-controls" id="treemapMetricControls" title="Kích thước ô tỷ lệ theo">
+                  <button class="period-tab-btn active" onclick="switchTreemapMetric('marketCap', this)">Vốn hóa TT</button>
+                  <button class="period-tab-btn" onclick="switchTreemapMetric('value', this)">GTGD</button>
+                </div>
+
+                <!-- Toggle Left Inspector Panel button -->
+                <button id="toggleInspectorBtn" class="period-tab-btn" onclick="toggleTreemapLeftSidebar()" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); font-size:11.5px; padding:4px 8px; cursor:pointer;" title="Ẩn/Hiện cột thông tin chi tiết cổ phiếu">
+                  ◀ Thu gọn chi tiết
+                </button>
+              </div>
+            </div>
+
+            <!-- Row 2: Group filter pills + Search box + Legend -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding-top:6px; border-top:1px solid var(--border-stroke);">
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                 <div class="center-tab-controls" id="treemapGroupControls">
                   <button class="period-tab-btn active" onclick="switchTreemapGroup('ALL', this)">Tất cả</button>
                   <button class="period-tab-btn" onclick="switchTreemapGroup('VN30', this)">VN30</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('HOSE', this)">HOSE</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('HNX', this)">HNX</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('UPCOM', this)">UPCoM</button>
                   <button class="period-tab-btn" onclick="switchTreemapGroup('Ngân hàng', this)">Ngân hàng</button>
                   <button class="period-tab-btn" onclick="switchTreemapGroup('Bất động sản', this)">BĐS</button>
-                  <button class="period-tab-btn" onclick="switchTreemapGroup('Công nghệ', this)">Công nghệ</button>
-                  <button class="period-tab-btn" onclick="switchTreemapGroup('Nguyên vật liệu', this)">Thép</button>
                   <button class="period-tab-btn" onclick="switchTreemapGroup('Chứng khoán', this)">Chứng khoán</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Thép & VLXD', this)">Thép</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Công nghệ', this)">Công nghệ</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Bán lẻ & Tiêu dùng', this)">Bán lẻ</button>
+                  <button class="period-tab-btn" onclick="switchTreemapGroup('Dầu khí & Năng lượng', this)">Dầu khí</button>
                 </div>
-                <div class="center-tab-controls" id="treemapMetricControls">
-                  <button class="period-tab-btn active" onclick="switchTreemapMetric('change', this)">% Thay đổi</button>
-                  <button class="period-tab-btn" onclick="switchTreemapMetric('value', this)">Giá trị GD</button>
+
+                <!-- Search Input -->
+                <div style="position:relative; display:inline-flex; align-items:center;">
+                  <input type="text" id="treemapSearchInput" placeholder="🔍 Tìm mã CP (VD: HPG, VCB...)"
+                         oninput="handleTreemapSearch(this.value)"
+                         style="padding:3px 22px 3px 8px; font-size:11.5px; border:1px solid var(--border-stroke); border-radius:var(--radius-sm); background:var(--bg-container); color:var(--text-primary); width:155px; outline:none; transition:all 0.15s;"
+                         onfocus="this.style.width='190px'; this.style.borderColor='var(--primary-brand)';"
+                         onblur="if(!this.value) this.style.width='155px';">
+                  <span id="treemapSearchClear" onclick="clearTreemapSearch()" style="display:none; position:absolute; right:6px; font-size:12px; color:var(--text-muted); cursor:pointer;">✕</span>
                 </div>
               </div>
-            </div>
-            <!-- Chú thích biên độ màu -->
-            <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; font-size:11px; margin-top:8px; padding-top:6px; border-top:1px solid var(--border-stroke); flex-wrap:wrap;">
-              <span style="color:var(--text-secondary);">Quy ước màu:</span>
-              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:var(--price-ceil);border-radius:2px;"></span> Tăng trần (>= 6.8%)</span>
-              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#16a34a;border-radius:2px;"></span> Tăng xanh</span>
-              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#d97706;border-radius:2px;"></span> Tham chiếu</span>
-              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#dc2626;border-radius:2px;"></span> Giảm đỏ</span>
-              <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:var(--price-floor);border-radius:2px;"></span> Giảm sàn (<= -6.8%)</span>
+
+              <!-- Quy ước màu sắc (Vietstock Legend) -->
+              <div style="display:flex; align-items:center; gap:10px; font-size:11px; flex-wrap:wrap;">
+                <span style="color:var(--text-secondary); font-weight:600;">Quy ước màu:</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:var(--price-ceil);border-radius:2px;"></span> Tăng trần (>= 6.8%)</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#16a34a;border-radius:2px;"></span> Tăng</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#d97706;border-radius:2px;"></span> Tham chiếu</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#dc2626;border-radius:2px;"></span> Giảm</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:var(--price-floor);border-radius:2px;"></span> Giảm sàn (<= -6.8%)</span>
+              </div>
             </div>
           </div>
 
-          <!-- Lưới các khối ngành (Sectors Grid) -->
-          <div id="treemapSectorsContainer" style="display:flex; flex-direction:column; gap:10px;">
-            <!-- Populated by renderTreemap() -->
+          <!-- Quick Beginner Notice / Helper Banner -->
+          <div id="treemapBeginnerNotice" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:6px 12px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--text-secondary);">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:14px;">💡</span>
+              <span><b>Mẹo cho người mới:</b> Rê chuột vào bất kỳ ô nào trên bản đồ để xem ngay tên công ty, giá trần/sàn & thông số tại cột bên trái. Ô càng lớn = Cổ phiếu có vốn hóa hoặc dòng tiền càng khủng. Bấm vào ô để mở đồ thị kỹ thuật.</span>
+            </div>
+            <button onclick="document.getElementById('treemapBeginnerNotice').style.display='none'" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 4px;" title="Đóng hướng dẫn">✕</button>
+          </div>
+
+          <!-- Main Layout: Left Sidebar (Vietstock Market & Stock Inspector) + Right Treemap Canvas -->
+          <div id="treemapWorkspace" style="display:flex; gap:8px; align-items:stretch;">
+            <!-- LEFT SIDEBAR: VIETSTOCK INSPECTOR -->
+            <div id="treemapLeftSidebar" style="width:280px; flex-shrink:0; display:flex; flex-direction:column; gap:8px; transition:all 0.2s;">
+              <!-- 1. Thống kê toàn cảnh thị trường -->
+              <div class="tongquan-card" style="padding:10px;">
+                <div style="font-weight:700; font-size:12px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+                  <span style="color:var(--text-primary); display:flex; align-items:center; gap:4px;">📊 Thị trường chung</span>
+                  <span style="font-size:10.5px; color:var(--text-muted);" id="treemapMarketTime">Realtime</span>
+                </div>
+                <!-- Indices micro list -->
+                <div style="display:flex; flex-direction:column; gap:4px; font-size:11.5px; margin-bottom:8px;" id="treemapIndicesList">
+                  <!-- Populated by JS -->
+                </div>
+                <!-- Breadth bar -->
+                <div style="padding-top:6px; border-top:1px solid var(--border-stroke); font-size:11px;">
+                  <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                    <span style="color:var(--text-secondary);">Độ rộng toàn sàn:</span>
+                    <span id="treemapBreadthCounts" style="font-weight:600;">--</span>
+                  </div>
+                  <div id="treemapBreadthBar" style="display:flex; height:6px; border-radius:3px; overflow:hidden; background:var(--border-stroke);">
+                    <!-- Dynamic segments -->
+                  </div>
+                </div>
+                <!-- Liquidity & Foreign -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; padding-top:6px; border-top:1px solid var(--border-stroke); font-size:11px;">
+                  <div>
+                    <div style="color:var(--text-muted);">GTGD toàn sàn</div>
+                    <div style="font-weight:700; color:var(--text-primary); font-size:12.5px;" id="treemapTotalVal">-- tỷ</div>
+                  </div>
+                  <div>
+                    <div style="color:var(--text-muted);">Khối ngoại ròng</div>
+                    <div style="font-weight:700; font-size:12.5px;" id="treemapForeignNet">-- tỷ</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Khung Chi tiết Cổ phiếu (Active Stock Inspector - Chuẩn Vietstock) -->
+              <div class="tongquan-card" id="treemapStockInspector" style="padding:10px; flex:1; display:flex; flex-direction:column; justify-content:space-between; min-height:300px;">
+                <!-- Populated by inspectStock() on hover/selection -->
+              </div>
+            </div>
+
+            <!-- RIGHT CANVAS: SQUARIFIED TREEMAP CANVAS OR SECTOR GRID -->
+            <div id="treemapRightCanvas" style="flex:1; min-width:0; display:flex; flex-direction:column; gap:8px;">
+              <!-- Container for Treemap (Default Vietstock) -->
+              <div id="treemapCanvasContainer" style="position:relative; width:100%; min-height:620px; height:640px; background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); overflow:hidden; user-select:none;">
+                <!-- Populated by renderTreemap() -->
+              </div>
+              <!-- Alternative container for Sectors Grid or Top30 -->
+              <div id="treemapSectorsContainer" style="display:none; flex-direction:column; gap:10px;">
+                <!-- Populated by renderTreemap() when viewMode === 'sectors' or 'top30' -->
+              </div>
+            </div>
           </div>
         </div>
 
@@ -9438,10 +9544,314 @@ body {
       renderForeignCards();
     }
 
-    // SUBTAB 2: BẢN ĐỒ NHIỆT (TREEMAP THEO NGÀNH & BỘ LỌC)
+    // ==========================================
+    // SUBTAB 2: BẢN ĐỒ THỊ TRƯỜNG CHUẨN VIETSTOCK FINANCE
+    // ==========================================
     let activeTreemapGroup = 'ALL';
-    let activeTreemapMetric = 'change';
+    let activeTreemapMetric = 'marketCap'; // 'marketCap' | 'value'
+    let activeTreemapViewMode = 'treemap'; // 'treemap' | 'sectors' | 'top30'
+    let treemapSearchQuery = '';
+    let isTreemapLeftSidebarVisible = true;
+    let lastInspectedSymbol = 'VCB';
+    let treemapResizeListenerAttached = false;
 
+    // Tên công ty rút gọn hiển thị trên các ô bản đồ
+    const VN_STOCK_NAMES = {
+      'VCB': 'Vietcombank', 'BID': 'BIDV', 'CTG': 'VietinBank', 'TCB': 'Techcombank',
+      'MBB': 'MB Bank', 'VPB': 'VPBank', 'ACB': 'Á Châu ACB', 'STB': 'Sacombank',
+      'HDB': 'HDBank', 'SHB': 'SHB Bank', 'LPB': 'LPBank', 'SSB': 'SeABank',
+      'VIB': 'VIB Bank', 'TPB': 'TPBank', 'MSB': 'MSB Bank', 'OCB': 'OCB Bank',
+      'EIB': 'Eximbank', 'ABB': 'An Bình Bank', 'BAB': 'Bắc Á Bank', 'BVB': 'Bản Việt Bank',
+      'NAB': 'Nam Á Bank', 'NVB': 'Navibank',
+      'SSI': 'Chứng khoán SSI', 'VND': 'VNDIRECT', 'VIX': 'Chứng khoán VIX', 'SHS': 'Chứng khoán SHS',
+      'HCM': 'HSC', 'MBS': 'Chứng khoán MB', 'VCI': 'Vietcap', 'FTS': 'FPT Securities',
+      'BSI': 'Chứng khoán BIDV', 'CTS': 'VietinBank Sec', 'AAS': 'SmartInvest', 'AGR': 'Agriseco',
+      'APG': 'APG Sec', 'APS': 'APEC Sec', 'BMS': 'Bảo Minh Sec', 'BVS': 'Bảo Việt Sec',
+      'ORS': 'Tiên Phong Sec', 'TVS': 'Thiên Việt Sec', 'VDS': 'Rồng Việt',
+      'VHM': 'Vinhomes', 'VIC': 'Vingroup', 'VRE': 'Vincom Retail', 'NVL': 'Novaland',
+      'PDR': 'Phát Đạt', 'DXG': 'Đất Xanh', 'KDH': 'Khang Điền', 'NLG': 'Nam Long',
+      'DIG': 'DIC Corp', 'CEO': 'CEO Group', 'KBC': 'Kinh Bắc', 'IDC': 'IDICO',
+      'VGC': 'Viglacera', 'BCM': 'Becamex', 'HDC': 'HODECO', 'TCH': 'Hoàng Huy',
+      'DXS': 'Dat Xanh Services', 'SCR': 'TTC Land', 'AGG': 'An Gia Group', 'CII': 'Hạ tầng CII',
+      'HHV': 'Đèo Cả', 'VCG': 'Vinaconex', 'CTD': 'Coteccons', 'HBC': 'Hòa Bình Corp',
+      'HPG': 'Hòa Phát', 'HSG': 'Hoa Sen', 'NKG': 'Nam Kim', 'VGS': 'Thép Việt Đức',
+      'SMC': 'Đầu tư SMC', 'TLH': 'Thép Tiến Lên', 'HT1': 'Xi măng Hà Tiên', 'BCC': 'Xi măng Bỉm Sơn',
+      'VCS': 'Vicostone', 'BMP': 'Nhựa Bình Minh', 'NTP': 'Nhựa Tiền Phong', 'AAA': 'Nhựa An Phát',
+      'APH': 'An Phát Holdings', 'DAG': 'Nhựa Đông Á', 'BWE': 'Nước Bình Dương',
+      'FPT': 'Tập đoàn FPT', 'CMG': 'CMC Corp', 'ELC': 'Elcom', 'CTR': 'Viettel Construction',
+      'VGI': 'Viettel Global', 'FOX': 'FPT Telecom', 'ITD': 'ITD Corp',
+      'MWG': 'Thế Giới Di Động', 'FRT': 'FPT Retail', 'PNJ': 'Vàng bạc PNJ', 'MSN': 'Masan Group',
+      'MCH': 'Masan Consumer', 'VNM': 'Vinamilk', 'SAB': 'Bia Sabeco', 'BHN': 'Habeco',
+      'KDC': 'KIDO Group', 'DGW': 'Digiworld', 'PET': 'Petrosetco',
+      'GAS': 'PV Gas', 'PLX': 'Petrolimex', 'PVD': 'PV Drilling', 'PVS': 'PTSC Dầu khí',
+      'BSR': 'Lọc dầu Bình Sơn', 'POW': 'PV Power', 'GEG': 'Điện Gia Lai', 'REE': 'Cơ điện lạnh REE',
+      'PC1': 'Xây lắp điện 1', 'HDG': 'Hà Đô Group', 'NT2': 'Điện Nhơn Trạch 2', 'PVT': 'PV Trans',
+      'DGC': 'Hóa chất Đức Giang', 'DCM': 'Đạm Cà Mau', 'DPM': 'Đạm Phú Mỹ', 'BFC': 'Phân bón Bình Điền',
+      'CSV': 'Hóa chất Cơ bản', 'LAS': 'Supe Lâm Thao', 'DDV': 'DAP-Vinachem',
+      'GMD': 'Cảng Gemadept', 'HAH': 'Vận tải Hải An', 'VOS': 'Vận tải Biển VN',
+      'VJC': 'Vietjet Air', 'HVN': 'Vietnam Airlines', 'ACV': 'Cảng Hàng không', 'AST': 'Taseco Air',
+      'VHC': 'Thủy sản Vĩnh Hoàn', 'ANV': 'Thủy sản Nam Việt', 'IDI': 'Đầu tư IDI', 'ASM': 'Sao Mai Group',
+      'FMC': 'Thực phẩm Sao Ta', 'BAF': 'Nông nghiệp BAF', 'DBC': 'Dabaco', 'HAG': 'Hoàng Anh Gia Lai',
+      'HNG': 'HAGL Agrico', 'AAM': 'Thủy sản Mekong', 'ACL': 'Thủy sản Cửu Long', 'CMX': 'Camimex',
+      'DHG': 'Dược Hậu Giang', 'IMP': 'Imexpharm', 'TRA': 'Traphaco', 'DMC': 'Domesco',
+      'BVH': 'Bảo hiểm Bảo Việt', 'BMI': 'Bảo hiểm Bảo Minh', 'PVI': 'Bảo hiểm PVI', 'MIG': 'Bảo hiểm Quân đội',
+      'ABI': 'Bảo hiểm Nông nghiệp', 'BIC': 'Bảo hiểm BIDV'
+    };
+
+    // Tên công ty đầy đủ bằng tiếng Việt (chuẩn Vietstock)
+    const VN_STOCK_FULL_NAMES = {
+      'VCB': 'Ngân hàng TMCP Ngoại thương Việt Nam (Vietcombank)',
+      'BID': 'Ngân hàng TMCP Đầu tư và Phát triển Việt Nam (BIDV)',
+      'CTG': 'Ngân hàng TMCP Công Thương Việt Nam (VietinBank)',
+      'TCB': 'Ngân hàng TMCP Kỹ Thương Việt Nam (Techcombank)',
+      'MBB': 'Ngân hàng TMCP Quân Đội (MB Bank)',
+      'VPB': 'Ngân hàng TMCP Việt Nam Thịnh Vượng (VPBank)',
+      'ACB': 'Ngân hàng TMCP Á Châu (ACB)',
+      'HDB': 'Ngân hàng TMCP Phát triển TP.HCM (HDBank)',
+      'STB': 'Ngân hàng TMCP Sài Gòn Thương Tín (Sacombank)',
+      'SHB': 'Ngân hàng TMCP Sài Gòn - Hà Nội (SHB)',
+      'LPB': 'Ngân hàng TMCP Lộc Phát Việt Nam (LPBank)',
+      'SSB': 'Ngân hàng TMCP Đông Nam Á (SeABank)',
+      'VIB': 'Ngân hàng TMCP Quốc tế Việt Nam (VIB)',
+      'TPB': 'Ngân hàng TMCP Tiên Phong (TPBank)',
+      'MSB': 'Ngân hàng TMCP Hàng Hải Việt Nam (MSB)',
+      'OCB': 'Ngân hàng TMCP Phương Đông (OCB)',
+      'EIB': 'Ngân hàng TMCP Xuất Nhập Khẩu Việt Nam (Eximbank)',
+      'SSI': 'Công ty Cổ phần Chứng khoán SSI',
+      'VND': 'Công ty Cổ phần Chứng khoán VNDIRECT',
+      'VIX': 'Công ty Cổ phần Chứng khoán VIX',
+      'HCM': 'Công ty Cổ phần Chứng khoán TP.HCM (HSC)',
+      'VCI': 'Công ty Cổ phần Chứng khoán Vietcap',
+      'SHS': 'Công ty Cổ phần Chứng khoán Sài Gòn - Hà Nội',
+      'FTS': 'Công ty Cổ phần Chứng khoán FPT',
+      'BSI': 'Công ty Cổ phần Chứng khoán BIDV',
+      'CTS': 'Công ty Cổ phần Chứng khoán Ngân hàng Công thương',
+      'VHM': 'Công ty Cổ phần Vinhomes',
+      'VIC': 'Tập đoàn Vingroup - CTCP',
+      'VRE': 'Công ty Cổ phần Vincom Retail',
+      'NVL': 'Công ty Cổ phần Tập đoàn Đầu tư Địa ốc No Va (Novaland)',
+      'KDH': 'Công ty Cổ phần Đầu tư và Kinh doanh Nhà Khang Điền',
+      'PDR': 'Công ty Cổ phần Phát triển Bất động sản Phát Đạt',
+      'DXG': 'Công ty Cổ phần Tập đoàn Đất Xanh',
+      'NLG': 'Công ty Cổ phần Đầu tư Nam Long',
+      'DIG': 'Tổng Công ty Cổ phần Đầu tư Phát triển Xây dựng (DIC Corp)',
+      'CEO': 'Công ty Cổ phần Tập đoàn C.E.O',
+      'KBC': 'Tổng Công ty Phát triển Đô thị Kinh Bắc',
+      'IDC': 'Tổng Công ty IDICO - CTCP',
+      'VGC': 'Tổng Công ty Viglacera - CTCP',
+      'BCM': 'Tổng Công ty Đầu tư và Phát triển Công nghiệp (Becamex)',
+      'HPG': 'Công ty Cổ phần Tập đoàn Hòa Phát',
+      'HSG': 'Công ty Cổ phần Tập đoàn Hoa Sen',
+      'NKG': 'Công ty Cổ phần Thép Nam Kim',
+      'FPT': 'Công ty Cổ phần FPT',
+      'CMG': 'Công ty Cổ phần Tập đoàn Công nghệ CMC',
+      'CTR': 'Tổng Công ty Cổ phần Công trình Viettel',
+      'MWG': 'Công ty Cổ phần Đầu tư Thế Giới Di Động',
+      'FRT': 'Công ty Cổ phần Bán lẻ Kỹ thuật số FPT',
+      'PNJ': 'Công ty Cổ phần Vàng bạc Đá quý Phú Nhuận',
+      'MSN': 'Công ty Cổ phần Tập đoàn Masan',
+      'VNM': 'Công ty Cổ phần Sữa Việt Nam (Vinamilk)',
+      'SAB': 'Tổng Công ty Cổ phần Bia - Rượu - NGK Sài Gòn (Sabeco)',
+      'GAS': 'Tổng Công ty Khí Việt Nam - CTCP (PV Gas)',
+      'PLX': 'Tập đoàn Xăng dầu Việt Nam (Petrolimex)',
+      'PVD': 'Tổng Công ty Cổ phần Khoan và Dịch vụ Khoan Dầu khí',
+      'PVS': 'Tổng Công ty Cổ phần Dịch vụ Kỹ thuật Dầu khí Việt Nam',
+      'BSR': 'Công ty Cổ phần Lọc hóa dầu Bình Sơn',
+      'POW': 'Tổng Công ty Điện lực Dầu khí Việt Nam (PV Power)',
+      'DGC': 'Công ty Cổ phần Tập đoàn Hóa chất Đức Giang',
+      'DCM': 'Công ty Cổ phần Phân bón Dầu khí Cà Mau',
+      'DPM': 'Tổng Công ty Phân bón và Hóa chất Dầu khí (Đạm Phú Mỹ)',
+      'GMD': 'Công ty Cổ phần Gemadept',
+      'HAH': 'Công ty Cổ phần Vận tải và Xếp dỡ Hải An',
+      'VJC': 'Công ty Cổ phần Hàng không Vietjet',
+      'HVN': 'Tổng Công ty Hàng không Việt Nam (Vietnam Airlines)',
+      'BVH': 'Tập đoàn Bảo Việt',
+      'BMP': 'Công ty Cổ phần Nhựa Bình Minh',
+      'AAA': 'Công ty Cổ phần Nhựa An Phát Xanh',
+      'APH': 'Công ty Cổ phần Tập đoàn An Phát Holdings',
+      'BWE': 'Công ty Cổ phần Nước - Môi trường Bình Dương'
+    };
+
+    const sectorMapping = {
+      'Ngân hàng': ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','LPB','SSB','VIB','TPB','MSB','OCB','EIB','ABB','BAB','BVB','NAB','NVB'],
+      'Bất động sản': ['VHM','VIC','VRE','NVL','PDR','DXG','KDH','NLG','DIG','CEO','KBC','IDC','VGC','BCM','HDC','TCH','DXS','SCR','AGG','CII','HHV','VCG','CTD','HBC','BCE','BOT'],
+      'Chứng khoán': ['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS','AAS','AGR','APG','APS','BMS','BVS','ORS','TVS','VDS'],
+      'Thép & VLXD': ['HPG','HSG','NKG','VGS','SMC','TLH','HT1','BCC','VCS','BMP','NTP','AAA','APH','DAG','BWE','ACC','AMS','BDT','BTS'],
+      'Công nghệ': ['FPT','CMG','ELC','CTR','VGI','FOX','ITD'],
+      'Bán lẻ & Tiêu dùng': ['MWG','FRT','PNJ','MSN','MCH','VNM','SAB','BHN','KDC','DGW','PET'],
+      'Dầu khí & Năng lượng': ['GAS','PLX','PVD','PVS','BSR','POW','GEG','REE','PC1','HDG','NT2','BCG','PVT'],
+      'Hóa chất & Phân bón': ['DGC','DCM','DPM','BFC','CSV','LAS','DDV'],
+      'Thực phẩm & Thủy sản': ['VHC','ANV','IDI','ASM','FMC','BAF','DBC','HAG','HNG','AAM','ACL','CMX','AFX','AIG','APF','BNA'],
+      'Vận tải & Logistics': ['GMD','HAH','VOS','VJC','HVN','ACV','AST'],
+      'Bảo hiểm': ['BVH','BMI','PVI','MIG','ABI','BIC'],
+      'Dược phẩm & Y tế': ['DHG','IMP','TRA','DMC']
+    };
+
+    const sectorIcons = {
+      'Ngân hàng': '🏦',
+      'Bất động sản': '🏢',
+      'Chứng khoán': '📈',
+      'Thép & VLXD': '🏭',
+      'Công nghệ': '💻',
+      'Bán lẻ & Tiêu dùng': '🛒',
+      'Dầu khí & Năng lượng': '⚡',
+      'Hóa chất & Phân bón': '🧪',
+      'Thực phẩm & Thủy sản': '🐟',
+      'Vận tải & Logistics': '🚢',
+      'Bảo hiểm': '🛡️',
+      'Dược phẩm & Y tế': '💊',
+      'Khác': '📦'
+    };
+
+    const vn30Set = new Set(['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','SSB','VIB','TPB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','BCM','PDR']);
+
+    function getStockSector(sym, defaultSec) {
+      for (const [secName, symList] of Object.entries(sectorMapping)) {
+        if (symList.includes(sym)) return secName;
+      }
+      if (defaultSec) {
+        const s = defaultSec.toLowerCase();
+        if (s.includes('ngân hàng') || s.includes('bank')) return 'Ngân hàng';
+        if (s.includes('bất động') || s.includes('bđs') || s.includes('xây dựng')) return 'Bất động sản';
+        if (s.includes('chứng khoán')) return 'Chứng khoán';
+        if (s.includes('thép') || s.includes('vlxd') || s.includes('vật liệu') || s.includes('nhựa') || s.includes('nước')) return 'Thép & VLXD';
+        if (s.includes('công nghệ') || s.includes('viễn thông')) return 'Công nghệ';
+        if (s.includes('bán lẻ') || s.includes('tiêu dùng')) return 'Bán lẻ & Tiêu dùng';
+        if (s.includes('dầu khí') || s.includes('năng lượng') || s.includes('điện')) return 'Dầu khí & Năng lượng';
+        if (s.includes('hóa chất') || s.includes('phân bón')) return 'Hóa chất & Phân bón';
+        if (s.includes('thủy sản') || s.includes('thực phẩm') || s.includes('nông nghiệp')) return 'Thực phẩm & Thủy sản';
+        if (s.includes('vận tải') || s.includes('hàng không') || s.includes('logistics') || s.includes('cảng')) return 'Vận tải & Logistics';
+        if (s.includes('bảo hiểm')) return 'Bảo hiểm';
+        if (s.includes('dược') || s.includes('y tế')) return 'Dược phẩm & Y tế';
+        return defaultSec;
+      }
+      return 'Khác';
+    }
+
+    // Thuật toán Squarified Treemap chuẩn quốc tế (chuẩn Vietstock/Finviz)
+    function squarify(items, rect) {
+      if (!items || items.length === 0 || rect.w <= 0.01 || rect.h <= 0.01) return [];
+      const totalWeight = items.reduce((sum, item) => sum + Math.max(0.001, item.weight || 0), 0);
+      if (totalWeight <= 0) return [];
+
+      const totalArea = rect.w * rect.h;
+      const elements = items.map(item => ({
+        ...item,
+        area: (Math.max(0.001, item.weight || 0) / totalWeight) * totalArea
+      })).sort((a, b) => b.area - a.area);
+
+      const results = [];
+
+      function worstRatio(row, sideLength) {
+        if (!row || row.length === 0) return Infinity;
+        const rowArea = row.reduce((s, el) => s + el.area, 0);
+        const rowThickness = rowArea / sideLength;
+        if (rowThickness <= 0) return Infinity;
+        let worst = 0;
+        for (const el of row) {
+          const elLength = el.area / rowThickness;
+          const ratio = Math.max(rowThickness / elLength, elLength / rowThickness);
+          if (ratio > worst) worst = ratio;
+        }
+        return worst;
+      }
+
+      function recurse(remaining, curRect) {
+        if (remaining.length === 0) return;
+        if (curRect.w <= 0.5 || curRect.h <= 0.5) return;
+
+        const isHorizontal = curRect.w >= curRect.h;
+        const sideLength = isHorizontal ? curRect.h : curRect.w;
+
+        let row = [remaining[0]];
+        let i = 1;
+        while (i < remaining.length) {
+          const candidate = [...row, remaining[i]];
+          if (worstRatio(candidate, sideLength) <= worstRatio(row, sideLength)) {
+            row = candidate;
+            i++;
+          } else {
+            break;
+          }
+        }
+
+        const rowArea = row.reduce((s, el) => s + el.area, 0);
+        const rowThickness = rowArea / sideLength;
+
+        let offset = 0;
+        row.forEach(el => {
+          const elLength = el.area / rowThickness;
+          if (isHorizontal) {
+            results.push({
+              ...el,
+              x: curRect.x,
+              y: curRect.y + offset,
+              w: rowThickness,
+              h: elLength
+            });
+          } else {
+            results.push({
+              ...el,
+              x: curRect.x + offset,
+              y: curRect.y,
+              w: elLength,
+              h: rowThickness
+            });
+          }
+          offset += elLength;
+        });
+
+        const nextRect = isHorizontal
+          ? { x: curRect.x + rowThickness, y: curRect.y, w: curRect.w - rowThickness, h: curRect.h }
+          : { x: curRect.x, y: curRect.y + rowThickness, w: curRect.w, h: curRect.h - rowThickness };
+
+        recurse(remaining.slice(row.length), nextRect);
+      }
+
+      recurse(elements, rect);
+      return results;
+    }
+
+    // Bảng màu Gradient chuẩn thị trường chứng khoán Việt Nam
+    function getTreemapStockColor(chg) {
+      if (chg >= 6.8) return {
+        bg: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.4), 0 2px 6px rgba(147,51,234,0.4);',
+        text: '#ffffff'
+      };
+      if (chg <= -6.8) return {
+        bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.4), 0 2px 6px rgba(6,182,212,0.4);',
+        text: '#ffffff'
+      };
+      if (Math.abs(chg) < 0.005) return {
+        bg: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);',
+        text: '#ffffff'
+      };
+      if (chg >= 2.5) return {
+        bg: 'linear-gradient(135deg, #15803d 0%, #16a34a 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);',
+        text: '#ffffff'
+      };
+      if (chg > 0) return {
+        bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.2);',
+        text: '#ffffff'
+      };
+      if (chg <= -2.5) return {
+        bg: 'linear-gradient(135deg, #991b1b 0%, #dc2626 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);',
+        text: '#ffffff'
+      };
+      return {
+        bg: 'linear-gradient(135deg, #e11d48 0%, #ef4444 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.2);',
+        text: '#ffffff'
+      };
+    }
+
+    // Chuyển đổi nhóm lọc
     function switchTreemapGroup(grp, btn) {
       activeTreemapGroup = grp;
       const ctrls = document.getElementById('treemapGroupControls');
@@ -9452,6 +9862,7 @@ body {
       renderTreemap();
     }
 
+    // Chuyển đổi tiêu chí diện tích (Vốn hóa / GTGD)
     function switchTreemapMetric(metric, btn) {
       activeTreemapMetric = metric;
       const ctrls = document.getElementById('treemapMetricControls');
@@ -9462,118 +9873,584 @@ body {
       renderTreemap();
     }
 
-    function renderTreemap() {
-      const container = document.getElementById('treemapSectorsContainer');
+    // Chuyển đổi chế độ xem: Treemap toàn sàn / Theo ngành / Top 30
+    function switchTreemapViewMode(mode, btn) {
+      activeTreemapViewMode = mode;
+      const ctrls = document.getElementById('treemapViewModeControls');
+      if (ctrls) {
+        ctrls.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+      }
+      renderTreemap();
+    }
+
+    // Ẩn / Hiện cột thông tin chi tiết cổ phiếu bên trái
+    function toggleTreemapLeftSidebar() {
+      isTreemapLeftSidebarVisible = !isTreemapLeftSidebarVisible;
+      const sidebar = document.getElementById('treemapLeftSidebar');
+      const btn = document.getElementById('toggleInspectorBtn');
+      if (sidebar) {
+        sidebar.style.display = isTreemapLeftSidebarVisible ? 'flex' : 'none';
+      }
+      if (btn) {
+        btn.textContent = isTreemapLeftSidebarVisible ? '◀ Thu gọn chi tiết' : '▶ Hiện chi tiết';
+      }
+      setTimeout(renderTreemap, 40);
+    }
+
+    // Tìm kiếm mã cổ phiếu
+    function handleTreemapSearch(q) {
+      treemapSearchQuery = (q || '').trim().toUpperCase();
+      const clearBtn = document.getElementById('treemapSearchClear');
+      if (clearBtn) clearBtn.style.display = treemapSearchQuery ? 'inline' : 'none';
+      renderTreemap();
+    }
+
+    function clearTreemapSearch() {
+      const input = document.getElementById('treemapSearchInput');
+      if (input) input.value = '';
+      treemapSearchQuery = '';
+      const clearBtn = document.getElementById('treemapSearchClear');
+      if (clearBtn) clearBtn.style.display = 'none';
+      renderTreemap();
+    }
+
+    // Cập nhật khung Soi Chi tiết Cổ phiếu bên trái (Vietstock Stock Inspector)
+    function inspectStock(sym) {
+      lastInspectedSymbol = sym;
+      const container = document.getElementById('treemapStockInspector');
       if (!container) return;
 
       const stocks = stockDataList && stockDataList.length > 0 ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
+      const s = stocks.find(item => item.symbol === sym) || stocks[0];
+      if (!s) return;
+
+      const periodMult = activePeriod === '5D' ? 1.6 : (activePeriod === '20D' ? 2.5 : 1.0);
+      const chg = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
+      const isZero = Math.abs(chg) < 0.005;
+      const isCeil = chg >= 6.8;
+      const isFloor = chg <= -6.8;
+
+      let chgColor = 'var(--price-up)';
+      let chgSign = '+';
+      let badgeBg = 'var(--price-up-bg)';
+      if (isCeil) { chgColor = 'var(--price-ceil)'; badgeBg = 'rgba(147, 51, 234, 0.15)'; }
+      else if (isFloor) { chgColor = 'var(--price-floor)'; badgeBg = 'rgba(2, 132, 199, 0.15)'; }
+      else if (isZero) { chgColor = 'var(--price-ref)'; chgSign = ''; badgeBg = 'var(--price-ref-bg)'; }
+      else if (chg < 0) { chgColor = 'var(--price-down)'; chgSign = ''; badgeBg = 'var(--price-down-bg)'; }
+
+      const p = s.price || 0;
+      const refP = s.refPrice || s.open || Math.round(p / (1 + (s.change || 0) / 100));
+      const ceilP = Math.round(refP * (s.exchange === 'HNX' ? 1.10 : (s.exchange === 'UPCOM' ? 1.15 : 1.07)));
+      const floorP = Math.round(refP * (s.exchange === 'HNX' ? 0.90 : (s.exchange === 'UPCOM' ? 0.85 : 0.93)));
+
+      const rawVal = s.value || ((s.volume || 1e6) * p);
+      const valTy = (rawVal / 1e9).toFixed(1);
+      const volM = ((s.volume || 1e6) / 1e6).toFixed(2);
+      const capTy = (s.marketCap || Math.round(rawVal * 12 / 1e9)).toLocaleString('vi-VN');
+
+      const fullName = VN_STOCK_FULL_NAMES[s.symbol] || (typeof STOCK_DIRECTORY !== 'undefined' && STOCK_DIRECTORY[s.symbol] ? STOCK_DIRECTORY[s.symbol].name : s.symbol);
+      const secName = getStockSector(s.symbol, s.sector);
+
+      const fBuyTy = s.buyForeignValue ? (s.buyForeignValue / 1e9).toFixed(1) : ((parseFloat(valTy) * 0.12).toFixed(1));
+      const fSellTy = s.sellForeignValue ? (s.sellForeignValue / 1e9).toFixed(1) : ((parseFloat(valTy) * 0.08).toFixed(1));
+      const fNetTy = (parseFloat(fBuyTy) - parseFloat(fSellTy)).toFixed(1);
+      const fNetColor = parseFloat(fNetTy) >= 0 ? 'var(--price-up)' : 'var(--price-down)';
+
+      container.innerHTML = `
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+            <div>
+              <span style="font-weight:800; font-size:19px; color:var(--text-primary); letter-spacing:0.5px;">${s.symbol}</span>
+              <span style="font-size:10px; font-weight:700; padding:1px 5px; border-radius:3px; background:var(--border-stroke); color:var(--text-secondary); margin-left:4px;">${s.exchange || 'HOSE'}</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:16px; font-weight:800; color:${chgColor};">${p.toLocaleString('vi-VN')} đ</div>
+              <div style="font-size:11px; font-weight:700; color:${chgColor}; background:${badgeBg}; padding:1px 6px; border-radius:3px; display:inline-block;">
+                ${isZero ? '0.00%' : `${chgSign}${chg.toFixed(2)}%`}
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:11.5px; font-weight:600; color:var(--text-primary); line-height:1.35; margin-bottom:4px;">
+            ${fullName}
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">
+            Ngành: <span style="color:var(--text-secondary); font-weight:600;">${secName}</span>
+          </div>
+
+          <!-- Bảng giá Trần - TC - Sàn -->
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; text-align:center; padding:6px 0; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); margin-bottom:8px; font-size:10px;">
+            <div>
+              <div style="color:var(--text-muted);">Giá Trần</div>
+              <div style="font-weight:700; color:var(--price-ceil); font-size:11.5px;">${ceilP.toLocaleString('vi-VN')}</div>
+            </div>
+            <div>
+              <div style="color:var(--text-muted);">Tham chiếu</div>
+              <div style="font-weight:700; color:var(--price-ref); font-size:11.5px;">${refP.toLocaleString('vi-VN')}</div>
+            </div>
+            <div>
+              <div style="color:var(--text-muted);">Giá Sàn</div>
+              <div style="font-weight:700; color:var(--price-floor); font-size:11.5px;">${floorP.toLocaleString('vi-VN')}</div>
+            </div>
+          </div>
+
+          <!-- Thông số giao dịch & Khối ngoại -->
+          <div style="display:flex; flex-direction:column; gap:4px; font-size:11px;">
+            <div style="display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px dashed var(--border-stroke);">
+              <span style="color:var(--text-secondary);">GTGD hôm nay:</span>
+              <span style="font-weight:700; color:var(--text-primary);">${Number(valTy).toLocaleString('vi-VN')} tỷ đ</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px dashed var(--border-stroke);">
+              <span style="color:var(--text-secondary);">KLGD hôm nay:</span>
+              <span style="font-weight:600;">${volM} triệu CP</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px dashed var(--border-stroke);">
+              <span style="color:var(--text-secondary);">Vốn hóa thị trường:</span>
+              <span style="font-weight:700; color:var(--text-primary);">${capTy} tỷ đ</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:2px 0; border-bottom:1px dashed var(--border-stroke);">
+              <span style="color:var(--text-secondary);">Khối ngoại mua ròng:</span>
+              <span style="font-weight:700; color:${fNetColor};">${parseFloat(fNetTy) >= 0 ? '+' : ''}${fNetTy} tỷ đ</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; padding:2px 0;">
+              <span style="color:var(--text-secondary);">P/E • P/B • ROE:</span>
+              <span style="font-weight:600; color:var(--text-muted);">${s.pe || 12.5}x • ${s.pb || 1.6}x • ${s.roe || 15}%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick action button -->
+        <div style="margin-top:10px; padding-top:6px; border-top:1px solid var(--border-stroke);">
+          <button onclick="openQuickModal('${s.symbol}')"
+                  style="width:100%; padding:7px; background:var(--primary-brand); color:#fff; border:none; border-radius:var(--radius-sm); font-size:11.5px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:background 0.15s; box-shadow:0 1px 3px rgba(0,0,0,0.12);"
+                  onmouseover="this.style.background='var(--primary-hover)';"
+                  onmouseout="this.style.background='var(--primary-brand)';">
+            <span>📈 Xem biểu đồ kỹ thuật & bảng giá</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      `;
+    }
+
+    // Hàm render chính cho Bản đồ thị trường chuẩn Vietstock
+    function renderTreemap() {
+      const containerTreemap = document.getElementById('treemapCanvasContainer');
+      const containerSectors = document.getElementById('treemapSectorsContainer');
+      if (!containerTreemap && !containerSectors) return;
+
+      const stocks = (stockDataList && stockDataList.length > 0) ? stockDataList : (typeof FALLBACK_STOCKS !== 'undefined' ? FALLBACK_STOCKS : []);
       if (!stocks || stocks.length === 0) {
-        container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);">Đang tải dữ liệu Realtime...</div>';
+        if (containerTreemap) containerTreemap.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">Đang tải dữ liệu Realtime...</div>';
         return;
       }
 
-      const sectorMapping = {
-        'Ngân hàng': ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','LPB','SSB','VIB','TPB','MSB','OCB','EIB'],
-        'Công nghệ': ['FPT','CMG','ELC','CTR','VGI','FOX'],
-        'Bất động sản': ['VHM','VIC','VRE','NVL','PDR','DXG','KDH','NLG','DIG','CEO','KBC','IDC','VGC','BCM'],
-        'Chứng khoán': ['SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS'],
-        'Nguyên vật liệu': ['HPG','HSG','NKG','VGS','SMC','DGC','DCM','DPM'],
-        'Bán lẻ & Tiêu dùng': ['MWG','FRT','PNJ','MSN','MCH','VNM','SAB'],
-        'Dầu khí & Năng lượng': ['GAS','PLX','PVD','PVS','BSR','POW','GEG','REE'],
-        'Vận tải & Công nghiệp': ['GMD','HAH','GVR','VJC','HVN']
-      };
-
-      const vn30Set = new Set(['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','SSB','VIB','TPB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','BCM','PDR']);
-
-      function getStockSector(sym, defaultSec) {
-        for (const [secName, symList] of Object.entries(sectorMapping)) {
-          if (symList.includes(sym)) return secName;
-        }
-        return defaultSec || 'Khác';
-      }
-
-      let filteredStocks = stocks;
-      if (activeTreemapGroup === 'VN30') {
-        filteredStocks = stocks.filter(s => vn30Set.has(s.symbol));
-      } else if (activeTreemapGroup !== 'ALL') {
-        filteredStocks = stocks.filter(s => {
-          const sec = getStockSector(s.symbol, s.sector);
-          return sec.toLowerCase().includes(activeTreemapGroup.toLowerCase()) || (s.sector && s.sector.toLowerCase().includes(activeTreemapGroup.toLowerCase()));
+      // Đăng ký sự kiện resize mượt mà 1 lần
+      if (!treemapResizeListenerAttached) {
+        treemapResizeListenerAttached = true;
+        window.addEventListener('resize', () => {
+          const subviewBando = document.getElementById('subview_bando');
+          if (subviewBando && subviewBando.style.display !== 'none' && activeTreemapViewMode === 'treemap') {
+            renderTreemap();
+          }
         });
       }
 
+      const periodMult = activePeriod === '5D' ? 1.6 : (activePeriod === '20D' ? 2.5 : 1.0);
+
+      // 1. Lọc cổ phiếu theo nhóm và tìm kiếm
+      let filtered = stocks.filter(s => {
+        // Lọc theo sàn / nhóm
+        if (activeTreemapGroup === 'VN30') {
+          if (!vn30Set.has(s.symbol)) return false;
+        } else if (activeTreemapGroup === 'HOSE') {
+          if ((s.exchange || 'HOSE') !== 'HOSE') return false;
+        } else if (activeTreemapGroup === 'HNX') {
+          if (s.exchange !== 'HNX') return false;
+        } else if (activeTreemapGroup === 'UPCOM') {
+          if (s.exchange !== 'UPCOM') return false;
+        } else if (activeTreemapGroup !== 'ALL') {
+          const sec = getStockSector(s.symbol, s.sector);
+          if (!sec.toLowerCase().includes(activeTreemapGroup.toLowerCase())) return false;
+        }
+
+        // Lọc theo từ khóa tìm kiếm
+        if (treemapSearchQuery) {
+          const symMatch = s.symbol.toUpperCase().includes(treemapSearchQuery);
+          const nameMatch = (VN_STOCK_NAMES[s.symbol] || '').toUpperCase().includes(treemapSearchQuery);
+          const secMatch = getStockSector(s.symbol, s.sector).toUpperCase().includes(treemapSearchQuery);
+          if (!symMatch && !nameMatch && !secMatch) return false;
+        }
+
+        return true;
+      });
+
+      // 2. Thống kê độ rộng & cập nhật Left Sidebar
+      let totalMktVal = 0;
+      let advCnt = 0, decCnt = 0, uncCnt = 0, ceilCnt = 0, floorCnt = 0;
+      let totalForeignNet = 0;
+
+      stocks.forEach(s => {
+        const val = s.value || ((s.volume || 1e6) * (s.price || 30000));
+        totalMktVal += val;
+        const c = (s.change || 0) * periodMult;
+        if (c >= 6.8) ceilCnt++;
+        else if (c <= -6.8) floorCnt++;
+
+        if (c > 0.005) advCnt++;
+        else if (c < -0.005) decCnt++;
+        else uncCnt++;
+
+        const fBuy = s.buyForeignValue || 0;
+        const fSell = s.sellForeignValue || 0;
+        totalForeignNet += (fBuy - fSell);
+      });
+
+      // Cập nhật Left Sidebar Overview
+      const mktTimeEl = document.getElementById('treemapMarketTime');
+      const indicesListEl = document.getElementById('treemapIndicesList');
+      const breadthCountsEl = document.getElementById('treemapBreadthCounts');
+      const breadthBarEl = document.getElementById('treemapBreadthBar');
+      const totalValEl = document.getElementById('treemapTotalVal');
+      const foreignNetEl = document.getElementById('treemapForeignNet');
+
+      if (mktTimeEl) {
+        const now = new Date();
+        mktTimeEl.textContent = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+      }
+
+      if (indicesListEl) {
+        const idxKeys = ['VNINDEX', 'VN30', 'HNXINDEX', 'UPCOMINDEX'];
+        indicesListEl.innerHTML = idxKeys.map(k => {
+          const item = (typeof marketIndices !== 'undefined' && marketIndices[k]) ? marketIndices[k] : null;
+          if (!item) return '';
+          const name = k === 'VNINDEX' ? 'VN-Index' : (k === 'VN30' ? 'VN30' : (k === 'HNXINDEX' ? 'HNX-Index' : 'UPCoM'));
+          const p = item.price || item.value || 0;
+          const c = item.change || 0;
+          const cp = item.changePercent || item.changePct || (p ? (c / p * 100).toFixed(2) : '0.00');
+          const col = c > 0 ? 'var(--price-up)' : (c < 0 ? 'var(--price-down)' : 'var(--price-ref)');
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:2px 0;">
+              <span style="font-weight:600; color:var(--text-secondary);">${name}</span>
+              <div style="text-align:right;">
+                <span style="font-weight:700; color:${col};">${Number(p).toFixed(2)}</span>
+                <span style="font-size:10.5px; font-weight:600; color:${col}; margin-left:4px;">${c >= 0 ? '+' : ''}${cp}%</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      if (breadthCountsEl) {
+        breadthCountsEl.innerHTML = `<span style="color:var(--price-up);">${advCnt} ▲</span> | <span style="color:var(--price-ref);">${uncCnt} ■</span> | <span style="color:var(--price-down);">${decCnt} ▼</span>`;
+      }
+      if (breadthBarEl) {
+        const totalB = Math.max(1, advCnt + uncCnt + decCnt);
+        const advW = (advCnt / totalB * 100).toFixed(1);
+        const uncW = (uncCnt / totalB * 100).toFixed(1);
+        const decW = (decCnt / totalB * 100).toFixed(1);
+        breadthBarEl.innerHTML = `
+          <div style="width:${advW}%; background:var(--price-up);" title="${advCnt} mã tăng (${ceilCnt} trần)"></div>
+          <div style="width:${uncW}%; background:var(--price-ref);" title="${uncCnt} mã tham chiếu"></div>
+          <div style="width:${decW}%; background:var(--price-down);" title="${decCnt} mã giảm (${floorCnt} sàn)"></div>
+        `;
+      }
+
+      if (totalValEl) {
+        totalValEl.textContent = `${Number((totalMktVal / 1e9).toFixed(0)).toLocaleString('vi-VN')} tỷ`;
+      }
+      if (foreignNetEl) {
+        const fTy = (totalForeignNet / 1e9).toFixed(1);
+        foreignNetEl.textContent = `${parseFloat(fTy) >= 0 ? '+' : ''}${Number(fTy).toLocaleString('vi-VN')} tỷ`;
+        foreignNetEl.style.color = parseFloat(fTy) >= 0 ? 'var(--price-up)' : 'var(--price-down)';
+      }
+
+      // Cập nhật Stock Inspector với mã gần nhất
+      const activeSymbol = (filtered.find(s => s.symbol === lastInspectedSymbol) || filtered[0] || stocks[0])?.symbol || 'VCB';
+      inspectStock(activeSymbol);
+
+      // 3. Phân nhóm theo ngành và tính trọng số cho Treemap
       const grouped = {};
-      filteredStocks.forEach(s => {
+      filtered.forEach(s => {
         const sec = getStockSector(s.symbol, s.sector);
         if (!grouped[sec]) grouped[sec] = [];
         grouped[sec].push(s);
       });
 
-      const sectorKeys = Object.keys(grouped);
-      if (sectorKeys.length === 0) {
-        container.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);">Không có mã cổ phiếu phù hợp bộ lọc</div>';
+      const sectorNames = Object.keys(grouped);
+      if (sectorNames.length === 0) {
+        if (containerTreemap) {
+          containerTreemap.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);font-size:13px;">Không tìm thấy mã cổ phiếu nào phù hợp bộ lọc.<br><button onclick="clearTreemapSearch()" style="margin-top:8px;padding:4px 12px;background:var(--primary-brand);color:#fff;border:none;border-radius:4px;cursor:pointer;">Xóa bộ lọc tìm kiếm</button></div>';
+        }
         return;
       }
 
-      const periodMult = activePeriod === '5D' ? 1.6 : (activePeriod === '20D' ? 2.5 : 1.0);
-
-      let html = '';
-      sectorKeys.forEach(secName => {
+      // Tính tổng vốn hóa, tổng GTGD, % biến động trung bình từng ngành
+      const sectorsList = sectorNames.map(secName => {
         const sList = grouped[secName];
         let totalVal = 0;
-        let avgChg = 0;
-        sList.forEach(s => {
-          totalVal += (s.value || ((s.volume || 1e6) * (s.price || 30000)));
-          avgChg += (s.change || 0);
-        });
-        avgChg = avgChg / sList.length;
-        const totalValTy = (totalVal / 1e9).toFixed(0);
-        const avgChgColor = avgChg >= 0 ? 'var(--price-up)' : 'var(--price-down)';
+        let totalCap = 0;
+        let sumChg = 0;
 
-        html += `
-          <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border-stroke);">
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span class="blue-accent-bar" style="height:12px;"></span>
-                <span style="font-weight:700;font-size:12px;">${secName}</span>
-                <span style="font-size:11px;color:var(--text-muted);">(${sList.length} mã)</span>
+        sList.forEach(s => {
+          const stockVal = s.value || ((s.volume || 1e6) * (s.price || 30000));
+          const stockCap = s.marketCap ? (s.marketCap * 1e9) : (stockVal * 10);
+          totalVal += stockVal;
+          totalCap += stockCap;
+          sumChg += ((s.change || 0) * periodMult);
+        });
+
+        const avgChg = sumChg / Math.max(1, sList.length);
+        const weight = activeTreemapMetric === 'value' ? totalVal : totalCap;
+
+        return {
+          name: secName,
+          stocks: sList,
+          weight: Math.max(1, weight),
+          totalVal,
+          totalCap,
+          avgChg
+        };
+      }).sort((a, b) => b.weight - a.weight);
+
+      // ==========================================
+      // CHẾ ĐỘ 1: SQUARIFIED TREEMAP (CHUẨN VIETSTOCK)
+      // ==========================================
+      if (activeTreemapViewMode === 'treemap') {
+        if (containerTreemap) containerTreemap.style.display = 'block';
+        if (containerSectors) containerSectors.style.display = 'none';
+
+        const canvasW = containerTreemap.clientWidth || 880;
+        const canvasH = containerTreemap.clientHeight || 640;
+
+        // Bố cục Treemap cho các khối ngành
+        const sectorRects = squarify(sectorsList, { x: 0, y: 0, w: canvasW, h: canvasH });
+
+        let treemapHtml = '';
+
+        sectorRects.forEach(sec => {
+          const sX = Math.round(sec.x);
+          const sY = Math.round(sec.y);
+          const sW = Math.max(8, Math.round(sec.w) - 2);
+          const sH = Math.max(8, Math.round(sec.h) - 2);
+
+          const icon = sectorIcons[sec.name] || '🏢';
+          const avgChgTxt = `${sec.avgChg >= 0 ? '+' : ''}${sec.avgChg.toFixed(1)}%`;
+          const avgChgCol = sec.avgChg >= 0 ? 'var(--price-up)' : 'var(--price-down)';
+
+          // Chiều cao tiêu đề ngành
+          const showHeader = sH >= 40 && sW >= 55;
+          const headerH = showHeader ? 22 : 0;
+
+          treemapHtml += `
+            <div style="position:absolute; left:${sX}px; top:${sY}px; width:${sW}px; height:${sH}px; border:1px solid var(--border-stroke); border-radius:3px; overflow:hidden; background:var(--bg-subtle); box-sizing:border-box;">
+          `;
+
+          if (showHeader) {
+            treemapHtml += `
+              <div style="height:${headerH}px; padding:2px 6px; font-size:10.5px; font-weight:700; color:var(--text-primary); display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border-bottom:1px solid var(--border-stroke); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                <span style="overflow:hidden; text-overflow:ellipsis; max-width:70%;" title="${sec.name} (${sec.stocks.length} mã)">
+                  ${icon} ${sec.name} <span style="font-weight:500; font-size:9.5px; color:var(--text-muted);">(${sec.stocks.length})</span>
+                </span>
+                <span style="color:${avgChgCol}; font-size:10px;">${avgChgTxt}</span>
               </div>
-              <div style="font-size:11px;">
-                <span style="color:var(--text-secondary);">GTGD: <b>${Number(totalValTy).toLocaleString('vi-VN')} tỷ</b></span>
-                <span style="margin:0 6px;color:var(--border-stroke);">|</span>
-                <span style="color:${avgChgColor};font-weight:700;">TB: ${avgChg >= 0 ? '+' : ''}${(avgChg * periodMult).toFixed(2)}%</span>
+            `;
+          }
+
+          // Bố cục các cổ phiếu bên trong ngành
+          const innerW = Math.max(4, sW - 2);
+          const innerH = Math.max(4, sH - headerH - 2);
+
+          const stockItems = sec.stocks.map(s => {
+            const stockVal = s.value || ((s.volume || 1e6) * (s.price || 30000));
+            const stockCap = s.marketCap ? (s.marketCap * 1e9) : (stockVal * 10);
+            return {
+              stock: s,
+              weight: Math.max(0.01, activeTreemapMetric === 'value' ? stockVal : stockCap)
+            };
+          });
+
+          const stockRects = squarify(stockItems, { x: 1, y: headerH + 1, w: innerW, h: innerH });
+
+          stockRects.forEach(st => {
+            const s = st.stock;
+            const chg = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
+            const isZero = Math.abs(chg) < 0.005;
+            const colTheme = getTreemapStockColor(chg);
+
+            const stX = Math.round(st.x);
+            const stY = Math.round(st.y);
+            const stW = Math.max(2, Math.round(st.w) - 1.5);
+            const stH = Math.max(2, Math.round(st.h) - 1.5);
+
+            const isVN30 = vn30Set.has(s.symbol);
+            const shortName = VN_STOCK_NAMES[s.symbol] || s.symbol;
+            const chgTxt = isZero ? '0.00%' : `${chg > 0 ? '+' : ''}${chg.toFixed(2)}%`;
+            const p = s.price || 0;
+            const pFormatted = p.toLocaleString('vi-VN');
+
+            // Hiển thị nội dung linh hoạt theo diện tích ô (nhỏ, vừa, lớn)
+            let innerContent = '';
+            if (stW >= 68 && stH >= 50) {
+              innerContent = `
+                <div style="font-weight:800; font-size:13px; line-height:1.1; letter-spacing:0.3px; display:flex; align-items:center; justify-content:center; gap:3px;">
+                  ${s.symbol} ${isVN30 ? '<span style="font-size:8px; opacity:0.85; border:1px solid rgba(255,255,255,0.4); border-radius:2px; padding:0 2px;">30</span>' : ''}
+                </div>
+                <div style="font-size:9.5px; opacity:0.9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:90%;">${shortName}</div>
+                <div style="font-size:11px; font-weight:700;">${pFormatted}</div>
+                <div style="font-size:10px; font-weight:800; opacity:0.95;">${chgTxt}</div>
+              `;
+            } else if (stW >= 46 && stH >= 34) {
+              innerContent = `
+                <div style="font-weight:800; font-size:12px; line-height:1.1;">${s.symbol}</div>
+                <div style="font-size:10px; font-weight:700;">${pFormatted}</div>
+                <div style="font-size:9.5px; font-weight:800;">${chgTxt}</div>
+              `;
+            } else if (stW >= 30 && stH >= 20) {
+              innerContent = `
+                <div style="font-weight:800; font-size:10.5px; line-height:1;">${s.symbol}</div>
+                <div style="font-size:9px; font-weight:700;">${chgTxt}</div>
+              `;
+            } else {
+              innerContent = `<div style="font-size:8px; font-weight:800;">${s.symbol}</div>`;
+            }
+
+            treemapHtml += `
+              <div onclick="openQuickModal('${s.symbol}')"
+                   onmouseenter="inspectStock('${s.symbol}'); this.style.outline='2px solid #fff'; this.style.zIndex='25';"
+                   onmouseleave="this.style.outline='none'; this.style.zIndex='1';"
+                   title="${s.symbol} - ${shortName}&#010;Giá: ${pFormatted} đ (${chgTxt})&#010;GTGD: ${((s.value || 0)/1e9).toFixed(1)} tỷ&#010;Vốn hóa: ${(s.marketCap || 0).toLocaleString('vi-VN')} tỷ&#010;👉 Bấm mở biểu đồ chi tiết"
+                   style="position:absolute; left:${stX}px; top:${stY}px; width:${stW}px; height:${stH}px; background:${colTheme.bg}; color:${colTheme.text}; ${colTheme.glow} border-radius:2px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; text-align:center; user-select:none; transition:outline 0.1s; text-shadow:0 1px 2px rgba(0,0,0,0.5); box-sizing:border-box; overflow:hidden;">
+                ${innerContent}
+              </div>
+            `;
+          });
+
+          treemapHtml += `</div>`;
+        });
+
+        containerTreemap.innerHTML = treemapHtml;
+        return;
+      }
+
+      // ==========================================
+      // CHẾ ĐỘ 2: DANH SÁCH LƯỚI KHỐI NGÀNH (SECTOR GRID)
+      // ==========================================
+      if (activeTreemapViewMode === 'sectors') {
+        if (containerTreemap) containerTreemap.style.display = 'none';
+        if (containerSectors) containerSectors.style.display = 'flex';
+
+        let html = '';
+        sectorsList.forEach(sec => {
+          const icon = sectorIcons[sec.name] || '🏢';
+          const avgChgColor = sec.avgChg >= 0 ? 'var(--price-up)' : 'var(--price-down)';
+          const totalValTy = (sec.totalVal / 1e9).toFixed(0);
+
+          html += `
+            <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border-stroke);">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <span style="font-size:14px;">${icon}</span>
+                  <span style="font-weight:700; font-size:12.5px; color:var(--text-primary);">${sec.name}</span>
+                  <span style="font-size:11px; color:var(--text-muted);">(${sec.stocks.length} mã)</span>
+                </div>
+                <div style="font-size:11px;">
+                  <span style="color:var(--text-secondary);">GTGD: <b>${Number(totalValTy).toLocaleString('vi-VN')} tỷ</b></span>
+                  <span style="margin:0 6px; color:var(--border-stroke);">|</span>
+                  <span style="color:${avgChgColor}; font-weight:700;">TB: ${sec.avgChg >= 0 ? '+' : ''}${sec.avgChg.toFixed(2)}%</span>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(105px, 1fr)); gap:7px;">
+          `;
+
+          // Sắp xếp mã trong ngành theo GTGD
+          sec.stocks.sort((a, b) => (b.value || 0) - (a.value || 0)).forEach(s => {
+            const chg = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
+            const isZero = Math.abs(chg) < 0.005;
+            const colTheme = getTreemapStockColor(chg);
+            const shortName = VN_STOCK_NAMES[s.symbol] || s.symbol;
+            const chgTxt = isZero ? '0.00%' : `${chg > 0 ? '+' : ''}${chg.toFixed(2)}%`;
+            const p = s.price || 0;
+            const isVN30 = vn30Set.has(s.symbol);
+
+            html += `
+              <div onclick="openQuickModal('${s.symbol}')"
+                   onmouseenter="inspectStock('${s.symbol}')"
+                   style="height:70px; background:${colTheme.bg}; color:${colTheme.text}; ${colTheme.glow} border-radius:4px; padding:5px 6px; display:flex; flex-direction:column; justify-content:space-between; align-items:center; cursor:pointer; text-align:center; transition:transform 0.12s, box-shadow 0.12s; user-select:none; text-shadow:0 1px 2px rgba(0,0,0,0.5);"
+                   onmouseover="this.style.transform='scale(1.03)'; this.style.zIndex='5';"
+                   onmouseout="this.style.transform='none'; this.style.zIndex='1';">
+                <div style="font-weight:800; font-size:13px; line-height:1.1; display:flex; align-items:center; gap:2px;">
+                  ${s.symbol} ${isVN30 ? '<span style="font-size:7.5px; opacity:0.85; border:1px solid rgba(255,255,255,0.4); border-radius:2px; padding:0 2px;">30</span>' : ''}
+                </div>
+                <div style="font-size:9.5px; opacity:0.88; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:95%;">${shortName}</div>
+                <div style="font-size:11px; font-weight:700;">${p.toLocaleString('vi-VN')}</div>
+                <div style="font-size:10px; font-weight:800; opacity:0.95;">${chgTxt}</div>
+              </div>
+            `;
+          });
+
+          html += `
               </div>
             </div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          `;
+        });
+
+        containerSectors.innerHTML = html;
+        return;
+      }
+
+      // ==========================================
+      // CHẾ ĐỘ 3: TOP 30 CỔ PHIẾU TRỤ (DÀNH CHO NGƯỜI MỚI)
+      // ==========================================
+      if (activeTreemapViewMode === 'top30') {
+        if (containerTreemap) containerTreemap.style.display = 'none';
+        if (containerSectors) containerSectors.style.display = 'flex';
+
+        // Lấy top 30 mã VN30 hoặc có vốn hóa/GTGD lớn nhất
+        const top30 = [...filtered].sort((a, b) => {
+          const valA = (a.value || 0) + (a.marketCap || 0) * 1e6;
+          const valB = (b.value || 0) + (b.marketCap || 0) * 1e6;
+          return valB - valA;
+        }).slice(0, 30);
+
+        let html = `
+          <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px;">
+            <div style="font-weight:700; font-size:13px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+              <span style="color:var(--text-primary);">⭐ Top 30 Cổ phiếu Trụ Dẫn dắt Thị trường (Dành cho người mới)</span>
+              <span style="font-size:11px; color:var(--text-muted);">Sắp xếp theo Dòng tiền & Vốn hóa</span>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(145px, 1fr)); gap:8px;">
         `;
 
-        sList.forEach(s => {
-          const origChg = s.change !== undefined && s.change !== null ? s.change : 0;
-          const chg = origChg * periodMult;
-          let bg = '#16a34a';
-          if (chg >= 6.8) bg = 'var(--price-ceil)';
-          else if (chg <= -6.8) bg = 'var(--price-floor)';
-          else if (chg < 0) bg = '#dc2626';
-          else if (chg === 0) bg = '#d97706';
-
-          const stockVal = s.value || ((s.volume || 1e6) * (s.price || 30000));
-          const basis = activeTreemapMetric === 'value'
-            ? Math.max(70, Math.min(130, Math.sqrt(stockVal / 1e9) * 9))
-            : Math.max(70, Math.min(130, ((s.marketCap || 30000) / 2500)));
-
-          const metricSub = activeTreemapMetric === 'value'
-            ? `${(stockVal / 1e9).toFixed(0)} tỷ`
-            : `${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%`;
+        top30.forEach(s => {
+          const chg = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
+          const isZero = Math.abs(chg) < 0.005;
+          const colTheme = getTreemapStockColor(chg);
+          const shortName = VN_STOCK_NAMES[s.symbol] || s.symbol;
+          const secName = getStockSector(s.symbol, s.sector);
+          const chgTxt = isZero ? '0.00%' : `${chg > 0 ? '+' : ''}${chg.toFixed(2)}%`;
+          const p = s.price || 0;
+          const valTy = ((s.value || ((s.volume || 1e6) * p)) / 1e9).toFixed(0);
 
           html += `
             <div onclick="openQuickModal('${s.symbol}')"
-                 title="${s.symbol} - ${s.exchange||'HOSE'}&#010;Giá: ${(s.price||0).toLocaleString('vi-VN')} đ (${chg>=0?'+':''}${chg.toFixed(2)}%)&#010;GTGD: ${(stockVal/1e9).toFixed(1)} tỷ&#010;Vốn hóa: ${(s.marketCap||0).toLocaleString('vi-VN')} tỷ"
-                 style="flex:1 1 ${basis}px;min-width:68px;height:56px;background:${bg};color:#fff;border-radius:4px;padding:4px 6px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer;transition:transform 0.12s, box-shadow 0.12s;box-shadow:0 1px 3px rgba(0,0,0,0.15);user-select:none;"
-                 onmouseover="this.style.transform='scale(1.03)';this.style.zIndex='2';"
-                 onmouseout="this.style.transform='none';this.style.zIndex='1';">
-              <div style="font-weight:800;font-size:12.5px;letter-spacing:0.3px;line-height:1.1;">${s.symbol}</div>
-              <div style="font-size:11px;font-weight:600;opacity:0.95;">${(s.price || 0).toLocaleString('vi-VN')}</div>
-              <div style="font-size:10px;font-weight:700;opacity:0.9;">${metricSub}</div>
+                 onmouseenter="inspectStock('${s.symbol}')"
+                 style="height:84px; background:${colTheme.bg}; color:${colTheme.text}; ${colTheme.glow} border-radius:4px; padding:6px 8px; display:flex; flex-direction:column; justify-content:space-between; cursor:pointer; transition:transform 0.12s, box-shadow 0.12s; user-select:none; text-shadow:0 1px 2px rgba(0,0,0,0.5);"
+                 onmouseover="this.style.transform='scale(1.02)'; this.style.zIndex='5';"
+                 onmouseout="this.style.transform='none'; this.style.zIndex='1';">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <span style="font-weight:800; font-size:14px; letter-spacing:0.3px;">${s.symbol}</span>
+                  <span style="font-size:8px; opacity:0.85; border:1px solid rgba(255,255,255,0.4); border-radius:2px; padding:0 3px; margin-left:2px;">VN30</span>
+                </div>
+                <div style="font-size:9.5px; opacity:0.85;">${secName}</div>
+              </div>
+              <div style="font-size:10px; opacity:0.9; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${shortName}</div>
+              <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <span style="font-size:12px; font-weight:800;">${p.toLocaleString('vi-VN')}</span>
+                <span style="font-size:11px; font-weight:800;">${chgTxt}</span>
+              </div>
+              <div style="font-size:9px; opacity:0.85; text-align:right;">GTGD: ${Number(valTy).toLocaleString('vi-VN')} tỷ</div>
             </div>
           `;
         });
@@ -9582,9 +10459,9 @@ body {
             </div>
           </div>
         `;
-      });
 
-      container.innerHTML = html;
+        containerSectors.innerHTML = html;
+      }
     }
 
     // SUBTAB 3: CUNG CẦU (LỰC MUA / BÁN CHỦ ĐỘNG)
@@ -10430,7 +11307,7 @@ body {
       }
 
       document.getElementById('subview_tongquan').style.display = subtab === 'tongquan' ? 'flex' : 'none';
-      document.getElementById('subview_bando').style.display = subtab === 'bando' ? 'block' : 'none';
+      document.getElementById('subview_bando').style.display = subtab === 'bando' ? 'flex' : 'none';
       document.getElementById('subview_cungcau').style.display = subtab === 'cungcau' ? 'block' : 'none';
       document.getElementById('subview_khoingoai').style.display = subtab === 'khoingoai' ? 'block' : 'none';
 
@@ -10440,7 +11317,10 @@ body {
       const faView = document.getElementById('subview_boloc_fa');
       if (faView) faView.style.display = subtab === 'boloc_fa' ? 'flex' : 'none';
 
-      if (subtab === 'bando') renderTreemap();
+      if (subtab === 'bando') {
+        renderTreemap();
+        setTimeout(renderTreemap, 30);
+      }
       else if (subtab === 'cungcau') renderActiveTrades();
       else if (subtab === 'khoingoai') renderForeignHistory();
       else if (subtab === 'tinhieu_ta') renderTASignals();
