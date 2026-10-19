@@ -2653,7 +2653,7 @@ body {
                       <span id="heroRefText" style="color:var(--price-ref); font-size:10px; white-space:nowrap;">Tham chiếu: 1.704,87</span>
                     </div>
                     <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
-                      <a id="heroIndexFireantLink" href="https://fireant.vn/charts?symbol=VNINDEX" target="_blank" rel="noopener noreferrer" class="btn-theme-toggle" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; text-decoration:none; display:inline-flex; align-items:center; gap:3px; color:var(--primary-brand); font-weight:600;" title="Mở biểu đồ chỉ số FireAnt toàn màn hình">FireAnt.vn ↗</a>
+                      <a id="heroIndexFireantLink" href="https://fireant.vn/ma-chung-khoan/VNINDEX" target="_blank" rel="noopener noreferrer" class="btn-theme-toggle" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; text-decoration:none; display:inline-flex; align-items:center; gap:3px; color:var(--primary-brand); font-weight:600;" title="Mở trang chỉ số FireAnt">FireAnt.vn ↗</a>
                       <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật FireAnt">Chi tiết</button>
                     </div>
                   </div>
@@ -2671,7 +2671,7 @@ body {
                   </div>
                   <!-- Chế độ 2: Biểu đồ nến FireAnt trực tiếp nhúng iframe -->
                   <div id="heroIntradayFireantWrap" style="flex:1; width:100%; display:none; min-height:155px; border-radius:var(--radius-sm); overflow:hidden; border:1px solid var(--border-stroke);">
-                    <iframe id="heroIndexFireantIframe" src="https://fireant.vn/charts?symbol=VNINDEX" style="width:100%; height:100%; min-height:155px; border:none; display:block;" title="Biểu đồ FireAnt Chỉ số"></iframe>
+                    <iframe id="heroIndexFireantIframe" src="https://fireant.vn/widgets/tv_chart?symbol=VNINDEX&theme=dark" style="width:100%; height:100%; min-height:155px; border:none; display:block;" title="Biểu đồ FireAnt Chỉ số"></iframe>
                   </div>
                 </div>
 
@@ -3991,11 +3991,13 @@ body {
       return `https://fireant.vn/ma-chung-khoan/${encodeURIComponent(s)}`;
     }
 
-    function getFireAntChartUrl(symbol) {
-      if (!symbol) return 'https://fireant.vn/charts';
+    function getFireAntChartUrl(symbol, theme) {
+      if (!symbol) symbol = 'VNINDEX';
       const s = String(symbol).trim().toUpperCase();
-      const clean = (s === 'HNXINDEX' ? 'HNX' : (s === 'UPCOMINDEX' ? 'UPCOM' : (s === 'VNI' ? 'VNINDEX' : s)));
-      return `https://fireant.vn/charts?symbol=${encodeURIComponent(clean)}`;
+      const clean = (s === 'HNXINDEX' ? 'HNX' : (s === 'UPCOMINDEX' ? 'UPCOM' : (s === 'VNI' || s === 'VN-INDEX' ? 'VNINDEX' : s)));
+      const isLight = document.body.classList.contains('light-theme') || (document.documentElement && document.documentElement.getAttribute('data-theme') === 'light');
+      const t = theme || (isLight ? 'light' : 'dark');
+      return `https://fireant.vn/widgets/tv_chart?symbol=${encodeURIComponent(clean)}&theme=${t}`;
     }
 
     // Danh mục 16 nhóm ngành đầy đủ và cổ phiếu thành phần đại diện
@@ -4144,8 +4146,16 @@ body {
         if (faWrap) faWrap.style.display = 'block';
         if (btnSvg) btnSvg.classList.remove('active');
         if (btnFa) btnFa.classList.add('active');
-        if (faIframe && (!faIframe.src || !faIframe.src.includes(cleanSym))) {
-          faIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(cleanSym)}`;
+        if (faIframe) {
+          const targetUrl = getFireAntChartUrl(cleanSym);
+          if (!faIframe.src || !faIframe.src.includes(`symbol=${encodeURIComponent(cleanSym)}`)) {
+            faIframe.src = targetUrl;
+          }
+          try {
+            if (faIframe.contentWindow) {
+              faIframe.contentWindow.postMessage(`loadChart:${cleanSym}`, '*');
+            }
+          } catch(e) {}
         }
       } else {
         if (svgWrap) svgWrap.style.display = 'flex';
@@ -6713,8 +6723,18 @@ body {
       const cleanFaSym = (idxKey === 'HNXINDEX' ? 'HNX' : (idxKey === 'UPCOMINDEX' ? 'UPCOM' : idxKey));
       const heroFaIframe = document.getElementById('heroIndexFireantIframe');
       const heroFaLink = document.getElementById('heroIndexFireantLink');
-      if (heroFaIframe) heroFaIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(cleanFaSym)}`;
-      if (heroFaLink) heroFaLink.href = `https://fireant.vn/charts?symbol=${encodeURIComponent(cleanFaSym)}`;
+      if (heroFaIframe) {
+        const targetUrl = getFireAntChartUrl(cleanFaSym);
+        if (!heroFaIframe.src || !heroFaIframe.src.includes(`symbol=${encodeURIComponent(cleanFaSym)}`)) {
+          heroFaIframe.src = targetUrl;
+        }
+        try {
+          if (heroFaIframe.contentWindow) {
+            heroFaIframe.contentWindow.postMessage(`loadChart:${cleanFaSym}`, '*');
+          }
+        } catch(e) {}
+      }
+      if (heroFaLink) heroFaLink.href = getFireAntStockUrl(cleanFaSym);
 
       // 2. Tải chuỗi điểm Intraday 1-minute thực tế cho chỉ số này từ API DNSE / VNDirect feed
       if (typeof fetchDNSEIntraday === 'function') {
@@ -7671,7 +7691,15 @@ body {
       }
       const faIframe = document.getElementById('stockDetailFireantIframe');
       if (faIframe && typeof getFireAntChartUrl === 'function') {
-        faIframe.src = getFireAntChartUrl(sym);
+        const targetUrl = getFireAntChartUrl(sym);
+        if (!faIframe.src || !faIframe.src.includes(`symbol=${encodeURIComponent(sym)}`)) {
+          faIframe.src = targetUrl;
+        }
+        try {
+          if (faIframe.contentWindow) {
+            faIframe.contentWindow.postMessage(`loadChart:${sym}`, '*');
+          }
+        } catch(e) {}
       }
     }
 
@@ -7795,7 +7823,15 @@ body {
       // Cập nhật iframe FireAnt theo đúng mã cổ phiếu được chọn (phục vụ tab phụ FireAnt Web)
       const fireantIframe = document.getElementById('stockDetailFireantIframe');
       if (fireantIframe) {
-        fireantIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(upperSym)}`;
+        const targetUrl = getFireAntChartUrl(upperSym);
+        if (!fireantIframe.src || !fireantIframe.src.includes(`symbol=${encodeURIComponent(upperSym)}`)) {
+          fireantIframe.src = targetUrl;
+        }
+        try {
+          if (fireantIframe.contentWindow) {
+            fireantIframe.contentWindow.postMessage(`loadChart:${upperSym}`, '*');
+          }
+        } catch(e) {}
       }
 
       // Đặt subview mặc định là Biểu đồ Kỹ thuật Pro để đảm bảo khớp 100% mã cổ phiếu, không lệch mã
@@ -8172,7 +8208,7 @@ body {
 
                 <!-- VIEW 2: BIỂU ĐỒ NẾN FIREANT IFRAME -->
                 <div id="candleFireantWrapper" style="display:${currentCandleSubView === 'fireant' ? 'block' : 'none'}; position:relative; width:100%; height:460px; background:var(--bg-subtle); border-radius:var(--radius-sm); border:1px solid var(--border-stroke); overflow:hidden;">
-                  <iframe id="stockDetailFireantIframe" src="${typeof getFireAntChartUrl === 'function' ? getFireAntChartUrl(stock.symbol) : `https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}`}" style="width:100%; height:100%; border:none; display:block;" allowfullscreen title="Biểu đồ nến FireAnt"></iframe>
+                  <iframe id="stockDetailFireantIframe" src="${typeof getFireAntChartUrl === 'function' ? getFireAntChartUrl(stock.symbol) : `https://fireant.vn/widgets/tv_chart?symbol=${encodeURIComponent(stock.symbol)}&theme=dark`}" style="width:100%; height:100%; border:none; display:block;" allowfullscreen title="Biểu đồ nến FireAnt"></iframe>
                 </div>
               </div>
             </div>
@@ -8411,8 +8447,17 @@ body {
         if (btnRobo) btnRobo.classList.remove('active');
         if (chartBadge) chartBadge.textContent = 'FireAnt Web';
         const iframe = document.getElementById('stockDetailFireantIframe');
-        if (iframe && currentStockDetailSymbol && !iframe.src.includes(encodeURIComponent(currentStockDetailSymbol))) {
-          iframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(currentStockDetailSymbol)}`;
+        const sym = (currentStockDetailSymbol || 'VNINDEX').toUpperCase();
+        if (iframe) {
+          const targetUrl = getFireAntChartUrl(sym);
+          if (!iframe.src || !iframe.src.includes(`symbol=${encodeURIComponent(sym)}`)) {
+            iframe.src = targetUrl;
+          }
+          try {
+            if (iframe.contentWindow) {
+              iframe.contentWindow.postMessage(`loadChart:${sym}`, '*');
+            }
+          } catch(e) {}
         }
       } else {
         if (faWrap) faWrap.style.display = 'none';
@@ -10359,7 +10404,15 @@ body {
 
         const fireantIframe = document.getElementById('stockDetailFireantIframe');
         if (fireantIframe) {
-          fireantIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(targetSym)}`;
+          const targetUrl = getFireAntChartUrl(targetSym);
+          if (!fireantIframe.src || !fireantIframe.src.includes(`symbol=${encodeURIComponent(targetSym)}`)) {
+            fireantIframe.src = targetUrl;
+          }
+          try {
+            if (fireantIframe.contentWindow) {
+              fireantIframe.contentWindow.postMessage(`loadChart:${targetSym}`, '*');
+            }
+          } catch(e) {}
         }
         if (isRobo && typeof drawDnseStockCandleChart === 'function') {
           drawDnseStockCandleChart(targetSym, currentDetailCandleRes);
