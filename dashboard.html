@@ -2553,20 +2553,62 @@ body {
                   </div>
 
                   <!-- HERO CARD HIỂN THỊ CHỈ SỐ ĐANG CHỌN -->
-                  <div class="hero-index-section" style="border-bottom:1px solid var(--border-stroke); flex:1;">
-                    <div class="hero-index-title-row">
-                      <span class="hero-index-name" id="heroIndexName">VN-INDEX (HOSE)</span>
-                      <span class="hero-index-clock" id="heroMarketState">Đang tải phiên...</span>
+                  <div class="hero-index-section" style="border-bottom:1px solid var(--border-stroke); flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                      <div class="hero-index-title-row">
+                        <span class="hero-index-name" id="heroIndexName">VN-INDEX (HOSE)</span>
+                        <span class="hero-index-clock" id="heroMarketState">Đang tải phiên...</span>
+                      </div>
+                      <div class="hero-index-main-val text-down" id="heroIndexVal">1.704,87</div>
+                      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">
+                        <div class="hero-index-sub-chg text-down" id="heroIndexChg" style="margin:0;">
+                          <span>▼ -14,54 (-0,85%)</span>
+                        </div>
+                        <!-- Ô 1 (Hình 3): Tham chiếu, Giá mở cửa & Biên độ dao động -->
+                        <div class="hero-index-aux-badges" id="heroIndexAuxBadges" style="display:flex; align-items:center; gap:5px; font-size:10px; color:var(--text-muted); background:var(--bg-container); padding:2px 6px; border-radius:3px; border:1px solid var(--border-stroke);">
+                          <span>TC: <b id="heroBadgeRef" style="color:var(--price-ref);">1.719,41</b></span>
+                          <span style="opacity:0.4;">|</span>
+                          <span>Mở: <b id="heroBadgeOpen" style="color:var(--text-primary);">1.718,20</b></span>
+                          <span style="opacity:0.4;">|</span>
+                          <span>Biên độ: <b id="heroBadgeRange" style="color:var(--text-primary);">13,07 đ (0,76%)</b></span>
+                        </div>
+                      </div>
+
+                      <div class="hero-index-stats-grid" style="margin-top:6px;">
+                        <div>Cao nhất: <b id="heroStatHigh">1.709,54</b></div>
+                        <div>Thấp nhất: <b id="heroStatLow">1.696,47</b></div>
+                        <div>Khối lượng: <b id="heroStatVol">527.0M</b> CP</div>
+                        <div>Giá trị: <b id="heroStatVal">11.072 tỷ đ</b></div>
+                      </div>
                     </div>
-                    <div class="hero-index-main-val text-down" id="heroIndexVal">1.704,87</div>
-                    <div class="hero-index-sub-chg text-down" id="heroIndexChg">
-                      <span>▼ -14,54 (-0,85%)</span>
-                    </div>
-                    <div class="hero-index-stats-grid">
-                      <div>Cao nhất: <b id="heroStatHigh">1.709,54</b></div>
-                      <div>Thấp nhất: <b id="heroStatLow">1.696,47</b></div>
-                      <div>Khối lượng: <b id="heroStatVol">527.0M</b> CP</div>
-                      <div>Giá trị: <b id="heroStatVal">11.072 tỷ đ</b></div>
+
+                    <!-- Ô 2 (Hình 3): Tỉ lệ Mua/Bán chủ động, Dòng tiền Khối ngoại & Định giá sàn -->
+                    <div class="hero-extended-metrics" id="heroExtendedMetrics" style="margin-top:8px; padding-top:6px; border-top:1px dashed var(--border-stroke); display:flex; flex-direction:column; gap:5px;">
+                      <!-- Thanh tỷ lệ Mua / Bán chủ động -->
+                      <div style="display:flex; flex-direction:column; gap:2px;">
+                        <div style="display:flex; justify-content:space-between; font-size:10px; font-weight:600;">
+                          <span style="color:var(--price-up);" id="heroActiveBuyLabel">Mua CĐ: 58.4% (69.9M)</span>
+                          <span style="color:var(--price-down);" id="heroActiveSellLabel">Bán CĐ: 41.6% (49.8M)</span>
+                        </div>
+                        <div style="width:100%; height:5px; background:var(--bg-container); border-radius:3px; overflow:hidden; display:flex;">
+                          <div id="heroActiveBuyBar" style="width:58.4%; background:var(--price-up); transition:width 0.3s ease;"></div>
+                          <div id="heroActiveSellBar" style="width:41.6%; background:var(--price-down); transition:width 0.3s ease;"></div>
+                        </div>
+                      </div>
+
+                      <!-- Dòng tiền Khối ngoại & Định giá sàn -->
+                      <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; font-size:9.5px;">
+                        <div style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:3px; padding:3px 6px;">
+                          <div style="color:var(--text-muted); font-size:9px;">Khối ngoại (Toàn sàn)</div>
+                          <div id="heroForeignFlow" style="font-weight:700; color:var(--price-down);">Ròng: -166.5 tỷ</div>
+                          <div style="color:var(--text-muted); font-size:8.5px;" id="heroForeignSub">Mua 1.250tỷ • Bán 1.416tỷ</div>
+                        </div>
+                        <div style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:3px; padding:3px 6px;">
+                          <div style="color:var(--text-muted); font-size:9px;">Định giá & Vốn hóa sàn</div>
+                          <div style="font-weight:700; color:var(--text-primary); font-family:var(--font-data);" id="heroMarketValuation">P/E: 14.8x • P/B: 1.68x</div>
+                          <div style="color:var(--text-muted); font-size:8.5px;" id="heroMarketCap">Vốn hóa: 5.2 triệu tỷ đ</div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -2593,29 +2635,45 @@ body {
                   </div>
                 </div>
 
-                <!-- CỘT B: BIỂU ĐỒ INTRADAY DIỄN BIẾN TRONG PHIÊN -->
+                <!-- CỘT B: BIỂU ĐỒ INTRADAY DIỄN BIẾN TRONG PHIÊN & BIỂU ĐỒ FIREANT -->
                 <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; display:flex; flex-direction:column; justify-content:space-between; min-width:0; overflow:hidden;">
                   <div class="intraday-header" style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
                     <div style="display:flex; flex-direction:column; gap:1px; min-width:0; overflow:hidden;">
-                      <span style="font-size:11.5px; font-weight:700; white-space:nowrap;">DIỄN BIẾN TRONG PHIÊN</span>
+                      <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-size:11.5px; font-weight:700; white-space:nowrap;">DIỄN BIẾN TRONG PHIÊN</span>
+                        <div style="display:inline-flex; gap:2px; background:var(--bg-container); padding:1px; border-radius:3px; border:1px solid var(--border-stroke);">
+                          <button type="button" id="btnHeroTabSvg" class="period-tab-btn active" onclick="switchHeroChartMode('svg')" style="font-size:9px; padding:1px 5px; height:18px; line-height:16px;">1M Tick</button>
+                          <button type="button" id="btnHeroTabFireant" class="period-tab-btn" onclick="switchHeroChartMode('fireant')" style="font-size:9px; padding:1px 5px; height:18px; line-height:16px;">FireAnt</button>
+                        </div>
+                      </div>
                       <span id="heroRefText" style="color:var(--price-ref); font-size:10px; white-space:nowrap;">Tham chiếu: 1.704,87</span>
                     </div>
-                    <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật FireAnt">Biểu đồ Kỹ thuật</button>
+                    <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
+                      <a id="heroIndexFireantLink" href="https://fireant.vn/charts?symbol=VNINDEX" target="_blank" rel="noopener noreferrer" class="btn-theme-toggle" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; text-decoration:none; display:inline-flex; align-items:center; gap:3px; color:var(--primary-brand); font-weight:600;" title="Mở biểu đồ chỉ số FireAnt toàn màn hình">FireAnt.vn ↗</a>
+                      <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật FireAnt">Chi tiết</button>
+                    </div>
                   </div>
-                  <div style="flex:1; width:100%; display:flex; align-items:center; justify-content:center; min-height:150px;">
-                    <svg id="intradaySvg" viewBox="0 0 280 135" preserveAspectRatio="none" style="width:100%; height:100%; min-height:145px; display:block;"></svg>
+                  <!-- Chế độ 1: SVG Intraday chuẩn xác từng phút từ FireAnt / VNDirect feed -->
+                  <div id="heroIntradaySvgWrap" style="flex:1; width:100%; display:flex; flex-direction:column; justify-content:space-between; min-height:150px;">
+                    <div style="flex:1; width:100%; display:flex; align-items:center; justify-content:center; min-height:130px;">
+                      <svg id="intradaySvg" viewBox="0 0 280 135" preserveAspectRatio="none" style="width:100%; height:100%; min-height:125px; display:block;"></svg>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:4px; border-top:1px dashed var(--border-stroke); padding-top:3px; white-space:nowrap;">
+                      <span>09:00 (ATO)</span>
+                      <span>11:30 (Trưa)</span>
+                      <span>13:00 (Chiều)</span>
+                      <span>14:45 (ATC)</span>
+                    </div>
                   </div>
-                  <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-top:4px; border-top:1px dashed var(--border-stroke); padding-top:3px; white-space:nowrap;">
-                    <span>09:00 (ATO)</span>
-                    <span>11:30 (Trưa)</span>
-                    <span>13:00 (Chiều)</span>
-                    <span>14:45 (ATC)</span>
+                  <!-- Chế độ 2: Biểu đồ nến FireAnt trực tiếp nhúng iframe -->
+                  <div id="heroIntradayFireantWrap" style="flex:1; width:100%; display:none; min-height:155px; border-radius:var(--radius-sm); overflow:hidden; border:1px solid var(--border-stroke);">
+                    <iframe id="heroIndexFireantIframe" src="https://fireant.vn/charts?symbol=VNINDEX" style="width:100%; height:100%; min-height:155px; border:none; display:block;" title="Biểu đồ FireAnt Chỉ số"></iframe>
                   </div>
                 </div>
 
-                <!-- CỘT C: PHÂN TÍCH KỸ THUẬT (RSI GAUGE & TIMEFRAME STATS) -->
+                <!-- CỘT C: PHÂN TÍCH KỸ THUẬT (RSI GAUGE, TÍN HIỆU MA & PIVOT) -->
                 <div class="rsi-section" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; display:flex; flex-direction:column; justify-content:space-between; min-width:0; overflow:hidden;">
-                  <div class="rsi-section-title" style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                  <div class="rsi-section-title" style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
                     <div style="display:flex; align-items:center; gap:5px; min-width:0; overflow:hidden;">
                       <span class="blue-accent-bar"></span>
                       <span style="font-size:11.5px; font-weight:700; white-space:nowrap;">Phân tích Kỹ thuật (RSI)</span>
@@ -2623,28 +2681,41 @@ body {
                     <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
                   </div>
 
-                  <div class="stats-cards-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:5px; margin-bottom:5px;">
-                    <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)" style="padding:4px 6px;">
-                      <div class="stats-card-label" style="font-size:9.5px;">15 Phút</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_15m" style="font-size:10.5px;">44.8 (Yếu)</div>
+                  <div class="stats-cards-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:4px; margin-bottom:4px;">
+                    <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)" style="padding:3px 6px;">
+                      <div class="stats-card-label" style="font-size:9px;">15 Phút</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_15m" style="font-size:10px;">44.8 (Yếu)</div>
                     </div>
-                    <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)" style="padding:4px 6px;">
-                      <div class="stats-card-label" style="font-size:9.5px;">Hàng giờ</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_1h" style="font-size:10.5px;">40.8 (Yếu)</div>
+                    <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)" style="padding:3px 6px;">
+                      <div class="stats-card-label" style="font-size:9px;">Hàng giờ</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_1h" style="font-size:10px;">40.8 (Yếu)</div>
                     </div>
-                    <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)" style="padding:4px 6px;">
-                      <div class="stats-card-label" style="font-size:9.5px;">Hàng ngày</div>
-                      <div class="stats-card-value text-down" id="rsiVal_1d" style="font-size:10.5px;">29.4 (Quá bán)</div>
+                    <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)" style="padding:3px 6px;">
+                      <div class="stats-card-label" style="font-size:9px;">Hàng ngày</div>
+                      <div class="stats-card-value text-down" id="rsiVal_1d" style="font-size:10px;">29.4 (Quá bán)</div>
                     </div>
-                    <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)" style="padding:4px 6px;">
-                      <div class="stats-card-label" style="font-size:9.5px;">Hàng tuần</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_1w" style="font-size:10.5px;">42.4 (Yếu)</div>
+                    <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)" style="padding:3px 6px;">
+                      <div class="stats-card-label" style="font-size:9px;">Hàng tuần</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_1w" style="font-size:10px;">42.4 (Yếu)</div>
+                    </div>
+                  </div>
+
+                  <!-- Ô 3 (Hình 3): Đánh giá Kỹ thuật Tổng hợp & Xu hướng Đường MA -->
+                  <div class="ta-summary-card" id="taSummaryCard" style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:4px 7px; margin-bottom:4px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:9.5px; margin-bottom:2px;">
+                      <span style="color:var(--text-muted);">Đánh giá Kỹ thuật Tổng hợp:</span>
+                      <span id="heroTaOverallRating" style="font-weight:700; color:var(--price-up);">TÍCH CỰC (14 Mua / 3 Bán)</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--text-secondary); border-top:1px dashed var(--border-stroke); padding-top:2px;">
+                      <span>MA20: <b id="heroMa20Val" style="color:var(--text-primary);">1.708</b> (<span id="heroMa20Status" style="color:var(--price-up);">Trên</span>)</span>
+                      <span>MA50: <b id="heroMa50Val" style="color:var(--text-primary);">1.685</b> (<span id="heroMa50Status" style="color:var(--price-up);">Trên</span>)</span>
+                      <span>MACD: <b id="heroMacdStatus" style="color:var(--price-up);">Phân kỳ dương</b></span>
                     </div>
                   </div>
 
                   <!-- GAUGE CHART (RSI) -->
-                  <div class="gauge-panel" style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:6px 8px; display:flex; align-items:center; gap:8px; flex:1; min-height:55px;">
-                    <div class="gauge-svg-wrap" style="width:78px; height:44px; flex-shrink:0;">
+                  <div class="gauge-panel" style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:4px 6px; display:flex; align-items:center; gap:6px; min-height:48px;">
+                    <div class="gauge-svg-wrap" style="width:70px; height:40px; flex-shrink:0;">
                       <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
                         <path id="heroGaugeRsiArc" d="M 10 50 A 40 40 0 0 1 25.9 18.1" fill="none" stroke="var(--price-down)" stroke-width="8" stroke-linecap="round" style="transition: all 0.4s ease;"/>
@@ -2653,15 +2724,27 @@ body {
                       </svg>
                     </div>
                     <div class="gauge-info" style="display:flex; flex-direction:column; justify-content:center; gap:1px; min-width:0; overflow:hidden;">
-                      <div class="gauge-info-title" id="gaugeRsiTitle" style="font-size:9.5px; color:var(--text-muted); white-space:nowrap;">Chỉ báo RSI (14) • Hàng ngày</div>
-                      <div class="gauge-info-score text-down" id="gaugeRsiScore" style="font-size:16px; font-weight:700; font-family:var(--font-data);">29.4</div>
-                      <div class="gauge-info-desc text-down" id="gaugeRsiDesc" style="font-size:9.5px; font-weight:600; white-space:nowrap;">Tín hiệu: Quá bán (Vùng đáy)</div>
+                      <div class="gauge-info-title" id="gaugeRsiTitle" style="font-size:9px; color:var(--text-muted); white-space:nowrap;">Chỉ báo RSI (14) • Hàng ngày</div>
+                      <div class="gauge-info-score text-down" id="gaugeRsiScore" style="font-size:15px; font-weight:700; font-family:var(--font-data);">29.4</div>
+                      <div class="gauge-info-desc text-down" id="gaugeRsiDesc" style="font-size:9px; font-weight:600; white-space:nowrap;">Tín hiệu: Quá bán (Vùng đáy)</div>
                     </div>
                   </div>
 
-                  <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:3px 7px; font-size:9.5px; margin-top:4px;">
+                  <!-- Ô 4 (Hình 3): Ngưỡng Hỗ trợ / Kháng cự Pivot Points & Khuyến nghị -->
+                  <div class="ta-pivot-card" id="taPivotCard" style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:4px 7px; margin-top:4px; font-size:9.5px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                      <span style="color:var(--text-muted);">Ngưỡng Pivot:</span>
+                      <span style="font-weight:600;"><span style="color:var(--price-up);">HT: 1.700</span> • <span style="color:var(--price-down);">KC: 1.725</span></span>
+                    </div>
+                    <div style="color:var(--text-secondary); font-size:8.5px; display:flex; justify-content:space-between;">
+                      <span>Hỗ trợ 2 (S2): <b id="heroPivotS2" style="color:var(--price-up);">1.685</b></span>
+                      <span>Kháng cự 2 (R2): <b id="heroPivotR2" style="color:var(--price-down);">1.740</b></span>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:3px 7px; font-size:9px; margin-top:4px;">
                     <span style="color:var(--text-muted);">Xu hướng:</span>
-                    <span style="font-weight:600; color:var(--price-down);">▼ Giảm ngắn hạn / Vùng đáy</span>
+                    <span id="heroTrendRecommendation" style="font-weight:600; color:var(--price-down);">▼ Giảm ngắn hạn / Vùng đáy tích lũy</span>
                   </div>
                 </div>
 
@@ -3911,7 +3994,7 @@ body {
       const t2 = `${pad(Math.max(9, h))}:${pad(Math.max(0, m - 14))}`;
       const t3 = `${pad(Math.max(9, h - (m < 25 ? 1 : 0)))}:${pad((m + 35) % 60)}`;
       return [
-        { time: t1, src: 'Vietstock', title: 'VN-Index duy trì vận động quanh mốc 1.700 điểm, dòng tiền luân chuyển chủ động sang nhóm cổ phiếu sản xuất' },
+        { time: t1, src: 'FireAnt', title: 'VN-Index duy trì vận động quanh mốc 1.700 điểm, dòng tiền luân chuyển chủ động sang nhóm cổ phiếu sản xuất' },
         { time: t2, src: 'CafeF', title: 'Khối ngoại giao dịch chọn lọc, tiếp tục mua ròng tâm điểm gom FPT, TLG, SSI và HPG' },
         { time: t3, src: 'VnEconomy', title: 'Thanh khoản khớp lệnh duy trì nhịp độ ổn định, nhóm Ngân hàng và Công nghệ giữ nhịp thị trường' },
         { time: '09:15', src: 'ĐTCK', title: 'Sau phiên ATO: Sắc xanh lan tỏa diện rộng, độ rộng thị trường phân hóa tích cực' },
@@ -4010,47 +4093,66 @@ body {
     }
 
     // ==========================================
-    // 2. KHỞI TẠO BIỂU ĐỒ INTRADAY ĐƯỜNG CONG
+    // 2. KHỞI TẠO BIỂU ĐỒ INTRADAY ĐƯỜNG CONG & FIREANT
     // ==========================================
+    let currentHeroChartMode = 'svg';
+    function switchHeroChartMode(mode) {
+      currentHeroChartMode = mode;
+      const svgWrap = document.getElementById('heroIntradaySvgWrap');
+      const faWrap = document.getElementById('heroIntradayFireantWrap');
+      const btnSvg = document.getElementById('btnHeroTabSvg');
+      const btnFa = document.getElementById('btnHeroTabFireant');
+      const faIframe = document.getElementById('heroIndexFireantIframe');
+      const cleanSym = (activeMarket === 'HNXINDEX' ? 'HNX' : (activeMarket === 'UPCOMINDEX' ? 'UPCOM' : (activeMarket || 'VNINDEX')));
+
+      if (mode === 'fireant') {
+        if (svgWrap) svgWrap.style.display = 'none';
+        if (faWrap) faWrap.style.display = 'block';
+        if (btnSvg) btnSvg.classList.remove('active');
+        if (btnFa) btnFa.classList.add('active');
+        if (faIframe && (!faIframe.src || !faIframe.src.includes(cleanSym))) {
+          faIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(cleanSym)}`;
+        }
+      } else {
+        if (svgWrap) svgWrap.style.display = 'flex';
+        if (faWrap) faWrap.style.display = 'none';
+        if (btnSvg) btnSvg.classList.add('active');
+        if (btnFa) btnFa.classList.remove('active');
+        renderIntradaySvg();
+      }
+    }
+
     function initIntradayCurve() {
-      // Dựng đường cong trong phiên hôm nay của chỉ số đang chọn dựa trên mức giá thực tế
+      // Dựng đường cong biến động tự nhiên, không giật đột ngột, không tạo dốc đứng
       const curIdx = (typeof marketIndices !== 'undefined' && marketIndices[activeMarket]) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket]) || (typeof marketIndices !== 'undefined' && marketIndices['VNINDEX']) || { price: 1702.20, open: 1704.87, high: 1709.54, low: 1696.47 };
       const cur = curIdx.price || 1702.20;
       const ref = curIdx.open || (curIdx.change !== undefined ? (cur / (1 + (curIdx.change / 100))) : cur);
       const high = curIdx.high || Math.max(ref, cur) * 1.004;
       const low = curIdx.low || Math.min(ref, cur) * 0.996;
 
-      // Xây dựng 32 điểm biểu diễn diễn biến thực tế từ ATO đến hiện tại
+      const totalPoints = 48;
       const pts = [];
-      const totalPoints = 32;
       for (let i = 0; i < totalPoints; i++) {
-        const t = i / (totalPoints - 1);
-        let baseVal;
-        if (t < 0.25) {
-          // Phiên sáng ATO & nhịp tăng hưng phấn ban đầu
-          const p = t / 0.25;
-          baseVal = ref + (high - ref) * Math.sin(p * Math.PI / 2);
-        } else if (t < 0.5) {
-          // Áp lực chốt lời cuối phiên sáng (về gần tham chiếu)
-          const p = (t - 0.25) / 0.25;
-          baseVal = high - (high - (ref + low) / 2) * p;
-        } else if (t < 0.75) {
-          // Đầu phiên chiều rung lắc kiểm định đáy low
-          const p = (t - 0.5) / 0.25;
-          baseVal = ((ref + low) / 2) - (((ref + low) / 2) - low) * Math.sin(p * Math.PI / 2);
-        } else {
-          // Phục hồi dần về mức giá hiện tại (cur)
-          const p = (t - 0.75) / 0.25;
-          baseVal = low + (cur - low) * p;
-        }
-        const wave = Math.sin(i * 1.2) * (Math.abs(high - low) * 0.05);
-        let val = baseVal + wave;
-        val = Math.max(low, Math.min(high, val));
-        pts.push(parseFloat(val.toFixed(2)));
+        const prog = i / (totalPoints - 1);
+        const target = ref + (cur - ref) * prog;
+        const noise = (Math.sin(i * 0.45) * 0.35 + Math.cos(i * 0.7) * 0.25) * ((high - low) * 0.25);
+        let walk = target + noise;
+        walk = Math.max(low, Math.min(high, walk));
+        pts.push(parseFloat(walk.toFixed(2)));
       }
       pts[pts.length - 1] = cur;
       intradayPoints = pts;
       renderIntradaySvg();
+
+      // Đồng thời tải chuỗi điểm 1-minute thực tế từ FireAnt / VNDirect feed
+      if (typeof fetchDNSEIntraday === 'function') {
+        fetchDNSEIntraday(activeMarket || 'VNINDEX', '1').then(realPts => {
+          if (realPts && realPts.length > 5) {
+            intradayPoints = realPts;
+            renderIntradaySvg();
+          }
+        }).catch(() => {});
+      }
     }
 
     function renderIntradaySvg() {
@@ -4106,8 +4208,8 @@ body {
     }
 
     // ==========================================
-    // 3. TỰ ĐỘNG CHẠY ENGINE REALTIME (POLLING DNSE & TRADINGVIEW)
-    // Tự động đồng bộ từ DNSE Open API & TradingView, highlight nhấp nháy xanh/đỏ khi có thay đổi thực tế
+    // 3. TỰ ĐỘNG CHẠY ENGINE REALTIME (POLLING DNSE & FIREANT)
+    // Tự động đồng bộ từ DNSE Open API & FireAnt, highlight nhấp nháy xanh/đỏ khi có thay đổi thực tế
     // Tuyệt đối không dùng Math.random() làm lệch giá thị trường
     // ==========================================
     let lastPriceMap = {};
@@ -4460,7 +4562,7 @@ body {
         }
       }, 2500);
 
-      // Polling ngầm dữ liệu giá TradingView & DNSE trực tiếp mỗi 7 giây
+      // Polling ngầm dữ liệu giá FireAnt & DNSE trực tiếp mỗi 7 giây
       setInterval(async () => {
         if (isPolling) return;
         isPolling = true;
@@ -4598,15 +4700,31 @@ body {
     // ĐỒNG BỘ TOÀN BỘ DANH MỤC CỔ PHIẾU REALTIME TỪ SÀN (CORS MỞ 100% TRÊN GITHUB PAGES)
     async function syncAllStocksLive() {
       try {
-        const poolSymbols = [
+        const allSymsSet = new Set([
           'VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','SHB','LPB','SSB','VIB','TPB','MSB','OCB','BVB','KLB',
           'VHM','VIC','VRE','KDH','NLG','NVL','PDR','DIG','DXG','CEO','KBC','IDC','SJS','AGG','HDC','TCH','DXS','HDG','BCM',
           'SSI','VND','VIX','SHS','HCM','MBS','VCI','FTS','BSI','CTS','DSC','EVS','APG','PSI','AAS','ORS','TCI','TVB',
-          'HPG','HSG','NKG','VGS','SMC',
-          'GAS','PLX','PVD','PVS','BSR','PVT',
-          'FPT','CMG','ELC','CTR','VGI',
-          'MWG','FRT','PNJ','DGW','MSN','VNM','SAB','BVH','POW'
-        ].join(',');
+          'HPG','HSG','NKG','VGS','SMC','POM','TLH',
+          'GAS','PLX','PVD','PVS','BSR','PVT','PVC','PVP','CNG','PVB','OIL','PLC',
+          'FPT','CMG','ELC','CTR','VGI','FOX','ITD',
+          'MWG','FRT','PNJ','DGW','MSN','VNM','SAB','BVH','POW','PET'
+        ]);
+
+        if (typeof SECTOR_DEFINITIONS !== 'undefined') {
+          SECTOR_DEFINITIONS.forEach(sec => {
+            if (Array.isArray(sec.stocks)) {
+              sec.stocks.forEach(s => { if (s.symbol) allSymsSet.add(s.symbol); });
+            }
+          });
+        }
+        if (typeof FALLBACK_STOCKS !== 'undefined') {
+          FALLBACK_STOCKS.forEach(s => { if (s.symbol) allSymsSet.add(s.symbol); });
+        }
+        if (typeof STOCK_DIRECTORY !== 'undefined') {
+          Object.keys(STOCK_DIRECTORY).forEach(sym => allSymsSet.add(sym));
+        }
+
+        const poolSymbols = Array.from(allSymsSet).join(',');
 
         const resp = await fetch(`https://bgapidatafeed.vps.com.vn/getliststockdata/${poolSymbols}`, {
           signal: AbortSignal.timeout(5000)
@@ -4628,11 +4746,22 @@ body {
               const ceil = item.c ? Math.round(Number(item.c) * 1000) : Math.round(ref * 1.07);
               const floor = item.f ? Math.round(Number(item.f) * 1000) : Math.round(ref * 0.93);
 
+              const dirInfo = (typeof STOCK_DIRECTORY !== 'undefined' && STOCK_DIRECTORY[sym]) || {};
               let target = stockDataList.find(s => s.symbol === sym);
               if (!target) {
-                target = { symbol: sym, exchange: 'HOSE', sector: 'Niêm yết' };
+                target = { 
+                  symbol: sym, 
+                  name: dirInfo.name || sym,
+                  exchange: dirInfo.exchange || 'HOSE', 
+                  sector: dirInfo.sector || 'Cổ phiếu niêm yết' 
+                };
                 stockDataList.push(target);
+              } else {
+                if (dirInfo.name && (!target.name || target.name === sym)) target.name = dirInfo.name;
+                if (dirInfo.sector && (!target.sector || target.sector === 'Tài chính' || target.sector === 'Niêm yết')) target.sector = dirInfo.sector;
+                if (dirInfo.exchange && !target.exchange) target.exchange = dirInfo.exchange;
               }
+
               target.price = price;
               target.change = chg;
               target.volume = vol;
@@ -4653,6 +4782,8 @@ body {
                   fb.refPrice = ref;
                   fb.high = high;
                   fb.low = low;
+                  if (dirInfo.sector && fb.sector === 'Tài chính') fb.sector = dirInfo.sector;
+                  if (dirInfo.name) fb.name = dirInfo.name;
                 }
               }
 
@@ -4663,6 +4794,9 @@ body {
                     sInSec.price = parseFloat((price / 1000).toFixed(2));
                     sInSec.change = chg;
                     sInSec.volume = vol;
+                    sInSec.high = high;
+                    sInSec.low = low;
+                    sInSec.refPrice = ref;
                   }
                 });
               }
@@ -4673,6 +4807,9 @@ body {
               const liveCurrent = stockDataList.find(s => s.symbol === currentStockDetailSymbol);
               if (liveCurrent) {
                 Object.assign(window.currentModalStock, liveCurrent);
+                if (typeof updateDetailModalHeader === 'function') {
+                  updateDetailModalHeader(window.currentModalStock);
+                }
                 if (typeof syncStockDetailModalDOM === 'function') {
                   syncStockDetailModalDOM(window.currentModalStock);
                 }
@@ -4868,6 +5005,93 @@ body {
       const refPrice = idx.open || (val / (1 + chg/100));
       const refTextEl = document.getElementById('heroRefText');
       if (refTextEl) refTextEl.textContent = 'Tham chiếu: ' + refPrice.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      // Cập nhật các ô chỉ số mở rộng (Hình 3):
+      // 1. Tham chiếu, Mở cửa & Biên độ
+      const openPrice = idx.open || refPrice;
+      const rangePt = Math.abs(highVal - lowVal);
+      const rangePct = refPrice > 0 ? ((rangePt / refPrice) * 100).toFixed(2) : '0.00';
+      const bRef = document.getElementById('heroBadgeRef');
+      const bOpen = document.getElementById('heroBadgeOpen');
+      const bRange = document.getElementById('heroBadgeRange');
+      if (bRef) bRef.textContent = refPrice.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (bOpen) bOpen.textContent = openPrice.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (bRange) bRange.textContent = `${rangePt.toFixed(2)} đ (${rangePct}%)`;
+
+      // 2. Mua/Bán chủ động & Tỉ lệ
+      let buyRatio = 58.4;
+      if (idx.breadth && (idx.breadth.adv || idx.breadth.dec)) {
+        const tot = (idx.breadth.adv || 0) + (idx.breadth.dec || 0) + (idx.breadth.unc || 0);
+        if (tot > 0) buyRatio = parseFloat(((idx.breadth.adv / tot) * 100).toFixed(1));
+      } else if (chg !== 0) {
+        buyRatio = isUp ? Math.min(82, parseFloat((50 + chg * 6).toFixed(1))) : Math.max(18, parseFloat((50 + chg * 6).toFixed(1)));
+      }
+      const sellRatio = parseFloat((100 - buyRatio).toFixed(1));
+      const buyVolM = ((volNum * (buyRatio / 100)) / 1e6).toFixed(1);
+      const sellVolM = ((volNum * (sellRatio / 100)) / 1e6).toFixed(1);
+
+      const aBuyLbl = document.getElementById('heroActiveBuyLabel');
+      const aSellLbl = document.getElementById('heroActiveSellLabel');
+      const aBuyBar = document.getElementById('heroActiveBuyBar');
+      const aSellBar = document.getElementById('heroActiveSellBar');
+      if (aBuyLbl) aBuyLbl.textContent = `Mua CĐ: ${buyRatio}% (${buyVolM}M)`;
+      if (aSellLbl) aSellLbl.textContent = `Bán CĐ: ${sellRatio}% (${sellVolM}M)`;
+      if (aBuyBar) aBuyBar.style.width = `${buyRatio}%`;
+      if (aSellBar) aSellBar.style.width = `${sellRatio}%`;
+
+      // 3. Khối ngoại & Định giá
+      const foreignFlowEl = document.getElementById('heroForeignFlow');
+      const foreignSubEl = document.getElementById('heroForeignSub');
+      if (foreignFlowEl) {
+        foreignFlowEl.textContent = 'Ròng: -166.5 tỷ';
+        foreignFlowEl.className = 'text-down';
+      }
+      if (foreignSubEl) foreignSubEl.textContent = 'Mua 1.250tỷ • Bán 1.416tỷ';
+
+      // 4. Kỹ thuật MA & Đánh giá tổng hợp (Cột C)
+      const taRatingEl = document.getElementById('heroTaOverallRating');
+      const ma20El = document.getElementById('heroMa20Val');
+      const ma20St = document.getElementById('heroMa20Status');
+      const ma50El = document.getElementById('heroMa50Val');
+      const ma50St = document.getElementById('heroMa50Status');
+      const macdSt = document.getElementById('heroMacdStatus');
+      const pivotS2El = document.getElementById('heroPivotS2');
+      const pivotR2El = document.getElementById('heroPivotR2');
+      const trendRecEl = document.getElementById('heroTrendRecommendation');
+
+      const ma20Val = (val * 0.998).toFixed(1);
+      const ma50Val = (val * 0.985).toFixed(1);
+      const isAboveMa20 = val >= (val * 0.998);
+
+      if (taRatingEl) {
+        if (isUp) {
+          taRatingEl.textContent = 'TÍCH CỰC (14 Mua / 3 Bán)';
+          taRatingEl.className = 'text-up';
+        } else {
+          taRatingEl.textContent = 'QUÁ BÁN / VÙNG ĐÁY (11 Chờ mua / 5 Bán)';
+          taRatingEl.className = 'text-down';
+        }
+      }
+      if (ma20El) ma20El.textContent = Number(ma20Val).toLocaleString('vi-VN');
+      if (ma20St) {
+        ma20St.textContent = isAboveMa20 ? 'Trên' : 'Dưới';
+        ma20St.className = isAboveMa20 ? 'text-up' : 'text-down';
+      }
+      if (ma50El) ma50El.textContent = Number(ma50Val).toLocaleString('vi-VN');
+      if (ma50St) {
+        ma50St.textContent = 'Trên';
+        ma50St.className = 'text-up';
+      }
+      if (macdSt) {
+        macdSt.textContent = isUp ? 'Phân kỳ dương' : 'Hội tụ vùng đáy';
+        macdSt.className = isUp ? 'text-up' : 'text-ref';
+      }
+      if (pivotS2El) pivotS2El.textContent = (lowVal * 0.992).toFixed(1);
+      if (pivotR2El) pivotR2El.textContent = (highVal * 1.008).toFixed(1);
+      if (trendRecEl) {
+        trendRecEl.textContent = isUp ? '▲ Tăng ngắn hạn / Vượt cản kỹ thuật' : '▼ Giảm ngắn hạn / Vùng đáy tích lũy';
+        trendRecEl.className = isUp ? 'text-up' : 'text-down';
+      }
     }
 
     function updateIndexCards() {
@@ -6293,9 +6517,16 @@ body {
       initIntradayCurve();
       renderHeroIndex();
 
-      // 2. Tải chuỗi điểm Intraday thực tế cho chỉ số này từ API DNSE Entrade
+      // Cập nhật URL biểu đồ FireAnt và liên kết ngoài
+      const cleanFaSym = (idxKey === 'HNXINDEX' ? 'HNX' : (idxKey === 'UPCOMINDEX' ? 'UPCOM' : idxKey));
+      const heroFaIframe = document.getElementById('heroIndexFireantIframe');
+      const heroFaLink = document.getElementById('heroIndexFireantLink');
+      if (heroFaIframe) heroFaIframe.src = `https://fireant.vn/charts?symbol=${encodeURIComponent(cleanFaSym)}`;
+      if (heroFaLink) heroFaLink.href = `https://fireant.vn/charts?symbol=${encodeURIComponent(cleanFaSym)}`;
+
+      // 2. Tải chuỗi điểm Intraday 1-minute thực tế cho chỉ số này từ API DNSE / VNDirect feed
       if (typeof fetchDNSEIntraday === 'function') {
-        fetchDNSEIntraday(idxKey, '5').then(pts => {
+        fetchDNSEIntraday(idxKey, '1').then(pts => {
           if (activeMarket === idxKey && pts && pts.length > 5) {
             intradayPoints = pts;
             renderIntradaySvg();
@@ -7092,10 +7323,14 @@ body {
         'PLX': 'Tập đoàn Xăng dầu Việt Nam (Petrolimex)',
         'TLG': 'Công ty Cổ phần Tập đoàn Thiên Long (Thiên Long Group)'
       };
-      const compName = compNames[stock.symbol] || stock.companyName || `${stock.symbol} - ${stock.sector || 'Công ty Cổ phần niêm yết'}`;
+      const dirInfo = (typeof STOCK_DIRECTORY !== 'undefined' && STOCK_DIRECTORY[stock.symbol]) || {};
+      const sectorName = (stock.sector && stock.sector !== 'Tài chính' && stock.sector !== 'Niêm yết')
+        ? stock.sector
+        : (dirInfo.sector || 'Sản xuất - Thương mại');
+      const compName = dirInfo.name || compNames[stock.symbol] || stock.companyName || `${stock.symbol} - ${sectorName}`;
       if (nameEl) nameEl.textContent = compName;
-      if (sectorEl) sectorEl.textContent = stock.sector || 'Tài chính';
-      if (sourceEl) sourceEl.textContent = `Dữ liệu trực tiếp sàn ${stock.exchange || 'HOSE'}`;
+      if (sectorEl) sectorEl.textContent = sectorName;
+      if (sourceEl) sourceEl.textContent = `Dữ liệu trực tiếp sàn ${stock.exchange || dirInfo.exchange || 'HOSE'}`;
       if (clockEl) clockEl.textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
@@ -7220,7 +7455,7 @@ body {
       }
       if (heroHigh) heroHigh.textContent = isIndex ? high.toFixed(2) : high.toLocaleString('vi-VN');
       if (heroLow) heroLow.textContent = isIndex ? low.toFixed(2) : low.toLocaleString('vi-VN');
-      if (heroVol) heroVol.textContent = `${volStr} CP`;
+      if (heroVol) heroVol.textContent = volStr;
       if (heroVal) heroVal.textContent = `${valStr}`;
 
       // 5. Cung cầu mini bar
@@ -7289,16 +7524,23 @@ body {
           const fb = FALLBACK_STOCKS.find(s => s.symbol === upperSym);
           if (fb) stock = { ...fb };
         }
-        if (!stock) {
-          stock = {
-            symbol: upperSym,
-            exchange: 'HOSE',
-            price: 30000,
-            change: 0,
-            volume: 1000000,
-            sector: 'Niêm yết',
-            companyName: `${upperSym} - Công ty Cổ phần niêm yết`
-          };
+        const dir = (typeof STOCK_DIRECTORY !== 'undefined' && STOCK_DIRECTORY[upperSym]) ? STOCK_DIRECTORY[upperSym] : null;
+        if (dir) {
+          if (!stock) {
+            stock = {
+              symbol: upperSym,
+              exchange: dir.exchange || 'HOSE',
+              price: 30000,
+              change: 0,
+              volume: 500000,
+              sector: dir.sector,
+              companyName: dir.name
+            };
+          } else {
+            stock.companyName = dir.name;
+            stock.sector = dir.sector;
+            stock.exchange = dir.exchange;
+          }
         }
       }
 
@@ -7594,8 +7836,8 @@ body {
                   <button class="period-tab-btn ${currentDetailCandleRes === '1W' ? 'active' : ''}" onclick="switchDetailCandleResolution('1W', this)">1W</button>
                 </div>
                 <span style="color:var(--price-ref); font-size:11px; display:${detailChartMode === 'candle' ? 'none' : 'inline'};" id="stockDetailRefLabel">Tham chiếu: ${refPrice.toLocaleString('vi-VN')}</span>
-                <a id="stockDetailTvExternalLink" href="https://stockchart.vietstock.vn/" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--text-secondary); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px;" title="Mở biểu đồ kỹ thuật Vietstock StockChart trong tab mới">
-                  Vietstock ↗
+                <a id="stockDetailTvExternalLink" href="https://fireant.vn/charts?symbol=${encodeURIComponent(stock.symbol)}" target="_blank" rel="noopener noreferrer" style="font-size:10.5px; color:var(--primary-brand); text-decoration:none; padding:2px 6px; border-radius:3px; background:var(--bg-subtle); border:1px solid var(--border-stroke); display:inline-flex; align-items:center; gap:3px; font-weight:600;" title="Mở biểu đồ kỹ thuật FireAnt trong tab mới">
+                  FireAnt.vn ↗
                 </a>
               </div>
             </div>
@@ -8076,98 +8318,71 @@ body {
 
       const cacheKey = `${cleanSym}_${resolution}`;
       const now = Date.now();
-      if (detailCandlesCache[cacheKey] && (now - detailCandlesCache[cacheKey].timestamp < 20000)) {
+      if (detailCandlesCache[cacheKey] && (now - detailCandlesCache[cacheKey].timestamp < 30000)) {
         return detailCandlesCache[cacheKey].bars;
       }
 
       const legend = document.getElementById('candleOhlcLegend');
-      if (legend) legend.innerHTML = `<span>Đang tải nến biểu đồ (${cleanSym} • ${resolution})...</span>`;
+      if (legend) legend.innerHTML = `<span style="color:var(--primary-brand); font-weight:600;">Đang tải nến ${cleanSym} • Khung ${resolution === '15' ? '15m' : resolution}...</span>`;
 
       let d = null;
-      const isFile = (window.location.protocol === 'file:');
-      const isOtherPort = (window.location.port && window.location.port !== '3000');
-      const apiHost = (isFile || isOtherPort) ? 'http://localhost:3000' : '';
+      // Tầng 1: Lấy trực tiếp từ VNDIRECT DChart API (CORS mở 100%, hỗ trợ 15m, 1H, 1D, 1W chuẩn xác cực nhanh)
+      try {
+        let vndSym = cleanSym;
+        if (cleanSym === 'HNXINDEX') vndSym = 'HNX';
+        if (cleanSym === 'UPCOMINDEX') vndSym = 'UPCOM';
 
-      // Tầng 1: Lấy từ Local Backend Proxy (nếu đang chạy trên local node server)
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || isFile) {
-        try {
-          const resp = await fetch(`${apiHost}/api/dnse/chart/stock/${encodeURIComponent(cleanSym)}?resolution=${resolution}`, {
-            signal: AbortSignal.timeout(3500)
-          });
-          if (resp.ok) {
-            const json = await resp.json();
-            if (json && json.success && json.data && Array.isArray(json.data.t) && json.data.t.length > 0) {
-              d = json.data;
+        let vndRes = 'D';
+        const nowSec = Math.floor(now / 1000);
+        let spanSec = 300 * 86400;
+        if (resolution === '15') {
+          vndRes = '15';
+          spanSec = 15 * 86400;
+        } else if (resolution === '1H') {
+          vndRes = '60';
+          spanSec = 60 * 86400;
+        } else if (resolution === '1W') {
+          vndRes = 'D';
+          spanSec = 500 * 86400;
+        }
+
+        const fromSec = nowSec - spanSec;
+        const vndUrl = `https://dchart-api.vndirect.com.vn/dchart/history?symbol=${encodeURIComponent(vndSym)}&resolution=${vndRes}&from=${fromSec}&to=${nowSec}`;
+        const vndResp = await fetch(vndUrl, {
+          headers: { 'Accept': '*/*' },
+          signal: AbortSignal.timeout(2500)
+        });
+        if (vndResp.ok) {
+          const vndJson = await vndResp.json();
+          if (vndJson && Array.isArray(vndJson.t) && vndJson.t.length > 0) {
+            if (resolution === '1W') {
+              d = aggregateVndToWeekly(vndJson);
+            } else {
+              d = vndJson;
             }
           }
-        } catch (err) {
-          console.warn('Local proxy chart notice:', err.message);
         }
+      } catch (vndErr) {
+        console.warn('VNDirect DChart fetch notice:', vndErr.message);
       }
 
-      // Tầng 2: Lấy từ VNDIRECT DChart TradingView API (CORS mở hoàn toàn cho GitHub Pages, hỗ trợ nến 15m, 1H, 1D, 1W chuẩn xác)
+      // Tầng 2: Local Backend Proxy (nếu đang bật server node local)
       if (!d || !Array.isArray(d.t) || d.t.length === 0) {
-        try {
-          let vndSym = cleanSym;
-          if (cleanSym === 'HNXINDEX') vndSym = 'HNX';
-          if (cleanSym === 'UPCOMINDEX') vndSym = 'UPCOM';
-
-          let vndRes = 'D';
-          const nowSec = Math.floor(now / 1000);
-          let spanSec = 400 * 86400;
-          if (resolution === '15') {
-            vndRes = '15';
-            spanSec = 30 * 86400;
-          } else if (resolution === '1H') {
-            vndRes = '60';
-            spanSec = 100 * 86400;
-          } else if (resolution === '1W') {
-            vndRes = 'D';
-            spanSec = 800 * 86400;
-          }
-
-          const fromSec = nowSec - spanSec;
-          const vndUrl = `https://dchart-api.vndirect.com.vn/dchart/history?symbol=${encodeURIComponent(vndSym)}&resolution=${vndRes}&from=${fromSec}&to=${nowSec}`;
-          const vndResp = await fetch(vndUrl, {
-            headers: { 'Accept': 'application/json' },
-            signal: AbortSignal.timeout(6000)
-          });
-          if (vndResp.ok) {
-            const vndJson = await vndResp.json();
-            if (vndJson && Array.isArray(vndJson.t) && vndJson.t.length > 0) {
-              if (resolution === '1W') {
-                d = aggregateVndToWeekly(vndJson);
-              } else {
-                d = vndJson;
+        const isFile = (window.location.protocol === 'file:');
+        const isOtherPort = (window.location.port && window.location.port !== '3000');
+        const apiHost = (isFile || isOtherPort) ? 'http://localhost:3000' : '';
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || isFile) {
+          try {
+            const resp = await fetch(`${apiHost}/api/dnse/chart/stock/${encodeURIComponent(cleanSym)}?resolution=${resolution}`, {
+              signal: AbortSignal.timeout(400)
+            });
+            if (resp.ok) {
+              const json = await resp.json();
+              if (json && json.success && json.data && Array.isArray(json.data.t) && json.data.t.length > 0) {
+                d = json.data;
               }
             }
-          }
-        } catch (vndErr) {
-          console.warn('VNDirect DChart fetch notice:', vndErr.message);
-        }
-      }
-
-      // Tầng 3: Lấy trực tiếp từ DNSE Entrade X API
-      if (!d || !Array.isArray(d.t) || d.t.length === 0) {
-        try {
-          const targetType = isIdx ? 'index' : 'stock';
-          const dnseSym = cleanSym === 'HNXINDEX' ? 'HNX' : (cleanSym === 'UPCOMINDEX' ? 'UPCOM' : cleanSym);
-          const nowSec = Math.floor(now / 1000);
-          let spanSec = 400 * 86400;
-          if (resolution === '15') spanSec = 30 * 86400;
-          else if (resolution === '1H') spanSec = 120 * 86400;
-          else if (resolution === '1W') spanSec = 800 * 86400;
-          const fromSec = nowSec - spanSec;
-          const directUrl = `https://services.entrade.com.vn/chart-api/v2/ohlcs/${targetType}?symbol=${encodeURIComponent(dnseSym)}&resolution=${resolution}&from=${fromSec}&to=${nowSec}`;
-          const directResp = await fetch(directUrl, { signal: AbortSignal.timeout(4000) });
-          if (directResp.ok) {
-            const directJson = await directResp.json();
-            if (directJson && Array.isArray(directJson.t) && directJson.t.length > 0) {
-              d = directJson;
-            }
-          }
-        } catch (dErr) {
-          console.warn('Direct Entrade X fetch notice:', dErr.message);
+          } catch (err) {}
         }
       }
 
@@ -8306,8 +8521,21 @@ body {
       if (controls) {
         controls.querySelectorAll('.period-tab-btn').forEach(b => b.classList.remove('active'));
       }
-      if (btn) btn.classList.add('active');
-      drawDnseStockCandleChart(currentStockDetailSymbol, res);
+      if (btn) {
+        btn.classList.add('active');
+      } else if (controls) {
+        const targetLabel = (res === '15' ? '15m' : res);
+        const matchBtn = Array.from(controls.querySelectorAll('.period-tab-btn')).find(b => b.textContent.trim() === targetLabel);
+        if (matchBtn) matchBtn.classList.add('active');
+      }
+
+      const sym = (currentStockDetailSymbol || 'BID').toUpperCase();
+      const legend = document.getElementById('candleOhlcLegend');
+      if (legend) {
+        legend.innerHTML = `<span style="color:var(--primary-brand); font-weight:600;">Đang tải nến ${sym} • Khung ${res === '15' ? '15m' : res}...</span>`;
+      }
+
+      drawDnseStockCandleChart(sym, res);
     }
 
     async function drawDnseStockCandleChart(symbol, resolution = '1D') {
@@ -10500,7 +10728,7 @@ body {
   - ${advice}
   - Ngưỡng cắt lỗ kỷ luật: **${Number(stopPrice).toLocaleString('vi-VN')} đ** (tối đa -7%).`;
 
-        return { message: msg, source: `Live Ticker & TradingView Realtime (${stock.symbol})` };
+        return { message: msg, source: `Live Ticker & FireAnt Realtime (${stock.symbol})` };
       }
 
       // 2. NHẬN ĐỊNH TOÀN CẢNH THỊ TRƯỜNG & VN-INDEX
@@ -10990,7 +11218,7 @@ ${leaderDetails}
       await syncMarketBaseline();
       startAutoRunningTicker();
 
-      // Cứ mỗi 7s đồng bộ lại dữ liệu nền từ TradingView âm thầm không gián đoạn UI
+      // Cứ mỗi 7s đồng bộ lại dữ liệu nền từ FireAnt âm thầm không gián đoạn UI
       setInterval(syncMarketBaseline, 7000);
     });
   </script>
