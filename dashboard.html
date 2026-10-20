@@ -662,8 +662,8 @@ body {
   background: none;
   border: 1px solid transparent;
   padding: 5px 14px;
-  font-size: 13.5px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -945,7 +945,7 @@ body {
 .right-tab-btn {
   background: none;
   border: none;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 600;
   color: var(--text-secondary);
   border-bottom: 2px solid transparent;
@@ -2517,7 +2517,7 @@ body {
               <div class="split-panel-header">
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="blue-accent-bar"></span>
-                  <b style="font-size:12.5px;">Chỉ số Thị trường & Phân tích Kỹ thuật Realtime</b>
+                  <b style="font-size:14px; font-weight:700;">Chỉ số Thị trường & Phân tích Kỹ thuật Realtime</b>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px;">
                   <span style="font-size:11px; color:var(--text-muted);" id="realtimeTickClock">14:30:15</span>
@@ -2607,17 +2607,22 @@ body {
                         </div>
                       </div>
 
-                      <!-- Dòng tiền Khối ngoại & Định giá sàn -->
-                      <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; font-size:9.5px;">
-                        <div style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:3px; padding:3px 6px;" title="Dữ liệu giao dịch Khối ngoại thời gian thực • Nguồn: FireAnt">
-                          <div style="color:var(--text-muted); font-size:9px;" id="heroForeignTitle">Khối ngoại (Toàn sàn)</div>
-                          <div id="heroForeignFlow" style="font-weight:700; color:var(--price-down);">Ròng: -850.3 tỷ</div>
-                          <div style="color:var(--text-muted); font-size:8.5px;" id="heroForeignSub">Mua 1.435,5tỷ • Bán 2.285,8tỷ</div>
+                      <!-- Định giá P/E, P/B & Vốn hóa sàn (Đã loại bỏ khối ngoại trùng lặp, phóng to P/E - P/B) -->
+                      <div style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:4px; padding:6px 10px; display:flex; flex-direction:column; gap:3px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                          <div style="color:var(--text-muted); font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px;">Định giá & Vốn hóa sàn</div>
+                          <div style="color:var(--text-muted); font-size:9.5px;" id="heroMarketCap">Vốn hóa: <b style="color:var(--text-primary); font-family:var(--font-data); font-weight:600;">5.2 triệu tỷ đ</b></div>
                         </div>
-                        <div style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:3px; padding:3px 6px;">
-                          <div style="color:var(--text-muted); font-size:9px;">Định giá & Vốn hóa sàn</div>
-                          <div style="font-weight:700; color:var(--text-primary); font-family:var(--font-data);" id="heroMarketValuation">P/E: 14.8x • P/B: 1.68x</div>
-                          <div style="color:var(--text-muted); font-size:8.5px;" id="heroMarketCap">Vốn hóa: 5.2 triệu tỷ đ</div>
+                        <div style="display:flex; align-items:center; justify-content:space-around; padding:2px 0;" id="heroMarketValuation">
+                          <div style="display:flex; align-items:baseline; gap:6px;">
+                            <span style="color:var(--text-secondary); font-size:11.5px; font-weight:600;">P/E:</span>
+                            <span style="font-weight:700; font-size:15px; color:var(--text-primary); font-family:var(--font-data); letter-spacing:0.3px;">14.8x</span>
+                          </div>
+                          <span style="color:var(--border-stroke); font-size:13px; opacity:0.6;">|</span>
+                          <div style="display:flex; align-items:baseline; gap:6px;">
+                            <span style="color:var(--text-secondary); font-size:11.5px; font-weight:600;">P/B:</span>
+                            <span style="font-weight:700; font-size:15px; color:var(--text-primary); font-family:var(--font-data); letter-spacing:0.3px;">1.68x</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -2687,7 +2692,7 @@ body {
                   <div class="rsi-section-title" style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
                     <div style="display:flex; align-items:center; gap:5px; min-width:0; overflow:hidden;">
                       <span class="blue-accent-bar"></span>
-                      <span style="font-size:11.5px; font-weight:700; white-space:nowrap;">Phân tích Kỹ thuật (RSI)</span>
+                      <span style="font-size:12.5px; font-weight:700; white-space:nowrap;">Phân tích Kỹ thuật (RSI)</span>
                     </div>
                     <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="width:auto; font-size:10px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
                   </div>
@@ -2767,7 +2772,7 @@ body {
               <div class="split-panel-header">
                 <div style="display:flex; align-items:center; gap:8px;">
                   <span class="blue-accent-bar"></span>
-                  <b style="font-size:12.5px;">Tổng quan Thị trường & Biến động Dòng tiền</b>
+                  <b style="font-size:14px; font-weight:700;">Tổng quan Thị trường & Biến động Dòng tiền</b>
                 </div>
                 <div style="display:flex; align-items:center; gap:10px;">
                   <span style="font-size:11px; color:var(--text-muted);">5 Biểu đồ cốt lõi</span>
