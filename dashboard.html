@@ -3178,14 +3178,14 @@ body {
                 </div>
               </div>
 
-              <!-- Quy ước màu sắc (Vietstock Legend) -->
+              <!-- Quy ước màu sắc (Vietstock Legend Chuẩn) -->
               <div style="display:flex; align-items:center; gap:10px; font-size:11px; flex-wrap:wrap;">
                 <span style="color:var(--text-secondary); font-weight:600;">Quy ước màu:</span>
-                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:var(--price-ceil);border-radius:2px;"></span> Tăng trần (>= 6.8%)</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#a855f7;border-radius:2px;"></span> Tăng trần</span>
                 <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#16a34a;border-radius:2px;"></span> Tăng</span>
-                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#d97706;border-radius:2px;"></span> Tham chiếu</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#eab308;border-radius:2px;"></span> Tham chiếu</span>
                 <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#dc2626;border-radius:2px;"></span> Giảm</span>
-                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:var(--price-floor);border-radius:2px;"></span> Giảm sàn (<= -6.8%)</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;"><span style="width:10px;height:10px;background:#06b6d4;border-radius:2px;"></span> Giảm sàn</span>
               </div>
             </div>
           </div>
@@ -5327,69 +5327,20 @@ body {
             updateIndexCards();
           }
 
-          // 2. Làm mới toàn bộ danh mục cổ phiếu realtime trực tiếp từ Live Scanner
-          let freshStocks = null;
-          if (typeof fetchLiveScannerStocks === 'function') {
-            freshStocks = await fetchLiveScannerStocks(80);
-          } else if (typeof refreshFallbackStocksLive === 'function') {
-            await refreshFallbackStocksLive();
-          }
-
-          if (freshStocks && freshStocks.length > 0) {
-            freshStocks.forEach(fresh => {
-              const cur = stockDataList.find(s => s.symbol === fresh.symbol);
-              const oldPrice = lastPriceMap[fresh.symbol] || (cur ? cur.price : null);
-              if (cur) {
-                Object.assign(cur, fresh);
-              } else {
-                stockDataList.push(fresh);
-              }
-              if (oldPrice && oldPrice !== fresh.price) {
-                flashStockRow(fresh.symbol, fresh.price > oldPrice, fresh);
-              }
-              lastPriceMap[fresh.symbol] = fresh.price;
-            });
-          } else {
-            // So sánh và highlight toàn bộ danh sách khi có biến động
-            stockDataList.forEach(s => {
-              const fb = (typeof FALLBACK_STOCKS !== 'undefined') ? FALLBACK_STOCKS.find(x => x.symbol === s.symbol) : null;
-              if (fb && fb.price) {
-                const oldPrice = lastPriceMap[s.symbol];
-                if (oldPrice && oldPrice !== fb.price) {
-                  s.price = fb.price;
-                  s.change = fb.change;
-                  s.volume = fb.volume;
-                  flashStockRow(s.symbol, fb.price > oldPrice, s);
-                }
-                lastPriceMap[s.symbol] = fb.price;
-              }
-            });
-          }
-
-          // Cập nhật giá một số cổ phiếu trọng yếu
-          if (typeof fetchDNSEStock === 'function') {
-            const keySymbols = ['FPT', 'HPG', 'TCB', 'MBB', 'MWG', 'VHM', 'VIC', 'SSI', 'TLG', 'VCB'];
-            const sampleSym = keySymbols[Math.floor(Math.random() * keySymbols.length)];
-            const quote = await fetchDNSEStock(sampleSym);
-            if (quote && quote.price) {
-              const oldPrice = lastPriceMap[quote.symbol];
-              const curStock = stockDataList.find(s => s.symbol === quote.symbol);
-              if (curStock) {
-                curStock.price = quote.price;
-                if (quote.change !== undefined) curStock.change = quote.change;
-                if (quote.volume) curStock.volume = quote.volume;
-              }
-              if (oldPrice && oldPrice !== quote.price) {
-                const isUp = quote.price > oldPrice;
-                flashStockRow(quote.symbol, isUp, curStock || quote);
-              }
-              lastPriceMap[quote.symbol] = quote.price;
-            }
+          // 2. Làm mới toàn bộ danh mục cổ phiếu realtime trực tiếp từ VPS batch datafeed
+          if (typeof syncAllStocksLive === 'function') {
+            await syncAllStocksLive();
           }
 
           // Cập nhật lại thanh chạy Ticker Banner & 5 biểu đồ Tổng quan với dữ liệu thực tế mới nhất
           renderTickerBanner();
           renderOverviewCards();
+
+          // Cập nhật Bản đồ thị trường Treemap realtime nếu đang mở
+          const bandoView = document.getElementById('subview_bando');
+          if (bandoView && bandoView.style.display !== 'none' && typeof renderTreemap === 'function') {
+            renderTreemap();
+          }
 
         } catch (err) {
           console.warn('Realtime ticker poll notice:', err);
@@ -5514,6 +5465,12 @@ body {
                 if (dirInfo.exchange && !target.exchange) target.exchange = dirInfo.exchange;
               }
 
+              const oldPrice = lastPriceMap[sym] || (target ? target.price : null);
+              if (oldPrice && price && oldPrice !== price && typeof flashStockRow === 'function') {
+                flashStockRow(sym, price > oldPrice, target);
+              }
+              lastPriceMap[sym] = price;
+
               target.price = price;
               target.change = chg;
               target.volume = vol;
@@ -5524,6 +5481,8 @@ body {
               target.ceilPrice = ceil;
               target.floorPrice = floor;
               target.value = vol * price;
+              target.buyForeignValue = item.fBValue ? Number(item.fBValue) : 0;
+              target.sellForeignValue = item.fSValue ? Number(item.fSValue) : 0;
 
               if (typeof FALLBACK_STOCKS !== 'undefined') {
                 const fb = FALLBACK_STOCKS.find(s => s.symbol === sym);
@@ -9830,41 +9789,71 @@ body {
       return results;
     }
 
-    // Bảng màu Gradient chuẩn thị trường chứng khoán Việt Nam
-    function getTreemapStockColor(chg) {
-      if (chg >= 6.8) return {
-        bg: 'linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)',
-        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.4), 0 2px 6px rgba(147,51,234,0.4);',
+    // Bảng màu Gradient chuẩn thị trường chứng khoán Việt Nam (Vietstock / FireAnt / VPS)
+    function getTreemapStockColor(chg, s) {
+      // 1. Kiểm tra kịch trần (Ceiling / Tím)
+      let isCeil = false;
+      let isFloor = false;
+
+      if (s) {
+        if (s.ceilPrice && s.price && s.price >= s.ceilPrice) {
+          isCeil = true;
+        }
+        if (s.floorPrice && s.price && s.price <= s.floorPrice) {
+          isFloor = true;
+        }
+      }
+
+      // Nếu không có ceilPrice/floorPrice, kiểm tra theo biên độ từng sàn
+      if (!isCeil && !isFloor) {
+        const ex = (s && s.exchange) || 'HOSE';
+        const ceilThreshold = ex === 'UPCOM' ? 14.3 : (ex === 'HNX' ? 9.5 : 6.8);
+        if (chg >= ceilThreshold) isCeil = true;
+        else if (chg <= -ceilThreshold) isFloor = true;
+      }
+
+      if (isCeil) return {
+        bg: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.4), 0 2px 8px rgba(168,85,247,0.45);',
         text: '#ffffff'
       };
-      if (chg <= -6.8) return {
+
+      if (isFloor) return {
         bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
-        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.4), 0 2px 6px rgba(6,182,212,0.4);',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.4), 0 2px 8px rgba(6,182,212,0.45);',
         text: '#ffffff'
       };
-      if (Math.abs(chg) < 0.005) return {
-        bg: 'linear-gradient(135deg, #b45309 0%, #d97706 100%)',
-        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);',
+
+      // 2. Tham chiếu (Vàng chuẩn Vietstock / HOSE)
+      if (Math.abs(chg) < 0.05) return {
+        bg: 'linear-gradient(135deg, #ca8a04 0%, #eab308 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.3), 0 2px 6px rgba(234,179,8,0.3);',
         text: '#ffffff'
       };
-      if (chg >= 2.5) return {
-        bg: 'linear-gradient(135deg, #15803d 0%, #16a34a 100%)',
-        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);',
-        text: '#ffffff'
-      };
-      if (chg > 0) return {
-        bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.2);',
-        text: '#ffffff'
-      };
+
+      // 3. Tăng giá (Xanh lá chuẩn)
+      if (chg > 0) {
+        if (chg >= 2.5) return {
+          bg: 'linear-gradient(135deg, #15803d 0%, #16a34a 100%)',
+          glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25), 0 2px 6px rgba(22,163,74,0.3);',
+          text: '#ffffff'
+        };
+        return {
+          bg: 'linear-gradient(135deg, #16a34a 0%, #22c55e 100%)',
+          glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.2), 0 2px 6px rgba(34,197,94,0.25);',
+          text: '#ffffff'
+        };
+      }
+
+      // 4. Giảm giá (Đỏ chuẩn)
       if (chg <= -2.5) return {
         bg: 'linear-gradient(135deg, #991b1b 0%, #dc2626 100%)',
-        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25);',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25), 0 2px 6px rgba(220,38,38,0.3);',
         text: '#ffffff'
       };
       return {
-        bg: 'linear-gradient(135deg, #e11d48 0%, #ef4444 100%)',
-        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.2);',
+        bg: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
+        glow: 'box-shadow:inset 0 0 0 1px rgba(255,255,255,0.2), 0 2px 6px rgba(239,68,68,0.25);',
         text: '#ffffff'
       };
     }
@@ -9945,22 +9934,24 @@ body {
 
       const periodMult = activePeriod === '5D' ? 1.6 : (activePeriod === '20D' ? 2.5 : 1.0);
       const chg = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
-      const isZero = Math.abs(chg) < 0.005;
-      const isCeil = chg >= 6.8;
-      const isFloor = chg <= -6.8;
+      const isZero = Math.abs(chg) < 0.05;
+      const ex = s.exchange || 'HOSE';
+      const ceilThresh = ex === 'UPCOM' ? 14.3 : (ex === 'HNX' ? 9.5 : 6.8);
+      const isCeil = (s.ceilPrice && s.price && s.price >= s.ceilPrice) || chg >= ceilThresh;
+      const isFloor = (s.floorPrice && s.price && s.price <= s.floorPrice) || chg <= -ceilThresh;
 
       let chgColor = 'var(--price-up)';
       let chgSign = '+';
       let badgeBg = 'var(--price-up-bg)';
       if (isCeil) { chgColor = 'var(--price-ceil)'; badgeBg = 'rgba(147, 51, 234, 0.15)'; }
       else if (isFloor) { chgColor = 'var(--price-floor)'; badgeBg = 'rgba(2, 132, 199, 0.15)'; }
-      else if (isZero) { chgColor = 'var(--price-ref)'; chgSign = ''; badgeBg = 'var(--price-ref-bg)'; }
+      else if (isZero) { chgColor = '#ca8a04'; chgSign = ''; badgeBg = 'rgba(234, 179, 8, 0.15)'; }
       else if (chg < 0) { chgColor = 'var(--price-down)'; chgSign = ''; badgeBg = 'var(--price-down-bg)'; }
 
       const p = s.price || 0;
-      const refP = s.refPrice || s.open || Math.round(p / (1 + (s.change || 0) / 100));
-      const ceilP = Math.round(refP * (s.exchange === 'HNX' ? 1.10 : (s.exchange === 'UPCOM' ? 1.15 : 1.07)));
-      const floorP = Math.round(refP * (s.exchange === 'HNX' ? 0.90 : (s.exchange === 'UPCOM' ? 0.85 : 0.93)));
+      const refP = s.refPrice || s.open || (chg !== 0 ? Math.round(p / (1 + chg / 100)) : p);
+      const ceilP = s.ceilPrice || Math.round(refP * (ex === 'HNX' ? 1.10 : (ex === 'UPCOM' ? 1.15 : 1.07)));
+      const floorP = s.floorPrice || Math.round(refP * (ex === 'HNX' ? 0.90 : (ex === 'UPCOM' ? 0.85 : 0.93)));
 
       const rawVal = s.value || ((s.volume || 1e6) * p);
       const valTy = (rawVal / 1e9).toFixed(1);
@@ -10111,12 +10102,17 @@ body {
       stocks.forEach(s => {
         const val = s.value || ((s.volume || 1e6) * (s.price || 30000));
         totalMktVal += val;
-        const c = (s.change || 0) * periodMult;
-        if (c >= 6.8) ceilCnt++;
-        else if (c <= -6.8) floorCnt++;
+        const c = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
+        const ex = s.exchange || 'HOSE';
+        const ceilThresh = ex === 'UPCOM' ? 14.3 : (ex === 'HNX' ? 9.5 : 6.8);
+        const isCeil = (s.ceilPrice && s.price && s.price >= s.ceilPrice) || c >= ceilThresh;
+        const isFloor = (s.floorPrice && s.price && s.price <= s.floorPrice) || c <= -ceilThresh;
 
-        if (c > 0.005) advCnt++;
-        else if (c < -0.005) decCnt++;
+        if (isCeil) ceilCnt++;
+        else if (isFloor) floorCnt++;
+
+        if (c >= 0.05) advCnt++;
+        else if (c <= -0.05) decCnt++;
         else uncCnt++;
 
         const fBuy = s.buyForeignValue || 0;
@@ -10253,7 +10249,7 @@ body {
           const sH = Math.max(8, Math.round(sec.h) - 2);
 
           const avgChgTxt = `${sec.avgChg >= 0 ? '+' : ''}${sec.avgChg.toFixed(1)}%`;
-          const avgChgCol = sec.avgChg >= 0 ? 'var(--price-up)' : 'var(--price-down)';
+          const avgChgCol = Math.abs(sec.avgChg) < 0.05 ? '#ca8a04' : (sec.avgChg > 0 ? 'var(--price-up)' : 'var(--price-down)');
 
           // Chiều cao tiêu đề ngành
           const showHeader = sH >= 40 && sW >= 55;
@@ -10292,8 +10288,8 @@ body {
           stockRects.forEach(st => {
             const s = st.stock;
             const chg = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
-            const isZero = Math.abs(chg) < 0.005;
-            const colTheme = getTreemapStockColor(chg);
+            const isZero = Math.abs(chg) < 0.05;
+            const colTheme = getTreemapStockColor(chg, s);
 
             const stX = Math.round(st.x);
             const stY = Math.round(st.y);
@@ -10382,8 +10378,8 @@ body {
           // Sắp xếp mã trong ngành theo GTGD
           sec.stocks.sort((a, b) => (b.value || 0) - (a.value || 0)).forEach(s => {
             const chg = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
-            const isZero = Math.abs(chg) < 0.005;
-            const colTheme = getTreemapStockColor(chg);
+            const isZero = Math.abs(chg) < 0.05;
+            const colTheme = getTreemapStockColor(chg, s);
             const shortName = VN_STOCK_NAMES[s.symbol] || s.symbol;
             const chgTxt = isZero ? '0.00%' : `${chg > 0 ? '+' : ''}${chg.toFixed(2)}%`;
             const p = s.price || 0;
@@ -10440,8 +10436,8 @@ body {
 
         top30.forEach(s => {
           const chg = (s.change !== undefined && s.change !== null ? s.change : 0) * periodMult;
-          const isZero = Math.abs(chg) < 0.005;
-          const colTheme = getTreemapStockColor(chg);
+          const isZero = Math.abs(chg) < 0.05;
+          const colTheme = getTreemapStockColor(chg, s);
           const shortName = VN_STOCK_NAMES[s.symbol] || s.symbol;
           const secName = getStockSector(s.symbol, s.sector);
           const chgTxt = isZero ? '0.00%' : `${chg > 0 ? '+' : ''}${chg.toFixed(2)}%`;
@@ -11336,6 +11332,9 @@ body {
       if (subtab === 'bando') {
         renderTreemap();
         setTimeout(renderTreemap, 30);
+        if (typeof syncAllStocksLive === 'function') {
+          syncAllStocksLive().catch(() => {});
+        }
       }
       else if (subtab === 'cungcau') renderActiveTrades();
       else if (subtab === 'khoingoai') renderForeignHistory();
