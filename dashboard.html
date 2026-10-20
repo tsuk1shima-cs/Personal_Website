@@ -3131,9 +3131,9 @@ body {
               <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                 <!-- View Mode: Treemap vs Lưới ngành vs Top 30 -->
                 <div class="center-tab-controls" id="treemapViewModeControls" title="Chọn kiểu hiển thị">
-                  <button class="period-tab-btn active" onclick="switchTreemapViewMode('treemap', this)">🗺️ Treemap</button>
-                  <button class="period-tab-btn" onclick="switchTreemapViewMode('sectors', this)">📑 Theo ngành</button>
-                  <button class="period-tab-btn" onclick="switchTreemapViewMode('top30', this)">⭐ Top 30 trụ</button>
+                  <button class="period-tab-btn active" onclick="switchTreemapViewMode('treemap', this)">Treemap</button>
+                  <button class="period-tab-btn" onclick="switchTreemapViewMode('sectors', this)">Theo ngành</button>
+                  <button class="period-tab-btn" onclick="switchTreemapViewMode('top30', this)">Top 30 trụ</button>
                 </div>
 
                 <!-- Size By Metric: Vốn hóa vs GTGD -->
@@ -3169,7 +3169,7 @@ body {
 
                 <!-- Search Input -->
                 <div style="position:relative; display:inline-flex; align-items:center;">
-                  <input type="text" id="treemapSearchInput" placeholder="🔍 Tìm mã CP (VD: HPG, VCB...)"
+                  <input type="text" id="treemapSearchInput" placeholder="Tìm mã CP (VD: HPG, VCB...)"
                          oninput="handleTreemapSearch(this.value)"
                          style="padding:3px 22px 3px 8px; font-size:11.5px; border:1px solid var(--border-stroke); border-radius:var(--radius-sm); background:var(--bg-container); color:var(--text-primary); width:155px; outline:none; transition:all 0.15s;"
                          onfocus="this.style.width='190px'; this.style.borderColor='var(--primary-brand)';"
@@ -3193,7 +3193,6 @@ body {
           <!-- Quick Beginner Notice / Helper Banner -->
           <div id="treemapBeginnerNotice" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:6px 12px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; color:var(--text-secondary);">
             <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size:14px;">💡</span>
               <span><b>Mẹo cho người mới:</b> Rê chuột vào bất kỳ ô nào trên bản đồ để xem ngay tên công ty, giá trần/sàn & thông số tại cột bên trái. Ô càng lớn = Cổ phiếu có vốn hóa hoặc dòng tiền càng khủng. Bấm vào ô để mở đồ thị kỹ thuật.</span>
             </div>
             <button onclick="document.getElementById('treemapBeginnerNotice').style.display='none'" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:0 4px;" title="Đóng hướng dẫn">✕</button>
@@ -3206,7 +3205,7 @@ body {
               <!-- 1. Thống kê toàn cảnh thị trường -->
               <div class="tongquan-card" style="padding:10px;">
                 <div style="font-weight:700; font-size:12px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                  <span style="color:var(--text-primary); display:flex; align-items:center; gap:4px;">📊 Thị trường chung</span>
+                  <span style="color:var(--text-primary); display:flex; align-items:center; gap:6px;"><span class="blue-accent-bar" style="height:12px;"></span>Thị trường chung</span>
                   <span style="font-size:10.5px; color:var(--text-muted);" id="treemapMarketTime">Realtime</span>
                 </div>
                 <!-- Indices micro list -->
@@ -4751,9 +4750,23 @@ body {
 
         const statusText = document.getElementById('streamingStatusText');
         const heroState = document.getElementById('heroMarketState');
+        const treemapClock = document.getElementById('treemapMarketTime');
+        if (treemapClock) {
+          treemapClock.textContent = timeStr;
+        }
 
         if (statusText) {
-          statusText.textContent = isTradingHours ? `Trực tiếp • ${todayStr}` : `Đóng cửa phiên • ${todayStr}`;
+          if (!isTradingDay) {
+            statusText.textContent = `Nghỉ cuối tuần • ${todayStr}`;
+          } else if (minTotal < 540) {
+            statusText.textContent = `Chưa mở cửa (09:00) • ${todayStr}`;
+          } else if (minTotal > 690 && minTotal < 780) {
+            statusText.textContent = `Tạm nghỉ trưa (11:30 - 13:00) • ${todayStr}`;
+          } else if (minTotal > 900) {
+            statusText.textContent = `Đóng cửa phiên • ${todayStr}`;
+          } else {
+            statusText.textContent = `Trực tiếp • ${todayStr}`;
+          }
         }
 
         if (heroState) {
@@ -10239,7 +10252,6 @@ body {
           const sW = Math.max(8, Math.round(sec.w) - 2);
           const sH = Math.max(8, Math.round(sec.h) - 2);
 
-          const icon = sectorIcons[sec.name] || '🏢';
           const avgChgTxt = `${sec.avgChg >= 0 ? '+' : ''}${sec.avgChg.toFixed(1)}%`;
           const avgChgCol = sec.avgChg >= 0 ? 'var(--price-up)' : 'var(--price-down)';
 
@@ -10254,8 +10266,8 @@ body {
           if (showHeader) {
             treemapHtml += `
               <div style="height:${headerH}px; padding:2px 6px; font-size:10.5px; font-weight:700; color:var(--text-primary); display:flex; justify-content:space-between; align-items:center; background:var(--bg-card); border-bottom:1px solid var(--border-stroke); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                <span style="overflow:hidden; text-overflow:ellipsis; max-width:70%;" title="${sec.name} (${sec.stocks.length} mã)">
-                  ${icon} ${sec.name} <span style="font-weight:500; font-size:9.5px; color:var(--text-muted);">(${sec.stocks.length})</span>
+                <span style="overflow:hidden; text-overflow:ellipsis; max-width:78%;" title="${sec.name} (${sec.stocks.length} mã)">
+                  ${sec.name} <span style="font-weight:500; font-size:9.5px; color:var(--text-muted);">(${sec.stocks.length})</span>
                 </span>
                 <span style="color:${avgChgCol}; font-size:10px;">${avgChgTxt}</span>
               </div>
@@ -10347,7 +10359,6 @@ body {
 
         let html = '';
         sectorsList.forEach(sec => {
-          const icon = sectorIcons[sec.name] || '🏢';
           const avgChgColor = sec.avgChg >= 0 ? 'var(--price-up)' : 'var(--price-down)';
           const totalValTy = (sec.totalVal / 1e9).toFixed(0);
 
@@ -10355,7 +10366,7 @@ body {
             <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid var(--border-stroke);">
                 <div style="display:flex; align-items:center; gap:6px;">
-                  <span style="font-size:14px;">${icon}</span>
+                  <span class="blue-accent-bar" style="height:12px;"></span>
                   <span style="font-weight:700; font-size:12.5px; color:var(--text-primary);">${sec.name}</span>
                   <span style="font-size:11px; color:var(--text-muted);">(${sec.stocks.length} mã)</span>
                 </div>
@@ -10421,7 +10432,7 @@ body {
         let html = `
           <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:10px;">
             <div style="font-weight:700; font-size:13px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:var(--text-primary);">⭐ Top 30 Cổ phiếu Trụ Dẫn dắt Thị trường (Dành cho người mới)</span>
+              <span style="color:var(--text-primary); display:flex; align-items:center; gap:6px;"><span class="blue-accent-bar" style="height:12px;"></span>Top 30 Cổ phiếu Trụ Dẫn dắt Thị trường (Dành cho người mới)</span>
               <span style="font-size:11px; color:var(--text-muted);">Sắp xếp theo Dòng tiền & Vốn hóa</span>
             </div>
             <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(145px, 1fr)); gap:8px;">
