@@ -5,6 +5,8 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const WebSocket = require('ws');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -23,7 +25,7 @@ app.use(cors({
             callback(new Error('Not allowed by CORS'));
         }
     },
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
@@ -1595,10 +1597,9 @@ const AUTH_USERS = [
         role: 'admin',
         name: 'Quản trị viên (Admin)',
         email: 'admin@phucdch.vn',
-        avatar: '👑',
         status: 'active',
         createdAt: '2026-01-01T00:00:00Z',
-        permissions: ['all', 'admin_panel', 'system_config', 'manage_users', 'view_logs', 'realtime_pro', 'ai_unlimited']
+        permissions: ['all', 'admin_panel', 'system_config', 'manage_users', 'manage_blog', 'view_logs', 'realtime_pro', 'ai_unlimited']
     },
     {
         id: 'usr_user_01',
@@ -1607,7 +1608,6 @@ const AUTH_USERS = [
         role: 'user',
         name: 'Người dùng Pro',
         email: 'user@phucdch.vn',
-        avatar: '👤',
         status: 'active',
         createdAt: '2026-01-15T00:00:00Z',
         permissions: ['view_realtime', 'stock_screener', 'ai_chat', 'view_ta', 'view_portfolio']
@@ -1619,7 +1619,6 @@ const AUTH_USERS = [
         role: 'user',
         name: 'Nhà đầu tư Cá nhân',
         email: 'demo@phucdch.vn',
-        avatar: '📈',
         status: 'active',
         createdAt: '2026-02-01T00:00:00Z',
         permissions: ['view_realtime', 'stock_screener', 'ai_chat', 'view_ta']
@@ -1656,7 +1655,7 @@ app.post('/api/auth/login', (req, res) => {
         const normalizedUsername = String(username).trim().toLowerCase();
         const user = AUTH_USERS.find(u => 
             u.username.toLowerCase() === normalizedUsername || 
-            u.email.toLowerCase() === normalizedUsername
+            (u.email && u.email.toLowerCase() === normalizedUsername)
         );
 
         if (!user || !user.passwords.includes(String(password).trim())) {
@@ -1684,7 +1683,6 @@ app.post('/api/auth/login', (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
-            avatar: user.avatar,
             permissions: user.permissions,
             loginTime: new Date().toISOString()
         };
@@ -1713,6 +1711,98 @@ app.post('/api/auth/login', (req, res) => {
     }
 });
 
+// Đăng ký tài khoản cho khách hàng (Guest Registration)
+app.post('/api/auth/register', (req, res) => {
+    try {
+        const { username, password, name, email, phone } = req.body || {};
+        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+
+        if (!username || !password || !name) {
+            return res.status(400).json({
+                success: false,
+                message: 'Vui lòng điền đầy đủ họ tên, tên đăng nhập và mật khẩu'
+            });
+        }
+
+        const normalizedUsername = String(username).trim().toLowerCase();
+        if (normalizedUsername.length < 3) {
+            return res.status(400).json({
+                success: false,
+                message: 'Tên đăng nhập phải có ít nhất 3 ký tự'
+            });
+        }
+
+        const cleanPassword = String(password).trim();
+        if (cleanPassword.length < 4) {
+            return res.status(400).json({
+                success: false,
+                message: 'Mật khẩu phải có ít nhất 4 ký tự'
+            });
+        }
+
+        const existing = AUTH_USERS.find(u => 
+            u.username.toLowerCase() === normalizedUsername || 
+            (email && u.email && u.email.toLowerCase() === String(email).trim().toLowerCase())
+        );
+
+        if (existing) {
+            return res.status(409).json({
+                success: false,
+                message: 'Tên đăng nhập hoặc email này đã tồn tại trên hệ thống'
+            });
+        }
+
+        const newUser = {
+            id: 'usr_' + Date.now(),
+            username: normalizedUsername,
+            passwords: [cleanPassword],
+            role: 'user', // Mặc định là tài khoản thành viên / khách hàng
+            name: String(name).trim(),
+            email: email ? String(email).trim() : `${normalizedUsername}@phucdch.vn`,
+            phone: phone ? String(phone).trim() : '',
+            status: 'active',
+            createdAt: new Date().toISOString(),
+            permissions: ['view_realtime', 'stock_screener', 'ai_chat', 'view_ta', 'view_portfolio']
+        };
+
+        AUTH_USERS.push(newUser);
+
+        const token = 'token_' + Buffer.from(`${newUser.username}_${Date.now()}_${Math.random()}`).toString('base64');
+        const sessionData = {
+            id: newUser.id,
+            username: newUser.username,
+            name: newUser.name,
+            email: newUser.email,
+            phone: newUser.phone,
+            role: newUser.role,
+            permissions: newUser.permissions,
+            loginTime: new Date().toISOString()
+        };
+
+        ACTIVE_SESSIONS.set(token, sessionData);
+
+        AUTH_ACCESS_LOGS.unshift({
+            id: 'log_' + Date.now(),
+            timestamp: new Date().toISOString(),
+            username: newUser.username,
+            role: newUser.role,
+            action: `Đăng ký tài khoản khách thành công: ${newUser.username}`,
+            ip: clientIp,
+            status: 'success'
+        });
+        if (AUTH_ACCESS_LOGS.length > 100) AUTH_ACCESS_LOGS.pop();
+
+        res.json({
+            success: true,
+            message: 'Đăng ký tài khoản khách thành công!',
+            token,
+            user: sessionData
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi đăng ký: ' + err.message });
+    }
+});
+
 // Lấy thông tin phiên hiện tại
 app.get('/api/auth/me', (req, res) => {
     const authHeader = req.headers.authorization;
@@ -1738,20 +1828,188 @@ app.post('/api/auth/logout', (req, res) => {
     res.json({ success: true, message: 'Đăng xuất thành công' });
 });
 
-// Danh sách tài khoản (Chỉ dành cho Admin hoặc kiểm tra phân quyền)
+// Danh sách tài khoản (Bảo mật: không lộ mật khẩu ra ngoài)
 app.get('/api/auth/users', (req, res) => {
     const safeUsers = AUTH_USERS.map(u => ({
         id: u.id,
         username: u.username,
         name: u.name,
         email: u.email,
+        phone: u.phone || '',
         role: u.role,
-        avatar: u.avatar,
         status: u.status,
         permissions: u.permissions,
-        defaultPasswordHint: u.passwords[0]
+        createdAt: u.createdAt
     }));
     res.json({ success: true, users: safeUsers });
+});
+
+// ==================== BLOG POSTS MANAGEMENT (ADMIN POST & EDIT) ====================
+const BLOG_DATA_FILE = path.join(__dirname, 'blog_posts.json');
+const POSTS_JS_FILE = path.join(__dirname, 'posts.js');
+
+let blogPostsStore = [];
+
+function initBlogPostsStore() {
+    try {
+        if (fs.existsSync(BLOG_DATA_FILE)) {
+            const raw = fs.readFileSync(BLOG_DATA_FILE, 'utf8');
+            blogPostsStore = JSON.parse(raw);
+        } else {
+            // Load from posts.js if exists
+            if (fs.existsSync(POSTS_JS_FILE)) {
+                try {
+                    delete require.cache[require.resolve(POSTS_JS_FILE)];
+                    const imported = require(POSTS_JS_FILE);
+                    if (imported && Array.isArray(imported.blogPosts)) {
+                        blogPostsStore = imported.blogPosts;
+                    }
+                } catch { /* fallback */ }
+            }
+            if (!blogPostsStore.length) {
+                blogPostsStore = [
+                    {
+                        id: "post_1",
+                        title: "Phân tích thị trường chứng khoán Việt Nam Q1/2026",
+                        excerpt: "Nhìn lại diễn biến thị trường quý 1 và dự báo xu hướng trong thời gian tới. VN-Index đã tăng trưởng 8.5% so với đầu năm.",
+                        content: "Diễn biến thị trường chứng khoán quý 1 ghi nhận sự bứt phá của nhóm cổ phiếu vốn hóa lớn và ngành công nghệ, bán lẻ...",
+                        date: "15/03/2026",
+                        author: "Đặng Cao Hoàng Phúc",
+                        tags: ["Phân tích", "VN-Index", "Thị trường"],
+                        url: "#"
+                    },
+                    {
+                        id: "post_2",
+                        title: "5 cổ phiếu triển vọng trong ngành công nghệ",
+                        excerpt: "Khám phá những cổ phiếu công nghệ đang được định giá hấp dẫn với tiềm năng tăng trưởng cao trong 2026.",
+                        content: "Ngành công nghệ Việt Nam đang có nhiều động lực tăng trưởng từ chuyển đổi số, bán dẫn và đầu tư công nghệ cao...",
+                        date: "10/03/2026",
+                        author: "Đặng Cao Hoàng Phúc",
+                        tags: ["Công nghệ", "Cổ phiếu", "Khuyến nghị"],
+                        url: "#"
+                    },
+                    {
+                        id: "post_3",
+                        title: "Chiến lược đầu tư trong bối cảnh lãi suất tăng",
+                        excerpt: "Cách điều chỉnh danh mục đầu tư khi Ngân hàng Nhà nước tăng lãi suất điều hành. Phân tích rủi ro và cơ hội.",
+                        content: "Trong môi trường lãi suất có xu hướng tăng, nhà đầu tư nên ưu tiên các doanh nghiệp có lượng tiền mặt dồi dào, tỷ lệ nợ vay thấp...",
+                        date: "05/03/2026",
+                        author: "Đặng Cao Hoàng Phúc",
+                        tags: ["Chiến lược", "Lãi suất", "Đầu tư"],
+                        url: "#"
+                    }
+                ];
+            }
+            saveBlogStore();
+        }
+    } catch (err) {
+        console.error('Lỗi khi khởi tạo blog posts store:', err.message);
+    }
+}
+
+function saveBlogStore() {
+    try {
+        fs.writeFileSync(BLOG_DATA_FILE, JSON.stringify(blogPostsStore, null, 2), 'utf8');
+        // Đồng bộ cả posts.js để phục vụ khi chạy static
+        const postsJsContent = `// Blog posts data\n// Danh sách bài viết blog thị trường & khuyến nghị đầu tư\nvar blogPosts = ${JSON.stringify(blogPostsStore, null, 2)};\n\nif (typeof module !== 'undefined' && module.exports) {\n  module.exports = { blogPosts };\n}\n`;
+        fs.writeFileSync(POSTS_JS_FILE, postsJsContent, 'utf8');
+    } catch (err) {
+        console.error('Lỗi khi ghi blog store:', err.message);
+    }
+}
+
+initBlogPostsStore();
+
+// API: Lấy danh sách bài viết blog
+app.get('/api/blog/posts', (req, res) => {
+    res.json({ success: true, posts: blogPostsStore });
+});
+
+// API: Đăng bài viết blog mới (Admin)
+app.post('/api/blog/posts', (req, res) => {
+    try {
+        const { title, excerpt, content, author, date, tags, url } = req.body || {};
+        if (!title || !excerpt) {
+            return res.status(400).json({ success: false, message: 'Vui lòng nhập tiêu đề và tóm tắt bài viết' });
+        }
+
+        const newPost = {
+            id: 'post_' + Date.now(),
+            title: String(title).trim(),
+            excerpt: String(excerpt).trim(),
+            content: content ? String(content).trim() : String(excerpt).trim(),
+            author: author ? String(author).trim() : 'Đặng Cao Hoàng Phúc',
+            date: date ? String(date).trim() : new Date().toLocaleDateString('vi-VN'),
+            tags: Array.isArray(tags) ? tags : (tags ? String(tags).split(',').map(t => t.trim()).filter(Boolean) : ['Thị trường']),
+            url: url ? String(url).trim() : '#'
+        };
+
+        blogPostsStore.unshift(newPost);
+        saveBlogStore();
+
+        res.json({
+            success: true,
+            message: 'Đăng bài viết mới thành công',
+            post: newPost
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi khi đăng bài viết: ' + err.message });
+    }
+});
+
+// API: Sửa thông tin bài viết blog (Admin)
+app.put('/api/blog/posts/:id', (req, res) => {
+    try {
+        const postId = req.params.id;
+        const { title, excerpt, content, author, date, tags, url } = req.body || {};
+
+        const postIndex = blogPostsStore.findIndex(p => String(p.id) === String(postId));
+        if (postIndex === -1) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy bài viết' });
+        }
+
+        const existing = blogPostsStore[postIndex];
+        const updatedPost = {
+            ...existing,
+            title: title ? String(title).trim() : existing.title,
+            excerpt: excerpt ? String(excerpt).trim() : existing.excerpt,
+            content: content !== undefined ? String(content).trim() : existing.content,
+            author: author ? String(author).trim() : existing.author,
+            date: date ? String(date).trim() : existing.date,
+            tags: tags !== undefined ? (Array.isArray(tags) ? tags : String(tags).split(',').map(t => t.trim()).filter(Boolean)) : existing.tags,
+            url: url !== undefined ? String(url).trim() : existing.url,
+            updatedAt: new Date().toISOString()
+        };
+
+        blogPostsStore[postIndex] = updatedPost;
+        saveBlogStore();
+
+        res.json({
+            success: true,
+            message: 'Cập nhật thông tin bài viết thành công',
+            post: updatedPost
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi khi cập nhật bài viết: ' + err.message });
+    }
+});
+
+// API: Xóa bài viết blog (Admin)
+app.delete('/api/blog/posts/:id', (req, res) => {
+    try {
+        const postId = req.params.id;
+        const initialLen = blogPostsStore.length;
+        blogPostsStore = blogPostsStore.filter(p => String(p.id) !== String(postId));
+
+        if (blogPostsStore.length === initialLen) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy bài viết để xóa' });
+        }
+
+        saveBlogStore();
+        res.json({ success: true, message: 'Đã xóa bài viết thành công' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi khi xóa bài viết: ' + err.message });
+    }
 });
 
 // Giám sát tài nguyên hệ thống (Admin System Monitor)

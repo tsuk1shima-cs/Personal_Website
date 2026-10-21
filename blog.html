@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog - Đặng Cao Hoàng Phúc</title>
+    <title>Blog & Phân Tích - Đặng Cao Hoàng Phúc</title>
     <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
     <script src="posts.js"></script>
     <style>
         .blog-container {
@@ -14,8 +15,13 @@
         }
         
         .blog-header {
-            margin-bottom: 42px;
+            margin-bottom: 24px;
             padding-left: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 16px;
         }
         
         .blog-header h1 {
@@ -29,45 +35,124 @@
             font-size: 15px;
             line-height: 1.5;
         }
+
+        /* ADMIN TOOLBAR BANNER */
+        .admin-blog-banner {
+            background: #ffffff;
+            border: 1px solid #d97706;
+            border-left: 4px solid #d97706;
+            border-radius: 4px;
+            padding: 12px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.08);
+        }
+        .admin-banner-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .role-pill-admin {
+            background: #d97706;
+            color: #ffffff;
+            font-size: 10.5px;
+            font-weight: 750;
+            padding: 3px 8px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .role-pill-user {
+            background: #059669;
+            color: #ffffff;
+            font-size: 10.5px;
+            font-weight: 750;
+            padding: 3px 8px;
+            border-radius: 3px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
         
         .posts-list {
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 20px;
             margin-bottom: 40px;
         }
         
         .post-card {
             background: white;
             border: 1px solid #e0e0e0;
-            padding: 26px 28px;
-            cursor: pointer;
-            transition: border-color 0.2s;
+            padding: 24px 28px;
+            position: relative;
+            transition: all 0.2s ease;
         }
         
         .post-card:hover {
             border-color: #999;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
         }
         
         .post-card:nth-child(3n+1) {
-            margin-left: 20px;
+            margin-left: 16px;
         }
         
         .post-card:nth-child(3n+2) {
-            margin-right: 20px;
+            margin-right: 16px;
         }
         
         .post-meta {
             display: flex;
-            gap: 14px;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
             font-size: 13px;
             color: #888;
             font-weight: 400;
         }
         
-        .post-meta span {
-            position: relative;
+        .post-meta-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .post-admin-actions {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .btn-post-action {
+            background: #f4f4f5;
+            border: 1px solid #d4d4d8;
+            padding: 3px 9px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-post-action.edit {
+            color: #2563eb;
+            border-color: #93c5fd;
+            background: #eff6ff;
+        }
+        .btn-post-action.edit:hover {
+            background: #2563eb;
+            color: #ffffff;
+        }
+        .btn-post-action.delete {
+            color: #dc2626;
+            border-color: #fca5a5;
+            background: #fef2f2;
+        }
+        .btn-post-action.delete:hover {
+            background: #dc2626;
+            color: #ffffff;
         }
         
         .post-title {
@@ -77,6 +162,10 @@
             color: #222;
             line-height: 1.35;
             letter-spacing: -0.01em;
+            cursor: pointer;
+        }
+        .post-title:hover {
+            color: #0284c7;
         }
         
         .post-excerpt {
@@ -93,12 +182,13 @@
         }
         
         .tag {
-            padding: 5px 11px;
+            padding: 4px 10px;
             background: #f5f5f5;
             border: 1px solid #ddd;
             font-size: 12px;
             font-weight: 500;
             color: #666;
+            border-radius: 2px;
         }
         
         .empty-state {
@@ -118,12 +208,135 @@
             color: #999;
             font-size: 14px;
         }
+
+        /* MODAL DIALOG */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
+        }
+        .modal-card {
+            background: #ffffff;
+            border-radius: 6px;
+            width: 520px;
+            max-width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .modal-head {
+            padding: 14px 18px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-head h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #111827;
+        }
+        .modal-body {
+            padding: 18px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .form-group label {
+            font-size: 12px;
+            font-weight: 650;
+            color: #374151;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 13px;
+            outline: none;
+            box-sizing: border-box;
+            background: #fff;
+        }
+        .form-control:focus {
+            border-color: #2563eb;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .btn-modal-cancel {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            color: #374151;
+            padding: 7px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-modal-save {
+            background: #0284c7;
+            border: none;
+            color: #ffffff;
+            padding: 7px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-modal-save:hover {
+            background: #0369a1;
+        }
+
+        /* TOAST */
+        .blog-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 5px;
+            font-size: 13px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            display: none;
+        }
         
         @media (max-width: 768px) {
             .post-card:nth-child(3n+1),
             .post-card:nth-child(3n+2) {
                 margin-left: 0;
                 margin-right: 0;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -176,12 +389,13 @@
 
                 <a href="tin-tuc.html" class="nav-link">Tin tức</a>
                 <a href="chatbot.html" class="nav-link">Chatbot</a>
-                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="blog.html" class="nav-link" style="color:var(--color-primary, #0284c7);font-weight:700;">Blog</a>
                 <a href="dashboard.html" class="nav-link">Dashboard</a>
             </div>
 
-            <div class="nav-actions">
-                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+            <!-- HEADER AUTH & ACTIONS -->
+            <div class="nav-actions" id="blogHeaderAuth">
+                <!-- Sẽ được render tự động qua JS theo trạng thái đăng nhập -->
             </div>
 
             <button class="hamburger" onclick="toggleMobileMenu()">
@@ -212,16 +426,163 @@
     <!-- BLOG CONTAINER -->
     <section class="blog-container">
         <div class="wrap">
+            <!-- BANNER CHẾ ĐỘ QUẢN TRỊ VIÊN (HIỂN THỊ KHI ĐĂNG NHẬP ADMIN) -->
+            <div class="admin-blog-banner" id="adminBlogBanner" style="display:none;">
+                <div class="admin-banner-left">
+                    <span class="role-pill-admin">ADMIN</span>
+                    <span style="font-size:13.5px;color:#1e293b;font-weight:600;">Chế độ Quản trị viên: Bạn có toàn quyền đăng bài viết mới, chỉnh sửa và gỡ bài viết.</span>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" onclick="openBlogEditModal()" style="background:#d97706;color:#fff;border:none;padding:6px 14px;border-radius:4px;font-size:12.5px;font-weight:700;cursor:pointer;">
+                        + Đăng bài viết mới
+                    </button>
+                    <a href="dashboard.html" style="background:#f3f4f6;color:#374151;border:1px solid #d1d5db;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;">
+                        Vào Dashboard ↗
+                    </a>
+                </div>
+            </div>
+
             <div class="blog-header">
-                <h1>Blog & Phân tích</h1>
-                <p>Chia sẻ kiến thức, phân tích thị trường và chiến lược đầu tư</p>
+                <div>
+                    <h1>Blog & Phân tích</h1>
+                    <p>Chia sẻ kiến thức, phân tích thị trường và chiến lược đầu tư</p>
+                </div>
+                <div id="guestRegisterPrompt" style="font-size:13px;color:#666;">
+                    Bạn là khách? <a href="javascript:;" onclick="openAuthModal('register')" style="color:#0284c7;font-weight:600;text-decoration:none;">Đăng ký tài khoản</a> để cập nhật nhận định sớm nhất.
+                </div>
             </div>
 
             <div class="posts-list" id="postsGrid">
-                <!-- Posts will be loaded from posts.js -->
+                <!-- Posts will be loaded from posts.js & localStorage -->
             </div>
         </div>
     </section>
+
+    <!-- MODAL ĐĂNG & SỬA BÀI VIẾT (DÀNH CHO ADMIN) -->
+    <div class="modal-overlay" id="blogPostModal" onclick="if(event.target.id==='blogPostModal')closeBlogPostModal()" style="display:none;">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="modal-head">
+                <h3 id="blogPostModalTitle">Đăng Bài Viết Mới</h3>
+                <button onclick="closeBlogPostModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;line-height:1;">&times;</button>
+            </div>
+            <form id="blogPostForm" onsubmit="handleSavePost(event)" class="modal-body">
+                <input type="hidden" id="editPostId" value="">
+                
+                <div class="form-group">
+                    <label>Tiêu đề bài viết (*)</label>
+                    <input type="text" id="postTitleInput" class="form-control" placeholder="Nhập tiêu đề bài viết..." required>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Tác giả</label>
+                        <input type="text" id="postAuthorInput" class="form-control" value="Đặng Cao Hoàng Phúc" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày đăng</label>
+                        <input type="text" id="postDateInput" class="form-control" placeholder="DD/MM/YYYY" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Thẻ phân loại (ngăn cách bằng dấu phẩy)</label>
+                    <input type="text" id="postTagsInput" class="form-control" placeholder="Ví dụ: Phân tích, VN-Index, Cổ phiếu">
+                </div>
+
+                <div class="form-group">
+                    <label>Tóm tắt ngắn gọn (*)</label>
+                    <textarea id="postExcerptInput" class="form-control" rows="3" placeholder="Mô tả tóm tắt nội dung bài viết..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Nội dung chi tiết</label>
+                    <textarea id="postContentInput" class="form-control" rows="4" placeholder="Nhập nội dung bài viết..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Đường dẫn bài viết (URL)</label>
+                    <input type="text" id="postUrlInput" class="form-control" placeholder="# hoặc link bài viết ngoài" value="#">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" onclick="closeBlogPostModal()" class="btn-modal-cancel">Hủy</button>
+                    <button type="submit" id="btnSavePost" class="btn-modal-save">Lưu bài viết</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <div class="modal-overlay" id="authModal" onclick="if(event.target.id==='authModal')closeAuthModal()" style="display:none;">
+        <div class="modal-card" style="width:420px;" onclick="event.stopPropagation()">
+            <div class="modal-head">
+                <div>
+                    <h3 id="authModalTitle">Tài Khoản & Phân Quyền</h3>
+                    <div style="font-size:11.5px;color:#6b7280;margin-top:2px;" id="authModalSub">Đăng nhập tài khoản hoặc tạo tài khoản mới</div>
+                </div>
+                <button onclick="closeAuthModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6b7280;line-height:1;">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <!-- TABS -->
+                <div style="display:flex;background:#f3f4f6;border-radius:4px;padding:3px;gap:4px;">
+                    <button type="button" id="tabLoginBtn" onclick="switchAuthMode('login')" style="flex:1;padding:6px;border:none;border-radius:3px;font-size:12.5px;font-weight:700;cursor:pointer;background:#fff;color:#111827;box-shadow:0 1px 2px rgba(0,0,0,0.1);">Đăng nhập</button>
+                    <button type="button" id="tabRegisterBtn" onclick="switchAuthMode('register')" style="flex:1;padding:6px;border:none;border-radius:3px;font-size:12.5px;font-weight:600;cursor:pointer;background:none;color:#6b7280;">Đăng ký tài khoản khách</button>
+                </div>
+
+                <!-- FORM LOGIN -->
+                <form id="blogLoginForm" onsubmit="handleBlogLogin(event)" style="display:flex;flex-direction:column;gap:10px;">
+                    <div class="form-group">
+                        <label>Tên đăng nhập hoặc Email</label>
+                        <input type="text" id="blogLoginUser" class="form-control" placeholder="Tên đăng nhập..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu</label>
+                        <input type="password" id="blogLoginPwd" class="form-control" placeholder="Nhập mật khẩu..." required>
+                    </div>
+                    <div id="blogLoginMsg" style="display:none;font-size:12px;padding:6px 10px;border-radius:4px;background:#fef2f2;color:#b91c1c;"></div>
+                    <button type="submit" class="btn-modal-save" style="margin-top:4px;">Đăng nhập</button>
+                </form>
+
+                <!-- FORM REGISTER -->
+                <form id="blogRegForm" onsubmit="handleBlogRegister(event)" style="display:none;flex-direction:column;gap:9px;">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" id="blogRegName" class="form-control" placeholder="Nguyễn Văn A" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Tên đăng nhập</label>
+                            <input type="text" id="blogRegUser" class="form-control" placeholder="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="tel" id="blogRegPhone" class="form-control" placeholder="098...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email liên hệ</label>
+                        <input type="email" id="blogRegEmail" class="form-control" placeholder="email@example.com" required>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Mật khẩu</label>
+                            <input type="password" id="blogRegPwd" class="form-control" placeholder="Tối thiểu 4 ký tự" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Xác nhận mật khẩu</label>
+                            <input type="password" id="blogRegConfirmPwd" class="form-control" placeholder="Nhập lại..." required>
+                        </div>
+                    </div>
+                    <div id="blogRegMsg" style="display:none;font-size:12px;padding:6px 10px;border-radius:4px;background:#fef2f2;color:#b91c1c;"></div>
+                    <button type="submit" class="btn-modal-save" style="margin-top:4px;">Tạo tài khoản khách</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="blogToast" class="blog-toast"></div>
 
     <!-- FOOTER -->
     <footer class="footer">
@@ -239,40 +600,488 @@
 
     <script src="nav-script.js"></script>
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            loadPosts();
-        });
+        // ==========================================
+        // DỮ LIỆU BÀI VIẾT BLOG & ĐỒNG BỘ
+        // ==========================================
+        let currentBlogPosts = [];
+        let currentAuthUser = null;
 
-        function loadPosts() {
+        function showToast(message) {
+            const toast = document.getElementById('blogToast');
+            if (!toast) return;
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3200);
+        }
+
+        // Kiểm tra phiên đăng nhập
+        function checkAuthStatus() {
+            try {
+                const saved = localStorage.getItem('phucdch_auth_user');
+                if (saved) {
+                    currentAuthUser = JSON.parse(saved);
+                } else {
+                    currentAuthUser = null;
+                }
+            } catch {
+                currentAuthUser = null;
+            }
+
+            renderHeaderAuth();
+            renderAdminBanner();
+        }
+
+        function renderHeaderAuth() {
+            const wrap = document.getElementById('blogHeaderAuth');
+            if (!wrap) return;
+
+            if (currentAuthUser) {
+                const isAdmin = currentAuthUser.role === 'admin';
+                wrap.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <span class="${isAdmin ? 'role-pill-admin' : 'role-pill-user'}">${isAdmin ? 'ADMIN' : 'THÀNH VIÊN'}</span>
+                        <span style="font-size:13px;font-weight:600;color:#1e293b;">${currentAuthUser.name}</span>
+                        ${isAdmin ? `
+                            <button type="button" class="btn btn--outline" style="padding:5px 12px;font-size:12px;" onclick="openBlogEditModal()">+ Đăng bài</button>
+                        ` : ''}
+                        <button type="button" class="btn btn--outline" style="padding:5px 10px;font-size:12px;color:#ef4444;" onclick="handleBlogLogout()">Đăng xuất</button>
+                    </div>
+                `;
+            } else {
+                wrap.innerHTML = `
+                    <button class="btn btn--outline" style="padding:6px 14px;font-size:12.5px;" onclick="openAuthModal('login')">Đăng nhập</button>
+                    <button class="btn btn--solid" style="padding:6px 14px;font-size:12.5px;" onclick="openAuthModal('register')">Đăng ký khách</button>
+                `;
+            }
+        }
+
+        function renderAdminBanner() {
+            const banner = document.getElementById('adminBlogBanner');
+            const guestPrompt = document.getElementById('guestRegisterPrompt');
+            const isAdmin = currentAuthUser && currentAuthUser.role === 'admin';
+
+            if (banner) banner.style.display = isAdmin ? 'flex' : 'none';
+            if (guestPrompt) guestPrompt.style.display = currentAuthUser ? 'none' : 'block';
+        }
+
+        // Tải danh sách bài viết
+        async function loadPosts() {
+            // 1. Thử lấy từ localStorage
+            try {
+                const cached = localStorage.getItem('phucdch_blog_posts');
+                if (cached) {
+                    currentBlogPosts = JSON.parse(cached);
+                } else if (typeof blogPosts !== 'undefined' && Array.isArray(blogPosts)) {
+                    currentBlogPosts = [...blogPosts];
+                }
+            } catch {
+                if (typeof blogPosts !== 'undefined' && Array.isArray(blogPosts)) {
+                    currentBlogPosts = [...blogPosts];
+                }
+            }
+
+            renderPostsGrid();
+
+            // 2. Thử fetch từ API backend nếu có
+            try {
+                const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+                    ? APP_CONFIG.apiBase
+                    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+                if (apiBase) {
+                    const res = await fetch(`${apiBase}/blog/posts`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.success && Array.isArray(data.posts)) {
+                            currentBlogPosts = data.posts;
+                            localStorage.setItem('phucdch_blog_posts', JSON.stringify(currentBlogPosts));
+                            renderPostsGrid();
+                        }
+                    }
+                }
+            } catch { /* offline mode */ }
+        }
+
+        function renderPostsGrid() {
             const grid = document.getElementById('postsGrid');
+            if (!grid) return;
             
-            if (typeof blogPosts === 'undefined' || blogPosts.length === 0) {
+            if (!currentBlogPosts || currentBlogPosts.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state">
-                        <h3>Chưa có bài viết</h3>
-                        <p>Thêm bài viết vào file posts.js để hiển thị ở đây</p>
+                        <h3>Chưa có bài viết nào</h3>
+                        <p>${currentAuthUser && currentAuthUser.role === 'admin' ? 'Nhấp vào "+ Đăng bài viết mới" để tạo bài viết đầu tiên.' : 'Hiện tại chưa có bài viết nào được đăng.'}</p>
                     </div>
                 `;
                 return;
             }
 
-            grid.innerHTML = blogPosts.map(post => `
-                <article class="post-card" onclick="window.location.href='${post.url || '#'}'">
-                    <div class="post-meta">
-                        <span>${post.date}</span>
-                        <span>•</span>
-                        <span>${post.author || 'Đặng Cao Hoàng Phúc'}</span>
-                    </div>
-                    <h2 class="post-title">${post.title}</h2>
-                    <p class="post-excerpt">${post.excerpt}</p>
-                    ${post.tags ? `
-                        <div class="post-tags">
-                            ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            const isAdmin = currentAuthUser && currentAuthUser.role === 'admin';
+
+            grid.innerHTML = currentBlogPosts.map((post, idx) => {
+                const pid = post.id || ('post_' + idx);
+                return `
+                    <article class="post-card">
+                        <div class="post-meta">
+                            <div class="post-meta-left">
+                                <span>${post.date || ''}</span>
+                                <span>•</span>
+                                <span>${post.author || 'Đặng Cao Hoàng Phúc'}</span>
+                            </div>
+                            ${isAdmin ? `
+                                <div class="post-admin-actions" onclick="event.stopPropagation()">
+                                    <button type="button" class="btn-post-action edit" onclick="openBlogEditModal('${pid}')">Sửa bài viết</button>
+                                    <button type="button" class="btn-post-action delete" onclick="deleteBlogPost('${pid}')">Xóa</button>
+                                </div>
+                            ` : ''}
                         </div>
-                    ` : ''}
-                </article>
-            `).join('');
+                        <h2 class="post-title" onclick="window.location.href='${post.url || '#'}'">${post.title}</h2>
+                        <p class="post-excerpt">${post.excerpt || ''}</p>
+                        ${post.tags && post.tags.length ? `
+                            <div class="post-tags">
+                                ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </article>
+                `;
+            }).join('');
         }
+
+        // ==========================================
+        // QUẢN TRỊ BÀI VIẾT: TẠO MỚI, CHỈNH SỬA & XÓA
+        // ==========================================
+        function openBlogEditModal(postId = null) {
+            const modal = document.getElementById('blogPostModal');
+            const titleEl = document.getElementById('blogPostModalTitle');
+            const idInput = document.getElementById('editPostId');
+            const titleInput = document.getElementById('postTitleInput');
+            const authorInput = document.getElementById('postAuthorInput');
+            const dateInput = document.getElementById('postDateInput');
+            const tagsInput = document.getElementById('postTagsInput');
+            const excerptInput = document.getElementById('postExcerptInput');
+            const contentInput = document.getElementById('postContentInput');
+            const urlInput = document.getElementById('postUrlInput');
+
+            if (postId) {
+                const p = currentBlogPosts.find(item => String(item.id) === String(postId));
+                if (p) {
+                    if (titleEl) titleEl.textContent = 'Chỉnh Sửa Bài Viết';
+                    if (idInput) idInput.value = p.id;
+                    if (titleInput) titleInput.value = p.title || '';
+                    if (authorInput) authorInput.value = p.author || 'Đặng Cao Hoàng Phúc';
+                    if (dateInput) dateInput.value = p.date || new Date().toLocaleDateString('vi-VN');
+                    if (tagsInput) tagsInput.value = Array.isArray(p.tags) ? p.tags.join(', ') : (p.tags || '');
+                    if (excerptInput) excerptInput.value = p.excerpt || '';
+                    if (contentInput) contentInput.value = p.content || '';
+                    if (urlInput) urlInput.value = p.url || '#';
+                }
+            } else {
+                if (titleEl) titleEl.textContent = 'Đăng Bài Viết Mới';
+                if (idInput) idInput.value = '';
+                if (titleInput) titleInput.value = '';
+                if (authorInput) authorInput.value = 'Đặng Cao Hoàng Phúc';
+                if (dateInput) dateInput.value = new Date().toLocaleDateString('vi-VN');
+                if (tagsInput) tagsInput.value = 'Phân tích, Thị trường, VN-Index';
+                if (excerptInput) excerptInput.value = '';
+                if (contentInput) contentInput.value = '';
+                if (urlInput) urlInput.value = '#';
+            }
+
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeBlogPostModal() {
+            const modal = document.getElementById('blogPostModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function handleSavePost(e) {
+            if (e) e.preventDefault();
+
+            const editId = (document.getElementById('editPostId')?.value || '').trim();
+            const title = (document.getElementById('postTitleInput')?.value || '').trim();
+            const author = (document.getElementById('postAuthorInput')?.value || 'Đặng Cao Hoàng Phúc').trim();
+            const date = (document.getElementById('postDateInput')?.value || new Date().toLocaleDateString('vi-VN')).trim();
+            const tagsRaw = (document.getElementById('postTagsInput')?.value || '').trim();
+            const excerpt = (document.getElementById('postExcerptInput')?.value || '').trim();
+            const content = (document.getElementById('postContentInput')?.value || '').trim();
+            const url = (document.getElementById('postUrlInput')?.value || '#').trim();
+            const btnSave = document.getElementById('btnSavePost');
+
+            if (!title || !excerpt) {
+                alert('Vui lòng điền tiêu đề và tóm tắt bài viết!');
+                return;
+            }
+
+            if (btnSave) {
+                btnSave.disabled = true;
+                btnSave.textContent = 'Đang lưu...';
+            }
+
+            const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : ['Thị trường'];
+
+            if (editId) {
+                // Sửa bài viết
+                const idx = currentBlogPosts.findIndex(p => String(p.id) === String(editId));
+                if (idx !== -1) {
+                    currentBlogPosts[idx] = {
+                        ...currentBlogPosts[idx],
+                        title, author, date, tags, excerpt, content, url
+                    };
+                }
+                // Đồng bộ API backend
+                try {
+                    const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+                        ? APP_CONFIG.apiBase
+                        : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+                    if (apiBase) {
+                        await fetch(`${apiBase}/blog/posts/${editId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ title, author, date, tags, excerpt, content, url })
+                        }).catch(() => null);
+                    }
+                } catch { /* ignore */ }
+            } else {
+                // Đăng bài viết mới
+                const newPost = {
+                    id: 'post_' + Date.now(),
+                    title, author, date, tags, excerpt, content, url
+                };
+                currentBlogPosts.unshift(newPost);
+                // Đồng bộ API backend
+                try {
+                    const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+                        ? APP_CONFIG.apiBase
+                        : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+                    if (apiBase) {
+                        await fetch(`${apiBase}/blog/posts`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(newPost)
+                        }).catch(() => null);
+                    }
+                } catch { /* ignore */ }
+            }
+
+            // Lưu LocalStorage
+            try {
+                localStorage.setItem('phucdch_blog_posts', JSON.stringify(currentBlogPosts));
+            } catch (err) {
+                console.error(err);
+            }
+
+            if (btnSave) {
+                btnSave.disabled = false;
+                btnSave.textContent = 'Lưu bài viết';
+            }
+
+            closeBlogPostModal();
+            renderPostsGrid();
+            showToast(editId ? 'Đã cập nhật bài viết thành công!' : 'Đã đăng bài viết mới thành công!');
+        }
+
+        async function deleteBlogPost(postId) {
+            if (!confirm('Bạn có chắc chắn muốn xóa bài viết này khỏi blog?')) return;
+
+            currentBlogPosts = currentBlogPosts.filter(p => String(p.id) !== String(postId));
+            localStorage.setItem('phucdch_blog_posts', JSON.stringify(currentBlogPosts));
+
+            // Gọi API backend
+            try {
+                const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+                    ? APP_CONFIG.apiBase
+                    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+                if (apiBase) {
+                    fetch(`${apiBase}/blog/posts/${postId}`, { method: 'DELETE' }).catch(() => null);
+                }
+            } catch { /* ignore */ }
+
+            renderPostsGrid();
+            showToast('Đã xóa bài viết thành công.');
+        }
+
+        // ==========================================
+        // AUTH TRÊN TRANG BLOG
+        // ==========================================
+        function openAuthModal(mode = 'login') {
+            const m = document.getElementById('authModal');
+            if (m) m.style.display = 'flex';
+            switchAuthMode(mode);
+        }
+
+        function closeAuthModal() {
+            const m = document.getElementById('authModal');
+            if (m) m.style.display = 'none';
+        }
+
+        function switchAuthMode(mode) {
+            const tabLogin = document.getElementById('tabLoginBtn');
+            const tabReg = document.getElementById('tabRegisterBtn');
+            const fLogin = document.getElementById('blogLoginForm');
+            const fReg = document.getElementById('blogRegForm');
+            const sub = document.getElementById('authModalSub');
+            const msg1 = document.getElementById('blogLoginMsg');
+            const msg2 = document.getElementById('blogRegMsg');
+
+            if (msg1) msg1.style.display = 'none';
+            if (msg2) msg2.style.display = 'none';
+
+            if (mode === 'register') {
+                if (fLogin) fLogin.style.display = 'none';
+                if (fReg) fReg.style.display = 'flex';
+                if (tabLogin) { tabLogin.style.background = 'none'; tabLogin.style.fontWeight = '600'; tabLogin.style.color = '#6b7280'; tabLogin.style.boxShadow = 'none'; }
+                if (tabReg) { tabReg.style.background = '#fff'; tabReg.style.fontWeight = '700'; tabReg.style.color = '#111827'; tabReg.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)'; }
+                if (sub) sub.textContent = 'Đăng ký tài khoản khách để tương tác & lưu bài viết';
+            } else {
+                if (fLogin) fLogin.style.display = 'flex';
+                if (fReg) fReg.style.display = 'none';
+                if (tabLogin) { tabLogin.style.background = '#fff'; tabLogin.style.fontWeight = '700'; tabLogin.style.color = '#111827'; tabLogin.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)'; }
+                if (tabReg) { tabReg.style.background = 'none'; tabReg.style.fontWeight = '600'; tabReg.style.color = '#6b7280'; tabReg.style.boxShadow = 'none'; }
+                if (sub) sub.textContent = 'Đăng nhập Quản trị viên (Admin) hoặc Thành viên';
+            }
+        }
+
+        function handleBlogLogin(e) {
+            e.preventDefault();
+            const u = (document.getElementById('blogLoginUser')?.value || '').trim();
+            const p = (document.getElementById('blogLoginPwd')?.value || '').trim();
+            const msg = document.getElementById('blogLoginMsg');
+
+            // Default accounts
+            const defaultAccs = [
+                { username: 'admin', passwords: ['admin', 'admin123', 'phucdch2026'], role: 'admin', name: 'Quản trị viên (Admin)', email: 'admin@phucdch.vn' },
+                { username: 'user', passwords: ['user', 'user123', '123456'], role: 'user', name: 'Người dùng Pro', email: 'user@phucdch.vn' },
+                { username: 'demo_investor', passwords: ['phucdch2026', 'demo123'], role: 'user', name: 'Nhà đầu tư Cá nhân', email: 'demo@phucdch.vn' }
+            ];
+
+            let registered = [];
+            try {
+                const s = localStorage.getItem('phucdch_registered_users');
+                if (s) registered = JSON.parse(s);
+            } catch { /* ignore */ }
+
+            const all = [...defaultAccs, ...registered];
+            const found = all.find(acc => 
+                (acc.username.toLowerCase() === u.toLowerCase() || (acc.email && acc.email.toLowerCase() === u.toLowerCase())) &&
+                (acc.passwords && acc.passwords.includes(p))
+            );
+
+            if (found) {
+                const session = {
+                    username: found.username,
+                    name: found.name,
+                    role: found.role,
+                    email: found.email,
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('phucdch_auth_user', JSON.stringify(session));
+                currentAuthUser = session;
+                closeAuthModal();
+                checkAuthStatus();
+                renderPostsGrid();
+                showToast(`Đăng nhập thành công! Quyền: ${found.role === 'admin' ? 'Quản trị viên' : 'Thành viên'}`);
+            } else {
+                if (msg) {
+                    msg.textContent = 'Tên đăng nhập hoặc mật khẩu không chính xác!';
+                    msg.style.display = 'block';
+                }
+            }
+        }
+
+        async function handleBlogRegister(e) {
+            e.preventDefault();
+            const name = (document.getElementById('blogRegName')?.value || '').trim();
+            const username = (document.getElementById('blogRegUser')?.value || '').trim().toLowerCase();
+            const phone = (document.getElementById('blogRegPhone')?.value || '').trim();
+            const email = (document.getElementById('blogRegEmail')?.value || '').trim().toLowerCase();
+            const pwd = (document.getElementById('blogRegPwd')?.value || '').trim();
+            const confirm = (document.getElementById('blogRegConfirmPwd')?.value || '').trim();
+            const msg = document.getElementById('blogRegMsg');
+
+            if (!name || !username || !email || !pwd) {
+                if (msg) { msg.textContent = 'Vui lòng điền đầy đủ các thông tin bắt buộc!'; msg.style.display = 'block'; }
+                return;
+            }
+
+            if (pwd !== confirm) {
+                if (msg) { msg.textContent = 'Mật khẩu xác nhận không khớp!'; msg.style.display = 'block'; }
+                return;
+            }
+
+            if (pwd.length < 4) {
+                if (msg) { msg.textContent = 'Mật khẩu phải từ 4 ký tự trở lên!'; msg.style.display = 'block'; }
+                return;
+            }
+
+            let registered = [];
+            try {
+                const s = localStorage.getItem('phucdch_registered_users');
+                if (s) registered = JSON.parse(s);
+            } catch { /* ignore */ }
+
+            if (registered.some(u => u.username === username || u.email === email) || username === 'admin' || username === 'user') {
+                if (msg) { msg.textContent = 'Tên đăng nhập hoặc email này đã tồn tại!'; msg.style.display = 'block'; }
+                return;
+            }
+
+            const newUser = {
+                id: 'usr_' + Date.now(),
+                username,
+                passwords: [pwd],
+                role: 'user',
+                name,
+                email,
+                phone,
+                status: 'active',
+                createdAt: new Date().toISOString()
+            };
+
+            registered.push(newUser);
+            localStorage.setItem('phucdch_registered_users', JSON.stringify(registered));
+
+            // Thử gọi backend API
+            try {
+                const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+                    ? APP_CONFIG.apiBase
+                    : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+                if (apiBase) {
+                    await fetch(`${apiBase}/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password: pwd, name, email, phone })
+                    }).catch(() => null);
+                }
+            } catch { /* ignore */ }
+
+            const session = {
+                username: newUser.username,
+                name: newUser.name,
+                role: newUser.role,
+                email: newUser.email,
+                loginTime: new Date().toISOString()
+            };
+            localStorage.setItem('phucdch_auth_user', JSON.stringify(session));
+            currentAuthUser = session;
+
+            closeAuthModal();
+            checkAuthStatus();
+            renderPostsGrid();
+            showToast(`Đăng ký tài khoản khách thành công! Xin chào ${name}`);
+        }
+
+        function handleBlogLogout() {
+            localStorage.removeItem('phucdch_auth_user');
+            currentAuthUser = null;
+            checkAuthStatus();
+            renderPostsGrid();
+            showToast('Đã đăng xuất tài khoản.');
+        }
+
+        // Khởi chạy khi load trang
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuthStatus();
+            loadPosts();
+        });
     </script>
 </body>
 </html>

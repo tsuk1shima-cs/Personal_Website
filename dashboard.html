@@ -2509,9 +2509,9 @@ body {
   user-select: none;
 }
 .header-user-badge.role-admin {
-  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15), rgba(168, 85, 247, 0.15));
-  border: 1px solid rgba(234, 179, 8, 0.4);
-  color: #fbbf24;
+  background: rgba(217, 119, 6, 0.12);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  color: #d97706;
 }
 .header-user-badge.role-user {
   background: rgba(16, 185, 129, 0.12);
@@ -2520,15 +2520,15 @@ body {
 }
 .user-role-pill {
   font-size: 10px;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 10px;
+  font-weight: 750;
+  padding: 2px 7px;
+  border-radius: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 .role-admin .user-role-pill {
-  background: #f59e0b;
-  color: #000;
+  background: #d97706;
+  color: #fff;
 }
 .role-user .user-role-pill {
   background: var(--price-up);
@@ -4415,123 +4415,172 @@ body {
   <!-- TOAST NOTIFICATION CONTAINER CHO THÔNG BÁO REALTIME -->
   <div class="market-toast-container" id="marketToastContainer"></div>
 
-  <!-- MODAL 5: ĐĂNG NHẬP PHÂN QUYỀN (ADMIN & NGƯỜI DÙNG) -->
+  <!-- MODAL 5: ĐĂNG NHẬP & ĐĂNG KÝ PHÂN QUYỀN -->
   <div class="modal-overlay" id="loginModal" onclick="if(event.target.id==='loginModal')closeLoginModal()" style="display:none;">
     <div class="modal-card" onclick="event.stopPropagation()" style="width:440px;max-width:calc(100vw - 32px);">
       <div class="modal-head">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--primary-brand)" stroke-width="2.2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <div>
-            <div style="font-size:15px;font-weight:750;">Đăng Nhập Hệ Thống PhucDCH Finance</div>
-            <div style="font-size:11px;color:var(--text-muted);">Phân quyền 2 cấp độ: Quản trị viên (Admin) & Người dùng (User)</div>
-          </div>
+        <div>
+          <div style="font-size:15px;font-weight:750;" id="authModalTitle">Tài Khoản & Phân Quyền</div>
+          <div style="font-size:11.5px;color:var(--text-muted);" id="authModalSubtitle">Đăng nhập tài khoản hoặc đăng ký thành viên mới</div>
         </div>
-        <button onclick="closeLoginModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);">&times;</button>
+        <button onclick="closeLoginModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);line-height:1;">&times;</button>
       </div>
 
       <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
-        <!-- HỘP THÔNG BÁO TÀI KHOẢN VÀ MẬT KHẨU CẤU HÌNH SẴN -->
-        <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:9px 12px;font-size:11.5px;display:flex;flex-direction:column;gap:5px;">
-          <div style="font-weight:750;color:var(--text-primary);display:flex;align-items:center;gap:5px;">
-            <span>🔑</span>
-            <span>Tài khoản & Mật khẩu đã cấu hình sẵn trong hệ thống:</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px dashed var(--border-stroke);">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="background:rgba(245,158,11,0.2);color:#f59e0b;font-weight:750;padding:1px 6px;border-radius:4px;font-size:10px;">ADMIN</span>
-              <span style="font-weight:600;">admin</span>
+        <!-- TABS CHUYỂN ĐỔI: ĐĂNG NHẬP / ĐĂNG KÝ -->
+        <div style="display:flex;background:var(--bg-subtle);border-radius:var(--radius-sm);padding:3px;border:1px solid var(--border-stroke);gap:4px;">
+          <button type="button" id="tabAuthLoginBtn" onclick="switchAuthTab('login')" style="flex:1;padding:7px;border:none;border-radius:4px;font-size:12.5px;font-weight:700;cursor:pointer;background:var(--bg-container);color:var(--text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);">Đăng nhập</button>
+          <button type="button" id="tabAuthRegisterBtn" onclick="switchAuthTab('register')" style="flex:1;padding:7px;border:none;border-radius:4px;font-size:12.5px;font-weight:600;cursor:pointer;background:none;color:var(--text-secondary);">Đăng ký tài khoản khách</button>
+        </div>
+
+        <!-- TAB 1: FORM ĐĂNG NHẬP -->
+        <div id="authLoginSection" style="display:flex;flex-direction:column;gap:10px;">
+          <form id="loginForm" onsubmit="handleUserLogin(event)" style="display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Tên đăng nhập hoặc Email</label>
+              <input type="text" id="loginUsername" placeholder="Nhập tên đăng nhập hoặc email..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
             </div>
-            <div style="color:var(--text-secondary);font-size:11px;">Mật khẩu: <code style="background:var(--bg-container);padding:1px 5px;border-radius:3px;font-weight:700;">admin</code> / <code style="background:var(--bg-container);padding:1px 5px;border-radius:3px;font-weight:700;">admin123</code></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="background:rgba(16,185,129,0.2);color:var(--price-up);font-weight:750;padding:1px 6px;border-radius:4px;font-size:10px;">USER</span>
-              <span style="font-weight:600;">user</span>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <label style="font-size:11.5px;font-weight:650;color:var(--text-secondary);">Mật khẩu</label>
+                <a href="javascript:;" onclick="togglePasswordVisibility()" style="font-size:11px;color:var(--primary-brand);text-decoration:none;" id="togglePwdText">Hiện mật khẩu</a>
+              </div>
+              <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
             </div>
-            <div style="color:var(--text-secondary);font-size:11px;">Mật khẩu: <code style="background:var(--bg-container);padding:1px 5px;border-radius:3px;font-weight:700;">user123</code></div>
+
+            <div id="loginStatusMsg" style="display:none;font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);"></div>
+
+            <button type="submit" id="btnSubmitLogin" class="btn-login-main" style="width:100%;padding:9px;border:none;cursor:pointer;margin-top:2px;font-size:12.5px;font-weight:750;">Xác nhận Đăng nhập</button>
+          </form>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);margin-top:4px;">
+            <span>Chưa có tài khoản?</span>
+            <a href="javascript:;" onclick="switchAuthTab('register')" style="color:var(--primary-brand);font-weight:650;text-decoration:none;">Đăng ký tài khoản khách ngay</a>
           </div>
         </div>
 
-        <!-- 2 NÚT ĐĂNG NHẬP NHANH 1-CLICK -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button type="button" onclick="quickLoginRole('admin')" class="btn-login-main" style="background:linear-gradient(135deg, #d97706, #b45309);border:none;cursor:pointer;padding:8px 10px;font-size:11.5px;font-weight:750;display:flex;align-items:center;justify-content:center;gap:5px;" title="Đăng nhập ngay với quyền Admin">
-            <span>👑</span>
-            <span>Đăng nhập Admin</span>
-          </button>
-          <button type="button" onclick="quickLoginRole('user')" class="btn-login-main" style="background:linear-gradient(135deg, #059669, #047857);border:none;cursor:pointer;padding:8px 10px;font-size:11.5px;font-weight:750;display:flex;align-items:center;justify-content:center;gap:5px;" title="Đăng nhập ngay với quyền Người dùng">
-            <span>👤</span>
-            <span>Đăng nhập Người dùng</span>
-          </button>
-        </div>
-
-        <div style="display:flex;align-items:center;gap:8px;margin:2px 0;">
-          <div style="flex:1;height:1px;background:var(--border-stroke);"></div>
-          <span style="font-size:10.5px;color:var(--text-muted);font-weight:600;">HOẶC NHẬP TÀI KHOẢN TÙY CHỌN</span>
-          <div style="flex:1;height:1px;background:var(--border-stroke);"></div>
-        </div>
-
-        <!-- FORM ĐĂNG NHẬP THỦ CÔNG -->
-        <form id="loginForm" onsubmit="handleUserLogin(event)" style="display:flex;flex-direction:column;gap:10px;">
-          <div>
-            <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Tên đăng nhập hoặc Email</label>
-            <input type="text" id="loginUsername" placeholder="admin hoặc user" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" value="admin" required>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-              <label style="font-size:11.5px;font-weight:650;color:var(--text-secondary);">Mật khẩu</label>
-              <a href="javascript:;" onclick="togglePasswordVisibility()" style="font-size:11px;color:var(--primary-brand);text-decoration:none;" id="togglePwdText">Hiện mật khẩu</a>
+        <!-- TAB 2: FORM ĐĂNG KÝ TÀI KHOẢN KHÁCH -->
+        <div id="authRegisterSection" style="display:none;flex-direction:column;gap:10px;">
+          <form id="registerForm" onsubmit="handleUserRegister(event)" style="display:flex;flex-direction:column;gap:9px;">
+            <div>
+              <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Họ và tên</label>
+              <input type="text" id="regFullName" placeholder="Ví dụ: Nguyễn Văn A" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
             </div>
-            <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" value="admin" required>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Tên đăng nhập</label>
+                <input type="text" id="regUsername" placeholder="tên viết liền..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+              </div>
+              <div>
+                <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Số điện thoại</label>
+                <input type="tel" id="regPhone" placeholder="098..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;">
+              </div>
+            </div>
+            <div>
+              <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Email</label>
+              <input type="email" id="regEmail" placeholder="email@example.com" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Mật khẩu</label>
+                <input type="password" id="regPassword" placeholder="Tối thiểu 4 ký tự" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+              </div>
+              <div>
+                <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Xác nhận mật khẩu</label>
+                <input type="password" id="regConfirmPassword" placeholder="Nhập lại mật khẩu" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+              </div>
+            </div>
+
+            <div id="registerStatusMsg" style="display:none;font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);"></div>
+
+            <button type="submit" id="btnSubmitRegister" class="btn-login-main" style="width:100%;padding:9px;border:none;cursor:pointer;margin-top:2px;font-size:12.5px;font-weight:750;">Hoàn tất Đăng Ký Tài Khoản</button>
+          </form>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);margin-top:4px;">
+            <span>Đã có tài khoản?</span>
+            <a href="javascript:;" onclick="switchAuthTab('login')" style="color:var(--primary-brand);font-weight:650;text-decoration:none;">Đăng nhập ngay</a>
           </div>
+        </div>
 
-          <div id="loginStatusMsg" style="display:none;font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);"></div>
-
-          <button type="submit" id="btnSubmitLogin" class="btn-login-main" style="width:100%;padding:9px;border:none;cursor:pointer;margin-top:2px;font-size:12.5px;font-weight:750;">Xác nhận Đăng nhập</button>
-        </form>
-
-        <div style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.4;">
-          Quản trị viên (Admin) có quyền xem toàn bộ báo cáo, cấu hình máy chủ và quản lý phân quyền.
+        <div style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.4;border-top:1px dashed var(--border-stroke);padding-top:8px;">
+          Bảo mật tiêu chuẩn SSL. Tài khoản khách sau khi đăng ký có thể lưu danh mục cá nhân và tra cứu dữ liệu.
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 6: BẢNG QUẢN TRỊ HỆ THỐNG & PHÂN QUYỀN (DÀNH CHO ADMIN) -->
+  <!-- MODAL 6: BẢNG QUẢN TRỊ HỆ THỐNG (DÀNH CHO ADMIN) -->
   <div class="modal-overlay" id="adminManagementModal" onclick="if(event.target.id==='adminManagementModal')closeAdminModal()" style="display:none;">
-    <div class="modal-card" onclick="event.stopPropagation()" style="width:680px;max-width:calc(100vw - 32px);max-height:85vh;display:flex;flex-direction:column;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="width:760px;max-width:calc(100vw - 32px);max-height:88vh;display:flex;flex-direction:column;">
       <div class="modal-head">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="width:28px;height:28px;border-radius:6px;background:linear-gradient(135deg, #f59e0b, #b45309);display:flex;align-items:center;justify-content:center;color:#000;font-size:14px;font-weight:800;">👑</div>
-          <div>
-            <div style="font-size:15px;font-weight:750;">Bảng Quản Trị Hệ Thống & Phân Quyền</div>
-            <div style="font-size:11px;color:var(--text-muted);">Trung tâm quản lý người dùng, cấu hình quyền hạn và giám sát server</div>
-          </div>
+        <div>
+          <div style="font-size:15px;font-weight:750;">Bảng Quản Trị Hệ Thống</div>
+          <div style="font-size:11.5px;color:var(--text-muted);">Quản trị viên (Admin) - Quản lý bài viết blog, tài khoản người dùng và máy chủ</div>
         </div>
-        <button onclick="closeAdminModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);">&times;</button>
+        <button onclick="closeAdminModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);line-height:1;">&times;</button>
       </div>
 
       <!-- TABS QUẢN TRỊ ADMIN -->
-      <div style="display:flex;gap:4px;padding:6px 12px;background:var(--bg-subtle);border-bottom:1px solid var(--border-stroke);">
-        <button type="button" id="tabBtnAdminUsers" onclick="switchAdminTab('users')" class="period-tab-btn active" style="font-size:12px;padding:4px 12px;height:28px;">Quản lý Người dùng & Phân quyền</button>
-        <button type="button" id="tabBtnAdminSystem" onclick="switchAdminTab('system')" class="period-tab-btn" style="font-size:12px;padding:4px 12px;height:28px;">Giám sát Máy chủ & Realtime</button>
-        <button type="button" id="tabBtnAdminLogs" onclick="switchAdminTab('logs')" class="period-tab-btn" style="font-size:12px;padding:4px 12px;height:28px;">Nhật ký Truy cập (Security Logs)</button>
+      <div style="display:flex;gap:4px;padding:6px 12px;background:var(--bg-subtle);border-bottom:1px solid var(--border-stroke);overflow-x:auto;">
+        <button type="button" id="tabBtnAdminBlog" onclick="switchAdminTab('blog')" class="period-tab-btn active" style="font-size:12px;padding:4px 12px;height:28px;">Quản lý Blog & Bài viết</button>
+        <button type="button" id="tabBtnAdminUsers" onclick="switchAdminTab('users')" class="period-tab-btn" style="font-size:12px;padding:4px 12px;height:28px;">Quản lý Người dùng & Phân quyền</button>
+        <button type="button" id="tabBtnAdminSystem" onclick="switchAdminTab('system')" class="period-tab-btn" style="font-size:12px;padding:4px 12px;height:28px;">Giám sát Máy chủ</button>
+        <button type="button" id="tabBtnAdminLogs" onclick="switchAdminTab('logs')" class="period-tab-btn" style="font-size:12px;padding:4px 12px;height:28px;">Nhật ký Bảo mật</button>
       </div>
 
       <div class="modal-body" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;">
-        <!-- TAB 1: DANH SÁCH NGƯỜI DÙNG & PHÂN QUYỀN -->
-        <div id="adminTabContent_users" style="display:flex;flex-direction:column;gap:10px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div style="font-size:12px;font-weight:700;color:var(--text-primary);">Danh sách tài khoản trong hệ thống</div>
-            <span style="font-size:11px;color:var(--text-muted);">2 Cấp phân quyền: Admin & Người dùng</span>
+        <!-- TAB 1: QUẢN LÝ BLOG & ĐĂNG BÀI (DÀNH RIÊNG ADMIN) -->
+        <div id="adminTabContent_blog" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <div>
+              <div style="font-size:12.5px;font-weight:750;color:var(--text-primary);">Danh sách bài viết Blog & Phân tích thị trường</div>
+              <div style="font-size:11px;color:var(--text-muted);">Admin có thể đăng bài mới, chỉnh sửa thông tin hoặc xóa bài viết trực tiếp</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <a href="blog.html" target="_blank" class="btn-theme-toggle" style="width:auto;padding:5px 10px;font-size:11.5px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Mở trang blog công khai">
+                <span>Xem trang Blog</span>
+              </a>
+              <button type="button" onclick="openAdminBlogModal()" class="btn-login-main" style="height:28px;font-size:11.5px;padding:0 12px;font-weight:700;">
+                + Đăng bài viết mới
+              </button>
+            </div>
           </div>
-          <div style="border:1px solid var(--border-stroke);border-radius:var(--radius-sm);overflow:hidden;">
-            <table style="width:100%;border-collapse:collapse;font-size:11.5px;text-align:left;">
+
+          <div style="border:1px solid var(--border-stroke);border-radius:var(--radius-sm);overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:11.5px;text-align:left;min-width:620px;">
+              <thead style="background:var(--bg-subtle);border-bottom:1px solid var(--border-stroke);color:var(--text-secondary);">
+                <tr>
+                  <th style="padding:8px 10px;width:35%;">Tiêu đề bài viết</th>
+                  <th style="padding:8px 10px;width:18%;">Tác giả</th>
+                  <th style="padding:8px 10px;width:14%;">Ngày đăng</th>
+                  <th style="padding:8px 10px;width:18%;">Thẻ phân loại</th>
+                  <th style="padding:8px 10px;text-align:right;width:15%;">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="adminBlogTableBody">
+                <!-- Rendered dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 2: DANH SÁCH NGƯỜI DÙNG & PHÂN QUYỀN -->
+        <div id="adminTabContent_users" style="display:none;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:12.5px;font-weight:750;color:var(--text-primary);">Danh sách tài khoản & phân quyền hệ thống</div>
+              <div style="font-size:11px;color:var(--text-muted);">Quản lý tài khoản Admin, thành viên và các tài khoản khách đã đăng ký</div>
+            </div>
+            <span id="adminUserCountBadge" style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bg-subtle);border:1px solid var(--border-stroke);color:var(--text-secondary);font-weight:600;">Tổng: 3 tài khoản</span>
+          </div>
+          <div style="border:1px solid var(--border-stroke);border-radius:var(--radius-sm);overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:11.5px;text-align:left;min-width:600px;">
               <thead style="background:var(--bg-subtle);border-bottom:1px solid var(--border-stroke);color:var(--text-secondary);">
                 <tr>
                   <th style="padding:8px 10px;">Tài khoản</th>
                   <th style="padding:8px 10px;">Họ tên</th>
+                  <th style="padding:8px 10px;">Email / Liên hệ</th>
                   <th style="padding:8px 10px;">Phân quyền</th>
-                  <th style="padding:8px 10px;">Mật khẩu mặc định</th>
                   <th style="padding:8px 10px;">Trạng thái</th>
                   <th style="padding:8px 10px;text-align:right;">Thao tác</th>
                 </tr>
@@ -4543,7 +4592,7 @@ body {
           </div>
         </div>
 
-        <!-- TAB 2: GIÁM SÁT MÁY CHỦ & REALTIME -->
+        <!-- TAB 3: GIÁM SÁT MÁY CHỦ & REALTIME -->
         <div id="adminTabContent_system" style="display:none;flex-direction:column;gap:10px;">
           <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;">
             <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;">
@@ -4555,8 +4604,8 @@ body {
               <div style="font-size:14px;font-weight:750;color:#38bdf8;margin-top:2px;">DNSE Open API & FireAnt</div>
             </div>
             <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:8px 10px;">
-              <div style="font-size:11px;color:var(--text-muted);">AI Market Engine</div>
-              <div style="font-size:14px;font-weight:750;color:#a855f7;margin-top:2px;">Nemotron 3.5 / DeepSeek</div>
+              <div style="font-size:11px;color:var(--text-muted);">Hệ Thống Blog & Auth</div>
+              <div style="font-size:14px;font-weight:750;color:#a855f7;margin-top:2px;">Sẵn sàng (Active)</div>
             </div>
           </div>
           <div style="background:var(--bg-container);border:1px solid var(--border-stroke);border-radius:var(--radius-sm);padding:10px;font-size:11.5px;display:flex;flex-direction:column;gap:6px;">
@@ -4576,7 +4625,7 @@ body {
           </div>
         </div>
 
-        <!-- TAB 3: NHẬT KÝ TRUY CẬP (LOGS) -->
+        <!-- TAB 4: NHẬT KÝ TRUY CẬP (LOGS) -->
         <div id="adminTabContent_logs" style="display:none;flex-direction:column;gap:8px;">
           <div style="font-size:12px;font-weight:700;color:var(--text-primary);">Lịch sử đăng nhập & bảo mật hệ thống</div>
           <div id="adminLogsContainer" style="border:1px solid var(--border-stroke);border-radius:var(--radius-sm);max-height:260px;overflow-y:auto;background:var(--bg-container);font-size:11px;font-family:monospace;padding:6px;">
@@ -4586,9 +4635,69 @@ body {
       </div>
 
       <div style="padding:10px 16px;border-top:1px solid var(--border-stroke);display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:11px;color:var(--text-muted);">Đang đăng nhập với quyền Quản trị viên tối cao</span>
+        <span style="font-size:11px;color:var(--text-muted);">Đang đăng nhập với quyền Quản trị viên (Admin)</span>
         <button onclick="closeAdminModal()" class="btn-theme-toggle" style="width:auto;padding:6px 16px;font-size:12px;">Đóng</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL 7: SOẠN THẢO & CHỈNH SỬA BÀI VIẾT BLOG (DÀNH CHO ADMIN) -->
+  <div class="modal-overlay" id="adminBlogEditModal" onclick="if(event.target.id==='adminBlogEditModal')closeAdminBlogModal()" style="display:none;z-index:1100;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="width:560px;max-width:calc(100vw - 32px);max-height:90vh;display:flex;flex-direction:column;">
+      <div class="modal-head">
+        <div>
+          <div style="font-size:15px;font-weight:750;" id="adminBlogModalTitle">Đăng Bài Viết Blog Mới</div>
+          <div style="font-size:11.5px;color:var(--text-muted);">Quản trị viên cấu hình nội dung và xuất bản trên website</div>
+        </div>
+        <button onclick="closeAdminBlogModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);line-height:1;">&times;</button>
+      </div>
+
+      <form id="adminBlogForm" onsubmit="handleSaveAdminBlogPost(event)" style="overflow-y:auto;flex:1;padding:12px;display:flex;flex-direction:column;gap:10px;">
+        <input type="hidden" id="adminBlogEditId" value="">
+
+        <div>
+          <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Tiêu đề bài viết (*)</label>
+          <input type="text" id="adminBlogTitle" placeholder="Ví dụ: Phân tích thị trường chứng khoán tuần mới..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Tác giả</label>
+            <input type="text" id="adminBlogAuthor" value="Đặng Cao Hoàng Phúc" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+          </div>
+          <div>
+            <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Ngày đăng</label>
+            <input type="text" id="adminBlogDate" placeholder="DD/MM/YYYY" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Thẻ phân loại (ngăn cách bằng dấu phẩy)</label>
+          <input type="text" id="adminBlogTags" placeholder="Ví dụ: Phân tích, VN-Index, Cổ phiếu" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;">
+        </div>
+
+        <div>
+          <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Tóm tắt ngắn gọn (*)</label>
+          <textarea id="adminBlogExcerpt" rows="3" placeholder="Tóm tắt ngắn gọn nội dung bài viết hiển thị ở danh sách bài viết..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;resize:vertical;" required></textarea>
+        </div>
+
+        <div>
+          <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Nội dung chi tiết bài viết</label>
+          <textarea id="adminBlogContent" rows="4" placeholder="Nhập nội dung chi tiết bài viết..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;resize:vertical;"></textarea>
+        </div>
+
+        <div>
+          <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Đường dẫn / Liên kết ngoài (URL)</label>
+          <input type="text" id="adminBlogUrl" placeholder="# hoặc liên kết bài viết chi tiết" value="#" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;">
+        </div>
+
+        <div id="adminBlogStatusMsg" style="display:none;font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);"></div>
+
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;border-top:1px solid var(--border-stroke);padding-top:10px;">
+          <button type="button" onclick="closeAdminBlogModal()" class="btn-theme-toggle" style="width:auto;padding:6px 16px;font-size:12px;">Hủy bỏ</button>
+          <button type="submit" id="btnSaveAdminBlog" class="btn-login-main" style="padding:6px 18px;font-size:12px;font-weight:700;">Lưu bài viết</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -4600,6 +4709,7 @@ body {
   </button>
 
   <script src="config.js"></script>
+  <script src="posts.js"></script>
   <script src="tv-api.js"></script>
   <script>
     // ==========================================
@@ -16219,6 +16329,8 @@ ${leaderDetails}
 
     // ==========================================
     // HỆ THỐNG XÁC THỰC & PHÂN QUYỀN ĐĂNG NHẬP (ADMIN & USER)
+        // ==========================================
+    // HỆ THỐNG XÁC THỰC & PHÂN QUYỀN ĐĂNG NHẬP (ADMIN & GUEST)
     // ==========================================
     const DEFAULT_ACCOUNTS = [
       {
@@ -16228,7 +16340,8 @@ ${leaderDetails}
         name: 'Quản trị viên (Admin)',
         email: 'admin@phucdch.vn',
         status: 'active',
-        permissions: ['all', 'admin_panel', 'system_config', 'manage_users', 'view_logs', 'realtime_pro', 'ai_unlimited']
+        createdAt: '2026-01-01T00:00:00Z',
+        permissions: ['all', 'admin_panel', 'system_config', 'manage_users', 'manage_blog', 'view_logs', 'realtime_pro', 'ai_unlimited']
       },
       {
         username: 'user',
@@ -16237,6 +16350,7 @@ ${leaderDetails}
         name: 'Người dùng Pro',
         email: 'user@phucdch.vn',
         status: 'active',
+        createdAt: '2026-01-15T00:00:00Z',
         permissions: ['view_realtime', 'stock_screener', 'ai_chat', 'view_ta', 'view_portfolio']
       },
       {
@@ -16246,22 +16360,82 @@ ${leaderDetails}
         name: 'Nhà đầu tư Cá nhân',
         email: 'demo@phucdch.vn',
         status: 'active',
+        createdAt: '2026-02-01T00:00:00Z',
         permissions: ['view_realtime', 'stock_screener', 'ai_chat', 'view_ta']
       }
     ];
 
     let currentAuthUser = null;
 
-    function openLoginDialog() {
+    // Lấy danh sách toàn bộ tài khoản (mặc định + tài khoản khách đăng ký)
+    function getAllRegisteredAccounts() {
+      let registered = [];
+      try {
+        const stored = localStorage.getItem('phucdch_registered_users');
+        if (stored) registered = JSON.parse(stored);
+      } catch { /* ignore */ }
+      return [...DEFAULT_ACCOUNTS, ...registered];
+    }
+
+    function openLoginDialog(tab = 'login') {
       const m = document.getElementById('loginModal');
       if (m) m.style.display = 'flex';
-      const statusEl = document.getElementById('loginStatusMsg');
-      if (statusEl) statusEl.style.display = 'none';
+      switchAuthTab(tab);
     }
 
     function closeLoginModal() {
       const m = document.getElementById('loginModal');
       if (m) m.style.display = 'none';
+    }
+
+    function switchAuthTab(tab) {
+      const btnLogin = document.getElementById('tabAuthLoginBtn');
+      const btnReg = document.getElementById('tabAuthRegisterBtn');
+      const secLogin = document.getElementById('authLoginSection');
+      const secReg = document.getElementById('authRegisterSection');
+      const titleEl = document.getElementById('authModalTitle');
+      const subEl = document.getElementById('authModalSubtitle');
+      const loginMsg = document.getElementById('loginStatusMsg');
+      const regMsg = document.getElementById('registerStatusMsg');
+
+      if (loginMsg) loginMsg.style.display = 'none';
+      if (regMsg) regMsg.style.display = 'none';
+
+      if (tab === 'register') {
+        if (secLogin) secLogin.style.display = 'none';
+        if (secReg) secReg.style.display = 'flex';
+        if (btnLogin) {
+          btnLogin.style.background = 'none';
+          btnLogin.style.color = 'var(--text-secondary)';
+          btnLogin.style.fontWeight = '600';
+          btnLogin.style.boxShadow = 'none';
+        }
+        if (btnReg) {
+          btnReg.style.background = 'var(--bg-container)';
+          btnReg.style.color = 'var(--text-primary)';
+          btnReg.style.fontWeight = '700';
+          btnReg.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        }
+        if (titleEl) titleEl.textContent = 'Đăng Ký Tài Khoản Khách';
+        if (subEl) subEl.textContent = 'Tạo tài khoản mới để tra cứu tín hiệu & lưu danh mục';
+      } else {
+        if (secLogin) secLogin.style.display = 'flex';
+        if (secReg) secReg.style.display = 'none';
+        if (btnLogin) {
+          btnLogin.style.background = 'var(--bg-container)';
+          btnLogin.style.color = 'var(--text-primary)';
+          btnLogin.style.fontWeight = '700';
+          btnLogin.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        }
+        if (btnReg) {
+          btnReg.style.background = 'none';
+          btnReg.style.color = 'var(--text-secondary)';
+          btnReg.style.fontWeight = '600';
+          btnReg.style.boxShadow = 'none';
+        }
+        if (titleEl) titleEl.textContent = 'Đăng Nhập Tài Khoản';
+        if (subEl) subEl.textContent = 'Quản trị viên (Admin) hoặc Thành viên đăng nhập';
+      }
     }
 
     function togglePasswordVisibility() {
@@ -16275,20 +16449,6 @@ ${leaderDetails}
         pwdInput.type = 'password';
         if (toggleText) toggleText.textContent = 'Hiện mật khẩu';
       }
-    }
-
-    // Đăng nhập nhanh 1-Click theo Role
-    function quickLoginRole(role) {
-      const uInput = document.getElementById('loginUsername');
-      const pInput = document.getElementById('loginPassword');
-      if (role === 'admin') {
-        if (uInput) uInput.value = 'admin';
-        if (pInput) pInput.value = 'admin';
-      } else {
-        if (uInput) uInput.value = 'user';
-        if (pInput) pInput.value = 'user123';
-      }
-      handleUserLogin();
     }
 
     async function handleUserLogin(e) {
@@ -16317,13 +16477,14 @@ ${leaderDetails}
         btnSubmit.textContent = 'Đang xác thực...';
       }
 
-      // 1. Kiểm tra tài khoản trong danh mục bộ nhớ
-      const matchedUser = DEFAULT_ACCOUNTS.find(acc => 
-        (acc.username.toLowerCase() === username.toLowerCase() || acc.email.toLowerCase() === username.toLowerCase()) &&
-        acc.passwords.includes(password)
+      // 1. Kiểm tra tài khoản trong bộ nhớ & LocalStorage
+      const allAccounts = getAllRegisteredAccounts();
+      const matchedUser = allAccounts.find(acc => 
+        (acc.username.toLowerCase() === username.toLowerCase() || (acc.email && acc.email.toLowerCase() === username.toLowerCase())) &&
+        (acc.passwords && acc.passwords.includes(password))
       );
 
-      // 2. Thử gửi lên backend nếu có API server
+      // 2. Gửi xác thực lên server nếu có backend
       try {
         const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
           ? APP_CONFIG.apiBase
@@ -16348,7 +16509,7 @@ ${leaderDetails}
           name: matchedUser.name,
           role: matchedUser.role,
           email: matchedUser.email,
-          permissions: matchedUser.permissions,
+          permissions: matchedUser.permissions || [],
           loginTime: new Date().toISOString()
         };
 
@@ -16358,13 +16519,13 @@ ${leaderDetails}
         closeLoginModal();
 
         if (sessionData.role === 'admin') {
-          showMarketToast('Đăng nhập thành công', 'Xin chào Quản trị viên! Bạn có toàn quyền quản lý hệ thống và kiểm soát dữ liệu.', 'up');
+          showMarketToast('Đăng nhập thành công', `Xin chào Quản trị viên ${sessionData.name}! Bạn có toàn quyền quản lý hệ thống.`, 'up');
         } else {
-          showMarketToast('Đăng nhập thành công', 'Xin chào Người dùng! Quyền Thành viên Pro đã được kích hoạt thành công.', 'up');
+          showMarketToast('Đăng nhập thành công', `Xin chào ${sessionData.name}! Chúc bạn phiên giao dịch thành công.`, 'up');
         }
       } else {
         if (statusEl) {
-          statusEl.textContent = 'Tên đăng nhập hoặc mật khẩu không chính xác! Vui lòng thử admin/admin hoặc user/user123.';
+          statusEl.textContent = 'Tên đăng nhập hoặc mật khẩu không chính xác!';
           statusEl.style.display = 'block';
           statusEl.style.background = 'rgba(239,68,68,0.15)';
           statusEl.style.color = '#ef4444';
@@ -16372,12 +16533,134 @@ ${leaderDetails}
       }
     }
 
+    // Đăng ký tài khoản khách (Guest Registration)
+    async function handleUserRegister(e) {
+      if (e) e.preventDefault();
+
+      const fullName = (document.getElementById('regFullName')?.value || '').trim();
+      const username = (document.getElementById('regUsername')?.value || '').trim().toLowerCase();
+      const email = (document.getElementById('regEmail')?.value || '').trim().toLowerCase();
+      const phone = (document.getElementById('regPhone')?.value || '').trim();
+      const password = (document.getElementById('regPassword')?.value || '').trim();
+      const confirmPwd = (document.getElementById('regConfirmPassword')?.value || '').trim();
+      const statusEl = document.getElementById('registerStatusMsg');
+      const btnSubmit = document.getElementById('btnSubmitRegister');
+
+      if (!fullName || !username || !email || !password) {
+        if (statusEl) {
+          statusEl.textContent = 'Vui lòng điền đầy đủ các trường thông tin bắt buộc (*)';
+          statusEl.style.display = 'block';
+          statusEl.style.background = 'rgba(239,68,68,0.15)';
+          statusEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (password !== confirmPwd) {
+        if (statusEl) {
+          statusEl.textContent = 'Xác nhận mật khẩu không khớp. Vui lòng kiểm tra lại.';
+          statusEl.style.display = 'block';
+          statusEl.style.background = 'rgba(239,68,68,0.15)';
+          statusEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (password.length < 4) {
+        if (statusEl) {
+          statusEl.textContent = 'Mật khẩu phải có độ dài từ 4 ký tự trở lên.';
+          statusEl.style.display = 'block';
+          statusEl.style.background = 'rgba(239,68,68,0.15)';
+          statusEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      const allAccounts = getAllRegisteredAccounts();
+      const isExist = allAccounts.some(u => u.username.toLowerCase() === username || (u.email && u.email.toLowerCase() === email));
+      if (isExist) {
+        if (statusEl) {
+          statusEl.textContent = 'Tên đăng nhập hoặc email này đã tồn tại trên hệ thống.';
+          statusEl.style.display = 'block';
+          statusEl.style.background = 'rgba(239,68,68,0.15)';
+          statusEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Đang tạo tài khoản...';
+      }
+
+      const newUser = {
+        id: 'usr_' + Date.now(),
+        username: username,
+        passwords: [password],
+        role: 'user', // Tài khoản khách đăng ký thành viên
+        name: fullName,
+        email: email,
+        phone: phone,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        permissions: ['view_realtime', 'stock_screener', 'ai_chat', 'view_ta', 'view_portfolio']
+      };
+
+      // 1. Lưu vào LocalStorage
+      try {
+        let storedUsers = [];
+        const existingStored = localStorage.getItem('phucdch_registered_users');
+        if (existingStored) storedUsers = JSON.parse(existingStored);
+        storedUsers.push(newUser);
+        localStorage.setItem('phucdch_registered_users', JSON.stringify(storedUsers));
+      } catch (err) {
+        console.error('Error saving registered user locally:', err);
+      }
+
+      // 2. Gửi API đăng ký lên backend server
+      try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+          ? APP_CONFIG.apiBase
+          : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        if (apiBase) {
+          await fetch(`${apiBase}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, name: fullName, email, phone })
+          }).catch(() => null);
+        }
+      } catch { /* ignore */ }
+
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Hoàn tất Đăng Ký Tài Khoản';
+      }
+
+      // Đăng nhập tự động cho tài khoản khách vừa tạo
+      const sessionData = {
+        username: newUser.username,
+        name: newUser.name,
+        role: newUser.role,
+        email: newUser.email,
+        phone: newUser.phone,
+        permissions: newUser.permissions,
+        loginTime: new Date().toISOString()
+      };
+
+      currentAuthUser = sessionData;
+      localStorage.setItem('phucdch_auth_user', JSON.stringify(sessionData));
+      renderUserHeaderBadge(sessionData);
+      closeLoginModal();
+
+      showMarketToast('Đăng ký thành công', `Chào mừng ${fullName}! Tài khoản khách của bạn đã được kích hoạt.`, 'up');
+    }
+
     function renderUserHeaderBadge(user) {
       const wrap = document.getElementById('headerAuthWrap');
       if (!wrap) return;
 
       const isAdmin = user && user.role === 'admin';
-      const roleBadge = isAdmin ? '👑 ADMIN' : '👤 USER';
+      const roleBadge = isAdmin ? 'ADMIN' : (user.role === 'user' ? 'THÀNH VIÊN' : 'KHÁCH');
       const roleCls = isAdmin ? 'role-admin' : 'role-user';
 
       wrap.innerHTML = `
@@ -16388,39 +16671,35 @@ ${leaderDetails}
         </div>
         <div id="userDropdownMenu" class="user-dropdown-card" style="display:none;" onclick="event.stopPropagation()">
           <div class="user-dropdown-head">
-            <div style="font-size:12.5px;font-weight:750;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
-              <span>${isAdmin ? '👑' : '👤'}</span>
-              <span>${user.name}</span>
+            <div style="font-size:12.5px;font-weight:750;color:var(--text-primary);">
+              ${user.name}
             </div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Email: ${user.email}</div>
-            <div style="font-size:10.5px;color:var(--price-up);margin-top:2px;">● Quyền: ${isAdmin ? 'Quản trị viên toàn quyền' : 'Người dùng Pro Realtime'}</div>
+            <div style="font-size:10.5px;color:var(--price-up);margin-top:2px;">● Quyền: ${isAdmin ? 'Quản trị viên toàn quyền' : 'Thành viên cá nhân'}</div>
           </div>
           ${isAdmin ? `
-            <a href="javascript:;" onclick="openAdminModal('users');toggleUserDropdown(event)" class="user-dropdown-item" style="color:#f59e0b;">
-              <span>👑</span>
-              <span>Bảng Quản trị Hệ thống (Admin Panel)</span>
+            <a href="javascript:;" onclick="openAdminModal('blog');toggleUserDropdown(event)" class="user-dropdown-item" style="color:var(--primary-brand);font-weight:700;">
+              <span>Quản lý Blog & Đăng bài</span>
+            </a>
+            <a href="javascript:;" onclick="openAdminModal('users');toggleUserDropdown(event)" class="user-dropdown-item">
+              <span>Bảng Quản trị & Phân quyền</span>
             </a>
             <a href="javascript:;" onclick="openAdminModal('system');toggleUserDropdown(event)" class="user-dropdown-item">
-              <span>📊</span>
-              <span>Giám sát Máy chủ & Realtime MCP</span>
+              <span>Giám sát Máy chủ & Realtime</span>
             </a>
             <a href="javascript:;" onclick="openAdminModal('logs');toggleUserDropdown(event)" class="user-dropdown-item">
-              <span>📜</span>
-              <span>Nhật ký Bảo mật & Audit Logs</span>
+              <span>Nhật ký Bảo mật (Audit Logs)</span>
             </a>
           ` : `
-            <a href="javascript:;" onclick="showMarketToast('Phân quyền','Tài khoản hiện tại là Người dùng Pro. Chỉ Admin mới vào được Admin Panel.','down')" class="user-dropdown-item" style="color:var(--text-muted);">
-              <span>🔒</span>
-              <span>Bảng Quản trị (Dành riêng Admin)</span>
+            <a href="blog.html" class="user-dropdown-item">
+              <span>Xem Blog & Nhận định</span>
             </a>
           `}
-          <a href="javascript:;" onclick="openLoginDialog();toggleUserDropdown(event)" class="user-dropdown-item">
-            <span>🔄</span>
-            <span>Chuyển đổi tài khoản khác</span>
+          <a href="javascript:;" onclick="openLoginDialog('login');toggleUserDropdown(event)" class="user-dropdown-item">
+            <span>Chuyển đổi tài khoản</span>
           </a>
           <div style="height:1px;background:var(--border-stroke);margin:2px 0;"></div>
           <a href="javascript:;" onclick="handleLogout()" class="user-dropdown-item danger">
-            <span>🚪</span>
             <span>Đăng xuất tài khoản</span>
           </a>
         </div>
@@ -16442,7 +16721,7 @@ ${leaderDetails}
       const wrap = document.getElementById('headerAuthWrap');
       if (wrap) {
         wrap.innerHTML = `
-          <a href="javascript:;" id="headerLoginBtn" onclick="openLoginDialog()" class="btn-login-main">Đăng nhập</a>
+          <a href="javascript:;" id="headerLoginBtn" onclick="openLoginDialog('login')" class="btn-login-main">Đăng nhập</a>
           <div id="userDropdownMenu" class="user-dropdown-card" style="display:none;" onclick="event.stopPropagation()"></div>
         `;
       }
@@ -16450,13 +16729,15 @@ ${leaderDetails}
       showMarketToast('Đã đăng xuất', 'Bạn đã đăng xuất tài khoản an toàn.', 'down');
     }
 
-    // Quản trị Admin Modal
-    function openAdminModal(initialTab = 'users') {
+    // ==========================================
+    // QUẢN TRỊ ADMIN MODAL & QUẢN LÝ BLOG
+    // ==========================================
+    let adminBlogPosts = [];
+
+    function openAdminModal(initialTab = 'blog') {
       const m = document.getElementById('adminManagementModal');
       if (m) m.style.display = 'flex';
       switchAdminTab(initialTab);
-      renderAdminUsersTable();
-      fetchAdminSystemStats();
     }
 
     function closeAdminModal() {
@@ -16465,7 +16746,7 @@ ${leaderDetails}
     }
 
     function switchAdminTab(tab) {
-      ['users', 'system', 'logs'].forEach(t => {
+      ['blog', 'users', 'system', 'logs'].forEach(t => {
         const c = document.getElementById(`adminTabContent_${t}`);
         const b = document.getElementById(`tabBtnAdmin${t.charAt(0).toUpperCase() + t.slice(1)}`);
         if (c) c.style.display = (t === tab ? 'flex' : 'none');
@@ -16474,35 +16755,333 @@ ${leaderDetails}
           else b.classList.remove('active');
         }
       });
+
+      if (tab === 'blog') loadAdminBlogPosts();
+      if (tab === 'users') renderAdminUsersTable();
+      if (tab === 'system') fetchAdminSystemStats();
     }
 
-    function renderAdminUsersTable() {
-      const tbody = document.getElementById('adminUserTableBody');
+    // --- BLOG MANAGEMENT CHO ADMIN ---
+    async function loadAdminBlogPosts() {
+      // 1. Thử load từ localStorage
+      try {
+        const cached = localStorage.getItem('phucdch_blog_posts');
+        if (cached) {
+          adminBlogPosts = JSON.parse(cached);
+        } else if (typeof blogPosts !== 'undefined' && Array.isArray(blogPosts)) {
+          adminBlogPosts = [...blogPosts];
+        }
+      } catch {
+        if (typeof blogPosts !== 'undefined' && Array.isArray(blogPosts)) {
+          adminBlogPosts = [...blogPosts];
+        }
+      }
+
+      renderAdminBlogTable();
+
+      // 2. Thử fetch từ backend nếu có API
+      try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+          ? APP_CONFIG.apiBase
+          : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        if (apiBase) {
+          const res = await fetch(`${apiBase}/blog/posts`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && Array.isArray(data.posts)) {
+              adminBlogPosts = data.posts;
+              localStorage.setItem('phucdch_blog_posts', JSON.stringify(adminBlogPosts));
+              renderAdminBlogTable();
+            }
+          }
+        }
+      } catch { /* offline mode */ }
+    }
+
+    function renderAdminBlogTable() {
+      const tbody = document.getElementById('adminBlogTableBody');
       if (!tbody) return;
 
-      tbody.innerHTML = DEFAULT_ACCOUNTS.map(acc => {
+      if (!adminBlogPosts || adminBlogPosts.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="padding:24px 10px;text-align:center;color:var(--text-muted);">
+              Chưa có bài viết blog nào. Nhấp vào <b>"+ Đăng bài viết mới"</b> để thêm bài viết đầu tiên!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = adminBlogPosts.map((post, idx) => {
+        const tagsHtml = (post.tags || []).map(t => `<span style="display:inline-block;padding:1px 6px;border-radius:3px;background:var(--bg-subtle);border:1px solid var(--border-stroke);font-size:10px;margin-right:3px;">${t}</span>`).join('');
+        const pid = post.id || ('post_' + idx);
+        return `
+          <tr style="border-bottom:1px solid var(--border-stroke);">
+            <td style="padding:8px 10px;font-weight:700;color:var(--text-primary);">
+              <div>${post.title}</div>
+              <div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:2px;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${post.excerpt || ''}</div>
+            </td>
+            <td style="padding:8px 10px;color:var(--text-secondary);">${post.author || 'Đặng Cao Hoàng Phúc'}</td>
+            <td style="padding:8px 10px;color:var(--text-muted);">${post.date || ''}</td>
+            <td style="padding:8px 10px;">${tagsHtml || '<span style="color:var(--text-muted);">-</span>'}</td>
+            <td style="padding:8px 10px;text-align:right;">
+              <div style="display:inline-flex;gap:4px;">
+                <button type="button" onclick="openAdminBlogModal('${pid}')" class="btn-theme-toggle" style="width:auto;padding:3px 8px;font-size:11px;color:var(--primary-brand);font-weight:700;" title="Sửa bài viết">Sửa</button>
+                <button type="button" onclick="handleDeleteAdminBlogPost('${pid}')" class="btn-theme-toggle" style="width:auto;padding:3px 8px;font-size:11px;color:#ef4444;" title="Xóa bài viết">Xóa</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openAdminBlogModal(postId = null) {
+      const modal = document.getElementById('adminBlogEditModal');
+      const titleEl = document.getElementById('adminBlogModalTitle');
+      const idInput = document.getElementById('adminBlogEditId');
+      const titleInput = document.getElementById('adminBlogTitle');
+      const authorInput = document.getElementById('adminBlogAuthor');
+      const dateInput = document.getElementById('adminBlogDate');
+      const tagsInput = document.getElementById('adminBlogTags');
+      const excerptInput = document.getElementById('adminBlogExcerpt');
+      const contentInput = document.getElementById('adminBlogContent');
+      const urlInput = document.getElementById('adminBlogUrl');
+      const statusEl = document.getElementById('adminBlogStatusMsg');
+
+      if (statusEl) statusEl.style.display = 'none';
+
+      if (postId) {
+        const post = adminBlogPosts.find(p => String(p.id) === String(postId));
+        if (post) {
+          if (titleEl) titleEl.textContent = 'Chỉnh Sửa Bài Viết Blog';
+          if (idInput) idInput.value = post.id;
+          if (titleInput) titleInput.value = post.title || '';
+          if (authorInput) authorInput.value = post.author || 'Đặng Cao Hoàng Phúc';
+          if (dateInput) dateInput.value = post.date || new Date().toLocaleDateString('vi-VN');
+          if (tagsInput) tagsInput.value = Array.isArray(post.tags) ? post.tags.join(', ') : (post.tags || '');
+          if (excerptInput) excerptInput.value = post.excerpt || '';
+          if (contentInput) contentInput.value = post.content || '';
+          if (urlInput) urlInput.value = post.url || '#';
+        }
+      } else {
+        if (titleEl) titleEl.textContent = 'Đăng Bài Viết Blog Mới';
+        if (idInput) idInput.value = '';
+        if (titleInput) titleInput.value = '';
+        if (authorInput) authorInput.value = 'Đặng Cao Hoàng Phúc';
+        if (dateInput) dateInput.value = new Date().toLocaleDateString('vi-VN');
+        if (tagsInput) tagsInput.value = 'Phân tích, Thị trường, VN-Index';
+        if (excerptInput) excerptInput.value = '';
+        if (contentInput) contentInput.value = '';
+        if (urlInput) urlInput.value = '#';
+      }
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function closeAdminBlogModal() {
+      const modal = document.getElementById('adminBlogEditModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function handleSaveAdminBlogPost(e) {
+      if (e) e.preventDefault();
+
+      const editId = (document.getElementById('adminBlogEditId')?.value || '').trim();
+      const title = (document.getElementById('adminBlogTitle')?.value || '').trim();
+      const author = (document.getElementById('adminBlogAuthor')?.value || 'Đặng Cao Hoàng Phúc').trim();
+      const date = (document.getElementById('adminBlogDate')?.value || new Date().toLocaleDateString('vi-VN')).trim();
+      const tagsRaw = (document.getElementById('adminBlogTags')?.value || '').trim();
+      const excerpt = (document.getElementById('adminBlogExcerpt')?.value || '').trim();
+      const content = (document.getElementById('adminBlogContent')?.value || '').trim();
+      const url = (document.getElementById('adminBlogUrl')?.value || '#').trim();
+      const statusEl = document.getElementById('adminBlogStatusMsg');
+      const btnSave = document.getElementById('btnSaveAdminBlog');
+
+      if (!title || !excerpt) {
+        if (statusEl) {
+          statusEl.textContent = 'Vui lòng nhập đầy đủ tiêu đề và tóm tắt bài viết!';
+          statusEl.style.display = 'block';
+          statusEl.style.background = 'rgba(239,68,68,0.15)';
+          statusEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (btnSave) {
+        btnSave.disabled = true;
+        btnSave.textContent = 'Đang lưu...';
+      }
+
+      const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : ['Thị trường'];
+
+      if (editId) {
+        // Cập nhật bài viết có sẵn
+        const idx = adminBlogPosts.findIndex(p => String(p.id) === String(editId));
+        if (idx !== -1) {
+          adminBlogPosts[idx] = {
+            ...adminBlogPosts[idx],
+            title, author, date, tags, excerpt, content, url
+          };
+        }
+        // Gọi backend API nếu có
+        try {
+          const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+            ? APP_CONFIG.apiBase
+            : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+          if (apiBase) {
+            await fetch(`${apiBase}/blog/posts/${editId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ title, author, date, tags, excerpt, content, url })
+            }).catch(() => null);
+          }
+        } catch { /* ignore */ }
+      } else {
+        // Tạo bài viết mới
+        const newPost = {
+          id: 'post_' + Date.now(),
+          title, author, date, tags, excerpt, content, url
+        };
+        adminBlogPosts.unshift(newPost);
+        // Gọi backend API nếu có
+        try {
+          const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+            ? APP_CONFIG.apiBase
+            : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+          if (apiBase) {
+            await fetch(`${apiBase}/blog/posts`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newPost)
+            }).catch(() => null);
+          }
+        } catch { /* ignore */ }
+      }
+
+      // Lưu vào LocalStorage
+      try {
+        localStorage.setItem('phucdch_blog_posts', JSON.stringify(adminBlogPosts));
+      } catch (err) {
+        console.error('Error saving blog posts to localStorage:', err);
+      }
+
+      if (btnSave) {
+        btnSave.disabled = false;
+        btnSave.textContent = 'Lưu bài viết';
+      }
+
+      closeAdminBlogModal();
+      renderAdminBlogTable();
+      showMarketToast('Lưu bài viết thành công', editId ? 'Đã cập nhật thông tin bài viết blog.' : 'Đã đăng bài viết mới lên website.', 'up');
+    }
+
+    async function handleDeleteAdminBlogPost(postId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa bài viết này khỏi trang Blog?')) return;
+
+      adminBlogPosts = adminBlogPosts.filter(p => String(p.id) !== String(postId));
+      localStorage.setItem('phucdch_blog_posts', JSON.stringify(adminBlogPosts));
+
+      // Gọi backend API nếu có
+      try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+          ? APP_CONFIG.apiBase
+          : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        if (apiBase) {
+          fetch(`${apiBase}/blog/posts/${postId}`, { method: 'DELETE' }).catch(() => null);
+        }
+      } catch { /* ignore */ }
+
+      renderAdminBlogTable();
+      showMarketToast('Đã xóa', 'Bài viết đã được gỡ khỏi danh sách.', 'down');
+    }
+
+    // --- USER MANAGEMENT CHO ADMIN ---
+    function renderAdminUsersTable() {
+      const tbody = document.getElementById('adminUserTableBody');
+      const badge = document.getElementById('adminUserCountBadge');
+      if (!tbody) return;
+
+      const allAccounts = getAllRegisteredAccounts();
+      if (badge) badge.textContent = `Tổng: ${allAccounts.length} tài khoản`;
+
+      tbody.innerHTML = allAccounts.map(acc => {
         const isAdmin = acc.role === 'admin';
+        const roleLabel = isAdmin ? 'ADMIN' : 'THÀNH VIÊN';
+        const isDefault = DEFAULT_ACCOUNTS.some(d => d.username === acc.username);
+
         return `
           <tr style="border-bottom:1px solid var(--border-stroke);">
             <td style="padding:8px 10px;font-weight:700;">
               ${acc.username}
             </td>
             <td style="padding:8px 10px;color:var(--text-secondary);">${acc.name}</td>
+            <td style="padding:8px 10px;color:var(--text-muted);font-size:11px;">${acc.email || '-'}${acc.phone ? ` • ${acc.phone}` : ''}</td>
             <td style="padding:8px 10px;">
-              <span style="font-weight:750;padding:2px 7px;border-radius:4px;font-size:10.5px;${isAdmin ? 'background:rgba(245,158,11,0.2);color:#f59e0b;' : 'background:rgba(16,185,129,0.2);color:var(--price-up);'}">
-                ${isAdmin ? '👑 ADMIN' : '👤 USER'}
+              <span style="font-weight:750;padding:2px 7px;border-radius:4px;font-size:10px;${isAdmin ? 'background:rgba(217,119,6,0.15);color:#d97706;' : 'background:rgba(16,185,129,0.15);color:var(--price-up);'}">
+                ${roleLabel}
               </span>
             </td>
-            <td style="padding:8px 10px;font-family:monospace;color:var(--text-muted);">${acc.passwords[0]}</td>
             <td style="padding:8px 10px;">
-              <span style="color:var(--price-up);font-weight:600;">● Hoạt động</span>
+              <span style="color:var(--price-up);font-weight:600;font-size:11px;">● Hoạt động</span>
             </td>
             <td style="padding:8px 10px;text-align:right;">
-              <button type="button" onclick="quickLoginRole('${acc.role}');closeAdminModal();" class="btn-theme-toggle" style="width:auto;padding:2px 8px;font-size:10.5px;">Đăng nhập nhanh</button>
+              ${isDefault && isAdmin ? `
+                <span style="color:var(--text-muted);font-size:10.5px;">Quản trị gốc</span>
+              ` : `
+                <div style="display:inline-flex;gap:4px;">
+                  <button type="button" onclick="toggleUserRole('${acc.username}')" class="btn-theme-toggle" style="width:auto;padding:2px 8px;font-size:10.5px;">
+                    ${isAdmin ? 'Hạ quyền' : 'Thăng Admin'}
+                  </button>
+                  ${!isDefault ? `
+                    <button type="button" onclick="deleteRegisteredUser('${acc.username}')" class="btn-theme-toggle" style="width:auto;padding:2px 8px;font-size:10.5px;color:#ef4444;">
+                      Xóa
+                    </button>
+                  ` : ''}
+                </div>
+              `}
             </td>
           </tr>
         `;
       }).join('');
+    }
+
+    function toggleUserRole(username) {
+      if (username === 'admin') {
+        alert('Không thể thay đổi quyền của tài khoản Admin gốc!');
+        return;
+      }
+      try {
+        const stored = localStorage.getItem('phucdch_registered_users');
+        if (stored) {
+          let users = JSON.parse(stored);
+          const u = users.find(x => x.username === username);
+          if (u) {
+            u.role = u.role === 'admin' ? 'user' : 'admin';
+            localStorage.setItem('phucdch_registered_users', JSON.stringify(users));
+            renderAdminUsersTable();
+            showMarketToast('Phân quyền', `Đã cập nhật quyền hạn cho tài khoản ${username}`, 'up');
+            return;
+          }
+        }
+      } catch { /* fallback */ }
+      renderAdminUsersTable();
+    }
+
+    function deleteRegisteredUser(username) {
+      if (!confirm(`Bạn có chắc chắn muốn xóa tài khoản ${username}?`)) return;
+      try {
+        const stored = localStorage.getItem('phucdch_registered_users');
+        if (stored) {
+          let users = JSON.parse(stored);
+          users = users.filter(x => x.username !== username);
+          localStorage.setItem('phucdch_registered_users', JSON.stringify(users));
+          renderAdminUsersTable();
+          showMarketToast('Đã xóa tài khoản', `Đã xóa tài khoản ${username} khỏi hệ thống`, 'down');
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     async function fetchAdminSystemStats() {
