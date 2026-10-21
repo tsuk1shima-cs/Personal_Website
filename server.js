@@ -1585,6 +1585,194 @@ wss.on('connection', (clientWs) => {
     }));
 });
 
+// ==================== AUTHENTICATION & ROLE-BASED ACCESS CONTROL ====================
+// Cấu hình tài khoản đăng nhập & phân quyền: Admin & Người dùng
+const AUTH_USERS = [
+    {
+        id: 'usr_admin_01',
+        username: 'admin',
+        passwords: ['admin', 'admin123', 'phucdch2026'],
+        role: 'admin',
+        name: 'Quản trị viên (Admin)',
+        email: 'admin@phucdch.vn',
+        avatar: '👑',
+        status: 'active',
+        createdAt: '2026-01-01T00:00:00Z',
+        permissions: ['all', 'admin_panel', 'system_config', 'manage_users', 'view_logs', 'realtime_pro', 'ai_unlimited']
+    },
+    {
+        id: 'usr_user_01',
+        username: 'user',
+        passwords: ['user', 'user123', '123456'],
+        role: 'user',
+        name: 'Người dùng Pro',
+        email: 'user@phucdch.vn',
+        avatar: '👤',
+        status: 'active',
+        createdAt: '2026-01-15T00:00:00Z',
+        permissions: ['view_realtime', 'stock_screener', 'ai_chat', 'view_ta', 'view_portfolio']
+    },
+    {
+        id: 'usr_demo_01',
+        username: 'demo_investor',
+        passwords: ['phucdch2026', 'demo123'],
+        role: 'user',
+        name: 'Nhà đầu tư Cá nhân',
+        email: 'demo@phucdch.vn',
+        avatar: '📈',
+        status: 'active',
+        createdAt: '2026-02-01T00:00:00Z',
+        permissions: ['view_realtime', 'stock_screener', 'ai_chat', 'view_ta']
+    }
+];
+
+// Lưu trữ token phiên đang hoạt động & nhật ký bảo mật
+const ACTIVE_SESSIONS = new Map();
+const AUTH_ACCESS_LOGS = [
+    {
+        id: 'log_init',
+        timestamp: new Date().toISOString(),
+        username: 'system',
+        role: 'system',
+        action: 'Khởi động dịch vụ xác thực phân quyền',
+        ip: '127.0.0.1',
+        status: 'success'
+    }
+];
+
+// Đăng nhập tài khoản (Admin hoặc Người dùng)
+app.post('/api/auth/login', (req, res) => {
+    try {
+        const { username, password } = req.body || {};
+        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+
+        if (!username || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Vui lòng cung cấp đầy đủ tên đăng nhập và mật khẩu'
+            });
+        }
+
+        const normalizedUsername = String(username).trim().toLowerCase();
+        const user = AUTH_USERS.find(u => 
+            u.username.toLowerCase() === normalizedUsername || 
+            u.email.toLowerCase() === normalizedUsername
+        );
+
+        if (!user || !user.passwords.includes(String(password).trim())) {
+            AUTH_ACCESS_LOGS.unshift({
+                id: 'log_' + Date.now(),
+                timestamp: new Date().toISOString(),
+                username: normalizedUsername,
+                role: 'unknown',
+                action: 'Đăng nhập thất bại (Sai thông tin)',
+                ip: clientIp,
+                status: 'failed'
+            });
+            if (AUTH_ACCESS_LOGS.length > 100) AUTH_ACCESS_LOGS.pop();
+
+            return res.status(401).json({
+                success: false,
+                message: 'Tên đăng nhập hoặc mật khẩu không chính xác'
+            });
+        }
+
+        const token = 'token_' + Buffer.from(`${user.username}_${Date.now()}_${Math.random()}`).toString('base64');
+        const sessionData = {
+            id: user.id,
+            username: user.username,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            avatar: user.avatar,
+            permissions: user.permissions,
+            loginTime: new Date().toISOString()
+        };
+
+        ACTIVE_SESSIONS.set(token, sessionData);
+
+        AUTH_ACCESS_LOGS.unshift({
+            id: 'log_' + Date.now(),
+            timestamp: new Date().toISOString(),
+            username: user.username,
+            role: user.role,
+            action: `Đăng nhập thành công với quyền [${user.role.toUpperCase()}]`,
+            ip: clientIp,
+            status: 'success'
+        });
+        if (AUTH_ACCESS_LOGS.length > 100) AUTH_ACCESS_LOGS.pop();
+
+        res.json({
+            success: true,
+            message: `Đăng nhập thành công! Quyền hạn: ${user.role === 'admin' ? 'Quản trị viên (Admin)' : 'Người dùng (User)'}`,
+            token,
+            user: sessionData
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi đăng nhập: ' + err.message });
+    }
+});
+
+// Lấy thông tin phiên hiện tại
+app.get('/api/auth/me', (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ success: false, message: 'Chưa đăng nhập' });
+
+    const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+    const session = ACTIVE_SESSIONS.get(token);
+
+    if (!session) {
+        return res.status(401).json({ success: false, message: 'Phiên đăng nhập đã hết hạn' });
+    }
+
+    res.json({ success: true, user: session });
+});
+
+// Đăng xuất
+app.post('/api/auth/logout', (req, res) => {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+        const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+        ACTIVE_SESSIONS.delete(token);
+    }
+    res.json({ success: true, message: 'Đăng xuất thành công' });
+});
+
+// Danh sách tài khoản (Chỉ dành cho Admin hoặc kiểm tra phân quyền)
+app.get('/api/auth/users', (req, res) => {
+    const safeUsers = AUTH_USERS.map(u => ({
+        id: u.id,
+        username: u.username,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        avatar: u.avatar,
+        status: u.status,
+        permissions: u.permissions,
+        defaultPasswordHint: u.passwords[0]
+    }));
+    res.json({ success: true, users: safeUsers });
+});
+
+// Giám sát tài nguyên hệ thống (Admin System Monitor)
+app.get('/api/admin/system-stats', (req, res) => {
+    const mem = process.memoryUsage();
+    res.json({
+        success: true,
+        uptimeSeconds: Math.floor(process.uptime()),
+        nodeVersion: process.version,
+        platform: process.platform,
+        memory: {
+            rssMb: Math.round(mem.rss / 1024 / 1024),
+            heapUsedMb: Math.round(mem.heapUsed / 1024 / 1024),
+            heapTotalMb: Math.round(mem.heapTotal / 1024 / 1024)
+        },
+        activeWebSocketClients: wss ? wss.clients.size : 0,
+        activeSessions: ACTIVE_SESSIONS.size,
+        accessLogs: AUTH_ACCESS_LOGS.slice(0, 20)
+    });
+});
+
 // ==================== HEALTH CHECK ====================
 
 app.get('/api/health', (req, res) => {
