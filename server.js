@@ -43,8 +43,12 @@ const dnseMcp           = require('./dnse-mcp-server');
 
 // Map ten model thân thiện -> model ID cua OpenRouter
 const MODEL_MAP = {
-    'nemotron':                             'nvidia/nemotron-3-super-120b-a12b',
-    'nemotron-3':                           'nvidia/nemotron-3-super-120b-a12b',
+    'nemotron':                             'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nemotron-3':                           'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nemotron-ultra':                       'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nemotron-3-ultra':                     'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nvidia/nemotron-3-ultra-550b-a55b:free':'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nvidia/nemotron-3-ultra-550b-a55b':    'nvidia/nemotron-3-ultra-550b-a55b:free',
     'nemotron-super':                       'nvidia/nemotron-3-super-120b-a12b',
     'nemotron-3-super':                     'nvidia/nemotron-3-super-120b-a12b',
     'nvidia/nemotron-3-super-120b-a12b':    'nvidia/nemotron-3-super-120b-a12b',
@@ -95,16 +99,18 @@ async function callDeepSeekDirect(messages, maxTokens = 1500) {
     return { message: content, usage: response.data.usage };
 }
 
-// Danh sach model fallback theo thu tu: Nemotron 3 Super -> Nemotron 3.5 Lightning -> DeepSeek -> Liquid
+// Danh sach model fallback theo thu tu: Nemotron 3 Ultra Free -> Nemotron 3.5 Lightning -> Nemotron 3 Super -> DeepSeek -> Liquid
 const FAST_FALLBACK_MODELS = [
-    'nvidia/nemotron-3-super-120b-a12b',
+    'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nvidia/nemotron-3-ultra-550b-a55b',
     'nvidia/nemotron-3.5-lightning:free',
+    'nvidia/nemotron-3-super-120b-a12b',
     'deepseek/deepseek-chat',
     'liquid/lfm-2.5-2.6b:free'
 ];
 
 // Ham goi OpenRouter voi auto-fallback neu model ban dau bi cham, loi hoac qua tai
-async function callOpenRouter(messages, model = 'nvidia/nemotron-3-super-120b-a12b', maxTokens = 1500) {
+async function callOpenRouter(messages, model = 'nvidia/nemotron-3-ultra-550b-a55b:free', maxTokens = 1500) {
     if (!OPENROUTER_KEY) throw new Error('OPENROUTER_API_KEY chua duoc cau hinh trong .env');
 
     const primaryModel = resolveModel(model);
@@ -615,10 +621,10 @@ async function fetchStockContextForPrompt(userText) {
 
 // ==================== AI CHATBOT ENDPOINT ====================
 
-// Endpoint chat duy nhat (mac dinh Nemotron 3 Super 120B suy luan chuyen sau)
+// Endpoint chat duy nhat (mac dinh Nemotron 3 Ultra 550B Free sieu manh)
 app.post('/api/chat', async (req, res) => {
     try {
-        const { messages, model = 'nvidia/nemotron-3-super-120b-a12b' } = req.body;
+        const { messages, model = 'nvidia/nemotron-3-ultra-550b-a55b:free' } = req.body;
         if (!messages || !messages.length) {
             return res.status(400).json({ success: false, error: 'Thieu danh sach tin nhan' });
         }
@@ -2293,8 +2299,8 @@ app.get('/api/ai/status', (req, res) => {
         openrouter: {
             configured: Boolean(OPENROUTER_KEY),
             keyPrefix: OPENROUTER_KEY ? `${OPENROUTER_KEY.slice(0, 10)}...${OPENROUTER_KEY.slice(-4)}` : null,
-            defaultModel: 'nvidia/nemotron-3-super-120b-a12b',
-            modelName: 'Nemotron 3 Super 120B (NVIDIA)'
+            defaultModel: 'nvidia/nemotron-3-ultra-550b-a55b:free',
+            modelName: 'Nemotron 3 Ultra 550B Free (NVIDIA)'
         },
         dnse_mcp: {
             active: true,
@@ -2309,7 +2315,7 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString(),
         apis: {
             openrouter:       !!OPENROUTER_KEY,
-            openrouter_model: 'nvidia/nemotron-3-super-120b-a12b',
+            openrouter_model: 'nvidia/nemotron-3-ultra-550b-a55b:free',
             deepseek:         !!DEEPSEEK_KEY,
             gemini:           !!GEMINI_KEY,
             dnse_configured:  Boolean(DNSE_API_KEY),
@@ -2325,7 +2331,7 @@ const server = app.listen(PORT, () => {
 Server dang chay tai port ${PORT}
 
 API Endpoints (DNSE Open API & Realtime Market):
-   - POST /api/chat              : Chatbot AI tích hợp DNSE MCP (Nemotron 3 Super 120B)
+   - POST /api/chat              : Chatbot AI tích hợp DNSE MCP (Nemotron 3 Ultra Free)
    - GET  /api/ai/status         : Kiem tra trang thai OpenRouter Key & Model mac dinh
    - POST /api/news/generate     : Tong hop tin tuc
    - GET  /api/news/rss          : Lay tin tuc RSS
@@ -2344,7 +2350,7 @@ Website: http://localhost:${PORT}
 WebSocket: ws://localhost:${PORT}
 
 API Status:
-   ${OPENROUTER_KEY ? 'Co key (' + OPENROUTER_KEY.slice(0, 10) + '...)' : 'Thieu key'} - OpenRouter (Nemotron 3 Super 120B mac dinh)
+   ${OPENROUTER_KEY ? 'Co key (' + OPENROUTER_KEY.slice(0, 10) + '...)' : 'Thieu key'} - OpenRouter (Nemotron 3 Ultra Free mac dinh)
    ${DEEPSEEK_KEY   ? 'Co key' : 'Chua cau hinh'} - DeepSeek Direct (api.deepseek.com)
    ${GEMINI_KEY     ? 'Co key' : 'Chua cau hinh'} - Google Gemini (Fallback)
    ${DNSE_API_KEY   ? 'Co key' : 'Chua cau hinh (dung che do Open Datafeed)'} - DNSE Open API & Entrade X

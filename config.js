@@ -35,6 +35,6 @@ const APP_CONFIG = {
     isLocal: (typeof window !== 'undefined' && window.location) ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '' || window.location.protocol === 'file:') : true,
     isGitHubPages: (typeof window !== 'undefined' && window.location) ? window.location.hostname.includes('github.io') : false,
     workerUrl: WORKER_URL || null,
-    defaultModel: 'nvidia/nemotron-3-super-120b-a12b',
-    defaultModelName: 'Nemotron 3 Super 120B (NVIDIA)',
+    defaultModel: 'nvidia/nemotron-3-ultra-550b-a55b:free',
+    defaultModelName: 'Nemotron 3 Ultra 550B Free (NVIDIA)',
 };

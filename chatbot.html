@@ -468,17 +468,18 @@
             <div class="model-selector">
                 <label>Chọn mô hình AI</label>
                 <select id="modelSelect" style="width:100%;padding:8px 10px;border:1px solid #d4d4d4;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;background:#fff;cursor:pointer;" onchange="changeModel(this.value)">
-                    <option value="nvidia/nemotron-3-super-120b-a12b" selected>🔬 Nemotron 3 Super (Suy luận 120B - Mặc định)</option>
+                    <option value="nvidia/nemotron-3-ultra-550b-a55b:free" selected>👑 Nemotron 3 Ultra (Siêu mô hình 550B Free - Mặc định)</option>
                     <option value="nvidia/nemotron-3.5-lightning:free">⚡ Nemotron 3.5 Lightning (Siêu nhanh 2-3s)</option>
+                    <option value="nvidia/nemotron-3-super-120b-a12b">🔬 Nemotron 3 Super (Suy luận 120B)</option>
                     <option value="deepseek/deepseek-chat">🧠 DeepSeek V3 (Phân tích chuyên sâu)</option>
                     <option value="liquid/lfm-2.5-2.6b:free">🚀 Liquid LFM 2.5 (Tức thì 1s)</option>
                 </select>
                 <div class="model-card">
                     <div class="model-card-header">
-                        <div class="model-avatar-badge" style="background: #7c3aed;" id="modelBadge">🔬</div>
+                        <div class="model-avatar-badge" style="background: #2563eb;" id="modelBadge">👑</div>
                         <div>
-                            <div class="model-card-title" id="modelCardTitle">Nemotron 3 Super 120B</div>
-                            <div class="model-card-sub" id="modelCardSub">NVIDIA AI Suy Luận Logic (Mô hình cũ mặc định)</div>
+                            <div class="model-card-title" id="modelCardTitle">Nemotron 3 Ultra 550B (Free)</div>
+                            <div class="model-card-sub" id="modelCardSub">NVIDIA AI 550B Siêu Cấp (Miễn phí / $0)</div>
                         </div>
                     </div>
                     <div class="mcp-pill" id="chatbotMcpPill">
@@ -486,9 +487,9 @@
                         <span id="chatbotMcpText">Live Realtime Market Protocol</span>
                     </div>
                     <ul class="model-features">
-                        <li>Mô hình Nemotron 120B tham số suy luận logic chuyên sâu</li>
+                        <li>Siêu mô hình 550B tham số mạnh mẽ hàng đầu của NVIDIA</li>
+                        <li>Miễn phí 100% (Free $0) trên OpenRouter</li>
                         <li>Dữ liệu giá & khối lượng realtime HOSE, HNX, UPCOM</li>
-                        <li>Định giá P/E, P/B, ROE, RSI, ADX thời gian thực</li>
                     </ul>
                     <div style="margin-top:12px;padding-top:10px;border-top:1px dashed #e5e7eb;">
                         <button onclick="promptCustomApiKey()" style="width:100%;padding:6px 10px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;">⚙️ Cài đặt OpenRouter Key (Web tĩnh)</button>
@@ -521,10 +522,10 @@
                 <div class="api-warning" id="apiWarning" style="display: none;"></div>
                 
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-state-icon">🔬</div>
+                    <div class="empty-state-icon">👑</div>
                     <div class="empty-state-text">
-                        <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime (Nemotron 3 Super).</strong><br>
-                        Mô hình AI tự động: <strong>NVIDIA Nemotron 3 Super 120B</strong> (Tích hợp dữ liệu thời gian thực các sàn HOSE, HNX, UPCOM).<br><br>
+                        <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime (Nemotron 3 Ultra Free).</strong><br>
+                        Mô hình AI tự động: <strong>NVIDIA Nemotron 3 Ultra 550B (Free)</strong> (Tích hợp dữ liệu thời gian thực các sàn HOSE, HNX, UPCOM).<br><br>
                         <span style="font-size: 13px; color: #737373;">Bạn có thể hỏi tôi về phân tích mã cổ phiếu (TCB, HPG, FPT, VCB...), tra cứu định giá P/E, P/B, ROE, chỉ báo RSI/ADX hoặc nhận định xu hướng thị trường hôm nay.</span>
                     </div>
                 </div>
@@ -549,20 +550,32 @@
     <script src="nav-script.js"></script>
     <script src="config.js"></script>
     <script>
-        let currentModel = 'nvidia/nemotron-3-super-120b-a12b';
+        let currentModel = 'nvidia/nemotron-3-ultra-550b-a55b:free';
         let messages = [];
         let isTyping = false;
 
         const MODEL_INFO = {
+            'nvidia/nemotron-3-ultra-550b-a55b:free': {
+                title: 'Nemotron 3 Ultra 550B (Free)',
+                sub: 'NVIDIA AI 550B Siêu Cấp (Miễn phí / $0)',
+                badge: '👑',
+                bg: '#2563eb'
+            },
+            'nvidia/nemotron-3-ultra-550b-a55b': {
+                title: 'Nemotron 3 Ultra 550B',
+                sub: 'NVIDIA AI 550B Siêu Cấp',
+                badge: '👑',
+                bg: '#2563eb'
+            },
             'nvidia/nemotron-3-super-120b-a12b': {
                 title: 'Nemotron 3 Super 120B',
-                sub: 'NVIDIA AI Suy Luận Logic (Mô hình cũ mặc định)',
+                sub: 'NVIDIA AI Suy Luận Logic 120B',
                 badge: '🔬',
                 bg: '#7c3aed'
             },
             'nvidia/nemotron-3-super-120b-a12b:free': {
                 title: 'Nemotron 3 Super 120B',
-                sub: 'NVIDIA AI Suy Luận Logic',
+                sub: 'NVIDIA AI Suy Luận Logic 120B',
                 badge: '🔬',
                 bg: '#7c3aed'
             },
@@ -588,7 +601,7 @@
 
         function changeModel(val) {
             currentModel = val;
-            const info = MODEL_INFO[val] || MODEL_INFO['nvidia/nemotron-3-super-120b-a12b'];
+            const info = MODEL_INFO[val] || MODEL_INFO['nvidia/nemotron-3-ultra-550b-a55b:free'];
             const titleEl = document.getElementById('modelCardTitle');
             const subEl = document.getElementById('modelCardSub');
             const badgeEl = document.getElementById('modelBadge');
@@ -1212,10 +1225,10 @@
 
         function newChat() {
             messages = [];
-            const info = MODEL_INFO[currentModel] || MODEL_INFO['nvidia/nemotron-3-super-120b-a12b'];
+            const info = MODEL_INFO[currentModel] || MODEL_INFO['nvidia/nemotron-3-ultra-550b-a55b:free'];
             document.getElementById('chatMessages').innerHTML = `
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-state-icon">${info.badge || '🔬'}</div>
+                    <div class="empty-state-icon">${info.badge || '👑'}</div>
                     <div class="empty-state-text">
                         <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime (${info.title}).</strong><br>
                         Mô hình đang hoạt động: <strong>${info.title}</strong> (Tự động kết nối dữ liệu Bảng giá & Thị trường Realtime).<br><br>

@@ -10,8 +10,12 @@ const CORS_HEADERS = {
 };
 
 const MODEL_MAP = {
-    'nemotron':                             'nvidia/nemotron-3-super-120b-a12b',
-    'nemotron-3':                           'nvidia/nemotron-3-super-120b-a12b',
+    'nemotron':                             'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nemotron-3':                           'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nemotron-ultra':                       'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nemotron-3-ultra':                     'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nvidia/nemotron-3-ultra-550b-a55b:free':'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nvidia/nemotron-3-ultra-550b-a55b':    'nvidia/nemotron-3-ultra-550b-a55b:free',
     'nemotron-super':                       'nvidia/nemotron-3-super-120b-a12b',
     'nemotron-3-super':                     'nvidia/nemotron-3-super-120b-a12b',
     'nvidia/nemotron-3-super-120b-a12b':    'nvidia/nemotron-3-super-120b-a12b',
@@ -35,8 +39,10 @@ function resolveModel(model) {
 }
 
 const FAST_FALLBACK_MODELS = [
-    'nvidia/nemotron-3-super-120b-a12b',
+    'nvidia/nemotron-3-ultra-550b-a55b:free',
+    'nvidia/nemotron-3-ultra-550b-a55b',
     'nvidia/nemotron-3.5-lightning:free',
+    'nvidia/nemotron-3-super-120b-a12b',
     'deepseek/deepseek-chat',
     'liquid/lfm-2.5-2.6b:free'
 ];
@@ -61,7 +67,7 @@ export async function onRequestPost(context) {
         );
     }
 
-    const { messages, model = 'nvidia/nemotron-3-super-120b-a12b' } = body;
+    const { messages, model = 'nvidia/nemotron-3-ultra-550b-a55b:free' } = body;
 
     if (!messages || !messages.length) {
         return new Response(
