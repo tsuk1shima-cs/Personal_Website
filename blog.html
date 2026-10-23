@@ -527,7 +527,8 @@
                 <!-- TABS -->
                 <div style="display:flex;background:#f3f4f6;border-radius:4px;padding:3px;gap:4px;">
                     <button type="button" id="tabLoginBtn" onclick="switchAuthMode('login')" style="flex:1;padding:6px;border:none;border-radius:3px;font-size:12.5px;font-weight:700;cursor:pointer;background:#fff;color:#111827;box-shadow:0 1px 2px rgba(0,0,0,0.1);">Đăng nhập</button>
-                    <button type="button" id="tabRegisterBtn" onclick="switchAuthMode('register')" style="flex:1;padding:6px;border:none;border-radius:3px;font-size:12.5px;font-weight:600;cursor:pointer;background:none;color:#6b7280;">Đăng ký tài khoản khách</button>
+                    <button type="button" id="tabRegisterBtn" onclick="switchAuthMode('register')" style="flex:1;padding:6px;border:none;border-radius:3px;font-size:12.5px;font-weight:600;cursor:pointer;background:none;color:#6b7280;">Đăng ký</button>
+                    <button type="button" id="tabForgotBtn" onclick="switchAuthMode('forgot')" style="flex:1;padding:6px;border:none;border-radius:3px;font-size:12.5px;font-weight:600;cursor:pointer;background:none;color:#6b7280;">Quên MK</button>
                 </div>
 
                 <!-- FORM LOGIN -->
@@ -537,7 +538,10 @@
                         <input type="text" id="blogLoginUser" class="form-control" placeholder="Tên đăng nhập..." required>
                     </div>
                     <div class="form-group">
-                        <label>Mật khẩu</label>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <label>Mật khẩu</label>
+                            <a href="javascript:;" onclick="switchAuthMode('forgot')" style="font-size:11.5px;color:#2980b9;text-decoration:none;">Quên mật khẩu?</a>
+                        </div>
                         <input type="password" id="blogLoginPwd" class="form-control" placeholder="Nhập mật khẩu..." required>
                     </div>
                     <div id="blogLoginMsg" style="display:none;font-size:12px;padding:6px 10px;border-radius:4px;background:#fef2f2;color:#b91c1c;"></div>
@@ -577,6 +581,44 @@
                     <div id="blogRegMsg" style="display:none;font-size:12px;padding:6px 10px;border-radius:4px;background:#fef2f2;color:#b91c1c;"></div>
                     <button type="submit" class="btn-modal-save" style="margin-top:4px;">Tạo tài khoản khách</button>
                 </form>
+
+                <!-- FORM FORGOT PASSWORD & OTP -->
+                <div id="blogForgotSection" style="display:none;flex-direction:column;gap:10px;">
+                    <div id="blogForgotStep1" style="display:flex;flex-direction:column;gap:9px;">
+                        <div style="font-size:12px;color:#6b7280;line-height:1.4;">
+                            Nhập <b>Tên đăng nhập</b> hoặc <b>Email</b> đã đăng ký để nhận mã xác thực OTP (6 chữ số).
+                        </div>
+                        <div class="form-group">
+                            <label>Tên đăng nhập hoặc Email</label>
+                            <input type="text" id="blogForgotUser" class="form-control" placeholder="Ví dụ: demo_investor..." required>
+                        </div>
+                        <div id="blogForgotMsg1" style="display:none;font-size:12px;padding:6px 10px;border-radius:4px;background:#fef2f2;color:#b91c1c;"></div>
+                        <button type="button" onclick="handleBlogRequestOtp()" class="btn-modal-save">Gửi Mã Xác Thực (OTP)</button>
+                    </div>
+
+                    <div id="blogForgotStep2" style="display:none;flex-direction:column;gap:9px;">
+                        <div style="background:#f0f9ff;border:1px solid #bae6fd;padding:8px 10px;border-radius:4px;font-size:12px;color:#0369a1;">
+                            Mã OTP xác thực đã được gửi cho tài khoản: <b id="blogForgotTarget">-</b>
+                            <div id="blogForgotDemoBadge" style="font-weight:700;color:#16a34a;margin-top:2px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Mã xác thực OTP (6 số)</label>
+                            <input type="text" id="blogForgotOtp" maxlength="6" class="form-control" placeholder="000000" style="letter-spacing:3px;font-weight:700;text-align:center;" required>
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Mật khẩu mới</label>
+                                <input type="password" id="blogForgotNewPwd" class="form-control" placeholder="Tối thiểu 4 ký tự" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Xác nhận MK</label>
+                                <input type="password" id="blogForgotConfirmPwd" class="form-control" placeholder="Nhập lại..." required>
+                            </div>
+                        </div>
+                        <div id="blogForgotMsg2" style="display:none;font-size:12px;padding:6px 10px;border-radius:4px;background:#fef2f2;color:#b91c1c;"></div>
+                        <button type="button" onclick="handleBlogResetPwd()" class="btn-modal-save">Xác Thực & Đổi Mật Khẩu</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -917,8 +959,10 @@
         function switchAuthMode(mode) {
             const tabLogin = document.getElementById('tabLoginBtn');
             const tabReg = document.getElementById('tabRegisterBtn');
+            const tabForgot = document.getElementById('tabForgotBtn');
             const fLogin = document.getElementById('blogLoginForm');
             const fReg = document.getElementById('blogRegForm');
+            const fForgot = document.getElementById('blogForgotSection');
             const sub = document.getElementById('authModalSub');
             const msg1 = document.getElementById('blogLoginMsg');
             const msg2 = document.getElementById('blogRegMsg');
@@ -926,20 +970,125 @@
             if (msg1) msg1.style.display = 'none';
             if (msg2) msg2.style.display = 'none';
 
+            [tabLogin, tabReg, tabForgot].forEach(t => {
+                if (t) { t.style.background = 'none'; t.style.fontWeight = '600'; t.style.color = '#6b7280'; t.style.boxShadow = 'none'; }
+            });
+
+            if (fLogin) fLogin.style.display = 'none';
+            if (fReg) fReg.style.display = 'none';
+            if (fForgot) fForgot.style.display = 'none';
+
             if (mode === 'register') {
-                if (fLogin) fLogin.style.display = 'none';
                 if (fReg) fReg.style.display = 'flex';
-                if (tabLogin) { tabLogin.style.background = 'none'; tabLogin.style.fontWeight = '600'; tabLogin.style.color = '#6b7280'; tabLogin.style.boxShadow = 'none'; }
                 if (tabReg) { tabReg.style.background = '#fff'; tabReg.style.fontWeight = '700'; tabReg.style.color = '#111827'; tabReg.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)'; }
                 if (sub) sub.textContent = 'Đăng ký tài khoản khách để tương tác & lưu bài viết';
+            } else if (mode === 'forgot') {
+                if (fForgot) fForgot.style.display = 'flex';
+                if (tabForgot) { tabForgot.style.background = '#fff'; tabForgot.style.fontWeight = '700'; tabForgot.style.color = '#111827'; tabForgot.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)'; }
+                if (sub) sub.textContent = 'Khôi phục mật khẩu an toàn qua mã OTP xác thực';
+                const s1 = document.getElementById('blogForgotStep1');
+                const s2 = document.getElementById('blogForgotStep2');
+                if (s1) s1.style.display = 'flex';
+                if (s2) s2.style.display = 'none';
             } else {
                 if (fLogin) fLogin.style.display = 'flex';
-                if (fReg) fReg.style.display = 'none';
                 if (tabLogin) { tabLogin.style.background = '#fff'; tabLogin.style.fontWeight = '700'; tabLogin.style.color = '#111827'; tabLogin.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)'; }
-                if (tabReg) { tabReg.style.background = 'none'; tabReg.style.fontWeight = '600'; tabReg.style.color = '#6b7280'; tabReg.style.boxShadow = 'none'; }
                 if (sub) sub.textContent = 'Đăng nhập Quản trị viên (Admin) hoặc Thành viên';
             }
         }
+
+        let blogCurrentOtp = null;
+        let blogResetUser = null;
+
+        async function handleBlogRequestOtp() {
+            const query = (document.getElementById('blogForgotUser')?.value || '').trim();
+            const msg = document.getElementById('blogForgotMsg1');
+            if (!query) {
+                if (msg) { msg.textContent = 'Vui lòng nhập tên đăng nhập hoặc email!'; msg.style.display = 'block'; }
+                return;
+            }
+
+            const otp = String(Math.floor(100000 + Math.random() * 900000));
+            blogCurrentOtp = otp;
+            blogResetUser = query;
+
+            // Gọi backend nếu có
+            try {
+                const apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+                if (apiBase) {
+                    const res = await fetch(`${apiBase}/auth/forgot-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ emailOrUsername: query })
+                    });
+                    const d = await res.json();
+                    if (d && d.otp) blogCurrentOtp = String(d.otp);
+                }
+            } catch (e) {}
+
+            document.getElementById('blogForgotStep1').style.display = 'none';
+            document.getElementById('blogForgotStep2').style.display = 'flex';
+            document.getElementById('blogForgotTarget').textContent = query;
+            document.getElementById('blogForgotDemoBadge').textContent = `Mã OTP demo: ${blogCurrentOtp}`;
+            showToast(`Mã OTP của bạn là: [${blogCurrentOtp}]. Hãy nhập mã để đổi mật khẩu.`);
+        }
+
+        async function handleBlogResetPwd() {
+            const otp = (document.getElementById('blogForgotOtp')?.value || '').trim();
+            const newP = (document.getElementById('blogForgotNewPwd')?.value || '').trim();
+            const confP = (document.getElementById('blogForgotConfirmPwd')?.value || '').trim();
+            const msg = document.getElementById('blogForgotMsg2');
+
+            if (!otp || !newP || !confP) {
+                if (msg) { msg.textContent = 'Vui lòng nhập đầy đủ các trường!'; msg.style.display = 'block'; }
+                return;
+            }
+            if (newP !== confP) {
+                if (msg) { msg.textContent = 'Mật khẩu xác nhận không khớp!'; msg.style.display = 'block'; }
+                return;
+            }
+            if (newP.length < 4) {
+                if (msg) { msg.textContent = 'Mật khẩu phải từ 4 ký tự trở lên!'; msg.style.display = 'block'; }
+                return;
+            }
+            if (otp !== blogCurrentOtp) {
+                if (msg) { msg.textContent = 'Mã OTP không chính xác!'; msg.style.display = 'block'; }
+                return;
+            }
+
+            // Cập nhật LocalStorage
+            try {
+                let s = localStorage.getItem('phucdch_registered_users');
+                if (s) {
+                    let users = JSON.parse(s);
+                    const idx = users.findIndex(u => u.username.toLowerCase() === blogResetUser.toLowerCase());
+                    if (idx !== -1) {
+                        users[idx].passwords = [newP];
+                        localStorage.setItem('phucdch_registered_users', JSON.stringify(users));
+                    } else {
+                        const ov = JSON.parse(localStorage.getItem('phucdch_pwd_overrides') || '{}');
+                        ov[blogResetUser.toLowerCase()] = newP;
+                        localStorage.setItem('phucdch_pwd_overrides', JSON.stringify(ov));
+                    }
+                }
+            } catch (e) {}
+
+            // Gọi backend reset password
+            try {
+                const apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+                if (apiBase) {
+                    await fetch(`${apiBase}/auth/reset-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ emailOrUsername: blogResetUser, otp, newPassword: newP })
+                    });
+                }
+            } catch (e) {}
+
+            showToast('Đổi mật khẩu thành công! Vui lòng đăng nhập.');
+            switchAuthMode('login');
+            const uInput = document.getElementById('blogLoginUser');
+            if (uInput) uInput.value = blogResetUser;
 
         function handleBlogLogin(e) {
             e.preventDefault();

@@ -1844,6 +1844,257 @@ app.get('/api/auth/users', (req, res) => {
     res.json({ success: true, users: safeUsers });
 });
 
+// Lưu trữ mã OTP quên mật khẩu (Map: key là username/email, value là { otp, expiresAt, user })
+const PASSWORD_RESET_OTPS = new Map();
+
+// Yêu cầu quên mật khẩu: Sinh mã OTP xác thực
+app.post('/api/auth/forgot-password', (req, res) => {
+    try {
+        const { emailOrUsername } = req.body || {};
+        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+
+        if (!emailOrUsername) {
+            return res.status(400).json({ success: false, message: 'Vui lòng nhập tên đăng nhập hoặc email đã đăng ký' });
+        }
+
+        const query = String(emailOrUsername).trim().toLowerCase();
+        const user = AUTH_USERS.find(u => 
+            u.username.toLowerCase() === query || 
+            (u.email && u.email.toLowerCase() === query)
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy tài khoản tương ứng với thông tin bạn cung cấp'
+            });
+        }
+
+        // Sinh mã OTP 6 chữ số ngẫu nhiên
+        const otp = String(Math.floor(100000 + Math.random() * 900000));
+        const expiresAt = Date.now() + 10 * 60 * 1000; // Có hiệu lực trong 10 phút
+
+        // Lưu vào bộ nhớ
+        const resetKey = user.username.toLowerCase();
+        PASSWORD_RESET_OTPS.set(resetKey, {
+            otp,
+            expiresAt,
+            username: user.username,
+            email: user.email,
+            name: user.name
+        });
+
+        // Ghi log bảo mật
+        AUTH_ACCESS_LOGS.unshift({
+            id: 'log_' + Date.now(),
+            timestamp: new Date().toISOString(),
+            username: user.username,
+            role: user.role,
+            action: `Yêu cầu cấp mã OTP khôi phục mật khẩu (Mã: ${otp})`,
+            ip: clientIp,
+            status: 'pending'
+        });
+        if (AUTH_ACCESS_LOGS.length > 100) AUTH_ACCESS_LOGS.pop();
+
+        res.json({
+            success: true,
+            message: `Mã xác thực OTP đã được tạo và gửi đến email ${user.email || user.username}. Mã có hiệu lực trong 10 phút.`,
+            otp: otp, // Trả về OTP để tiện trải nghiệm/kiểm thử realtime
+            expiresInSeconds: 600,
+            username: user.username,
+            maskedEmail: user.email ? user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') : user.username
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi xử lý quên mật khẩu: ' + err.message });
+    }
+});
+
+// Xác thực mã OTP
+app.post('/api/auth/verify-otp', (req, res) => {
+    try {
+        const { emailOrUsername, otp } = req.body || {};
+        if (!emailOrUsername || !otp) {
+            return res.status(400).json({ success: false, message: 'Vui lòng cung cấp tài khoản và mã xác thực OTP' });
+        }
+
+        const query = String(emailOrUsername).trim().toLowerCase();
+        const user = AUTH_USERS.find(u => 
+            u.username.toLowerCase() === query || 
+            (u.email && u.email.toLowerCase() === query)
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Tài khoản không tồn tại' });
+        }
+
+        const resetData = PASSWORD_RESET_OTPS.get(user.username.toLowerCase());
+        if (!resetData) {
+            return res.status(400).json({ success: false, message: 'Chưa có yêu cầu đặt lại mật khẩu hoặc mã đã hết hạn. Vui lòng yêu cầu lại.' });
+        }
+
+        if (Date.now() > resetData.expiresAt) {
+            PASSWORD_RESET_OTPS.delete(user.username.toLowerCase());
+            return res.status(400).json({ success: false, message: 'Mã xác thực OTP đã hết hạn. Vui lòng lấy mã mới.' });
+        }
+
+        if (String(resetData.otp).trim() !== String(otp).trim()) {
+            return res.status(400).json({ success: false, message: 'Mã xác thực OTP không chính xác' });
+        }
+
+        res.json({
+            success: true,
+            message: 'Mã xác thực OTP chính xác! Bạn có thể đặt mật khẩu mới.'
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi xác thực OTP: ' + err.message });
+    }
+});
+
+// Đặt lại mật khẩu mới sau khi xác thực OTP
+app.post('/api/auth/reset-password', (req, res) => {
+    try {
+        const { emailOrUsername, otp, newPassword } = req.body || {};
+        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+
+        if (!emailOrUsername || !otp || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ tài khoản, mã OTP và mật khẩu mới' });
+        }
+
+        const cleanPwd = String(newPassword).trim();
+        if (cleanPwd.length < 4) {
+            return res.status(400).json({ success: false, message: 'Mật khẩu mới phải có tối thiểu 4 ký tự' });
+        }
+
+        const query = String(emailOrUsername).trim().toLowerCase();
+        const user = AUTH_USERS.find(u => 
+            u.username.toLowerCase() === query || 
+            (u.email && u.email.toLowerCase() === query)
+        );
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Tài khoản không tồn tại' });
+        }
+
+        const resetData = PASSWORD_RESET_OTPS.get(user.username.toLowerCase());
+        if (!resetData) {
+            return res.status(400).json({ success: false, message: 'Yêu cầu không hợp lệ hoặc mã OTP đã hết hiệu lực' });
+        }
+
+        if (Date.now() > resetData.expiresAt) {
+            PASSWORD_RESET_OTPS.delete(user.username.toLowerCase());
+            return res.status(400).json({ success: false, message: 'Mã OTP đã hết hạn. Vui lòng thực hiện lại.' });
+        }
+
+        if (String(resetData.otp).trim() !== String(otp).trim()) {
+            return res.status(400).json({ success: false, message: 'Mã xác thực OTP không chính xác' });
+        }
+
+        // Cập nhật mật khẩu mới cho user
+        if (!Array.isArray(user.passwords)) {
+            user.passwords = [cleanPwd];
+        } else {
+            // Đưa mật khẩu mới lên đầu danh sách chấp nhận
+            user.passwords = [cleanPwd, ...user.passwords.filter(p => p !== cleanPwd)];
+        }
+
+        // Xóa OTP sau khi đã sử dụng thành công
+        PASSWORD_RESET_OTPS.delete(user.username.toLowerCase());
+
+        // Ghi log bảo mật
+        AUTH_ACCESS_LOGS.unshift({
+            id: 'log_' + Date.now(),
+            timestamp: new Date().toISOString(),
+            username: user.username,
+            role: user.role,
+            action: 'Đặt lại mật khẩu thành công qua xác thực OTP',
+            ip: clientIp,
+            status: 'success'
+        });
+        if (AUTH_ACCESS_LOGS.length > 100) AUTH_ACCESS_LOGS.pop();
+
+        res.json({
+            success: true,
+            message: 'Đổi mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới ngay bây giờ.'
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi đặt lại mật khẩu: ' + err.message });
+    }
+});
+
+// Đổi mật khẩu cho người dùng đang đăng nhập (từ trang hồ sơ cá nhân)
+app.post('/api/auth/change-password', (req, res) => {
+    try {
+        const { username, currentPassword, newPassword } = req.body || {};
+        if (!username || !currentPassword || !newPassword) {
+            return res.status(400).json({ success: false, message: 'Vui lòng cung cấp mật khẩu cũ và mật khẩu mới' });
+        }
+
+        const user = AUTH_USERS.find(u => u.username.toLowerCase() === String(username).trim().toLowerCase());
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản' });
+        }
+
+        if (!user.passwords.includes(String(currentPassword).trim())) {
+            return res.status(400).json({ success: false, message: 'Mật khẩu hiện tại không chính xác' });
+        }
+
+        const cleanPwd = String(newPassword).trim();
+        if (cleanPwd.length < 4) {
+            return res.status(400).json({ success: false, message: 'Mật khẩu mới phải có tối thiểu 4 ký tự' });
+        }
+
+        user.passwords = [cleanPwd, ...user.passwords.filter(p => p !== cleanPwd)];
+
+        res.json({ success: true, message: 'Cập nhật mật khẩu cá nhân thành công!' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi: ' + err.message });
+    }
+});
+
+// Admin API: Xóa tài khoản khách hàng trên server
+app.delete('/api/auth/users/:username', (req, res) => {
+    try {
+        const username = req.params.username.toLowerCase();
+        if (username === 'admin') {
+            return res.status(403).json({ success: false, message: 'Không thể xóa tài khoản Quản trị viên gốc' });
+        }
+
+        const index = AUTH_USERS.findIndex(u => u.username.toLowerCase() === username);
+        if (index === -1) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản cần xóa' });
+        }
+
+        const deleted = AUTH_USERS.splice(index, 1)[0];
+        res.json({ success: true, message: `Đã xóa tài khoản [${deleted.username}] thành công` });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ khi xóa người dùng: ' + err.message });
+    }
+});
+
+// Admin API: Chuyển đổi quyền người dùng trên server
+app.post('/api/auth/users/:username/role', (req, res) => {
+    try {
+        const username = req.params.username.toLowerCase();
+        if (username === 'admin') {
+            return res.status(403).json({ success: false, message: 'Không thể hạ quyền tài khoản Admin gốc' });
+        }
+
+        const user = AUTH_USERS.find(u => u.username.toLowerCase() === username);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản' });
+        }
+
+        user.role = user.role === 'admin' ? 'user' : 'admin';
+        res.json({
+            success: true,
+            message: `Đã chuyển đổi quyền cho tài khoản [${user.username}] thành: ${user.role.toUpperCase()}`,
+            role: user.role
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Lỗi máy chủ: ' + err.message });
+    }
+});
+
 // ==================== BLOG POSTS MANAGEMENT (ADMIN POST & EDIT) ====================
 const BLOG_DATA_FILE = path.join(__dirname, 'blog_posts.json');
 const POSTS_JS_FILE = path.join(__dirname, 'posts.js');

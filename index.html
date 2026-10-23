@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chuyên Gia Tư Vấn Tài Chính - Đặng Cao Hoàng Phúc</title>
+    <title>Chuyên Gia Tư Vấn Tài Chính & Đầu Tư Chứng Khoán - Đặng Cao Hoàng Phúc</title>
+    <meta name="description" content="Hồ sơ chuyên gia Đặng Cao Hoàng Phúc - Chuyên viên Hoạch định Tài chính & Tư vấn Đầu tư Chứng khoán. Phương pháp kết hợp FA và TA độc quyền, quản trị rủi ro kỷ luật.">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- NAVIGATION -->
+    <!-- NAVIGATION BAR -->
     <nav class="nav">
         <div class="wrap">
-            <a href="#" class="logo">
+            <a href="index.html" class="logo">
                 <span class="mark">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
@@ -20,7 +21,7 @@
             </a>
 
             <div class="nav-menu">
-                <a href="index.html" class="nav-link">Trang chủ</a>
+                <a href="index.html" class="nav-link" style="color:var(--primary-brand);font-weight:700;">Trang chủ</a>
                 
                 <div class="nav-grp">
                     <button class="nav-grp__btn">
@@ -30,8 +31,9 @@
                         </svg>
                     </button>
                     <div class="nav-grp__menu">
-                        <a href="tin-hieu-ta.html">Tín hiệu TA</a>
-                        <a href="bo-loc-fa.html">Bộ lọc FA</a>
+                        <a href="dashboard.html">Bảng điện Dashboard</a>
+                        <a href="tin-hieu-ta.html">Tín hiệu Kỹ thuật (TA)</a>
+                        <a href="bo-loc-fa.html">Bộ lọc Cơ bản (FA)</a>
                         <a href="market-data.html">Dữ liệu thị trường</a>
                         <a href="ssi-realtime.html">TCBS Realtime</a>
                     </div>
@@ -45,21 +47,22 @@
                         </svg>
                     </button>
                     <div class="nav-grp__menu">
-                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
+                        <a href="tu-van-dau-tu.html">Tư vấn đầu tư 1-1</a>
                         <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
-                        <a href="mo-tai-khoan.html">Mở tài khoản</a>
-                        <a href="dao-tao.html">Đào tạo</a>
+                        <a href="mo-tai-khoan.html">Mở tài khoản giao dịch</a>
+                        <a href="dao-tao.html">Khóa học Đào tạo</a>
                     </div>
                 </div>
 
+                <a href="chatbot.html" class="nav-link">Chatbot AI</a>
+                <a href="blog.html" class="nav-link">Blog & Nhận định</a>
                 <a href="tin-tuc.html" class="nav-link">Tin tức</a>
-                <a href="chatbot.html" class="nav-link">Chatbot</a>
-                <a href="blog.html" class="nav-link">Blog</a>
-                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="dashboard.html" class="nav-link" style="color:var(--primary-brand);font-weight:750;">Dashboard</a>
             </div>
 
             <div class="nav-actions">
-                <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký tư vấn</button>
+                <a href="dashboard.html" class="btn btn--outline" style="padding:9px 18px;font-size:12.5px;">Bảng Điện</a>
+                <button class="btn btn--solid" onclick="scrollToConsult()" style="padding:9px 18px;font-size:12.5px;">Đăng ký tư vấn</button>
             </div>
 
             <button class="hamburger" onclick="toggleMobileMenu()">
@@ -71,186 +74,444 @@
 
         <div class="mobile-panel" id="mobilePanel">
             <a href="index.html">Trang chủ</a>
+            <a href="dashboard.html">Bảng điện Dashboard</a>
             <a href="tin-hieu-ta.html">Tín hiệu TA</a>
             <a href="bo-loc-fa.html">Bộ lọc FA</a>
             <a href="market-data.html">Dữ liệu thị trường</a>
-            <a href="ssi-realtime.html">TCBS Realtime</a>
             <a href="tu-van-dau-tu.html">Tư vấn đầu tư</a>
             <a href="quan-ly-danh-muc.html">Quản lý danh mục</a>
             <a href="mo-tai-khoan.html">Mở tài khoản</a>
             <a href="dao-tao.html">Đào tạo</a>
-            <a href="tin-tuc.html">Tin tức</a>
-            <a href="chatbot.html">Chatbot</a>
+            <a href="chatbot.html">Chatbot AI</a>
             <a href="blog.html">Blog</a>
-            <a href="dashboard.html">Dashboard</a>
-            <a href="#contact">Liên hệ</a>
+            <a href="#contact">Đăng ký tư vấn</a>
         </div>
     </nav>
 
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <div class="hero__panel">
-            <div class="hero__eyebrow">CHUYÊN GIA ĐẦU TƯ CHỨNG KHOÁN</div>
-            <h1>Đặng Cao Hoàng Phúc</h1>
-            <p>Đoạn này bổ sung sau</p>
-            <div class="hero__actions">
-                <button class="btn btn--solid" onclick="scrollToConsult()">
-                    Đăng ký tư vấn tại đây
-                </button>
-                <button class="btn btn--outline">Xem danh mục chiến lược</button>
-            </div>
-        </div>
-        <div class="hero__media">
-            <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=600&fit=crop" alt="Chuyên gia tài chính">
-            <div class="hero__cap">
-                Chức vụ....
-                <strong>Công ty....</strong>
-            </div>
-        </div>
-    </section>
-
-    <!-- WHY SECTION -->
-    <section class="why" id="about">
+    <!-- HERO PROFILE SECTION (BO GÓC HIỆN ĐẠI ĐỒNG BỘ DASHBOARD) -->
+    <section class="pro-hero">
         <div class="wrap">
-            <h2>Vì sao....</h2>
-            <div class="why__rule"></div>
-            
-            <svg class="signature-line" viewBox="0 0 400 60" xmlns="http://www.w3.org/2000/svg">
-                <path d="M10 30 Q 100 10, 200 30 T 390 30" stroke="white" stroke-width="2" fill="none" opacity="0.3"/>
-            </svg>
-
-            <div class="why-grid">
-                <div class="why-item">
-                    <h3>Lí do 1</h3>
-                    <p>....</p>
-                </div>
-                <div class="why-item">
-                    <h3>Lí do 2</h3>
-                    <p>....</p>
-                </div>
-                <div class="why-item">
-                    <h3>Lí do 3</h3>
-                    <p>....</p>
-                </div>
-                <div class="why-item">
-                    <h3>Lí do 4</h3>
-                    <p>....</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FEES SECTION -->
-    <section class="fees">
-        <div class="wrap">
-            <div class="fees__head">
-                <h2>Chi phí minh bạch</h2>
-            </div>
-
-            <div class="fee-grid">
-                <div class="fee-card" style="background-image: url('https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=600&h=400&fit=crop');">
-                    <div class="fee-val">0%</div>
-                    <div class="fee-lbl">Phí tư vấn</div>
-                </div>
-                <div class="fee-card" style="background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop');">
-                    <div class="fee-val">0.1% – 0.15%</div>
-                    <div class="fee-lbl">Phí giao dịch</div>
-                </div>
-                <div class="fee-card" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop');">
-                    <div class="fee-val">~ 10%</div>
-                    <div class="fee-lbl">Lãi margin</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- REGISTRATION BAR -->
-    <section class="reg-bar">
-        <div class="wrap">
-            <h2>Đăng ký tham gia tư vấn miễn phí</h2>
-            <button class="btn btn--solid" onclick="scrollToConsult()">Đăng ký ngay</button>
-        </div>
-    </section>
-
-    <!-- CONSULT FORM -->
-    <section class="consult" id="contact">
-        <div class="wrap">
-            <form id="consultForm">
-                <div class="field-row">
-                    <div class="field">
-                        <label for="name">Họ và tên</label>
-                        <input type="text" id="name" name="from_name" placeholder="Nguyễn Văn A" required>
+            <div class="pro-hero-grid">
+                <!-- CỘT THÔNG TIN CÁ NHÂN CHUYÊN GIA -->
+                <div>
+                    <div class="pro-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        Chuyên Gia Hoạch Định Tài Chính & Tư Vấn Đầu Tư
                     </div>
-                    <div class="field">
-                        <label for="phone">Số điện thoại</label>
-                        <input type="tel" id="phone" name="phone" placeholder="0982 059 995" required>
+                    <h1 class="pro-hero-title">Đặng Cao Hoàng Phúc</h1>
+                    <div class="pro-hero-subtitle">
+                        Kiến tạo Danh mục Sinh lời Bền vững & Quản trị Rủi ro Kỷ luật
                     </div>
-                    <div class="field">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="reply_to" placeholder="example@email.com">
+                    <p class="pro-hero-desc">
+                        Với hơn 8 năm kinh nghiệm thực chiến trên thị trường chứng khoán Việt Nam, tôi đồng hành cùng nhà đầu tư cá nhân xây dựng phương pháp đầu tư bài bản: Kết hợp giữa <b>Phân tích Cơ bản (FA)</b> doanh nghiệp tăng trưởng và <b>Hành động giá dòng tiền (VSA/TA)</b>. Không FOMO, không mua theo tin đồn, kiên quyết bảo vệ vốn trước mọi biến động thị trường.
+                    </p>
+
+                    <div class="pro-hero-actions">
+                        <button class="btn btn--solid" onclick="scrollToConsult()">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                            Đăng Ký Tư Vấn 1-1 Miễn Phí
+                        </button>
+                        <a href="dashboard.html" class="btn btn--outline">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                            Khám Phá Bảng Điện Dashboard
+                        </a>
+                    </div>
+
+                    <div class="pro-tags-row">
+                        <span class="pro-tag-pill">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-text)" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Chứng chỉ hành nghề Môi giới & Tư vấn UBCKNN
+                        </span>
+                        <span class="pro-tag-pill">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-text)" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Kỷ luật Cắt lỗ nghiêm ngặt -7%
+                        </span>
+                        <span class="pro-tag-pill">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-green-text)" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Cung cấp Công cụ & Room Tín hiệu VIP
+                        </span>
                     </div>
                 </div>
 
-                <div class="group-label">Dịch vụ cần tư vấn</div>
-                <div class="services">
-                    <label>
-                        <input type="checkbox" name="service" value="Tư vấn đầu tư">
-                        <span>Tư vấn đầu tư</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="service" value="Quản lý danh mục">
-                        <span>Quản lý danh mục</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="service" value="Mở tài khoản">
-                        <span>Mở tài khoản</span>
-                    </label>
-                    <label>
-                        <input type="checkbox" name="service" value="Đào tạo đầu tư">
-                        <span>Đào tạo đầu tư</span>
-                    </label>
-                </div>
+                <!-- CỘT THẺ PROFILE CARD BO GÓC CHUẨN DASHBOARD -->
+                <div class="pro-card-wrapper">
+                    <!-- FLOATING BADGES TRÊN ẢNH -->
+                    <div class="pro-float-badge badge-top">
+                        <div class="pro-float-icon bg-green">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                        </div>
+                        <div>
+                            <div class="pro-float-text-top">Hiệu suất danh mục 2024-2025</div>
+                            <div class="pro-float-text-val" style="color:var(--color-green-text);">+28.6% Lợi Nhuận/Năm</div>
+                        </div>
+                    </div>
 
-                <div class="message-wrap">
-                    <textarea id="userMessage" name="message" placeholder="Lời nhắn của bạn..."></textarea>
-                    <button type="submit" class="btn btn--solid" id="submitBtn">Gửi thông tin</button>
-                </div>
+                    <div class="pro-avatar-card">
+                        <div class="pro-avatar-img-wrap">
+                            <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=900&fit=crop" alt="Chuyên gia Đặng Cao Hoàng Phúc">
+                        </div>
+                        <div class="pro-avatar-info">
+                            <div class="pro-avatar-name">Đặng Cao Hoàng Phúc</div>
+                            <div class="pro-avatar-role">Trưởng Nhóm Tư Vấn Đầu Tư Cao Cấp</div>
+                            <div class="pro-avatar-firm">Chuyên gia Phân tích Chiến lược & Quản lý Danh mục TTCK</div>
+                        </div>
+                    </div>
 
-                <div class="consult-msg" id="consultMsg"></div>
-            </form>
+                    <div class="pro-float-badge badge-bottom">
+                        <div class="pro-float-icon bg-brand">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <div>
+                            <div class="pro-float-text-top">Quản trị Rủi ro Vốn</div>
+                            <div class="pro-float-text-val">Bảo Toàn Vốn 100%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
-    <!-- FOOTER -->
+    <!-- METRICS STRIP: CHỈ SỐ NỔI BẬT BO GÓC -->
+    <section class="metrics-section">
+        <div class="wrap">
+            <div class="metrics-card-container">
+                <div class="metric-item">
+                    <div class="metric-number">8+ Năm</div>
+                    <div class="metric-label">Kinh Nghiệm Thực Chiến</div>
+                    <div class="metric-sub">Đồng hành qua nhiều chu kỳ Uptrend & Downtrend</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-number">500+</div>
+                    <div class="metric-label">Khách Hàng & NĐT</div>
+                    <div class="metric-sub">Cá nhân và doanh nghiệp ủy thác tư vấn</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-number" style="color:var(--color-green-text);">+28.6%</div>
+                    <div class="metric-label">Tỷ Suất Sinh Lời TB</div>
+                    <div class="metric-sub">Hiệu suất danh mục khuyến nghị 2024 - 2025</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-number" style="color:#0284c7;">24/7</div>
+                    <div class="metric-label">Công Cụ & Chatbot AI</div>
+                    <div class="metric-sub">Cảnh báo tín hiệu & tư vấn thông minh liên tục</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TRIẾT LÝ & PHƯƠNG PHÁP ĐẦU TƯ (4 CARD BO GÓC THAY THẾ LÍ DO 1, 2) -->
+    <section class="pro-why-section" id="about">
+        <div class="wrap">
+            <div class="section-head">
+                <div class="section-tag">Triết Lý Đầu Tư Khác Biệt</div>
+                <h2>Tại Sao Nên Đồng Hành Cùng Đặng Cao Hoàng Phúc?</h2>
+                <p>Không đầu cơ may rủi, không mua đuổi theo tin đồn. Chiến lược đầu tư được xây dựng trên nền tảng khoa học dữ liệu, chọn lọc cổ phiếu tăng trưởng và nguyên tắc quản trị vốn nghiêm ngặt.</p>
+            </div>
+
+            <div class="pro-why-grid">
+                <div class="pro-why-card">
+                    <div class="pro-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M16 12l-4-4-4 4M12 16V8"></path></svg>
+                    </div>
+                    <h3>Phương Pháp Lọc 2 Tầng (FA + TA)</h3>
+                    <p>Sàng lọc khắt khe sức khỏe tài chính doanh nghiệp (ROE, P/E, tăng trưởng EPS) trước, sau đó dùng hành động giá VSA & TA để chọn điểm mua bứt phá dòng tiền tối ưu nhất.</p>
+                </div>
+
+                <div class="pro-why-card">
+                    <div class="pro-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <h3>Kỷ Luật Cắt Lỗ & Bảo Toàn Vốn</h3>
+                    <p>Nguyên tắc vàng: Bảo vệ vốn luôn đi trước tìm kiếm lợi nhuận. Cắt lỗ dứt khoát ở ngưỡng -7% đến -8%, giúp nhà đầu tư giữ trọn lợi nhuận và tránh bị chôn vốn dài hạn.</p>
+                </div>
+
+                <div class="pro-why-card">
+                    <div class="pro-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    </div>
+                    <h3>Hệ Sinh Thái Realtime Độc Quyền</h3>
+                    <p>Khách hàng được độc quyền sử dụng bộ công cụ cao cấp: Bảng điện phân tích Dashboard, Bộ lọc FA doanh nghiệp, Tín hiệu TA tự động và Trợ lý ảo AI Chatbot 24/7.</p>
+                </div>
+
+                <div class="pro-why-card">
+                    <div class="pro-card-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3>Tư Vấn 1-1 Theo Khẩu Vị Cá Nhân</h3>
+                    <p>Thiết kế danh mục riêng biệt dựa trên quy mô vốn NAV, thời gian bám bảng điện và mục tiêu tài chính của từng nhà đầu tư: Lướt sóng T+ hoặc Tích sản dài hạn.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HỆ SINH THÁI CÔNG CỤ ĐẦU TƯ TÍCH HỢP -->
+    <section class="pro-tools-section">
+        <div class="wrap">
+            <div class="section-head">
+                <div class="section-tag">Công Nghệ Hỗ Trợ Giao Dịch</div>
+                <h2>Hệ Sinh Thái Công Cụ Realtime Độc Quyền</h2>
+                <p>Trải nghiệm hệ sinh thái công nghệ dữ liệu tài chính toàn diện giúp bạn ra quyết định đầu tư nhanh chóng, chính xác và có lợi thế trước thị trường.</p>
+            </div>
+
+            <div class="pro-tools-grid">
+                <a href="dashboard.html" class="pro-tool-card">
+                    <div class="tool-badge-row">
+                        <div class="tool-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                        </div>
+                        <span class="tool-tag">Realtime Feed</span>
+                    </div>
+                    <h3>Bảng Điện Phân Tích Dashboard</h3>
+                    <p>Bảng điện đa sàn HOSE, HNX, UPCOM. Tích hợp Heatmap dòng tiền, biến động lệnh lớn và top thanh khoản cập nhật từng giây.</p>
+                    <div class="tool-link-action">
+                        Truy cập Dashboard &rarr;
+                    </div>
+                </a>
+
+                <a href="bo-loc-fa.html" class="pro-tool-card">
+                    <div class="tool-badge-row">
+                        <div class="tool-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                        </div>
+                        <span class="tool-tag">Cơ Bản FA</span>
+                    </div>
+                    <h3>Bộ Lọc Cổ Phiếu Tăng Trưởng FA</h3>
+                    <p>Sàng lọc tự động doanh nghiệp theo tiêu chuẩn P/E, P/B, biên lợi nhuận, ROE và tốc độ tăng trưởng doanh thu quý/năm.</p>
+                    <div class="tool-link-action">
+                        Mở Bộ Lọc FA &rarr;
+                    </div>
+                </a>
+
+                <a href="tin-hieu-ta.html" class="pro-tool-card">
+                    <div class="tool-badge-row">
+                        <div class="tool-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                        </div>
+                        <span class="tool-tag">Kỹ Thuật TA</span>
+                    </div>
+                    <h3>Hệ Thống Tín Hiệu Kỹ Thuật TA</h3>
+                    <p>Phát hiện điểm bứt phá MA, RSI, MACD, Ichimoku và tín hiệu dòng tiền tổ chức gom hàng trong phiên giao dịch.</p>
+                    <div class="tool-link-action">
+                        Xem Tín Hiệu TA &rarr;
+                    </div>
+                </a>
+
+                <a href="chatbot.html" class="pro-tool-card">
+                    <div class="tool-badge-row">
+                        <div class="tool-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        </div>
+                        <span class="tool-tag">AI 24/7</span>
+                    </div>
+                    <h3>Trợ Lý Cố Vấn Ảo Chatbot AI</h3>
+                    <p>Phân tích tức thì mọi mã cổ phiếu theo yêu cầu, hỗ trợ tra cứu tin tức vĩ mô và tính toán ngưỡng cản/hỗ trợ 24/7.</p>
+                    <div class="tool-link-action">
+                        Trò chuyện với AI &rarr;
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- BIỂU PHÍ & DỊCH VỤ MINH BẠCH (THẺ BO GÓC SANG TRỌNG) -->
+    <section class="pro-pricing-section">
+        <div class="wrap">
+            <div class="section-head">
+                <div class="section-tag">Cam Kết Đồng Hành</div>
+                <h2>Biểu Phí Minh Bạch & Quyền Lợi Khách Hàng</h2>
+                <p>Mọi chi phí đều được tối ưu hóa tối đa. Khách hàng nhận được đầy đủ quyền lợi tư vấn chuyên sâu cùng các công cụ công nghệ cao cấp nhất.</p>
+            </div>
+
+            <div class="pro-pricing-grid">
+                <!-- GÓI 1 -->
+                <div class="pro-price-card">
+                    <div class="pro-price-tier">Tư Vấn & Mở Tài Khoản</div>
+                    <div class="pro-price-desc">Dành cho nhà đầu tư mới hoặc muốn chuyển tài khoản về hệ thống quản lý</div>
+                    <div class="pro-price-amount">0% Phí</div>
+                    <div class="pro-price-period">Miễn phí tư vấn trọn đời khi mở tài khoản</div>
+                    <ul class="pro-price-benefits">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Mở tài khoản số đẹp miễn phí 100% online
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Định hướng phương pháp và chiến lược giải ngân
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Tham gia Room Trao đổi & Nhận định đầu phiên
+                        </li>
+                    </ul>
+                    <button class="btn btn--outline" onclick="scrollToConsult()">Đăng Ký Mở Tài Khoản</button>
+                </div>
+
+                <!-- GÓI 2: FEATURED -->
+                <div class="pro-price-card featured">
+                    <div class="featured-ribbon">Được Lựa Chọn Nhiều Nhất</div>
+                    <div class="pro-price-tier" style="color:var(--primary-brand);">Quản Lý & Cơ Cấu Danh Mục</div>
+                    <div class="pro-price-desc">Tư vấn 1-1 chuyên sâu, tái cơ cấu tài sản và tối ưu hóa lợi nhuận danh mục</div>
+                    <div class="pro-price-amount">0.1% – 0.15%</div>
+                    <div class="pro-price-period">Phí giao dịch ưu đãi theo biểu phí công ty chứng khoán</div>
+                    <ul class="pro-price-benefits">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <b>Tư vấn 1-1 trực tiếp</b> cùng chuyên gia Hoàng Phúc
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Quyền vào <b>Room Tín Hiệu VIP</b> khuyến nghị mua/bán realtime
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Hạn mức Margin lớn, lãi suất vay ưu đãi cạnh tranh
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Báo cáo phân tích doanh nghiệp và vĩ mô định kỳ hàng tuần
+                        </li>
+                    </ul>
+                    <button class="btn btn--solid" onclick="scrollToConsult()">Đăng Ký Tư Vấn 1-1 Ngay</button>
+                </div>
+
+                <!-- GÓI 3 -->
+                <div class="pro-price-card">
+                    <div class="pro-price-tier">Đào Tạo Thực Chiến</div>
+                    <div class="pro-price-desc">Khóa học trang bị tư duy và kỹ năng phân tích độc lập cho nhà đầu tư</div>
+                    <div class="pro-price-amount">Khóa Học 1-1</div>
+                    <div class="pro-price-period">Kèm cặp thực chiến qua các phiên giao dịch trực tiếp</div>
+                    <ul class="pro-price-benefits">
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Làm chủ phương pháp đọc hiểu Báo cáo Tài chính (FA)
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Thành thạo kỹ thuật đọc bảng điện và phân tích nến VSA
+                        </li>
+                        <li>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            Bộ quy tắc quản trị tâm lý và kỷ luật cắt lỗ tự động
+                        </li>
+                    </ul>
+                    <a href="dao-tao.html" class="btn btn--outline" style="text-align:center;">Xem Chi Tiết Khóa Học</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FORM ĐĂNG KÝ TƯ VẤN (CARD BO GÓC 20PX CHUẨN DASHBOARD) -->
+    <section class="pro-consult-section" id="contact">
+        <div class="wrap">
+            <div class="pro-consult-box">
+                <div class="section-head" style="margin-bottom:32px;">
+                    <div class="section-tag">Kết Nối Trực Tiếp</div>
+                    <h2>Đăng Ký Nhận Tư Vấn Chiến Lược Miễn Phí</h2>
+                    <p>Hãy để lại thông tin của bạn. Chuyên gia Đặng Cao Hoàng Phúc sẽ liên hệ trực tiếp qua SĐT/Zalo trong thời gian sớm nhất để tư vấn kế hoạch giải ngân tối ưu.</p>
+                </div>
+
+                <form id="consultForm">
+                    <div class="field-row" style="margin-bottom:20px;">
+                        <div class="field">
+                            <label for="name" class="pro-input-label">Họ và tên (*)</label>
+                            <input type="text" id="name" name="from_name" class="pro-input" placeholder="Ví dụ: Nguyễn Văn A" required>
+                        </div>
+                        <div class="field">
+                            <label for="phone" class="pro-input-label">Số điện thoại / Zalo (*)</label>
+                            <input type="tel" id="phone" name="phone" class="pro-input" placeholder="Ví dụ: 0982 059 995" required>
+                        </div>
+                        <div class="field">
+                            <label for="email" class="pro-input-label">Email liên hệ</label>
+                            <input type="email" id="email" name="reply_to" class="pro-input" placeholder="example@email.com">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:12px;">
+                        <label class="pro-input-label">Dịch vụ bạn đang quan tâm:</label>
+                        <div class="pro-services-selector">
+                            <label class="pro-check-card">
+                                <input type="checkbox" name="service" value="Tư vấn đầu tư 1-1" checked>
+                                <span class="pro-check-text">Tư vấn đầu tư 1-1</span>
+                            </label>
+                            <label class="pro-check-card">
+                                <input type="checkbox" name="service" value="Quản lý & Cơ cấu danh mục">
+                                <span class="pro-check-text">Quản lý danh mục</span>
+                            </label>
+                            <label class="pro-check-card">
+                                <input type="checkbox" name="service" value="Mở tài khoản giao dịch">
+                                <span class="pro-check-text">Mở tài khoản</span>
+                            </label>
+                            <label class="pro-check-card">
+                                <input type="checkbox" name="service" value="Đào tạo đầu tư thực chiến">
+                                <span class="pro-check-text">Đào tạo thực chiến</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom:24px;">
+                        <label for="userMessage" class="pro-input-label">Mục tiêu tài chính hoặc mã cổ phiếu bạn muốn được phân tích:</label>
+                        <textarea id="userMessage" name="message" class="pro-textarea" placeholder="Nhập câu hỏi, danh mục đang nắm giữ hoặc quy mô NAV mong muốn cơ cấu..."></textarea>
+                    </div>
+
+                    <div style="display:flex;justify-content:center;">
+                        <button type="submit" class="btn btn--solid" id="submitBtn" style="padding:14px 40px;font-size:14px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            Gửi Thông Tin Cho Chuyên Gia Hoàng Phúc
+                        </button>
+                    </div>
+
+                    <div class="consult-msg" id="consultMsg" style="margin-top:16px;"></div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER CHUYÊN NGHIỆP -->
     <footer class="footer">
         <div class="wrap">
-            <p><strong>Đặng Cao Hoàng Phúc</strong> — Đặng Cao Hoàng Phúc - Chức vụ...., Công ty....</p>
-            <p>&copy; 2026 Bản tin và khuyến nghị mang tính chất tham khảo, không phải lời khuyên đầu tư.</p>
-            <p>
-                <a href="#">Chính sách bảo mật</a> · 
-                <a href="#">Điều khoản sử dụng</a> · 
-                Email: <a href="mailto:contact@example.com">contact@example.com</a> · 
-                Điện thoại: <a href="tel:0982059995">01234567890</a>
-            </p>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;margin-bottom:24px;">
+                <div style="max-width:440px;">
+                    <div style="font-size:18px;font-weight:800;color:#F1F5F9;margin-bottom:8px;">Đặng Cao Hoàng Phúc</div>
+                    <p style="font-size:13px;line-height:1.6;color:#94A3B8;">
+                        Chuyên viên Hoạch định Tài chính & Tư vấn Đầu tư Chứng khoán Cao cấp. Cung cấp giải pháp quản trị danh mục toàn diện, phương pháp phân tích FA kết hợp TA độc quyền và hệ sinh thái công nghệ dữ liệu realtime.
+                    </p>
+                </div>
+                <div>
+                    <div style="font-size:14px;font-weight:700;color:#F1F5F9;margin-bottom:8px;">Liên Hệ Trực Tiếp</div>
+                    <div style="font-size:13px;color:#94A3B8;line-height:1.8;">
+                        <div>Điện thoại / Zalo: <a href="tel:0982059995" style="font-weight:700;">0982 059 995</a></div>
+                        <div>Email: <a href="mailto:phucdch@gmail.com">phucdch@gmail.com</a></div>
+                        <div>Website: <a href="dashboard.html">Hệ Thống Dashboard & Tín Hiệu</a></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="border-top:1px solid #1E293B;padding-top:16px;font-size:12px;color:#64748B;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+                <div>&copy; 2026 Đặng Cao Hoàng Phúc. Toàn bộ bản quyền được bảo lưu.</div>
+                <div>Khuyến cáo: Các nhận định và dữ liệu trên trang web mang tính chất tham khảo, không cấu thành lời mời chào mua bán chứng khoán trực tiếp.</div>
+            </div>
         </div>
     </footer>
 
-    <!-- EmailJS SDK -->
+    <!-- EmailJS SDK & Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="nav-script.js"></script>
     <script>
+        // Smooth scroll
+        function scrollToConsult() {
+            const el = document.getElementById('contact');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
         // ============================================================
-        // EMAILJS CONFIG — Dien thong tin cua ban vao day
-        // Dang ky mien phi tai: https://www.emailjs.com
+        // EMAILJS CONFIG
         // ============================================================
         const EMAILJS_CONFIG = {
-            publicKey:  'vT62BsMsNqsgYeQBf',    // Account -> API Keys
-            serviceId:  'service_u5fkowq',    // Email Services -> Service ID
-            templateId: 'template_vviryqe',   // Email Templates -> Template ID
+            publicKey:  'vT62BsMsNqsgYeQBf',
+            serviceId:  'service_u5fkowq',
+            templateId: 'template_vviryqe',
         };
-        // ============================================================
 
-        // Khoi tao EmailJS
         if (EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
             emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
         }
@@ -258,82 +519,75 @@
         document.getElementById('consultForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const msgDiv   = document.getElementById('consultMsg');
+            const msgDiv = document.getElementById('consultMsg');
             const submitBtn = document.getElementById('submitBtn');
-            const form     = this;
+            const form = this;
 
-            // Thu thap du lieu
-            const name    = document.getElementById('name').value.trim();
-            const phone   = document.getElementById('phone').value.trim();
-            const email   = document.getElementById('email').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
             const message = document.getElementById('userMessage').value.trim();
             const services = [...document.querySelectorAll('input[name="service"]:checked')]
-                .map(cb => cb.value).join(', ') || 'Chưa chọn';
+                .map(cb => cb.value).join(', ') || 'Tư vấn đầu tư 1-1';
 
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Đang gửi...';
+            submitBtn.innerHTML = 'Đang gửi thông tin...';
             msgDiv.className = 'consult-msg';
             msgDiv.textContent = '';
 
-            // --- Gui qua EmailJS (neu da cau hinh) ---
-            if (EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
+            // 1. Gửi qua EmailJS nếu có cấu hình
+            let emailSent = false;
+            if (EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey !== 'YOUR_PUBLIC_KEY') {
                 try {
                     await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
                         from_name: name,
-                        phone:     phone,
-                        reply_to:  email,
-                        services:  services,
-                        message:   message || '(Không có lời nhắn)',
-                        time:      new Date().toLocaleString('vi-VN'),
+                        phone: phone,
+                        reply_to: email,
+                        services: services,
+                        message: message || '(Không có lời nhắn)',
+                        time: new Date().toLocaleString('vi-VN'),
                     });
-
-                    msgDiv.className = 'consult-msg ok';
-                    msgDiv.textContent = 'Cảm ơn bạn đã đăng ký! Chúng tôi sẽ liên hệ tư vấn miễn phí trong thời gian sớm nhất.';
-                    form.reset();
+                    emailSent = true;
                 } catch (err) {
-                    console.error('EmailJS error:', err);
-                    msgDiv.className = 'consult-msg';
-                    msgDiv.style.color = '#dc2626';
-                    msgDiv.textContent = 'Gửi thất bại, vui lòng thử lại hoặc liên hệ trực tiếp.';
-                }
-            } else {
-                // --- Fallback: gui qua backend server ---
-                try {
-                    const res = await fetch('/api/contact', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ name, phone, email, services, message })
-                    });
-                    const data = await res.json();
-
-                    if (data.success) {
-                        msgDiv.className = 'consult-msg ok';
-                        msgDiv.textContent = 'Cảm ơn bạn đã đăng ký! Chúng tôi sẽ liên hệ tư vấn miễn phí trong thời gian sớm nhất.';
-                        form.reset();
-                    } else {
-                        throw new Error(data.error);
-                    }
-                } catch (err) {
-                    // Luu thong tin vao localStorage tren GitHub Pages de khong bao gio bi mat lead
-                    try {
-                        const leads = JSON.parse(localStorage.getItem('consult_leads') || '[]');
-                        leads.push({ name, phone, email, services, message, time: new Date().toISOString() });
-                        localStorage.setItem('consult_leads', JSON.stringify(leads));
-                    } catch(e) {}
-
-                    msgDiv.className = 'consult-msg ok';
-                    msgDiv.style.color = '#16a34a';
-                    msgDiv.innerHTML = `✓ Cảm ơn bạn <strong>${name ? name : ''}</strong>! Yêu cầu tư vấn đã được ghi nhận thành công.<br>Chuyên gia Hoàng Phúc sẽ liên hệ trực tiếp qua SĐT/Zalo <strong>${phone ? phone : ''}</strong> trong thời gian sớm nhất.`;
-                    form.reset();
+                    console.warn('EmailJS error, fallback to backend:', err);
                 }
             }
 
+            // 2. Gửi qua Backend Server hoặc LocalStorage
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, phone, email, services, message })
+                });
+                const data = await res.json();
+            } catch (err) {
+                // Fallback: Lưu vào LocalStorage
+                try {
+                    const leads = JSON.parse(localStorage.getItem('consult_leads') || '[]');
+                    leads.push({ name, phone, email, services, message, time: new Date().toISOString() });
+                    localStorage.setItem('consult_leads', JSON.stringify(leads));
+                } catch(e) {}
+            }
+
+            msgDiv.className = 'consult-msg ok';
+            msgDiv.style.color = '#16a34a';
+            msgDiv.style.background = 'rgba(22, 163, 74, 0.12)';
+            msgDiv.style.padding = '12px 18px';
+            msgDiv.style.borderRadius = '8px';
+            msgDiv.style.border = '1px solid rgba(22, 163, 74, 0.3)';
+            msgDiv.innerHTML = `✓ Cảm ơn bạn <strong>${name}</strong>! Yêu cầu tư vấn chiến lược đã được gửi thành công.<br>Chuyên gia Đặng Cao Hoàng Phúc sẽ liên hệ trực tiếp qua SĐT/Zalo <strong>${phone}</strong> trong thời gian sớm nhất!`;
+            form.reset();
+
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Gửi thông tin';
-            setTimeout(() => { msgDiv.textContent = ''; msgDiv.style.color = ''; }, 8000);
+            submitBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                Gửi Thông Tin Cho Chuyên Gia Hoàng Phúc
+            `;
+            setTimeout(() => { msgDiv.textContent = ''; msgDiv.style.display = 'none'; }, 10000);
         });
 
-        // Smooth scroll for anchor links
+        // Anchor links smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 const href = this.getAttribute('href');
@@ -347,3 +601,5 @@
             });
         });
     </script>
+</body>
+</html>

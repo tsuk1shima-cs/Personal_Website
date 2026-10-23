@@ -4427,10 +4427,11 @@ body {
       </div>
 
       <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
-        <!-- TABS CHUYỂN ĐỔI: ĐĂNG NHẬP / ĐĂNG KÝ -->
+        <!-- TABS CHUYỂN ĐỔI: ĐĂNG NHẬP / ĐĂNG KÝ / QUÊN MẬT KHẨU -->
         <div style="display:flex;background:var(--bg-subtle);border-radius:var(--radius-sm);padding:3px;border:1px solid var(--border-stroke);gap:4px;">
-          <button type="button" id="tabAuthLoginBtn" onclick="switchAuthTab('login')" style="flex:1;padding:7px;border:none;border-radius:4px;font-size:12.5px;font-weight:700;cursor:pointer;background:var(--bg-container);color:var(--text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);">Đăng nhập</button>
-          <button type="button" id="tabAuthRegisterBtn" onclick="switchAuthTab('register')" style="flex:1;padding:7px;border:none;border-radius:4px;font-size:12.5px;font-weight:600;cursor:pointer;background:none;color:var(--text-secondary);">Đăng ký tài khoản khách</button>
+          <button type="button" id="tabAuthLoginBtn" onclick="switchAuthTab('login')" style="flex:1;padding:7px;border:none;border-radius:4px;font-size:12px;font-weight:700;cursor:pointer;background:var(--bg-container);color:var(--text-primary);box-shadow:0 1px 3px rgba(0,0,0,0.1);">Đăng nhập</button>
+          <button type="button" id="tabAuthRegisterBtn" onclick="switchAuthTab('register')" style="flex:1;padding:7px;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text-secondary);">Đăng ký tài khoản</button>
+          <button type="button" id="tabAuthForgotBtn" onclick="switchAuthTab('forgot')" style="flex:1;padding:7px;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;background:none;color:var(--text-secondary);">Quên mật khẩu</button>
         </div>
 
         <!-- TAB 1: FORM ĐĂNG NHẬP -->
@@ -4443,7 +4444,11 @@ body {
             <div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                 <label style="font-size:11.5px;font-weight:650;color:var(--text-secondary);">Mật khẩu</label>
-                <a href="javascript:;" onclick="togglePasswordVisibility()" style="font-size:11px;color:var(--primary-brand);text-decoration:none;" id="togglePwdText">Hiện mật khẩu</a>
+                <div style="display:flex;gap:10px;align-items:center;">
+                  <a href="javascript:;" onclick="togglePasswordVisibility()" style="font-size:11px;color:var(--primary-brand);text-decoration:none;" id="togglePwdText">Hiện mật khẩu</a>
+                  <span style="color:var(--border-stroke);">|</span>
+                  <a href="javascript:;" onclick="switchAuthTab('forgot')" style="font-size:11px;color:var(--primary-brand);text-decoration:none;font-weight:600;">Quên mật khẩu?</a>
+                </div>
               </div>
               <input type="password" id="loginPassword" placeholder="Nhập mật khẩu..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
             </div>
@@ -4502,9 +4507,134 @@ body {
           </div>
         </div>
 
-        <div style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.4;border-top:1px dashed var(--border-stroke);padding-top:8px;">
-          Bảo mật tiêu chuẩn SSL. Tài khoản khách sau khi đăng ký có thể lưu danh mục cá nhân và tra cứu dữ liệu.
+        <!-- TAB 3: FORM QUÊN MẬT KHẨU & XÁC THỰC OTP -->
+        <div id="authForgotSection" style="display:none;flex-direction:column;gap:10px;">
+          <!-- Bước 1: Nhập email/username để lấy OTP -->
+          <div id="forgotStep1" style="display:flex;flex-direction:column;gap:9px;">
+            <div style="font-size:11.5px;color:var(--text-secondary);line-height:1.45;">
+              Vui lòng nhập <b>Tên đăng nhập</b> hoặc <b>Email</b> đã đăng ký. Hệ thống sẽ cấp mã xác thực OTP (6 chữ số) để xác minh và cấp quyền đổi mật khẩu.
+            </div>
+            <div>
+              <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Tên đăng nhập hoặc Email</label>
+              <input type="text" id="forgotEmailOrUser" placeholder="Ví dụ: demo_investor hoặc email@example.com..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+            </div>
+            <div id="forgotStatusMsg1" style="display:none;font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);"></div>
+            <button type="button" id="btnRequestOtp" onclick="handleRequestOtp()" class="btn-login-main" style="width:100%;padding:9px;border:none;cursor:pointer;margin-top:2px;font-size:12.5px;font-weight:750;">Gửi Mã Xác Thực (OTP)</button>
+          </div>
+
+          <!-- Bước 2: Nhập OTP & Đặt mật khẩu mới -->
+          <div id="forgotStep2" style="display:none;flex-direction:column;gap:9px;">
+            <div style="background:rgba(41,128,185,0.08);border:1px solid var(--primary-border);border-radius:var(--radius-sm);padding:8px 10px;font-size:11.5px;color:var(--text-primary);">
+              <div>Mã xác thực OTP đã được tạo cho tài khoản: <b id="forgotTargetUser" style="color:var(--primary-brand);">-</b></div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:3px;display:flex;justify-content:space-between;align-items:center;">
+                <span id="forgotCountdownText">Thời gian hiệu lực: 10:00</span>
+                <span id="forgotDemoOtpBadge" style="background:var(--bg-container);border:1px solid var(--border-stroke);padding:1px 6px;border-radius:4px;font-family:monospace;font-weight:700;color:var(--price-up);"></span>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <label style="font-size:11.5px;font-weight:650;color:var(--text-secondary);">Mã xác thực OTP (6 chữ số)</label>
+                <a href="javascript:;" onclick="handleRequestOtp(true)" style="font-size:11px;color:var(--primary-brand);text-decoration:none;">Gửi lại mã mới</a>
+              </div>
+              <input type="text" id="forgotOtpInput" maxlength="6" placeholder="000000" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:15px;letter-spacing:4px;font-weight:700;text-align:center;outline:none;" required>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Mật khẩu mới</label>
+                <input type="password" id="forgotNewPassword" placeholder="Tối thiểu 4 ký tự" style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+              </div>
+              <div>
+                <label style="font-size:11.5px;font-weight:650;display:block;margin-bottom:4px;color:var(--text-secondary);">Xác nhận MK mới</label>
+                <input type="password" id="forgotConfirmNewPassword" placeholder="Nhập lại..." style="width:100%;padding:8px 10px;border:1px solid var(--border-stroke);border-radius:var(--radius-sm);background:var(--bg-subtle);color:var(--text-primary);font-size:12.5px;outline:none;" required>
+              </div>
+            </div>
+            <div id="forgotStatusMsg2" style="display:none;font-size:11.5px;padding:6px 10px;border-radius:var(--radius-sm);"></div>
+            <button type="button" id="btnSubmitResetPwd" onclick="handleResetPassword()" class="btn-login-main" style="width:100%;padding:9px;border:none;cursor:pointer;margin-top:2px;font-size:12.5px;font-weight:750;">Xác Thực OTP & Đặt Mật Khẩu</button>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-muted);margin-top:4px;">
+            <span>Đã nhớ mật khẩu?</span>
+            <a href="javascript:;" onclick="switchAuthTab('login')" style="color:var(--primary-brand);font-weight:650;text-decoration:none;">Quay lại Đăng nhập</a>
+          </div>
         </div>
+
+        <div style="font-size:11px;color:var(--text-muted);text-align:center;line-height:1.4;border-top:1px dashed var(--border-stroke);padding-top:8px;">
+          Bảo mật tiêu chuẩn SSL. Tài khoản sau khi đăng ký có thể lưu danh mục cá nhân, tra cứu tín hiệu và khôi phục an toàn.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HỒ SƠ CÁ NHÂN / THÔNG TIN TÀI KHOẢN (BO GÓC CHUẨN DASHBOARD) -->
+  <div class="modal-overlay" id="userProfileModal" onclick="if(event.target.id==='userProfileModal')closeUserProfileModal()" style="display:none;">
+    <div class="modal-card" onclick="event.stopPropagation()" style="width:500px;max-width:calc(100vw - 32px);border-radius:12px;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,0.25);">
+      <div class="modal-head" style="background:var(--bg-subtle);border-bottom:1px solid var(--border-stroke);padding:14px 18px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg, var(--primary-brand), #0284c7);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;" id="profileAvatarInitial">
+            U
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:750;color:var(--text-primary);" id="profileModalName">Hồ Sơ Cá Nhân</div>
+            <div style="font-size:11.5px;color:var(--text-muted);" id="profileModalRole">Tài khoản thành viên</div>
+          </div>
+        </div>
+        <button onclick="closeUserProfileModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-secondary);line-height:1;">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding:16px 18px;display:flex;flex-direction:column;gap:14px;">
+        <!-- Card thông tin cá nhân bo góc chuẩn dashboard -->
+        <div style="background:var(--bg-subtle);border:1px solid var(--border-stroke);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--text-secondary);">Tên đăng nhập:</span>
+            <b id="profileModalUsername" style="color:var(--text-primary);">-</b>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--text-secondary);">Email liên hệ:</span>
+            <span id="profileModalEmail" style="color:var(--text-primary);font-weight:500;">-</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--text-secondary);">Số điện thoại:</span>
+            <span id="profileModalPhone" style="color:var(--text-primary);font-weight:500;">-</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--text-secondary);">Phân quyền hệ thống:</span>
+            <span id="profileModalBadge" style="font-weight:700;font-size:10.5px;padding:2px 8px;border-radius:4px;background:rgba(16,185,129,0.15);color:var(--price-up);">THÀNH VIÊN</span>
+          </div>
+        </div>
+
+        <!-- Form đổi mật khẩu cá nhân -->
+        <div style="background:var(--bg-container);border:1px solid var(--border-stroke);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:12.5px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>Đổi Mật Khẩu Cá Nhân</span>
+          </div>
+          <form id="changePasswordForm" onsubmit="handleChangePersonalPassword(event)" style="display:flex;flex-direction:column;gap:8px;">
+            <div>
+              <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:3px;">Mật khẩu hiện tại</label>
+              <input type="password" id="profileCurrentPassword" placeholder="Nhập mật khẩu hiện tại..." style="width:100%;padding:7px 10px;border:1px solid var(--border-stroke);border-radius:6px;background:var(--bg-subtle);color:var(--text-primary);font-size:12px;outline:none;" required>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:3px;">Mật khẩu mới</label>
+                <input type="password" id="profileNewPassword" placeholder="Tối thiểu 4 ký tự" style="width:100%;padding:7px 10px;border:1px solid var(--border-stroke);border-radius:6px;background:var(--bg-subtle);color:var(--text-primary);font-size:12px;outline:none;" required>
+              </div>
+              <div>
+                <label style="font-size:11px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:3px;">Xác nhận MK mới</label>
+                <input type="password" id="profileConfirmNewPassword" placeholder="Nhập lại..." style="width:100%;padding:7px 10px;border:1px solid var(--border-stroke);border-radius:6px;background:var(--bg-subtle);color:var(--text-primary);font-size:12px;outline:none;" required>
+              </div>
+            </div>
+            <div id="changePasswordMsg" style="display:none;font-size:11.5px;padding:6px 10px;border-radius:6px;"></div>
+            <button type="submit" class="btn-login-main" style="padding:8px;font-size:12px;border:none;border-radius:6px;cursor:pointer;font-weight:700;margin-top:2px;">Cập Nhật Mật Khẩu</button>
+          </form>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:8px;">
+          <button type="button" onclick="closeUserProfileModal()" class="btn-theme-toggle" style="width:auto;padding:6px 14px;font-size:12px;border-radius:6px;">Đóng</button>
+          <button type="button" onclick="closeUserProfileModal();handleLogout();" class="btn-theme-toggle" style="width:auto;padding:6px 14px;font-size:12px;border-radius:6px;color:#ef4444;border-color:rgba(239,68,68,0.3);">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+  </div>
       </div>
     </div>
   </div>
@@ -16388,28 +16518,44 @@ ${leaderDetails}
       if (m) m.style.display = 'none';
     }
 
+    let otpCountdownTimer = null;
+    let currentResetSession = null;
+
     function switchAuthTab(tab) {
       const btnLogin = document.getElementById('tabAuthLoginBtn');
       const btnReg = document.getElementById('tabAuthRegisterBtn');
+      const btnForgot = document.getElementById('tabAuthForgotBtn');
       const secLogin = document.getElementById('authLoginSection');
       const secReg = document.getElementById('authRegisterSection');
+      const secForgot = document.getElementById('authForgotSection');
       const titleEl = document.getElementById('authModalTitle');
       const subEl = document.getElementById('authModalSubtitle');
       const loginMsg = document.getElementById('loginStatusMsg');
       const regMsg = document.getElementById('registerStatusMsg');
+      const forgotMsg1 = document.getElementById('forgotStatusMsg1');
+      const forgotMsg2 = document.getElementById('forgotStatusMsg2');
 
       if (loginMsg) loginMsg.style.display = 'none';
       if (regMsg) regMsg.style.display = 'none';
+      if (forgotMsg1) forgotMsg1.style.display = 'none';
+      if (forgotMsg2) forgotMsg2.style.display = 'none';
+
+      // Reset style các nút tab
+      [btnLogin, btnReg, btnForgot].forEach(btn => {
+        if (btn) {
+          btn.style.background = 'none';
+          btn.style.color = 'var(--text-secondary)';
+          btn.style.fontWeight = '600';
+          btn.style.boxShadow = 'none';
+        }
+      });
+
+      if (secLogin) secLogin.style.display = 'none';
+      if (secReg) secReg.style.display = 'none';
+      if (secForgot) secForgot.style.display = 'none';
 
       if (tab === 'register') {
-        if (secLogin) secLogin.style.display = 'none';
         if (secReg) secReg.style.display = 'flex';
-        if (btnLogin) {
-          btnLogin.style.background = 'none';
-          btnLogin.style.color = 'var(--text-secondary)';
-          btnLogin.style.fontWeight = '600';
-          btnLogin.style.boxShadow = 'none';
-        }
         if (btnReg) {
           btnReg.style.background = 'var(--bg-container)';
           btnReg.style.color = 'var(--text-primary)';
@@ -16418,24 +16564,403 @@ ${leaderDetails}
         }
         if (titleEl) titleEl.textContent = 'Đăng Ký Tài Khoản Khách';
         if (subEl) subEl.textContent = 'Tạo tài khoản mới để tra cứu tín hiệu & lưu danh mục';
+      } else if (tab === 'forgot') {
+        if (secForgot) secForgot.style.display = 'flex';
+        if (btnForgot) {
+          btnForgot.style.background = 'var(--bg-container)';
+          btnForgot.style.color = 'var(--text-primary)';
+          btnForgot.style.fontWeight = '700';
+          btnForgot.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+        }
+        if (titleEl) titleEl.textContent = 'Quên Mật Khẩu & Xác Thực OTP';
+        if (subEl) subEl.textContent = 'Khôi phục quyền truy cập an toàn qua mã OTP xác minh';
+        
+        // Mặc định về step 1
+        const s1 = document.getElementById('forgotStep1');
+        const s2 = document.getElementById('forgotStep2');
+        if (s1) s1.style.display = 'flex';
+        if (s2) s2.style.display = 'none';
       } else {
         if (secLogin) secLogin.style.display = 'flex';
-        if (secReg) secReg.style.display = 'none';
         if (btnLogin) {
           btnLogin.style.background = 'var(--bg-container)';
           btnLogin.style.color = 'var(--text-primary)';
           btnLogin.style.fontWeight = '700';
           btnLogin.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
         }
-        if (btnReg) {
-          btnReg.style.background = 'none';
-          btnReg.style.color = 'var(--text-secondary)';
-          btnReg.style.fontWeight = '600';
-          btnReg.style.boxShadow = 'none';
-        }
         if (titleEl) titleEl.textContent = 'Đăng Nhập Tài Khoản';
         if (subEl) subEl.textContent = 'Quản trị viên (Admin) hoặc Thành viên đăng nhập';
       }
+    }
+
+    // Gửi yêu cầu sinh mã OTP quên mật khẩu
+    async function handleRequestOtp(isResend = false) {
+      const inputEl = document.getElementById('forgotEmailOrUser');
+      const msgEl = document.getElementById('forgotStatusMsg1');
+      const btnEl = document.getElementById('btnRequestOtp');
+      const query = (inputEl ? inputEl.value : '').trim().toLowerCase();
+
+      if (!query) {
+        if (msgEl) {
+          msgEl.textContent = 'Vui lòng nhập tên đăng nhập hoặc email đã đăng ký!';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (btnEl) {
+        btnEl.disabled = true;
+        btnEl.textContent = isResend ? 'Đang gửi lại mã...' : 'Đang gửi mã xác thực...';
+      }
+
+      // 1. Kiểm tra trong LocalStorage và Default accounts
+      const allAccounts = getAllRegisteredAccounts();
+      const matched = allAccounts.find(u => 
+        u.username.toLowerCase() === query || 
+        (u.email && u.email.toLowerCase() === query)
+      );
+
+      // Sinh mã OTP 6 số
+      const fallbackOtp = String(Math.floor(100000 + Math.random() * 900000));
+      let finalOtp = fallbackOtp;
+      let targetUser = matched ? matched.username : query;
+
+      // 2. Gửi request lên backend API nếu có server
+      try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+          ? APP_CONFIG.apiBase
+          : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        if (apiBase) {
+          const res = await fetch(`${apiBase}/auth/forgot-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emailOrUsername: query })
+          });
+          const data = await res.json();
+          if (data && data.success) {
+            if (data.otp) finalOtp = String(data.otp);
+            if (data.username) targetUser = data.username;
+          }
+        }
+      } catch (err) {
+        console.warn('Backend forgot-password fetch error, fallback to local OTP:', err);
+      }
+
+      if (btnEl) {
+        btnEl.disabled = false;
+        btnEl.textContent = 'Gửi Mã Xác Thực (OTP)';
+      }
+
+      if (!matched && !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+        // Nếu không có cả user local và không có backend
+        if (msgEl) {
+          msgEl.textContent = 'Không tìm thấy tài khoản tương ứng với thông tin bạn cung cấp.';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      // Lưu phiên xác thực
+      currentResetSession = {
+        username: matched ? matched.username : targetUser,
+        email: matched ? matched.email : query,
+        otp: finalOtp,
+        expiresAt: Date.now() + 10 * 60 * 1000
+      };
+
+      // Chuyển sang Bước 2
+      const s1 = document.getElementById('forgotStep1');
+      const s2 = document.getElementById('forgotStep2');
+      const targetUserEl = document.getElementById('forgotTargetUser');
+      const demoBadgeEl = document.getElementById('forgotDemoOtpBadge');
+      const otpInputEl = document.getElementById('forgotOtpInput');
+
+      if (s1) s1.style.display = 'none';
+      if (s2) s2.style.display = 'flex';
+      if (targetUserEl) targetUserEl.textContent = currentResetSession.username;
+      if (demoBadgeEl) demoBadgeEl.textContent = `Mã OTP demo: ${finalOtp}`;
+      if (otpInputEl) {
+        otpInputEl.value = '';
+        otpInputEl.focus();
+      }
+
+      // Khởi động bộ đếm ngược 10 phút
+      startOtpCountdown(10 * 60);
+
+      showMarketToast('Mã OTP xác thực', `Mã OTP của bạn là: [${finalOtp}]. Vui lòng nhập mã để đặt lại mật khẩu.`, 'up');
+    }
+
+    function startOtpCountdown(seconds) {
+      if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+      let remain = seconds;
+      const countEl = document.getElementById('forgotCountdownText');
+
+      otpCountdownTimer = setInterval(() => {
+        remain--;
+        if (remain <= 0) {
+          clearInterval(otpCountdownTimer);
+          if (countEl) countEl.textContent = 'Mã OTP đã hết hiệu lực. Vui lòng bấm Gửi lại mã.';
+          if (currentResetSession) currentResetSession.otp = null;
+        } else {
+          const m = String(Math.floor(remain / 60)).padStart(2, '0');
+          const s = String(remain % 60).padStart(2, '0');
+          if (countEl) countEl.textContent = `Thời gian hiệu lực: ${m}:${s}`;
+        }
+      }, 1000);
+    }
+
+    // Đặt lại mật khẩu mới sau khi xác thực OTP
+    async function handleResetPassword() {
+      const otpInput = (document.getElementById('forgotOtpInput')?.value || '').trim();
+      const newPwd = (document.getElementById('forgotNewPassword')?.value || '').trim();
+      const confirmPwd = (document.getElementById('forgotConfirmNewPassword')?.value || '').trim();
+      const msgEl = document.getElementById('forgotStatusMsg2');
+      const btnSubmit = document.getElementById('btnSubmitResetPwd');
+
+      if (!otpInput || !newPwd || !confirmPwd) {
+        if (msgEl) {
+          msgEl.textContent = 'Vui lòng nhập đầy đủ mã OTP và mật khẩu mới';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (newPwd !== confirmPwd) {
+        if (msgEl) {
+          msgEl.textContent = 'Mật khẩu xác nhận không khớp!';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (newPwd.length < 4) {
+        if (msgEl) {
+          msgEl.textContent = 'Mật khẩu mới phải có tối thiểu 4 ký tự!';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (!currentResetSession || !currentResetSession.otp || Date.now() > currentResetSession.expiresAt) {
+        if (msgEl) {
+          msgEl.textContent = 'Mã OTP đã hết hiệu lực. Vui lòng gửi lại mã mới!';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (otpInput !== currentResetSession.otp) {
+        if (msgEl) {
+          msgEl.textContent = 'Mã xác thực OTP không chính xác!';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Đang đặt lại mật khẩu...';
+      }
+
+      const username = currentResetSession.username;
+
+      // 1. Cập nhật trong LocalStorage (cho các tài khoản khách đã đăng ký)
+      try {
+        let storedUsers = [];
+        const existing = localStorage.getItem('phucdch_registered_users');
+        if (existing) storedUsers = JSON.parse(existing);
+        const idx = storedUsers.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+        if (idx !== -1) {
+          storedUsers[idx].passwords = [newPwd];
+          localStorage.setItem('phucdch_registered_users', JSON.stringify(storedUsers));
+        } else {
+          // Lưu override mật khẩu cho tài khoản mặc định
+          const overrides = JSON.parse(localStorage.getItem('phucdch_pwd_overrides') || '{}');
+          overrides[username.toLowerCase()] = newPwd;
+          localStorage.setItem('phucdch_pwd_overrides', JSON.stringify(overrides));
+        }
+      } catch (err) {
+        console.error('Error updating local password:', err);
+      }
+
+      // 2. Gửi API lên backend server
+      try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+          ? APP_CONFIG.apiBase
+          : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        if (apiBase) {
+          await fetch(`${apiBase}/auth/reset-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emailOrUsername: username, otp: otpInput, newPassword: newPwd })
+          }).catch(() => null);
+        }
+      } catch (err) {
+        console.warn('Reset password API call error:', err);
+      }
+
+      if (otpCountdownTimer) clearInterval(otpCountdownTimer);
+      currentResetSession = null;
+
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Xác Thực OTP & Đặt Mật Khẩu';
+      }
+
+      showMarketToast('Đổi mật khẩu thành công', `Tài khoản ${username} đã được cập nhật mật khẩu mới. Vui lòng đăng nhập!`, 'up');
+
+      // Chuyển sang tab đăng nhập và điền sẵn username
+      switchAuthTab('login');
+      const uInput = document.getElementById('loginUsername');
+      const pInput = document.getElementById('loginPassword');
+      if (uInput) uInput.value = username;
+      if (pInput) {
+        pInput.value = '';
+        pInput.focus();
+      }
+    }
+
+    // Modal Hồ sơ cá nhân / Thông tin tài khoản
+    function openUserProfileModal() {
+      const modal = document.getElementById('userProfileModal');
+      if (!modal) return;
+
+      const user = currentAuthUser || {
+        name: 'Khách hàng cá nhân',
+        username: 'guest',
+        email: 'guest@phucdch.vn',
+        phone: 'Chưa cập nhật',
+        role: 'user'
+      };
+
+      const nameEl = document.getElementById('profileModalName');
+      const roleEl = document.getElementById('profileModalRole');
+      const uEl = document.getElementById('profileModalUsername');
+      const emEl = document.getElementById('profileModalEmail');
+      const phEl = document.getElementById('profileModalPhone');
+      const badgeEl = document.getElementById('profileModalBadge');
+      const avatarEl = document.getElementById('profileAvatarInitial');
+
+      if (nameEl) nameEl.textContent = user.name || 'Người dùng';
+      if (roleEl) roleEl.textContent = user.role === 'admin' ? 'Quản trị viên toàn quyền hệ thống' : 'Thành viên đầu tư cá nhân';
+      if (uEl) uEl.textContent = user.username || '-';
+      if (emEl) emEl.textContent = user.email || 'Chưa thiết lập';
+      if (phEl) phEl.textContent = user.phone || '0982 059 995';
+      if (badgeEl) {
+        const isAdmin = user.role === 'admin';
+        badgeEl.textContent = isAdmin ? 'QUẢN TRỊ VIÊN' : 'THÀNH VIÊN';
+        badgeEl.style.background = isAdmin ? 'rgba(217,119,6,0.15)' : 'rgba(16,185,129,0.15)';
+        badgeEl.style.color = isAdmin ? '#d97706' : 'var(--price-up)';
+      }
+      if (avatarEl) {
+        avatarEl.textContent = (user.name ? user.name.charAt(0) : 'U').toUpperCase();
+      }
+
+      modal.style.display = 'flex';
+    }
+
+    function closeUserProfileModal() {
+      const modal = document.getElementById('userProfileModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function handleChangePersonalPassword(e) {
+      if (e) e.preventDefault();
+      const currPwd = (document.getElementById('profileCurrentPassword')?.value || '').trim();
+      const newPwd = (document.getElementById('profileNewPassword')?.value || '').trim();
+      const confPwd = (document.getElementById('profileConfirmNewPassword')?.value || '').trim();
+      const msgEl = document.getElementById('changePasswordMsg');
+
+      if (!currPwd || !newPwd || !confPwd) {
+        if (msgEl) {
+          msgEl.textContent = 'Vui lòng nhập đầy đủ các trường!';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (newPwd !== confPwd) {
+        if (msgEl) {
+          msgEl.textContent = 'Mật khẩu mới xác nhận không khớp!';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      if (newPwd.length < 4) {
+        if (msgEl) {
+          msgEl.textContent = 'Mật khẩu mới phải có tối thiểu 4 ký tự!';
+          msgEl.style.display = 'block';
+          msgEl.style.background = 'rgba(239,68,68,0.15)';
+          msgEl.style.color = '#ef4444';
+        }
+        return;
+      }
+
+      const username = currentAuthUser ? currentAuthUser.username : 'user';
+
+      // Cập nhật LocalStorage
+      try {
+        let storedUsers = [];
+        const existing = localStorage.getItem('phucdch_registered_users');
+        if (existing) storedUsers = JSON.parse(existing);
+        const idx = storedUsers.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+        if (idx !== -1) {
+          storedUsers[idx].passwords = [newPwd];
+          localStorage.setItem('phucdch_registered_users', JSON.stringify(storedUsers));
+        } else {
+          const overrides = JSON.parse(localStorage.getItem('phucdch_pwd_overrides') || '{}');
+          overrides[username.toLowerCase()] = newPwd;
+          localStorage.setItem('phucdch_pwd_overrides', JSON.stringify(overrides));
+        }
+      } catch (err) {
+        console.error('Error updating profile password:', err);
+      }
+
+      // Gửi API backend
+      try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+          ? APP_CONFIG.apiBase
+          : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        if (apiBase) {
+          await fetch(`${apiBase}/auth/change-password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, currentPassword: currPwd, newPassword: newPwd })
+          }).catch(() => null);
+        }
+      } catch (err) { /* ignore */ }
+
+      if (msgEl) {
+        msgEl.textContent = 'Cập nhật mật khẩu cá nhân thành công!';
+        msgEl.style.display = 'block';
+        msgEl.style.background = 'rgba(22,163,74,0.15)';
+        msgEl.style.color = '#16a34a';
+      }
+
+      document.getElementById('profileCurrentPassword').value = '';
+      document.getElementById('profileNewPassword').value = '';
+      document.getElementById('profileConfirmNewPassword').value = '';
+
+      showMarketToast('Hồ sơ cá nhân', 'Mật khẩu tài khoản của bạn đã được cập nhật thành công.', 'up');
     }
 
     function togglePasswordVisibility() {
@@ -16695,6 +17220,9 @@ ${leaderDetails}
               <span>Xem Blog & Nhận định</span>
             </a>
           `}
+          <a href="javascript:;" onclick="openUserProfileModal();toggleUserDropdown(event)" class="user-dropdown-item" style="color:var(--primary-brand);font-weight:700;">
+            <span>Hồ sơ & Thông tin cá nhân</span>
+          </a>
           <a href="javascript:;" onclick="openLoginDialog('login');toggleUserDropdown(event)" class="user-dropdown-item">
             <span>Chuyển đổi tài khoản</span>
           </a>
@@ -17046,7 +17574,7 @@ ${leaderDetails}
       }).join('');
     }
 
-    function toggleUserRole(username) {
+    async function toggleUserRole(username) {
       if (username === 'admin') {
         alert('Không thể thay đổi quyền của tài khoản Admin gốc!');
         return;
@@ -17059,16 +17587,26 @@ ${leaderDetails}
           if (u) {
             u.role = u.role === 'admin' ? 'user' : 'admin';
             localStorage.setItem('phucdch_registered_users', JSON.stringify(users));
-            renderAdminUsersTable();
-            showMarketToast('Phân quyền', `Đã cập nhật quyền hạn cho tài khoản ${username}`, 'up');
-            return;
           }
         }
-      } catch { /* fallback */ }
-      renderAdminUsersTable();
+
+        // Gọi đồng bộ lên backend API
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+          ? APP_CONFIG.apiBase
+          : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        if (apiBase) {
+          await fetch(`${apiBase}/auth/users/${username}/role`, { method: 'POST' }).catch(() => null);
+        }
+
+        renderAdminUsersTable();
+        showMarketToast('Phân quyền', `Đã cập nhật quyền hạn cho tài khoản ${username}`, 'up');
+      } catch (err) {
+        console.error('Error toggling role:', err);
+        renderAdminUsersTable();
+      }
     }
 
-    function deleteRegisteredUser(username) {
+    async function deleteRegisteredUser(username) {
       if (!confirm(`Bạn có chắc chắn muốn xóa tài khoản ${username}?`)) return;
       try {
         const stored = localStorage.getItem('phucdch_registered_users');
@@ -17076,9 +17614,18 @@ ${leaderDetails}
           let users = JSON.parse(stored);
           users = users.filter(x => x.username !== username);
           localStorage.setItem('phucdch_registered_users', JSON.stringify(users));
-          renderAdminUsersTable();
-          showMarketToast('Đã xóa tài khoản', `Đã xóa tài khoản ${username} khỏi hệ thống`, 'down');
         }
+
+        // Gọi đồng bộ lên backend API
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
+          ? APP_CONFIG.apiBase
+          : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        if (apiBase) {
+          await fetch(`${apiBase}/auth/users/${username}`, { method: 'DELETE' }).catch(() => null);
+        }
+
+        renderAdminUsersTable();
+        showMarketToast('Đã xóa tài khoản', `Đã xóa tài khoản ${username} khỏi hệ thống`, 'down');
       } catch (e) {
         console.error(e);
       }
