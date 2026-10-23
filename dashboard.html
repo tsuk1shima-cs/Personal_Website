@@ -2910,17 +2910,16 @@ body {
 
                 <!-- CỘT B: BIỂU ĐỒ INTRADAY DIỄN BIẾN TRONG PHIÊN & BIỂU ĐỒ FIREANT -->
                 <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; display:flex; flex-direction:column; justify-content:space-between; min-width:0; overflow:hidden;">
-                  <div class="intraday-header" style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:4px; height:24px;">
-                    <div style="display:flex; align-items:center; gap:5px; min-width:0;">
+                  <div class="intraday-header" style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:6px; height:24px;">
+                    <div style="display:flex; align-items:center; gap:5px; min-width:0; flex-shrink:0;">
                       <span class="blue-accent-bar"></span>
                       <span style="font-size:12px; font-weight:750; letter-spacing:0.2px; text-transform:uppercase; color:var(--text-primary); white-space:nowrap;">Diễn biến phiên</span>
-                      <div style="display:inline-flex; gap:1px; background:var(--bg-container); padding:1px; border-radius:3px; border:1px solid var(--border-stroke); flex-shrink:0;">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                      <div style="display:inline-flex; gap:1px; background:var(--bg-container); padding:1px; border-radius:3px; border:1px solid var(--border-stroke);">
                         <button type="button" id="btnHeroTabSvg" class="period-tab-btn active" onclick="switchHeroChartMode('svg')" style="font-size:9.5px; padding:0 5px; height:18px; line-height:16px;">1M</button>
                         <button type="button" id="btnHeroTabFireant" class="period-tab-btn" onclick="switchHeroChartMode('fireant')" style="font-size:9.5px; padding:0 5px; height:18px; line-height:16px;">Nến</button>
                       </div>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:3px; flex-shrink:0;">
-                      <a id="heroIndexFireantLink" href="https://fireant.vn/ma-chung-khoan/VNINDEX" target="_blank" rel="noopener noreferrer" class="btn-theme-toggle" style="width:auto; font-size:10px; padding:1px 6px; height:20px; white-space:nowrap; text-decoration:none; display:inline-flex; align-items:center; gap:2px; color:var(--primary-brand); font-weight:600;" title="Mở trang chỉ số FireAnt">FireAnt ↗</a>
                       <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="width:auto; font-size:10px; padding:1px 6px; height:20px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật FireAnt">Chi tiết</button>
                     </div>
                   </div>
@@ -2934,7 +2933,8 @@ body {
                       <span>09:00</span>
                       <span>11:30</span>
                       <span>13:00</span>
-                      <span>14:45 (ATC)</span>
+                      <span>14:45</span>
+                      <a id="heroIndexFireantLink" href="https://fireant.vn/ma-chung-khoan/VNINDEX" target="_blank" rel="noopener noreferrer" style="color:var(--primary-brand); font-weight:600; text-decoration:none; margin-left:4px;" title="Mở trang chỉ số FireAnt">FireAnt ↗</a>
                     </div>
                   </div>
                   <!-- Chế độ 2: Biểu đồ nến FireAnt trực tiếp nhúng iframe -->
