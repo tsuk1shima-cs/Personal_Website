@@ -2227,15 +2227,16 @@ body {
 .tech-grid-3col {
   display: grid;
   grid-template-columns: 1.15fr 1fr 1fr;
-  gap: 6px;
+  gap: 8px;
   padding: 6px 8px;
   flex: 1;
   min-height: 0;
   align-items: stretch;
 }
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   .tech-grid-3col {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 }
 
@@ -2245,9 +2246,24 @@ body {
   flex-shrink: 0 !important;
   width: auto !important;
   min-width: unset !important;
-  height: 24px !important;
-  padding: 2px 8px !important;
   box-sizing: border-box !important;
+}
+
+.intraday-header .period-tab-btn {
+  height: 20px !important;
+  line-height: 18px !important;
+  padding: 1px 6px !important;
+  font-size: 10px !important;
+}
+
+.intraday-header .btn-theme-toggle,
+.rsi-section-title .btn-theme-toggle {
+  height: 22px !important;
+  padding: 2px 7px !important;
+  font-size: 10.5px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* CÂN ĐỐI KÍCH THƯỚC CHỮ, PHÓNG TO THÔNG SỐ VÀ LẤP ĐẦY CÁC Ô TRỐNG */
@@ -2870,20 +2886,25 @@ body {
 
                 <!-- CỘT B: BIỂU ĐỒ INTRADAY DIỄN BIẾN TRONG PHIÊN & BIỂU ĐỒ FIREANT -->
                 <div style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; display:flex; flex-direction:column; justify-content:space-between; min-width:0; overflow:hidden;">
-                  <div class="intraday-header" style="margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
-                    <div style="display:flex; flex-direction:column; gap:1px; min-width:0; overflow:hidden;">
-                      <div style="display:flex; align-items:center; gap:6px;">
-                        <span style="font-size:12.5px; font-weight:750; white-space:nowrap;">DIỄN BIẾN TRONG PHIÊN</span>
-                        <div style="display:inline-flex; gap:2px; background:var(--bg-container); padding:1px; border-radius:3px; border:1px solid var(--border-stroke);">
-                          <button type="button" id="btnHeroTabSvg" class="period-tab-btn active" onclick="switchHeroChartMode('svg')" style="font-size:10px; padding:1px 6px; height:19px; line-height:17px;">1M Tick</button>
-                          <button type="button" id="btnHeroTabFireant" class="period-tab-btn" onclick="switchHeroChartMode('fireant')" style="font-size:10px; padding:1px 6px; height:19px; line-height:17px;">FireAnt</button>
-                        </div>
+                  <div class="intraday-header" style="margin-bottom:6px; display:flex; flex-direction:column; gap:4px;">
+                    <!-- Hàng 1: Tiêu đề diễn biến + Chế độ xem biểu đồ 1M Tick / FireAnt -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                      <div style="display:flex; align-items:center; gap:5px; min-width:0;">
+                        <span class="blue-accent-bar"></span>
+                        <span style="font-size:12px; font-weight:750; letter-spacing:0.3px; text-transform:uppercase; color:var(--text-primary); white-space:nowrap;">Diễn biến phiên</span>
                       </div>
-                      <span id="heroRefText" style="color:var(--price-ref); font-size:11px; white-space:nowrap;">Tham chiếu: 1.704,87</span>
+                      <div style="display:inline-flex; gap:2px; background:var(--bg-container); padding:1px; border-radius:3px; border:1px solid var(--border-stroke); flex-shrink:0;">
+                        <button type="button" id="btnHeroTabSvg" class="period-tab-btn active" onclick="switchHeroChartMode('svg')" style="font-size:10px; padding:1px 6px; height:19px; line-height:17px;">1M Tick</button>
+                        <button type="button" id="btnHeroTabFireant" class="period-tab-btn" onclick="switchHeroChartMode('fireant')" style="font-size:10px; padding:1px 6px; height:19px; line-height:17px;">FireAnt</button>
+                      </div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:5px; flex-shrink:0;">
-                      <a id="heroIndexFireantLink" href="https://fireant.vn/ma-chung-khoan/VNINDEX" target="_blank" rel="noopener noreferrer" class="btn-theme-toggle" style="width:auto; font-size:11px; padding:2px 8px; white-space:nowrap; text-decoration:none; display:inline-flex; align-items:center; gap:3px; color:var(--primary-brand); font-weight:600;" title="Mở trang chỉ số FireAnt">FireAnt.vn ↗</a>
-                      <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="width:auto; font-size:11px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật FireAnt">Chi tiết</button>
+                    <!-- Hàng 2: Giá tham chiếu + Nút FireAnt.vn và Chi tiết -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                      <span id="heroRefText" style="color:var(--price-ref); font-size:11px; font-weight:600; white-space:nowrap;">Tham chiếu: 1.704,87</span>
+                      <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                        <a id="heroIndexFireantLink" href="https://fireant.vn/ma-chung-khoan/VNINDEX" target="_blank" rel="noopener noreferrer" class="btn-theme-toggle" style="width:auto; font-size:10.5px; padding:2px 7px; white-space:nowrap; text-decoration:none; display:inline-flex; align-items:center; gap:3px; color:var(--primary-brand); font-weight:600;" title="Mở trang chỉ số FireAnt">FireAnt.vn ↗</a>
+                        <button type="button" class="btn-theme-toggle" onclick="openStockDetailModal(activeMarket || 'VNINDEX')" style="width:auto; font-size:10.5px; padding:2px 7px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Mở biểu đồ nến kỹ thuật FireAnt">Chi tiết</button>
+                      </div>
                     </div>
                   </div>
                   <!-- Chế độ 1: SVG Intraday chuẩn xác từng phút từ FireAnt / VNDirect feed -->
@@ -2906,12 +2927,20 @@ body {
 
                 <!-- CỘT C: PHÂN TÍCH KỸ THUẬT (RSI GAUGE, TÍN HIỆU MA & PIVOT) -->
                 <div class="rsi-section" style="background:var(--bg-subtle); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:8px 10px; display:flex; flex-direction:column; justify-content:space-between; min-width:0; overflow:hidden;">
-                  <div class="rsi-section-title" style="margin-bottom:5px; display:flex; justify-content:space-between; align-items:center; gap:6px;">
-                    <div style="display:flex; align-items:center; gap:5px; min-width:0; overflow:hidden;">
-                      <span class="blue-accent-bar"></span>
-                      <span style="font-size:13.5px; font-weight:750; white-space:nowrap;">Phân tích Kỹ thuật (RSI)</span>
+                  <div class="rsi-section-title" style="margin-bottom:6px; display:flex; flex-direction:column; gap:4px;">
+                    <!-- Hàng 1: Tiêu đề kỹ thuật + Nút Chỉ báo -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+                      <div style="display:flex; align-items:center; gap:5px; min-width:0;">
+                        <span class="blue-accent-bar"></span>
+                        <span style="font-size:12px; font-weight:750; letter-spacing:0.3px; text-transform:uppercase; color:var(--text-primary); white-space:nowrap;">Kỹ thuật & RSI</span>
+                      </div>
+                      <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="width:auto; font-size:10.5px; padding:2px 7px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
                     </div>
-                    <button type="button" class="btn-theme-toggle" onclick="openIndicatorLibraryModal()" style="width:auto; font-size:11px; padding:2px 8px; white-space:nowrap; flex-shrink:0; cursor:pointer;" title="Cài đặt thư viện chỉ báo kỹ thuật Robostock">＋ Chỉ báo</button>
+                    <!-- Hàng 2: Trạng thái chu kỳ & tín hiệu Realtime đồng bộ độ cao với Cột B -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; font-size:11px;">
+                      <span style="color:var(--text-muted); font-size:11px;">Chu kỳ: <b style="color:var(--text-primary);">RSI (14) Realtime</b></span>
+                      <span style="color:var(--price-up); font-size:10.5px; font-weight:600; display:inline-flex; align-items:center; gap:3px;">● Live Tick</span>
+                    </div>
                   </div>
 
                   <div class="stats-cards-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:4px; margin-bottom:4px;">
