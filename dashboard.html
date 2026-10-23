@@ -3468,10 +3468,10 @@ body {
                 <div style="display:flex; align-items:center; gap:8px;">
                   <div class="ai-avatar-badge" style="width:24px; height:24px; font-size:10px; font-weight:700;">AI</div>
                   <div>
-                    <div style="font-size:12.5px; font-weight:700;">Trợ lý AI Phân tích Realtime</div>
+                    <div style="font-size:12.5px; font-weight:700;">Trợ lý AI Nemotron 3 Super</div>
                     <div style="font-size:10.5px; color:var(--price-up); display:flex; align-items:center; gap:3px;">
                       <span class="pulse-dot" style="width:4px;height:4px;"></span>
-                      <span>Dữ liệu trực tiếp sàn HOSE/HNX</span>
+                      <span>Nemotron 120B • Realtime HOSE/HNX</span>
                     </div>
                   </div>
                 </div>
@@ -3484,7 +3484,7 @@ body {
               <div class="ai-messages-scroll" id="aiChatMessages" style="height:360px; max-height:420px; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px;">
                 <div class="ai-msg-item bot">
                   <div class="ai-bubble" style="font-size:12px; line-height:1.45;">
-                    <p><strong>Xin chào! Tôi là Trợ lý AI phân tích thị trường chứng khoán Realtime.</strong></p>
+                    <p><strong>Xin chào! Tôi là Trợ lý AI Nemotron 3 Super (Dữ liệu Realtime).</strong></p>
                     <p>Dữ liệu VN-Index, độ rộng thị trường và giá các mã (FPT, TCB, HPG, SSI...) được cập nhật realtime từ sàn giao dịch.</p>
                     <p>Bạn có thể hỏi tôi:</p>
                     <ul style="padding-left:16px; margin:4px 0;">
@@ -15961,9 +15961,10 @@ body {
       const norm = q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
       // 1. GỌI TRỰC TIẾP BACKEND SERVER VỚI DNSE MCP REALTIME CONTEXT (NẾU CÓ)
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '' || window.location.protocol === 'file:';
       const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
         ? APP_CONFIG.apiBase
-        : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 'http://localhost:3000/api' : null);
+        : (isLocal ? 'http://localhost:3000/api' : null);
 
       if (apiBase) {
         try {
@@ -15972,9 +15973,9 @@ body {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               messages: [{ role: 'user', content: q }],
-              model: 'nvidia/nemotron-3.5-lightning:free'
+              model: 'nvidia/nemotron-3-super-120b-a12b'
             }),
-            signal: AbortSignal.timeout(10000)
+            signal: AbortSignal.timeout(18000)
           });
           if (r.ok) {
             const resJson = await r.json();
@@ -15983,8 +15984,8 @@ body {
                 ? ` [Tools: ${resJson.mcp.toolsUsed.join(', ')}]`
                 : '';
               const mcpLabel = (resJson.dataSources && resJson.dataSources.length)
-                ? resJson.dataSources.map(s => s.replace(/DNSE\s*/gi, '')).join(', ') + mcpTools
-                : 'Hệ thống Phân tích AI Realtime';
+                ? resJson.dataSources.map(s => s.replace(/DNSE\s*/gi, '')).join(', ') + mcpTools + ' • Nemotron 3 Super'
+                : 'Nemotron 3 Super AI Realtime';
               return {
                 message: resJson.message,
                 source: mcpLabel
@@ -16010,21 +16011,21 @@ body {
               'X-Title': 'MarketVN Realtime Assistant'
             },
             body: JSON.stringify({
-              model: 'nvidia/nemotron-3.5-lightning:free',
+              model: 'nvidia/nemotron-3-super-120b-a12b',
               messages: [
                 { role: 'system', content: `Bạn là Chuyên gia Phân tích Chứng khoán Việt Nam cao cấp. Trả lời chi tiết, súc tích bằng tiếng Việt, có số liệu dẫn chứng cụ thể từ dữ liệu trực tiếp sau:\n\n${liveContext}` },
                 { role: 'user', content: q }
               ],
-              max_tokens: 900,
-              temperature: 0.5
+              max_tokens: 1500,
+              temperature: 0.6
             }),
-            signal: AbortSignal.timeout(8000)
+            signal: AbortSignal.timeout(20000)
           });
           if (r.ok) {
             const json = await r.json();
             const text = json.choices?.[0]?.message?.content;
             if (text) {
-              return { message: text, source: 'OpenRouter AI + Live Market Memory' };
+              return { message: text, source: 'Nemotron 3 Super AI + Live Market Memory' };
             }
           }
         } catch (e) {

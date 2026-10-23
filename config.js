@@ -8,8 +8,8 @@ const WORKER_URL = ''; // VD: 'https://rss-proxy.username.workers.dev' (Cloudfla
 function getAPIBase() {
     const host = window.location.hostname;
 
-    // Dang chay local
-    if (host === 'localhost' || host === '127.0.0.1') {
+    // Dang chay local (localhost, 127.0.0.1, Live Server hoac mo file truc tiep tren may)
+    if (host === 'localhost' || host === '127.0.0.1' || host === '' || (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:')) {
         return 'http://localhost:3000/api';
     }
 
@@ -32,7 +32,9 @@ const APP_CONFIG = {
     apiBase: getAPIBase(),
     hasBackend: !!getAPIBase(),
     renderUrl: RENDER_URL,
-    isLocal: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
-    isGitHubPages: window.location.hostname.includes('github.io'),
+    isLocal: (typeof window !== 'undefined' && window.location) ? (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '' || window.location.protocol === 'file:') : true,
+    isGitHubPages: (typeof window !== 'undefined' && window.location) ? window.location.hostname.includes('github.io') : false,
     workerUrl: WORKER_URL || null,
+    defaultModel: 'nvidia/nemotron-3-super-120b-a12b',
+    defaultModelName: 'Nemotron 3 Super 120B (NVIDIA)',
 };

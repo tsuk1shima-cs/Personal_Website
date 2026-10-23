@@ -10,13 +10,17 @@ const CORS_HEADERS = {
 };
 
 const MODEL_MAP = {
+    'nemotron':                             'nvidia/nemotron-3-super-120b-a12b',
+    'nemotron-3':                           'nvidia/nemotron-3-super-120b-a12b',
+    'nemotron-super':                       'nvidia/nemotron-3-super-120b-a12b',
+    'nemotron-3-super':                     'nvidia/nemotron-3-super-120b-a12b',
+    'nvidia/nemotron-3-super-120b-a12b':    'nvidia/nemotron-3-super-120b-a12b',
+    'nvidia/nemotron-3-super-120b-a12b:free':'nvidia/nemotron-3-super-120b-a12b',
     'nemotron-lightning':                   'nvidia/nemotron-3.5-lightning:free',
-    'nemotron':                             'nvidia/nemotron-3.5-lightning:free',
+    'nvidia/nemotron-3.5-lightning:free':   'nvidia/nemotron-3.5-lightning:free',
     'liquid':                               'liquid/lfm-2.5-2.6b:free',
     'lfm':                                  'liquid/lfm-2.5-2.6b:free',
-    'nvidia/nemotron-3.5-lightning:free':   'nvidia/nemotron-3.5-lightning:free',
     'liquid/lfm-2.5-2.6b:free':             'liquid/lfm-2.5-2.6b:free',
-    'nemotron-3-super-120b-a12b:free':      'nvidia/nemotron-3-super-120b-a12b:free',
     'deepseek-chat':                        'deepseek/deepseek-chat',
     'gpt-4o-mini':                          'openai/gpt-4o-mini',
     'gpt-4o':                               'openai/gpt-4o',
@@ -31,10 +35,10 @@ function resolveModel(model) {
 }
 
 const FAST_FALLBACK_MODELS = [
+    'nvidia/nemotron-3-super-120b-a12b',
     'nvidia/nemotron-3.5-lightning:free',
-    'liquid/lfm-2.5-2.6b:free',
     'deepseek/deepseek-chat',
-    'nvidia/nemotron-3-super-120b-a12b:free'
+    'liquid/lfm-2.5-2.6b:free'
 ];
 
 export async function onRequestPost(context) {
@@ -57,7 +61,7 @@ export async function onRequestPost(context) {
         );
     }
 
-    const { messages, model = 'nvidia/nemotron-3.5-lightning:free' } = body;
+    const { messages, model = 'nvidia/nemotron-3-super-120b-a12b' } = body;
 
     if (!messages || !messages.length) {
         return new Response(

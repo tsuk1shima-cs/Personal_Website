@@ -468,17 +468,17 @@
             <div class="model-selector">
                 <label>Chọn mô hình AI</label>
                 <select id="modelSelect" style="width:100%;padding:8px 10px;border:1px solid #d4d4d4;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;background:#fff;cursor:pointer;" onchange="changeModel(this.value)">
-                    <option value="nvidia/nemotron-3.5-lightning:free" selected>⚡ Nemotron 3.5 Lightning (Siêu nhanh 2-3s)</option>
-                    <option value="liquid/lfm-2.5-2.6b:free">🚀 Liquid LFM 2.5 (Tức thì 1s)</option>
+                    <option value="nvidia/nemotron-3-super-120b-a12b" selected>🔬 Nemotron 3 Super (Suy luận 120B - Mặc định)</option>
+                    <option value="nvidia/nemotron-3.5-lightning:free">⚡ Nemotron 3.5 Lightning (Siêu nhanh 2-3s)</option>
                     <option value="deepseek/deepseek-chat">🧠 DeepSeek V3 (Phân tích chuyên sâu)</option>
-                    <option value="nvidia/nemotron-3-super-120b-a12b:free">🔬 Nemotron 3 Super (Suy luận 120B)</option>
+                    <option value="liquid/lfm-2.5-2.6b:free">🚀 Liquid LFM 2.5 (Tức thì 1s)</option>
                 </select>
                 <div class="model-card">
                     <div class="model-card-header">
-                        <div class="model-avatar-badge" style="background: #15803d;" id="modelBadge">⚡</div>
+                        <div class="model-avatar-badge" style="background: #7c3aed;" id="modelBadge">🔬</div>
                         <div>
-                            <div class="model-card-title" id="modelCardTitle">Nemotron 3.5 Lightning</div>
-                            <div class="model-card-sub" id="modelCardSub">NVIDIA AI Siêu Tốc (Miễn phí / $0)</div>
+                            <div class="model-card-title" id="modelCardTitle">Nemotron 3 Super 120B</div>
+                            <div class="model-card-sub" id="modelCardSub">NVIDIA AI Suy Luận Logic (Mô hình cũ mặc định)</div>
                         </div>
                     </div>
                     <div class="mcp-pill" id="chatbotMcpPill">
@@ -486,7 +486,7 @@
                         <span id="chatbotMcpText">Live Realtime Market Protocol</span>
                     </div>
                     <ul class="model-features">
-                        <li>Tốc độ phản hồi cực nhanh (2 - 4 giây)</li>
+                        <li>Mô hình Nemotron 120B tham số suy luận logic chuyên sâu</li>
                         <li>Dữ liệu giá & khối lượng realtime HOSE, HNX, UPCOM</li>
                         <li>Định giá P/E, P/B, ROE, RSI, ADX thời gian thực</li>
                     </ul>
@@ -521,10 +521,10 @@
                 <div class="api-warning" id="apiWarning" style="display: none;"></div>
                 
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-state-icon">⚡</div>
+                    <div class="empty-state-icon">🔬</div>
                     <div class="empty-state-text">
-                        <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime.</strong><br>
-                        Hệ thống đã được tích hợp dữ liệu thời gian thực từ <strong>Sàn chứng khoán Việt Nam (HOSE, HNX, UPCOM)</strong> và <strong>TCBS</strong>.<br><br>
+                        <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime (Nemotron 3 Super).</strong><br>
+                        Mô hình AI tự động: <strong>NVIDIA Nemotron 3 Super 120B</strong> (Tích hợp dữ liệu thời gian thực các sàn HOSE, HNX, UPCOM).<br><br>
                         <span style="font-size: 13px; color: #737373;">Bạn có thể hỏi tôi về phân tích mã cổ phiếu (TCB, HPG, FPT, VCB...), tra cứu định giá P/E, P/B, ROE, chỉ báo RSI/ADX hoặc nhận định xu hướng thị trường hôm nay.</span>
                     </div>
                 </div>
@@ -549,14 +549,26 @@
     <script src="nav-script.js"></script>
     <script src="config.js"></script>
     <script>
-        let currentModel = 'nvidia/nemotron-3.5-lightning:free';
+        let currentModel = 'nvidia/nemotron-3-super-120b-a12b';
         let messages = [];
         let isTyping = false;
 
         const MODEL_INFO = {
+            'nvidia/nemotron-3-super-120b-a12b': {
+                title: 'Nemotron 3 Super 120B',
+                sub: 'NVIDIA AI Suy Luận Logic (Mô hình cũ mặc định)',
+                badge: '🔬',
+                bg: '#7c3aed'
+            },
+            'nvidia/nemotron-3-super-120b-a12b:free': {
+                title: 'Nemotron 3 Super 120B',
+                sub: 'NVIDIA AI Suy Luận Logic',
+                badge: '🔬',
+                bg: '#7c3aed'
+            },
             'nvidia/nemotron-3.5-lightning:free': {
                 title: 'Nemotron 3.5 Lightning',
-                sub: 'NVIDIA AI Siêu Tốc (Miễn phí / $0)',
+                sub: 'NVIDIA AI Siêu Tốc (2-3s)',
                 badge: '⚡',
                 bg: '#15803d'
             },
@@ -571,18 +583,12 @@
                 sub: 'DeepSeek AI Phân tích tài chính chuyên sâu',
                 badge: '🧠',
                 bg: '#4f46e5'
-            },
-            'nvidia/nemotron-3-super-120b-a12b:free': {
-                title: 'Nemotron 3 Super 120B',
-                sub: 'Mô hình suy luận logic 120B NVIDIA',
-                badge: '🔬',
-                bg: '#7c3aed'
             }
         };
 
         function changeModel(val) {
             currentModel = val;
-            const info = MODEL_INFO[val] || MODEL_INFO['nvidia/nemotron-3.5-lightning:free'];
+            const info = MODEL_INFO[val] || MODEL_INFO['nvidia/nemotron-3-super-120b-a12b'];
             const titleEl = document.getElementById('modelCardTitle');
             const subEl = document.getElementById('modelCardSub');
             const badgeEl = document.getElementById('modelBadge');
@@ -1048,7 +1054,7 @@
             const isMarketQuery = message.toLowerCase().includes('thị trường') || message.toLowerCase().includes('vnindex') || message.toLowerCase().includes('xu hướng') || message.toLowerCase().includes('chỉ số');
 
             // 1. Kiem tra va uu tien goi Backend API (/api/chat) chi khi o localhost hoac co cau hinh API thuc su
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '' || window.location.protocol === 'file:';
             const base = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
                 ? APP_CONFIG.apiBase
                 : (isLocal ? 'http://localhost:3000/api' : null);
@@ -1060,7 +1066,7 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ messages: chatMessages, model: currentModel }),
-                        signal: AbortSignal.timeout(12000)
+                        signal: AbortSignal.timeout(20000)
                     });
 
                     if (response.ok) {
@@ -1069,7 +1075,7 @@
                             const mcpTools = data.mcp?.toolsUsed?.length ? ` [${data.mcp.toolsUsed.join(', ')}]` : '';
                             const mcpSource = data.dataSources && data.dataSources.length 
                                 ? data.dataSources.map(s => s.replace(/DNSE\s*/gi, '') + mcpTools)
-                                : ['Live Market Realtime Protocol'];
+                                : ['Live Market Realtime Protocol • Nemotron 3 Super'];
                             return {
                                 message: data.message,
                                 sources: mcpSource
@@ -1100,7 +1106,7 @@
                         body: JSON.stringify({
                             model: currentModel,
                             messages: chatMessages,
-                            max_tokens: 1000,
+                            max_tokens: 1500,
                             temperature: 0.6
                         })
                     });
@@ -1206,13 +1212,13 @@
 
         function newChat() {
             messages = [];
-            const info = MODEL_INFO[currentModel] || MODEL_INFO['nvidia/nemotron-3.5-lightning:free'];
+            const info = MODEL_INFO[currentModel] || MODEL_INFO['nvidia/nemotron-3-super-120b-a12b'];
             document.getElementById('chatMessages').innerHTML = `
                 <div class="empty-state" id="emptyState">
-                    <div class="empty-state-icon">⚡</div>
+                    <div class="empty-state-icon">${info.badge || '🔬'}</div>
                     <div class="empty-state-text">
                         <strong>Xin chào! Tôi là Trợ lý AI Tài chính Realtime (${info.title}).</strong><br>
-                        Hệ thống đã được kết nối trực tiếp với <strong>Dữ liệu Bảng giá & Thị trường Realtime</strong>.<br><br>
+                        Mô hình đang hoạt động: <strong>${info.title}</strong> (Tự động kết nối dữ liệu Bảng giá & Thị trường Realtime).<br><br>
                         <span style="font-size: 13px; color: #737373;">Bạn có thể hỏi tôi về phân tích mã cổ phiếu (TCB, HPG, FPT, VCB...), tra cứu định giá P/E, P/B, ROE, chỉ báo RSI/ADX hoặc nhận định xu hướng thị trường hôm nay.</span>
                     </div>
                 </div>
@@ -1221,11 +1227,25 @@
 
         async function checkDnseMcpStatus() {
             try {
-                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '' || window.location.protocol === 'file:';
                 const base = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase)
                     ? APP_CONFIG.apiBase
                     : (isLocal ? 'http://localhost:3000/api' : null);
                 if (!base) return;
+
+                // Kiem tra trang thai OpenRouter & Model mac dinh
+                try {
+                    const aiRes = await fetch(`${base}/ai/status`, { signal: AbortSignal.timeout(3000) });
+                    if (aiRes.ok) {
+                        const aiData = await aiRes.json();
+                        const keyEl = document.getElementById('keyStatusText');
+                        if (keyEl && aiData.openrouter?.configured) {
+                            keyEl.style.display = 'block';
+                            keyEl.textContent = `✓ Đã kết nối API Key (${aiData.openrouter.keyPrefix})`;
+                        }
+                    }
+                } catch(e) {}
+
                 const res = await fetch(`${base}/dnse/status`, { signal: AbortSignal.timeout(3000) });
                 if (res.ok) {
                     const d = await res.json();
