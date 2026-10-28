@@ -28,6 +28,7 @@
   --price-down-bg: #FEE2E2;
   --price-ref: #D97706;
   --price-ref-bg: #FEF3C7;
+  --text-ref: var(--price-ref);
   --price-ceil: #9333EA;
   --price-floor: #0284C7;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
@@ -55,6 +56,7 @@
   --price-down-bg: #3B161B;
   --price-ref: #F59E0B;
   --price-ref-bg: #362909;
+  --text-ref: var(--price-ref);
   --price-ceil: #C084FC;
   --price-floor: #38BDF8;
   --shadow-sm: none;
@@ -12933,7 +12935,7 @@ body {
       const needleEl = document.getElementById('heroGaugeRsiNeedle');
 
       const colorCls = val >= 55 ? 'text-up' : (val < 45 ? 'text-down' : 'text-ref');
-      const colorVar = val >= 55 ? 'var(--price-up)' : (val < 45 ? 'var(--price-down)' : 'var(--text-ref)');
+      const colorVar = val >= 55 ? 'var(--price-up)' : (val < 45 ? 'var(--price-down)' : 'var(--price-ref)');
 
       if (scoreEl) {
         scoreEl.textContent = val.toFixed(1);
@@ -12955,11 +12957,13 @@ body {
       if (arcEl) {
         arcEl.setAttribute('d', `M 10 50 A 40 40 0 0 1 ${ax.toFixed(1)} ${ay.toFixed(1)}`);
         arcEl.setAttribute('stroke', colorVar);
+        arcEl.style.stroke = colorVar;
       }
       if (needleEl) {
         needleEl.setAttribute('x2', nx.toFixed(1));
         needleEl.setAttribute('y2', ny.toFixed(1));
         needleEl.setAttribute('stroke', colorVar);
+        needleEl.style.stroke = colorVar;
       }
     }
 
@@ -13571,14 +13575,14 @@ body {
                 <div class="gauge-svg-wrap">
                   <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
                     <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
-                    <path id="stockDetailRsiArc" d="M 10 50 A 40 40 0 0 1 ${initArcX} ${initArcY}" fill="none" stroke="${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'}" stroke-width="8" stroke-linecap="round"/>
+                    <path id="stockDetailRsiArc" d="M 10 50 A 40 40 0 0 1 ${initArcX} ${initArcY}" fill="none" stroke="${rsiScore >= 55 ? 'var(--price-up)' : (rsiScore < 45 ? 'var(--price-down)' : 'var(--price-ref)')}" stroke-width="8" stroke-linecap="round"/>
                     <circle cx="50" cy="50" r="4" fill="var(--text-primary)"/>
-                    <line id="stockDetailRsiNeedle" x1="50" y1="50" x2="${initTipX}" y2="${initTipY}" stroke="${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'}" stroke-width="2.5" stroke-linecap="round"/>
+                    <line id="stockDetailRsiNeedle" x1="50" y1="50" x2="${initTipX}" y2="${initTipY}" stroke="${rsiScore >= 55 ? 'var(--price-up)' : (rsiScore < 45 ? 'var(--price-down)' : 'var(--price-ref)')}" stroke-width="2.5" stroke-linecap="round"/>
                   </svg>
                 </div>
                 <div class="gauge-info">
                   <div class="gauge-info-title">Chỉ báo RSI (14) của ${stock.symbol}</div>
-                  <div class="gauge-info-score" id="stockDetailRsiScore" style="color:${rsiScore >= 50 ? 'var(--price-up)' : 'var(--price-down)'};">${rsiScore}</div>
+                  <div class="gauge-info-score" id="stockDetailRsiScore" style="color:${rsiScore >= 55 ? 'var(--price-up)' : (rsiScore < 45 ? 'var(--price-down)' : 'var(--price-ref)')};">${rsiScore}</div>
                   <div class="gauge-info-desc" id="stockDetailRsiDesc">${rsiDesc}</div>
                 </div>
               </div>
@@ -13828,8 +13832,7 @@ body {
       const needleEl = document.getElementById('stockDetailRsiNeedle');
       const arcEl = document.getElementById('stockDetailRsiArc');
 
-      const isBull = score >= 50;
-      const color = isBull ? 'var(--price-up)' : 'var(--price-down)';
+      const color = score >= 55 ? 'var(--price-up)' : (score < 45 ? 'var(--price-down)' : 'var(--price-ref)');
 
       if (scoreEl) {
         scoreEl.textContent = Number(score).toFixed(1);
@@ -13843,6 +13846,7 @@ body {
       if (arcEl) {
         arcEl.setAttribute('d', `M 10 50 A 40 40 0 0 1 ${arcX} ${arcY}`);
         arcEl.setAttribute('stroke', color);
+        arcEl.style.stroke = color;
       }
 
       const tipX = (50 - 28 * Math.cos(rad)).toFixed(1);
@@ -13851,6 +13855,7 @@ body {
         needleEl.setAttribute('x2', tipX);
         needleEl.setAttribute('y2', tipY);
         needleEl.setAttribute('stroke', color);
+        needleEl.style.stroke = color;
       }
     }
 
