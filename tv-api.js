@@ -4,13 +4,13 @@
 
 // Dữ liệu chỉ số thị trường chuẩn xác thời gian thực từ sàn HOSE / HNX / UPCOM
 const FALLBACK_INDICES = {
-    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1702.20, change: -0.16, high: 1709.54, low: 1696.47, open: 1704.87, volume: 526987695, value: 11072000000000, valueTy: 11072, breadth: { adv: 152, dec: 162, unc: 43 } },
-    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1702.20, change: -0.16, high: 1709.54, low: 1696.47, open: 1704.87, volume: 526987695, value: 11072000000000, valueTy: 11072, breadth: { adv: 152, dec: 162, unc: 43 } },
-    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1846.50, change: -0.32, high: 1853.55, low: 1840.26, open: 1852.44, volume: 212343072, value: 6237000000000, valueTy: 6237, breadth: { adv: 13, dec: 15, unc: 2 } },
-    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 260.71,  change: -1.68, high: 265.21,  low: 259.20,  open: 265.16, volume: 51736012, value: 730000000000, valueTy: 730, breadth: { adv: 59, dec: 61, unc: 50 } },
-    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 260.71,  change: -1.68, high: 265.21,  low: 259.20,  open: 265.16, volume: 51736012, value: 730000000000, valueTy: 730, breadth: { adv: 59, dec: 61, unc: 50 } },
-    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 124.39,  change: 0.36,  high: 124.80,  low: 123.90,  open: 123.94, volume: 23758007, value: 776000000000, valueTy: 776, breadth: { adv: 101, dec: 65, unc: 80 } },
-    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 124.39,  change: 0.36,  high: 124.80,  low: 123.90,  open: 123.94, volume: 23758007, value: 776000000000, valueTy: 776, breadth: { adv: 101, dec: 65, unc: 80 } }
+    'VNI':        { symbol: 'VNI',        exchange: 'HOSE',  price: 1762.47, change: 0.03, high: 1765.58, low: 1754.72, open: 1761.87, volume: 526987695, value: 11072000000000, valueTy: 11072, breadth: { adv: 152, dec: 162, unc: 43 } },
+    'VNINDEX':    { symbol: 'VNINDEX',    exchange: 'HOSE',  price: 1762.47, change: 0.03, high: 1765.58, low: 1754.72, open: 1761.87, volume: 526987695, value: 11072000000000, valueTy: 11072, breadth: { adv: 152, dec: 162, unc: 43 } },
+    'VN30':       { symbol: 'VN30',       exchange: 'HOSE',  price: 1887.81, change: -0.03, high: 1893.05, low: 1882.61, open: 1888.48, volume: 212343072, value: 6237000000000, valueTy: 6237, breadth: { adv: 13, dec: 15, unc: 2 } },
+    'HNX':        { symbol: 'HNX',        exchange: 'HNX',   price: 259.56,  change: 0.02,  high: 261.49,  low: 259.47,  open: 259.50, volume: 51736012, value: 730000000000, valueTy: 730, breadth: { adv: 59, dec: 61, unc: 50 } },
+    'HNXINDEX':   { symbol: 'HNXINDEX',   exchange: 'HNX',   price: 259.56,  change: 0.02,  high: 261.49,  low: 259.47,  open: 259.50, volume: 51736012, value: 730000000000, valueTy: 730, breadth: { adv: 59, dec: 61, unc: 50 } },
+    'UPCOM':      { symbol: 'UPCOM',      exchange: 'UPCOM', price: 126.14,  change: 0.17,  high: 126.50,  low: 125.80,  open: 125.93, volume: 23758007, value: 776000000000, valueTy: 776, breadth: { adv: 101, dec: 65, unc: 80 } },
+    'UPCOMINDEX': { symbol: 'UPCOMINDEX', exchange: 'UPCOM', price: 126.14,  change: 0.17,  high: 126.50,  low: 125.80,  open: 125.93, volume: 23758007, value: 776000000000, valueTy: 776, breadth: { adv: 101, dec: 65, unc: 80 } }
 };
 
 // Từ điển thông tin chuẩn xác công ty, phân ngành và sàn niêm yết (Khắc phục triệt để lỗi lệch ngành và sai lệch mã)

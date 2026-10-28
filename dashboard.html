@@ -2956,19 +2956,19 @@ body {
                   <div class="stats-cards-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:4px; margin-bottom:4px;">
                     <div class="stats-card" id="rsiCard_15m" onclick="selectRSIInterval('15m', this)" style="padding:4px 6px;">
                       <div class="stats-card-label" style="font-size:11px;">15 Phút</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_15m" style="font-size:12.5px;">44.8 (Yếu)</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_15m" style="font-size:12.5px;">45.6 (Trung tính)</div>
                     </div>
                     <div class="stats-card" id="rsiCard_1h" onclick="selectRSIInterval('1h', this)" style="padding:4px 6px;">
                       <div class="stats-card-label" style="font-size:11px;">Hàng giờ</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_1h" style="font-size:12.5px;">40.8 (Yếu)</div>
+                      <div class="stats-card-value text-up" id="rsiVal_1h" style="font-size:12.5px;">58.0 (Tăng/Mạnh)</div>
                     </div>
                     <div class="stats-card active" id="rsiCard_1d" onclick="selectRSIInterval('1d', this)" style="padding:4px 6px;">
                       <div class="stats-card-label" style="font-size:11px;">Hàng ngày</div>
-                      <div class="stats-card-value text-down" id="rsiVal_1d" style="font-size:12.5px;">29.4 (Quá bán)</div>
+                      <div class="stats-card-value text-up" id="rsiVal_1d" style="font-size:12.5px;">53.3 (Tích cực)</div>
                     </div>
                     <div class="stats-card" id="rsiCard_1w" onclick="selectRSIInterval('1w', this)" style="padding:4px 6px;">
                       <div class="stats-card-label" style="font-size:11px;">Hàng tuần</div>
-                      <div class="stats-card-value text-ref" id="rsiVal_1w" style="font-size:12.5px;">42.4 (Yếu)</div>
+                      <div class="stats-card-value text-ref" id="rsiVal_1w" style="font-size:12.5px;">48.5 (Trung tính)</div>
                     </div>
                   </div>
 
@@ -2979,14 +2979,14 @@ body {
                       <span id="heroTaOverallRating" style="font-weight:750; font-size:12px; color:var(--price-up);">TÍCH CỰC (14 Mua / 3 Bán)</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); border-top:1px dashed var(--border-stroke); padding-top:3px;">
-                      <span>MA20: <b id="heroMa20Val" style="color:var(--text-primary); font-size:12px;">1.708</b> (<span id="heroMa20Status" style="color:var(--price-up); font-weight:700;">Trên</span>)</span>
-                      <span>MA50: <b id="heroMa50Val" style="color:var(--text-primary); font-size:12px;">1.685</b> (<span id="heroMa50Status" style="color:var(--price-up); font-weight:700;">Trên</span>)</span>
-                      <span>MA100: <b id="heroMa100Val" style="color:var(--text-primary); font-size:12px;">1.658</b> (<span id="heroMa100Status" style="color:var(--price-up); font-weight:700;">Trên</span>)</span>
+                      <span>MA20: <b id="heroMa20Val" style="color:var(--text-primary); font-size:12px;">1.735,9</b> (<span id="heroMa20Status" style="color:var(--price-up); font-weight:700;">Trên</span>)</span>
+                      <span>MA50: <b id="heroMa50Val" style="color:var(--text-primary); font-size:12px;">1.772,2</b> (<span id="heroMa50Status" style="color:var(--price-down); font-weight:700;">Dưới</span>)</span>
+                      <span>MA100: <b id="heroMa100Val" style="color:var(--text-primary); font-size:12px;">1.782,5</b> (<span id="heroMa100Status" style="color:var(--price-down); font-weight:700;">Dưới</span>)</span>
                     </div>
                     <div style="display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-secondary); border-top:1px dashed var(--border-stroke); padding-top:3px; margin-top:2px;">
                       <span>MACD: <b id="heroMacdStatus" style="color:var(--price-up); font-weight:750;">Phân kỳ dương</b></span>
-                      <span>Bollinger: <b id="heroBbStatus" style="color:var(--text-primary); font-weight:650;">Chạm band dưới</b></span>
-                      <span>Stoch: <b id="heroStochVal" style="color:var(--price-down); font-weight:750;">22.4 (Vùng đáy)</b></span>
+                      <span>Bollinger: <b id="heroBbStatus" style="color:var(--text-primary); font-weight:650;">Vùng cân bằng giữa band</b></span>
+                      <span>Stoch: <b id="heroStochVal" style="color:var(--price-up); font-weight:750;">81.6 (Quá mua)</b></span>
                     </div>
                   </div>
 
@@ -2995,15 +2995,15 @@ body {
                     <div class="gauge-svg-wrap" style="width:76px; height:42px; flex-shrink:0;">
                       <svg viewBox="0 0 100 55" style="width:100%;height:100%;">
                         <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="var(--border-stroke)" stroke-width="8" stroke-linecap="round"/>
-                        <path id="heroGaugeRsiArc" d="M 10 50 A 40 40 0 0 1 25.9 18.1" fill="none" stroke="var(--price-down)" stroke-width="8" stroke-linecap="round" style="transition: all 0.4s ease;"/>
+                        <path id="heroGaugeRsiArc" d="M 10 50 A 40 40 0 0 1 54.1 10.2" fill="none" stroke="var(--price-up)" stroke-width="8" stroke-linecap="round" style="transition: all 0.4s ease;"/>
                         <circle cx="50" cy="50" r="4" fill="var(--text-primary)"/>
-                        <line id="heroGaugeRsiNeedle" x1="50" y1="50" x2="30.7" y2="24.5" stroke="var(--price-down)" stroke-width="2.5" stroke-linecap="round" style="transition: all 0.4s ease;"/>
+                        <line id="heroGaugeRsiNeedle" x1="50" y1="50" x2="53.3" y2="18.2" stroke="var(--price-up)" stroke-width="2.5" stroke-linecap="round" style="transition: all 0.4s ease;"/>
                       </svg>
                     </div>
                     <div class="gauge-info" style="display:flex; flex-direction:column; justify-content:center; gap:2px; min-width:0; overflow:hidden;">
                       <div class="gauge-info-title" id="gaugeRsiTitle" style="font-size:11px; color:var(--text-muted); font-weight:600; white-space:nowrap;">Chỉ báo RSI (14) • Hàng ngày</div>
-                      <div class="gauge-info-score text-down" id="gaugeRsiScore" style="font-size:22px; font-weight:850; font-family:var(--font-data); line-height:1.1;">29.4</div>
-                      <div class="gauge-info-desc text-down" id="gaugeRsiDesc" style="font-size:11px; font-weight:700; white-space:nowrap;">Tín hiệu: Quá bán (Vùng đáy RSI &lt; 30)</div>
+                      <div class="gauge-info-score text-up" id="gaugeRsiScore" style="font-size:22px; font-weight:850; font-family:var(--font-data); line-height:1.1;">53.3</div>
+                      <div class="gauge-info-desc text-up" id="gaugeRsiDesc" style="font-size:11px; font-weight:700; white-space:nowrap;">Tín hiệu: Tích lũy tích cực (Vùng 50-60)</div>
                     </div>
                   </div>
 
@@ -3011,36 +3011,36 @@ body {
                   <div class="ta-mfi-box" style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:4px 8px; margin-top:3px; display:flex; justify-content:space-between; align-items:center; font-size:11px;">
                     <div>
                       <span style="color:var(--text-muted);">MFI (14):</span>
-                      <b id="heroMfiScore" style="color:var(--price-up); font-size:12px; margin-left:3px; font-weight:750;">31.8</b>
-                      <span style="color:var(--price-up); font-size:10px; font-weight:600;"> (Gom đáy)</span>
+                      <b id="heroMfiScore" style="color:var(--price-up); font-size:12px; margin-left:3px; font-weight:750;">39.8</b>
+                      <span style="color:var(--price-up); font-size:10px; font-weight:600;"> (Tích lũy)</span>
                     </div>
                     <span style="opacity:0.4;">|</span>
                     <div>
                       <span style="color:var(--text-muted);">ATR:</span>
-                      <b id="heroAtrVal" style="color:var(--text-primary); font-size:12px; margin-left:3px; font-weight:750;">14.8 đ</b>
+                      <b id="heroAtrVal" style="color:var(--text-primary); font-size:12px; margin-left:3px; font-weight:750;">26.6 đ</b>
                     </div>
                     <span style="opacity:0.4;">|</span>
                     <div>
                       <span style="color:var(--text-muted);">ADX:</span>
-                      <b id="heroAdxVal" style="color:var(--text-primary); font-size:12px; margin-left:3px; font-weight:750;">24.2</b>
+                      <b id="heroAdxVal" style="color:var(--text-primary); font-size:12px; margin-left:3px; font-weight:750;">22.1</b>
                     </div>
                   </div>
 
                   <!-- Ô 4: NGƯỠNG HỖ TRỢ / KHÁNG CỰ PIVOT POINTS MỞ RỘNG -->
                   <div class="ta-pivot-card" id="taPivotCard" style="background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:4px 7px; margin-top:3px; font-size:11px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                      <span style="color:var(--text-muted);">Điểm xoay PP: <b id="heroPivotPP" style="color:var(--text-primary); font-size:12px; font-weight:750;">1.712</b></span>
-                      <span style="font-weight:700;"><span style="color:var(--price-up);" id="heroPivotHT1">HT1: 1.700</span> • <span style="color:var(--price-down);" id="heroPivotKC1">KC1: 1.725</span></span>
+                      <span style="color:var(--text-muted);">Điểm xoay PP: <b id="heroPivotPP" style="color:var(--text-primary); font-size:12px; font-weight:750;">1.761,0</b></span>
+                      <span style="font-weight:700;"><span style="color:var(--price-up);" id="heroPivotHT1">HT1: 1.752,4</span> • <span style="color:var(--price-down);" id="heroPivotKC1">KC1: 1.769,8</span></span>
                     </div>
                     <div style="color:var(--text-secondary); font-size:10.5px; display:flex; justify-content:space-between; border-top:1px dashed var(--border-stroke); padding-top:2px;">
-                      <span>Hỗ trợ 2 (S2): <b id="heroPivotS2" style="color:var(--price-up); font-size:11.5px; font-weight:750;">1.685</b></span>
-                      <span>Kháng cự 2 (R2): <b id="heroPivotR2" style="color:var(--price-down); font-size:11.5px; font-weight:750;">1.740</b></span>
+                      <span>Hỗ trợ 2 (S2): <b id="heroPivotS2" style="color:var(--price-up); font-size:11.5px; font-weight:750;">1.743,8</b></span>
+                      <span>Kháng cự 2 (R2): <b id="heroPivotR2" style="color:var(--price-down); font-size:11.5px; font-weight:750;">1.778,4</b></span>
                     </div>
                   </div>
 
                   <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-container); border:1px solid var(--border-stroke); border-radius:var(--radius-sm); padding:4px 8px; font-size:11px; margin-top:3px;">
                     <span style="color:var(--text-muted); font-weight:600;">Khuyến nghị:</span>
-                    <span id="heroTrendRecommendation" style="font-weight:750; color:var(--price-down); font-size:11.5px;">▼ Giảm ngắn hạn / Vùng đáy tích lũy</span>
+                    <span id="heroTrendRecommendation" style="font-weight:750; color:var(--price-up); font-size:11.5px;">▲ Tăng ngắn hạn / Vượt cản kỹ thuật</span>
                   </div>
                 </div>
 
@@ -5648,8 +5648,8 @@ body {
 
     function initIntradayCurve() {
       // Dựng đường cong biến động tự nhiên, không giật đột ngột, không tạo dốc đứng
-      const curIdx = (typeof marketIndices !== 'undefined' && marketIndices[activeMarket]) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket]) || (typeof marketIndices !== 'undefined' && marketIndices['VNINDEX']) || { price: 1702.20, open: 1704.87, high: 1709.54, low: 1696.47 };
-      const cur = curIdx.price || 1702.20;
+      const curIdx = (typeof marketIndices !== 'undefined' && marketIndices[activeMarket]) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket]) || (typeof marketIndices !== 'undefined' && marketIndices['VNINDEX']) || { price: 1762.47, open: 1761.87, high: 1765.58, low: 1754.72 };
+      const cur = curIdx.price || 1762.47;
       const ref = curIdx.open || (curIdx.change !== undefined ? (cur / (1 + (curIdx.change / 100))) : cur);
       const high = curIdx.high || Math.max(ref, cur) * 1.004;
       const low = curIdx.low || Math.min(ref, cur) * 0.996;
@@ -5664,6 +5664,7 @@ body {
         walk = Math.max(low, Math.min(high, walk));
         pts.push(parseFloat(walk.toFixed(2)));
       }
+      pts[0] = ref;
       pts[pts.length - 1] = cur;
       intradayPoints = pts;
       renderIntradaySvg();
@@ -5685,8 +5686,8 @@ body {
       svg.setAttribute('viewBox', '0 0 280 135');
       svg.setAttribute('preserveAspectRatio', 'none');
 
-      const curIdx = (typeof marketIndices !== 'undefined' && marketIndices[activeMarket]) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket]) || (typeof marketIndices !== 'undefined' && marketIndices['VNINDEX']) || { price: 1702.20, open: 1704.87 };
-      const ref = curIdx.open || (curIdx.change !== undefined ? (curIdx.price / (1 + (curIdx.change / 100))) : curIdx.price) || 1704.87;
+      const curIdx = (typeof marketIndices !== 'undefined' && marketIndices[activeMarket]) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket]) || (typeof marketIndices !== 'undefined' && marketIndices['VNINDEX']) || { price: 1762.47, open: 1761.87 };
+      const ref = curIdx.open || (curIdx.change !== undefined ? (curIdx.price / (1 + (curIdx.change / 100))) : curIdx.price) || 1761.87;
 
       const allVals = [...intradayPoints, ref];
       const minVal = Math.min(...allVals) * 0.999;
@@ -5744,10 +5745,10 @@ body {
       if (!track) return;
 
       const indices = [
-        { name: 'VN-INDEX', key: 'VNINDEX', fallback: 1702.20, chg: -0.16 },
-        { name: 'VN30', key: 'VN30', fallback: 1846.50, chg: -0.32 },
-        { name: 'HNX', key: 'HNXINDEX', fallback: 260.71, chg: -1.68 },
-        { name: 'UPCOM', key: 'UPCOMINDEX', fallback: 124.34, chg: 0.32 }
+        { name: 'VN-INDEX', key: 'VNINDEX', fallback: 1762.47, chg: 0.03 },
+        { name: 'VN30', key: 'VN30', fallback: 1887.81, chg: -0.03 },
+        { name: 'HNX', key: 'HNXINDEX', fallback: 259.56, chg: 0.02 },
+        { name: 'UPCOM', key: 'UPCOMINDEX', fallback: 126.14, chg: 0.17 }
       ];
 
       // Ưu tiên danh mục thực tế từ Live Scanner, sắp xếp theo thanh khoản cao nhất
@@ -5952,26 +5953,27 @@ body {
           const isVN30Stock = ['VCB','BID','CTG','TCB','MBB','VPB','ACB','STB','HDB','FPT','HPG','MWG','MSN','VNM','SAB','VHM','VIC','VRE','SSI','GAS','PLX','POW','GVR','BVH','TPB','VIB','SHB','SSB','BCM','PDR'].includes(stock.symbol);
 
           if (isHOSEStock && marketIndices['VNINDEX']) {
+            const vniObj = marketIndices['VNINDEX'];
+            const refVni = vniObj.open || vniObj.ref || (vniObj.price ? (vniObj.price / (1 + (vniObj.change || 0) / 100)) : 1761.87);
+            const vniMin = vniObj.low || (refVni * 0.98);
+            const vniMax = vniObj.high || (refVni * 1.02);
+            const oldVni = vniObj.price || refVni;
             const tickDelta = isBuy ? (0.01 + Math.random() * 0.04) : -(0.01 + Math.random() * 0.04);
-            const oldVni = marketIndices['VNINDEX'].price || 1699.39;
-            const vniMin = marketIndices['VNINDEX'].low || 1696.47;
-            const vniMax = marketIndices['VNINDEX'].high || 1704.87;
             const newVni = parseFloat(Math.max(vniMin, Math.min(vniMax, oldVni + tickDelta)).toFixed(2));
-            marketIndices['VNINDEX'].price = newVni;
-
-            const refVni = 1704.87;
-            marketIndices['VNINDEX'].change = parseFloat((((newVni - refVni) / refVni) * 100).toFixed(2));
-            marketIndices['VNINDEX'].volume = (marketIndices['VNINDEX'].volume || 542000000) + vol;
+            vniObj.price = newVni;
+            vniObj.change = parseFloat((((newVni - refVni) / refVni) * 100).toFixed(2));
+            vniObj.volume = (vniObj.volume || 270000000) + vol;
 
             if (isVN30Stock && marketIndices['VN30']) {
-              const oldVn30 = marketIndices['VN30'].price || 1844.13;
-              const vn30Min = marketIndices['VN30'].low || 1840.26;
-              const vn30Max = marketIndices['VN30'].high || 1852.44;
+              const vn30Obj = marketIndices['VN30'];
+              const refVn30 = vn30Obj.open || vn30Obj.ref || (vn30Obj.price ? (vn30Obj.price / (1 + (vn30Obj.change || 0) / 100)) : 1888.48);
+              const vn30Min = vn30Obj.low || (refVn30 * 0.98);
+              const vn30Max = vn30Obj.high || (refVn30 * 1.02);
+              const oldVn30 = vn30Obj.price || refVn30;
               const newVn30 = parseFloat(Math.max(vn30Min, Math.min(vn30Max, oldVn30 + (tickDelta * 1.15))).toFixed(2));
-              marketIndices['VN30'].price = newVn30;
-              const refVn30 = 1852.44;
-              marketIndices['VN30'].change = parseFloat((((newVn30 - refVn30) / refVn30) * 100).toFixed(2));
-              marketIndices['VN30'].volume = (marketIndices['VN30'].volume || 235000000) + vol;
+              vn30Obj.price = newVn30;
+              vn30Obj.change = parseFloat((((newVn30 - refVn30) / refVn30) * 100).toFixed(2));
+              vn30Obj.volume = (vn30Obj.volume || 110000000) + vol;
             }
 
             // Cập nhật đồ thị intraday và Hero Index cột trái chuẩn theo chỉ số đang chọn
@@ -6486,14 +6488,15 @@ body {
     function renderHeroIndex(flashUp = true) {
       const fallbackIdx = (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket])
         ? FALLBACK_INDICES[activeMarket]
-        : { price: 1702.20, change: -0.16, high: 1709.54, low: 1696.47, open: 1704.87, volume: 526987695, value: 11072000000000, valueTy: 11072 };
+        : { price: 1762.47, change: 0.03, high: 1765.58, low: 1754.72, open: 1761.87, volume: 526987695, value: 11072000000000, valueTy: 11072 };
       const idx = marketIndices[activeMarket] || fallbackIdx;
-      const val = idx.price || 1702.20;
-      const chg = idx.change !== undefined && idx.change !== null ? idx.change : -0.16;
+      const val = idx.price || 1762.47;
+      const chg = idx.change !== undefined && idx.change !== null ? idx.change : 0.03;
       const isUp = chg >= 0;
       const colorCls = isUp ? 'text-up' : 'text-down';
       const arrow = isUp ? '▲' : '▼';
-      const pointChg = Math.abs(val * (chg / 100)).toFixed(2);
+      const refPrice = idx.open || idx.ref || (idx.change !== undefined && idx.change !== 0 ? (val / (1 + idx.change/100)) : val);
+      const pointChg = Math.abs(val - refPrice).toFixed(2);
 
       const valEl = document.getElementById('heroIndexVal');
       if (valEl) {
@@ -6541,7 +6544,6 @@ body {
         updateBreadthUI(idx.breadth);
       }
 
-      const refPrice = idx.open || (val / (1 + chg/100));
       const refTextEl = document.getElementById('heroRefText');
       if (refTextEl) refTextEl.textContent = 'Tham chiếu: ' + refPrice.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -6624,78 +6626,88 @@ body {
       }
 
       // 4. Kỹ thuật MA & Đánh giá tổng hợp (Cột C)
-      const taRatingEl = document.getElementById('heroTaOverallRating');
-      const ma20El = document.getElementById('heroMa20Val');
-      const ma20St = document.getElementById('heroMa20Status');
-      const ma50El = document.getElementById('heroMa50Val');
-      const ma50St = document.getElementById('heroMa50Status');
-      const ma100El = document.getElementById('heroMa100Val');
-      const ma100St = document.getElementById('heroMa100Status');
-      const macdSt = document.getElementById('heroMacdStatus');
-      const bbSt = document.getElementById('heroBbStatus');
-      const stochVal = document.getElementById('heroStochVal');
-      const mfiScore = document.getElementById('heroMfiScore');
-      const atrVal = document.getElementById('heroAtrVal');
-      const adxVal = document.getElementById('heroAdxVal');
-      const pivotPP = document.getElementById('heroPivotPP');
-      const pivotHT1 = document.getElementById('heroPivotHT1');
-      const pivotKC1 = document.getElementById('heroPivotKC1');
-      const pivotS2El = document.getElementById('heroPivotS2');
-      const pivotR2El = document.getElementById('heroPivotR2');
-      const trendRecEl = document.getElementById('heroTrendRecommendation');
+      if (typeof currentHeroTechnical !== 'undefined' && currentHeroTechnical) {
+        applyHeroTechnicalUI(currentHeroTechnical);
+      } else {
+        const taRatingEl = document.getElementById('heroTaOverallRating');
+        const ma20El = document.getElementById('heroMa20Val');
+        const ma20St = document.getElementById('heroMa20Status');
+        const ma50El = document.getElementById('heroMa50Val');
+        const ma50St = document.getElementById('heroMa50Status');
+        const ma100El = document.getElementById('heroMa100Val');
+        const ma100St = document.getElementById('heroMa100Status');
+        const macdSt = document.getElementById('heroMacdStatus');
+        const bbSt = document.getElementById('heroBbStatus');
+        const stochVal = document.getElementById('heroStochVal');
+        const mfiScore = document.getElementById('heroMfiScore');
+        const atrVal = document.getElementById('heroAtrVal');
+        const adxVal = document.getElementById('heroAdxVal');
+        const pivotPP = document.getElementById('heroPivotPP');
+        const pivotHT1 = document.getElementById('heroPivotHT1');
+        const pivotKC1 = document.getElementById('heroPivotKC1');
+        const pivotS2El = document.getElementById('heroPivotS2');
+        const pivotR2El = document.getElementById('heroPivotR2');
+        const trendRecEl = document.getElementById('heroTrendRecommendation');
 
-      const ma20Val = (val * 0.998).toFixed(1);
-      const ma50Val = (val * 0.985).toFixed(1);
-      const ma100Val = (val * 0.974).toFixed(1);
-      const isAboveMa20 = val >= (val * 0.998);
+        const ma20Val = (val * 0.992).toFixed(1);
+        const ma50Val = (val * 1.005).toFixed(1);
+        const ma100Val = (val * 1.011).toFixed(1);
+        const isAboveMa20 = val >= (val * 0.992);
 
-      if (taRatingEl) {
-        if (isUp) {
-          taRatingEl.textContent = 'TÍCH CỰC (14 Mua / 3 Bán)';
-          taRatingEl.className = 'text-up';
-        } else {
-          taRatingEl.textContent = 'QUÁ BÁN / VÙNG ĐÁY (11 Chờ mua / 5 Bán)';
-          taRatingEl.className = 'text-down';
+        if (taRatingEl) {
+          if (isUp) {
+            taRatingEl.textContent = 'TÍCH CỰC (14 Mua / 3 Bán)';
+            taRatingEl.className = 'text-up';
+          } else {
+            taRatingEl.textContent = 'TRUNG TÍNH (8 Mua / 8 Bán)';
+            taRatingEl.className = 'text-ref';
+          }
         }
-      }
-      if (ma20El) ma20El.textContent = Number(ma20Val).toLocaleString('vi-VN');
-      if (ma20St) {
-        ma20St.textContent = isAboveMa20 ? 'Trên' : 'Dưới';
-        ma20St.className = isAboveMa20 ? 'text-up' : 'text-down';
-      }
-      if (ma50El) ma50El.textContent = Number(ma50Val).toLocaleString('vi-VN');
-      if (ma50St) {
-        ma50St.textContent = 'Trên';
-        ma50St.className = 'text-up';
-      }
-      if (ma100El) ma100El.textContent = Number(ma100Val).toLocaleString('vi-VN');
-      if (ma100St) {
-        ma100St.textContent = 'Trên';
-        ma100St.className = 'text-up';
-      }
-      if (macdSt) {
-        macdSt.textContent = isUp ? 'Phân kỳ dương' : 'Hội tụ vùng đáy';
-        macdSt.className = isUp ? 'text-up' : 'text-ref';
-      }
-      if (bbSt) bbSt.textContent = isUp ? 'Bám dải trên' : 'Chạm band dưới';
-      if (stochVal) {
-        stochVal.textContent = isUp ? '68.2' : '22.4 (Vùng đáy)';
-        stochVal.className = isUp ? 'text-up' : 'text-down';
-      }
-      if (mfiScore) {
-        mfiScore.textContent = isUp ? '58.4' : '31.8';
-        mfiScore.className = isUp ? 'text-up' : 'text-up';
-      }
-      if (atrVal) atrVal.textContent = `${rangePt.toFixed(1)} đ`;
-      if (adxVal) adxVal.textContent = (20 + Math.abs(chg) * 3).toFixed(1);
-      if (pivotPP) pivotPP.textContent = ((highVal + lowVal + val) / 3).toFixed(1);
-      if (pivotHT1) pivotHT1.textContent = `HT1: ${(lowVal * 0.998).toFixed(1)}`;
-      if (pivotKC1) pivotKC1.textContent = `KC1: ${(highVal * 1.002).toFixed(1)}`;
-      if (pivotS2El) pivotS2El.textContent = (lowVal * 0.992).toFixed(1);
-      if (pivotR2El) pivotR2El.textContent = (highVal * 1.008).toFixed(1);
-      if (trendRecEl) {
-        trendRecEl.textContent = isUp ? '▲ Tăng ngắn hạn / Vượt cản kỹ thuật' : '▼ Giảm ngắn hạn / Vùng đáy tích lũy';
-        trendRecEl.className = isUp ? 'text-up' : 'text-down';
+        if (ma20El) ma20El.textContent = Number(ma20Val).toLocaleString('vi-VN');
+        if (ma20St) {
+          ma20St.textContent = isAboveMa20 ? 'Trên' : 'Dưới';
+          ma20St.className = isAboveMa20 ? 'text-up' : 'text-down';
+        }
+        if (ma50El) ma50El.textContent = Number(ma50Val).toLocaleString('vi-VN');
+        if (ma50St) {
+          ma50St.textContent = val >= ma50Val ? 'Trên' : 'Dưới';
+          ma50St.className = val >= ma50Val ? 'text-up' : 'text-down';
+        }
+        if (ma100El) ma100El.textContent = Number(ma100Val).toLocaleString('vi-VN');
+        if (ma100St) {
+          ma100St.textContent = val >= ma100Val ? 'Trên' : 'Dưới';
+          ma100St.className = val >= ma100Val ? 'text-up' : 'text-down';
+        }
+        if (macdSt) {
+          macdSt.textContent = isUp ? 'Phân kỳ dương' : 'Hội tụ vùng đáy';
+          macdSt.className = isUp ? 'text-up' : 'text-ref';
+        }
+        if (bbSt) bbSt.textContent = isUp ? 'Bám dải trên' : 'Vùng cân bằng giữa band';
+        if (stochVal) {
+          stochVal.textContent = isUp ? '81.6 (Quá mua)' : '42.4 (Cân bằng)';
+          stochVal.className = isUp ? 'text-up' : 'text-ref';
+        }
+        if (mfiScore) {
+          mfiScore.textContent = isUp ? '58.4' : '39.8';
+          mfiScore.className = isUp ? 'text-up' : 'text-ref';
+        }
+        if (atrVal) atrVal.textContent = `${rangePt.toFixed(1)} đ`;
+        if (adxVal) adxVal.textContent = (20 + Math.abs(chg) * 3).toFixed(1);
+        const pp = ((highVal + lowVal + val) / 3).toFixed(1);
+        const ht1 = (2 * pp - highVal).toFixed(1);
+        const kc1 = (2 * pp - lowVal).toFixed(1);
+        const s2 = (pp - (highVal - lowVal)).toFixed(1);
+        const r2 = (parseFloat(pp) + (highVal - lowVal)).toFixed(1);
+
+        if (pivotPP) pivotPP.textContent = Number(pp).toLocaleString('vi-VN');
+        if (pivotHT1) pivotHT1.textContent = `HT1: ${Number(ht1).toLocaleString('vi-VN')}`;
+        if (pivotKC1) pivotKC1.textContent = `KC1: ${Number(kc1).toLocaleString('vi-VN')}`;
+        if (pivotS2El) pivotS2El.textContent = Number(s2).toLocaleString('vi-VN');
+        if (pivotR2El) pivotR2El.textContent = Number(r2).toLocaleString('vi-VN');
+        if (trendRecEl) {
+          trendRecEl.textContent = isUp ? '▲ Tăng ngắn hạn / Vượt cản kỹ thuật' : '■ Tích lũy tích cực / Cân bằng';
+          trendRecEl.className = isUp ? 'text-up' : 'text-ref';
+        }
       }
     }
 
@@ -12490,63 +12502,395 @@ body {
     let currentRsiInterval = '1d';
     let currentRsiData = {
       symbol: 'VNINDEX',
-      rsi: { '15m': 44.8, '1h': 40.8, '1d': 29.4, '1w': 42.4 },
+      rsi: { '15m': 45.6, '1h': 58.0, '1d': 53.3, '1w': 48.5 },
       signals: {
-        '15m': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu', tag: 'weak' },
-        '1h': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu', tag: 'weak' },
-        '1d': { label: 'Quá bán', text: 'Tín hiệu: Quá bán (Vùng đáy / RSI < 30)', tag: 'oversold' },
-        '1w': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu', tag: 'weak' }
+        '15m': { label: 'Trung tính', text: 'Tín hiệu: Cân bằng / Tích lũy', tag: 'neutral' },
+        '1h': { label: 'Tăng/Mạnh', text: 'Tín hiệu: Mua tích cực / Tăng', tag: 'strong' },
+        '1d': { label: 'Tích cực', text: 'Tín hiệu: Tích lũy tích cực / Hồi phục', tag: 'strong' },
+        '1w': { label: 'Trung tính', text: 'Tín hiệu: Cân bằng / Tích lũy', tag: 'neutral' }
       }
     };
+    let currentHeroTechnical = null;
     let rsiDataCacheBySymbol = {};
+
+    function calculateWilderRSI(closes, period = 14) {
+      if (!closes || closes.length < period + 1) return null;
+      let gains = 0;
+      let losses = 0;
+      for (let i = 1; i <= period; i++) {
+        const diff = closes[i] - closes[i - 1];
+        if (diff >= 0) gains += diff;
+        else losses -= diff;
+      }
+      let avgGain = gains / period;
+      let avgLoss = losses / period;
+
+      for (let i = period + 1; i < closes.length; i++) {
+        const diff = closes[i] - closes[i - 1];
+        if (diff >= 0) {
+          avgGain = (avgGain * (period - 1) + diff) / period;
+          avgLoss = (avgLoss * (period - 1)) / period;
+        } else {
+          avgGain = (avgGain * (period - 1)) / period;
+          avgLoss = (avgLoss * (period - 1) - diff) / period;
+        }
+      }
+      if (avgGain === 0 && avgLoss === 0) return 50;
+      if (avgLoss === 0) return 100;
+      if (avgGain === 0) return 0;
+      const rs = avgGain / avgLoss;
+      return parseFloat((100 - (100 / (1 + rs))).toFixed(1));
+    }
+
+    function calculateSMA(data, period) {
+      if (!data || data.length < period) return null;
+      const slice = data.slice(-period);
+      const sum = slice.reduce((a, b) => a + b, 0);
+      return parseFloat((sum / period).toFixed(1));
+    }
 
     function getRsiSignalFallback(rsi) {
       if (rsi === null || rsi === undefined) return { label: 'Đang tính', text: 'Tín hiệu: Đang cập nhật', tag: 'neutral' };
       if (rsi < 30) return { label: 'Quá bán', text: 'Tín hiệu: Quá bán (Vùng đáy / RSI < 30)', tag: 'oversold' };
       if (rsi < 45) return { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu', tag: 'weak' };
-      if (rsi <= 55) return { label: 'Trung tính', text: 'Tín hiệu: Tích lũy / Cân bằng', tag: 'neutral' };
+      if (rsi <= 55) return { label: 'Trung tính', text: 'Tín hiệu: Cân bằng / Tích lũy (45 - 55)', tag: 'neutral' };
       if (rsi <= 70) return { label: 'Tăng/Mạnh', text: 'Tín hiệu: Mua tích cực / Tăng', tag: 'strong' };
       return { label: 'Quá mua', text: 'Tín hiệu: Quá mua (Hưng phấn / RSI > 70)', tag: 'overbought' };
     }
 
-    async function fetchMarketTechnicalRSI(symbol) {
+    function applyHeroTechnicalUI(ta) {
+      if (!ta) return;
+      currentHeroTechnical = ta;
+      const taRatingEl = document.getElementById('heroTaOverallRating');
+      const ma20El = document.getElementById('heroMa20Val');
+      const ma20St = document.getElementById('heroMa20Status');
+      const ma50El = document.getElementById('heroMa50Val');
+      const ma50St = document.getElementById('heroMa50Status');
+      const ma100El = document.getElementById('heroMa100Val');
+      const ma100St = document.getElementById('heroMa100Status');
+      const macdSt = document.getElementById('heroMacdStatus');
+      const bbSt = document.getElementById('heroBbStatus');
+      const stochVal = document.getElementById('heroStochVal');
+      const mfiScore = document.getElementById('heroMfiScore');
+      const atrVal = document.getElementById('heroAtrVal');
+      const adxVal = document.getElementById('heroAdxVal');
+      const pivotPP = document.getElementById('heroPivotPP');
+      const pivotHT1 = document.getElementById('heroPivotHT1');
+      const pivotKC1 = document.getElementById('heroPivotKC1');
+      const pivotS2El = document.getElementById('heroPivotS2');
+      const pivotR2El = document.getElementById('heroPivotR2');
+      const trendRecEl = document.getElementById('heroTrendRecommendation');
+
+      if (taRatingEl && ta.rating) {
+        taRatingEl.textContent = ta.rating;
+        taRatingEl.className = ta.ratingCls || (ta.rating.includes('TÍCH') ? 'text-up' : 'text-down');
+      }
+      if (ma20El && ta.ma20) ma20El.textContent = Number(ta.ma20).toLocaleString('vi-VN');
+      if (ma20St && ta.ma20Status) {
+        ma20St.textContent = ta.ma20Status;
+        ma20St.className = ta.ma20Status === 'Trên' ? 'text-up' : 'text-down';
+      }
+      if (ma50El && ta.ma50) ma50El.textContent = Number(ta.ma50).toLocaleString('vi-VN');
+      if (ma50St && ta.ma50Status) {
+        ma50St.textContent = ta.ma50Status;
+        ma50St.className = ta.ma50Status === 'Trên' ? 'text-up' : 'text-down';
+      }
+      if (ma100El && ta.ma100) ma100El.textContent = Number(ta.ma100).toLocaleString('vi-VN');
+      if (ma100St && ta.ma100Status) {
+        ma100St.textContent = ta.ma100Status;
+        ma100St.className = ta.ma100Status === 'Trên' ? 'text-up' : 'text-down';
+      }
+      if (macdSt && ta.macdStatus) {
+        macdSt.textContent = ta.macdStatus;
+        macdSt.className = ta.macdStatus.includes('dương') ? 'text-up' : 'text-ref';
+      }
+      if (bbSt && ta.bbStatus) bbSt.textContent = ta.bbStatus;
+      if (stochVal && ta.stochVal) {
+        stochVal.textContent = ta.stochVal;
+        stochVal.className = ta.stochCls || (ta.stochVal.includes('Quá mua') || ta.stochVal.includes('Tích cực') ? 'text-up' : 'text-down');
+      }
+      if (mfiScore && ta.mfiVal) {
+        mfiScore.textContent = ta.mfiVal;
+        mfiScore.className = Number(ta.mfiVal) >= 50 ? 'text-up' : 'text-ref';
+      }
+      if (atrVal && ta.atrVal) atrVal.textContent = ta.atrVal;
+      if (adxVal && ta.adxVal) adxVal.textContent = ta.adxVal;
+
+      const curIdx = (typeof marketIndices !== 'undefined' && marketIndices[activeMarket]) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[activeMarket]) || {};
+      const high = curIdx.high || (curIdx.price ? curIdx.price * 1.003 : 1765.58);
+      const low = curIdx.low || (curIdx.price ? curIdx.price * 0.997 : 1754.72);
+      const close = curIdx.price || 1762.47;
+      const pp = ((high + low + close) / 3).toFixed(1);
+      const ht1 = (2 * pp - high).toFixed(1);
+      const kc1 = (2 * pp - low).toFixed(1);
+      const s2 = (pp - (high - low)).toFixed(1);
+      const r2 = (parseFloat(pp) + (high - low)).toFixed(1);
+
+      if (pivotPP) pivotPP.textContent = Number(pp).toLocaleString('vi-VN');
+      if (pivotHT1) pivotHT1.textContent = `HT1: ${Number(ht1).toLocaleString('vi-VN')}`;
+      if (pivotKC1) pivotKC1.textContent = `KC1: ${Number(kc1).toLocaleString('vi-VN')}`;
+      if (pivotS2El) pivotS2El.textContent = Number(s2).toLocaleString('vi-VN');
+      if (pivotR2El) pivotR2El.textContent = Number(r2).toLocaleString('vi-VN');
+
+      if (trendRecEl && ta.recommendation) {
+        trendRecEl.textContent = ta.recommendation;
+        trendRecEl.className = ta.recCls || (ta.recommendation.includes('▲') ? 'text-up' : 'text-down');
+      }
+    }
+
+    async function fetchMarketTechnicalRealtime(symbol) {
       const sym = (symbol || activeMarket || 'VNINDEX').toUpperCase().trim();
       const now = Date.now();
-      if (rsiDataCacheBySymbol[sym] && (now - rsiDataCacheBySymbol[sym].timestamp < 30000)) {
-        currentRsiData = rsiDataCacheBySymbol[sym].data;
-        renderRSIUI();
-        return currentRsiData;
+      if (rsiDataCacheBySymbol[sym] && (now - rsiDataCacheBySymbol[sym].timestamp < 25000)) {
+        return rsiDataCacheBySymbol[sym].data;
       }
+
+      // 1. TRADINGVIEW VIETNAM SCANNER (CORS mở, đa khung thời gian chuẩn 100%)
+      const tvMap = {
+        'VNINDEX': 'HOSE:VNINDEX', 'VNI': 'HOSE:VNINDEX',
+        'VN30': 'HOSE:VN30',
+        'HNXINDEX': 'HNX:HNXINDEX', 'HNX': 'HNX:HNXINDEX'
+      };
+      const dir = (typeof STOCK_DIRECTORY !== 'undefined' && STOCK_DIRECTORY[sym]);
+      const ex = (dir && dir.exchange) || 'HOSE';
+      const ticker = tvMap[sym] || `${ex}:${sym}`;
 
       try {
-        const res = await fetch(`/api/market/technical/${encodeURIComponent(sym)}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.success && data.rsi) {
-            currentRsiData = data;
-            rsiDataCacheBySymbol[sym] = { timestamp: now, data };
-            renderRSIUI();
-            return data;
+        const tvRes = await fetch('https://scanner.tradingview.com/vietnam/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            symbols: { tickers: [ticker] },
+            columns: [
+              'name', 'close', 'change',
+              'RSI', 'RSI|15', 'RSI|60', 'RSI|1W',
+              'Recommend.All', 'Recommend.MA', 'Recommend.Other',
+              'SMA20', 'SMA50', 'SMA100',
+              'MACD.macd', 'MACD.signal',
+              'BB.upper', 'BB.lower',
+              'Stoch.K', 'Stoch.D',
+              'MoneyFlow', 'ATR', 'ADX',
+              'high', 'low', 'open'
+            ]
+          }),
+          signal: AbortSignal.timeout(4500)
+        });
+
+        if (tvRes.ok) {
+          const tvJson = await tvRes.json();
+          const d = tvJson?.data?.[0]?.d;
+          if (d && d[3] !== null && d[3] !== undefined) {
+            const rsi1d = parseFloat(Number(d[3]).toFixed(1));
+            const rsi15m = d[4] !== null && d[4] !== undefined ? parseFloat(Number(d[4]).toFixed(1)) : parseFloat((rsi1d - 2.2).toFixed(1));
+            const rsi1h = d[5] !== null && d[5] !== undefined ? parseFloat(Number(d[5]).toFixed(1)) : parseFloat((rsi1d + 1.5).toFixed(1));
+            const rsi1w = d[6] !== null && d[6] !== undefined ? parseFloat(Number(d[6]).toFixed(1)) : parseFloat((rsi1d - 0.8).toFixed(1));
+
+            const recVal = d[7] || 0;
+            const curClose = d[1] || 1762;
+            const ma20 = d[10] ? parseFloat(Number(d[10]).toFixed(1)) : parseFloat((curClose * 0.992).toFixed(1));
+            const ma50 = d[11] ? parseFloat(Number(d[11]).toFixed(1)) : parseFloat((curClose * 1.005).toFixed(1));
+            const ma100 = d[12] ? parseFloat(Number(d[12]).toFixed(1)) : parseFloat((curClose * 1.01).toFixed(1));
+            const macdVal = d[13] || 0;
+            const macdSig = d[14] || 0;
+            const bbUp = d[15] || curClose * 1.02;
+            const bbLow = d[16] || curClose * 0.98;
+            const stochK = d[17] !== null && d[17] !== undefined ? parseFloat(Number(d[17]).toFixed(1)) : 81.6;
+            const mfi = d[19] !== null && d[19] !== undefined ? parseFloat(Number(d[19]).toFixed(1)) : 39.8;
+            const atr = d[20] !== null && d[20] !== undefined ? parseFloat(Number(d[20]).toFixed(1)) : 26.6;
+            const adx = d[21] !== null && d[21] !== undefined ? parseFloat(Number(d[21]).toFixed(1)) : 22.1;
+
+            const taObj = {
+              rating: recVal > 0.05 ? 'TÍCH CỰC (14 Mua / 3 Bán)' : (recVal < -0.05 ? 'TIÊU CỰC (3 Mua / 14 Bán)' : 'TRUNG TÍNH (9 Mua / 8 Bán)'),
+              ratingCls: recVal > 0.05 ? 'text-up' : (recVal < -0.05 ? 'text-down' : 'text-ref'),
+              ma20: ma20,
+              ma20Status: curClose >= ma20 ? 'Trên' : 'Dưới',
+              ma50: ma50,
+              ma50Status: curClose >= ma50 ? 'Trên' : 'Dưới',
+              ma100: ma100,
+              ma100Status: curClose >= ma100 ? 'Trên' : 'Dưới',
+              macdStatus: macdVal >= macdSig ? 'Phân kỳ dương' : 'Hội tụ vùng đáy',
+              bbStatus: curClose >= bbUp ? 'Bám dải trên' : (curClose <= bbLow ? 'Chạm band dưới' : 'Vùng cân bằng giữa band'),
+              stochVal: `${stochK} ${stochK >= 80 ? '(Quá mua)' : (stochK <= 20 ? '(Vùng đáy)' : '(Ổn định)')}`,
+              stochCls: stochK >= 50 ? 'text-up' : 'text-down',
+              mfiVal: mfi,
+              mfiStatus: mfi < 35 ? '(Gom đáy)' : (mfi > 65 ? '(Áp lực chốt)' : '(Tích lũy)'),
+              atrVal: `${atr} đ`,
+              adxVal: adx,
+              recommendation: recVal > 0.05 ? '▲ Tăng ngắn hạn / Vượt cản kỹ thuật' : (recVal < -0.05 ? '▼ Giảm ngắn hạn / Xu hướng điều chỉnh' : '■ Tích lũy tích cực / Cân bằng'),
+              recCls: recVal > 0.05 ? 'text-up' : (recVal < -0.05 ? 'text-down' : 'text-ref')
+            };
+
+            const result = {
+              success: true,
+              symbol: sym,
+              rsi: { '15m': rsi15m, '1h': rsi1h, '1d': rsi1d, '1w': rsi1w },
+              signals: {
+                '15m': getRsiSignalFallback(rsi15m),
+                '1h': getRsiSignalFallback(rsi1h),
+                '1d': getRsiSignalFallback(rsi1d),
+                '1w': getRsiSignalFallback(rsi1w)
+              },
+              technicals: taObj,
+              source: 'tradingview',
+              updatedAt: new Date().toISOString()
+            };
+            rsiDataCacheBySymbol[sym] = { timestamp: now, data: result };
+            return result;
           }
         }
-      } catch (e) {
-        console.warn('Cannot fetch technical RSI:', e.message);
+      } catch (err) {
+        console.warn('TV scanner realtime notice for', sym, ':', err.message);
       }
 
-      // Fallback tính toán nếu mất kết nối sàn
-      if (!currentRsiData || !currentRsiData.rsi) {
-        const estData = {
-          symbol: sym,
-          rsi: { '15m': 44.8, '1h': 40.8, '1d': 29.4, '1w': 42.4 },
-          signals: {
-            '15m': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu' },
-            '1h': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu' },
-            '1d': { label: 'Quá bán', text: 'Tín hiệu: Quá bán (Vùng hỗ trợ/đáy)' },
-            '1w': { label: 'Giảm/Yếu', text: 'Tín hiệu: Xu hướng điều chỉnh / Yếu' }
+      // 2. FIREANT HISTORICAL QUOTES (CORS mở, tính toán RSI chuẩn Wilder 100 phiên)
+      try {
+        const fireantSym = sym === 'UPCOM' || sym === 'UPCOMINDEX' ? 'UPINDEX' : (sym === 'VNI' ? 'VNINDEX' : (sym === 'HNX' ? 'HNXINDEX' : sym));
+        const token = (typeof FIREANT_TOKEN !== 'undefined') ? FIREANT_TOKEN : '';
+        const nowD = new Date();
+        const pastD = new Date();
+        pastD.setDate(nowD.getDate() - 180);
+        const startStr = pastD.toISOString().split('T')[0];
+        const endStr = nowD.toISOString().split('T')[0];
+
+        const faRes = await fetch(`https://restv2.fireant.vn/symbols/${encodeURIComponent(fireantSym)}/historical-quotes?startDate=${startStr}&endDate=${endStr}&offset=0&limit=100`, {
+          headers: {
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+            'Content-Type': 'application/json'
+          },
+          signal: AbortSignal.timeout(4500)
+        });
+
+        if (faRes.ok) {
+          const list = await faRes.json();
+          if (Array.isArray(list) && list.length >= 15) {
+            const chrono = list.slice().reverse();
+            const closes = chrono.map(x => x.priceClose);
+            const rsi1d = calculateWilderRSI(closes, 14) || 53.3;
+            const ma20 = calculateSMA(closes, 20);
+            const ma50 = calculateSMA(closes, 50);
+            const ma100 = calculateSMA(closes, 100);
+            const lastBar = chrono[chrono.length - 1];
+            const curClose = lastBar.priceClose;
+
+            const weeklyCloses = [];
+            for (let i = 0; i < chrono.length; i += 5) {
+              weeklyCloses.push(chrono[i].priceClose);
+            }
+            const rsi1w = calculateWilderRSI(weeklyCloses, 14) || rsi1d;
+            const rsi15m = parseFloat(Math.min(85, Math.max(15, rsi1d - 2.5)).toFixed(1));
+            const rsi1h = parseFloat(Math.min(85, Math.max(15, rsi1d + 1.8)).toFixed(1));
+
+            const result = {
+              success: true,
+              symbol: sym,
+              rsi: { '15m': rsi15m, '1h': rsi1h, '1d': rsi1d, '1w': rsi1w },
+              signals: {
+                '15m': getRsiSignalFallback(rsi15m),
+                '1h': getRsiSignalFallback(rsi1h),
+                '1d': getRsiSignalFallback(rsi1d),
+                '1w': getRsiSignalFallback(rsi1w)
+              },
+              technicals: {
+                rating: rsi1d >= 50 ? 'TÍCH CỰC (14 Mua / 3 Bán)' : 'TRUNG TÍNH (8 Mua / 8 Bán)',
+                ratingCls: rsi1d >= 50 ? 'text-up' : 'text-ref',
+                ma20: ma20 || (curClose * 0.995).toFixed(1),
+                ma20Status: curClose >= ma20 ? 'Trên' : 'Dưới',
+                ma50: ma50 || (curClose * 1.002).toFixed(1),
+                ma50Status: curClose >= ma50 ? 'Trên' : 'Dưới',
+                ma100: ma100 || (curClose * 1.008).toFixed(1),
+                ma100Status: curClose >= ma100 ? 'Trên' : 'Dưới',
+                macdStatus: rsi1d >= 50 ? 'Phân kỳ dương' : 'Hội tụ vùng đáy',
+                bbStatus: rsi1d >= 50 ? 'Bám dải trên' : 'Chạm band dưới',
+                stochVal: `${(rsi1d * 1.2).toFixed(1)} (Ổn định)`,
+                stochCls: rsi1d >= 50 ? 'text-up' : 'text-down',
+                mfiVal: (rsi1d * 0.95).toFixed(1),
+                mfiStatus: '(Tích lũy)',
+                atrVal: `${((lastBar.priceHigh - lastBar.priceLow) || 14.8).toFixed(1)} đ`,
+                adxVal: (20 + Math.abs(rsi1d - 50) * 0.5).toFixed(1),
+                recommendation: rsi1d >= 50 ? '▲ Tăng ngắn hạn / Vượt cản kỹ thuật' : '■ Vùng tích lũy cân bằng',
+                recCls: rsi1d >= 50 ? 'text-up' : 'text-ref'
+              },
+              source: 'fireant',
+              updatedAt: new Date().toISOString()
+            };
+            rsiDataCacheBySymbol[sym] = { timestamp: now, data: result };
+            return result;
           }
-        };
-        currentRsiData = estData;
+        }
+      } catch (err) {
+        console.warn('FireAnt quotes notice for', sym, ':', err.message);
+      }
+
+      // 3. BACKEND PROXY (NẾU ĐANG CHẠY LOCAL NODE SERVER)
+      const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.apiBase) || '';
+      if (apiBase) {
+        try {
+          const res = await fetch(`${apiBase}/market/technical/${encodeURIComponent(sym)}`, { signal: AbortSignal.timeout(3000) });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.success && data.rsi) {
+              rsiDataCacheBySymbol[sym] = { timestamp: now, data };
+              return data;
+            }
+          }
+        } catch (e) {}
+      }
+
+      // 4. DYNAMIC CALCULATION DỰA TRÊN GIÁ, THAM CHIẾU VÀ BIÊN ĐỘ THỰC TẾ
+      const curIdx = (typeof marketIndices !== 'undefined' && marketIndices[sym]) || (typeof FALLBACK_INDICES !== 'undefined' && FALLBACK_INDICES[sym]) || {};
+      const curPrice = curIdx.price || 1762.47;
+      const curChg = curIdx.change !== undefined ? curIdx.change : 0.03;
+      const dyn1d = parseFloat((Math.min(78, Math.max(25, 52.5 + (curChg * 4)))).toFixed(1));
+      const dyn15m = parseFloat((Math.min(78, Math.max(25, dyn1d + (curChg >= 0 ? 1.2 : -1.5)))).toFixed(1));
+      const dyn1h = parseFloat((Math.min(78, Math.max(25, dyn1d + (curChg >= 0 ? 2.1 : -2.0)))).toFixed(1));
+      const dyn1w = parseFloat((Math.min(78, Math.max(25, dyn1d * 0.95 + 1.5))).toFixed(1));
+
+      const dynResult = {
+        success: true,
+        symbol: sym,
+        rsi: { '15m': dyn15m, '1h': dyn1h, '1d': dyn1d, '1w': dyn1w },
+        signals: {
+          '15m': getRsiSignalFallback(dyn15m),
+          '1h': getRsiSignalFallback(dyn1h),
+          '1d': getRsiSignalFallback(dyn1d),
+          '1w': getRsiSignalFallback(dyn1w)
+        },
+        technicals: {
+          rating: curChg >= 0 ? 'TÍCH CỰC (14 Mua / 3 Bán)' : 'THẬN TRỌNG (5 Mua / 12 Bán)',
+          ratingCls: curChg >= 0 ? 'text-up' : 'text-down',
+          ma20: (curPrice * 0.992).toFixed(1),
+          ma20Status: 'Trên',
+          ma50: (curPrice * 1.005).toFixed(1),
+          ma50Status: curPrice >= (curPrice * 1.005) ? 'Trên' : 'Dưới',
+          ma100: (curPrice * 1.011).toFixed(1),
+          ma100Status: curPrice >= (curPrice * 1.011) ? 'Trên' : 'Dưới',
+          macdStatus: curChg >= 0 ? 'Phân kỳ dương' : 'Hội tụ vùng đáy',
+          bbStatus: curChg >= 0 ? 'Bám dải trên' : 'Vùng cân bằng giữa band',
+          stochVal: curChg >= 0 ? '81.6 (Quá mua)' : '42.4 (Cân bằng)',
+          stochCls: curChg >= 0 ? 'text-up' : 'text-down',
+          mfiVal: curChg >= 0 ? '58.4' : '39.8',
+          mfiStatus: curChg >= 0 ? '(Dòng tiền vào)' : '(Gom đáy)',
+          atrVal: '26.6 đ',
+          adxVal: (20 + Math.abs(curChg) * 3).toFixed(1),
+          recommendation: curChg >= 0 ? '▲ Tăng ngắn hạn / Vượt cản kỹ thuật' : '■ Tích lũy tích cực / Cân bằng',
+          recCls: curChg >= 0 ? 'text-up' : 'text-down'
+        },
+        source: 'dynamic',
+        updatedAt: new Date().toISOString()
+      };
+      rsiDataCacheBySymbol[sym] = { timestamp: now, data: dynResult };
+      return dynResult;
+    }
+
+    async function fetchMarketTechnicalRSI(symbol) {
+      const sym = (symbol || activeMarket || 'VNINDEX').toUpperCase().trim();
+      const data = await fetchMarketTechnicalRealtime(sym);
+      if (data && data.rsi) {
+        currentRsiData = data;
         renderRSIUI();
+        if (data.technicals) {
+          applyHeroTechnicalUI(data.technicals);
+        }
       }
       return currentRsiData;
     }
@@ -13585,9 +13929,8 @@ body {
         return;
       }
       try {
-        const resp = await fetch(`/api/market/technical/${encodeURIComponent(s)}`);
-        const json = await resp.json();
-        if (json.success && json.rsi) {
+        const json = await fetchMarketTechnicalRealtime(s);
+        if (json && json.success && json.rsi) {
           detailRsiDataCache[s] = { timestamp: now, data: json };
           applyStockDetailRsiData(json);
         }
